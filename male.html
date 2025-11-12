@@ -92,7 +92,7 @@
         <input type="text" id="telegram" placeholder="@username" required>
 
         <h3>Qirat Schedules</h3>
-        <p>Select any days of the week and enter the Qirat name. Add multiple schedules as needed.</p>
+        <p>SELECT DAYS OF THE WEEK YOU ARE FOLLOWING QIRAT</p>
 
         <div id="schedules">
             <!-- first schedule -->
@@ -107,11 +107,11 @@
                     <label><input type="checkbox" class="day-check" value="Sunday"><span>Sunday</span></label>
                 </div>
                 <label>Qirat Name</label>
-                <input type="text" class="qirat_name" placeholder="e.g. Surah Al-Fatiha" required>
+                <input type="text" class="qirat_name" placeholder="e.g. Shuja, Quran or other" required>
             </div>
         </div>
 
-        <button type="button" id="add-schedule">+ Add Another Schedule</button>
+        <button type="button" id="add-schedule">+ I have another schedule</button>
 
         <button type="submit">Submit Registration</button>
     </form>
@@ -225,7 +225,7 @@ Submitted on ${new Date().toLocaleString()}
 
     const allOk = results.every(r => r.ok);
     if (allOk) {
-        status.textContent = 'Registration sent to all organizers!';
+        status.textContent = '👍REGISTRATION SUCCESFUL!';
         status.className = 'success';
         document.getElementById('qiratForm').reset();
         document.getElementById('schedules').innerHTML = `
