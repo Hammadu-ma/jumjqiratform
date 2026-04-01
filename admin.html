@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>نور التلاوة | Qirat Admin Dashboard - Advanced Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #10b981;
+            --primary-dark: #059669;
+            --secondary: #6366f1;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --dark: #1f2937;
+            --light: #f9fafb;
+            --gray: #6b7280;
+            --border: #e5e7eb;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f2b22 0%, #1a4a35 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .dashboard {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 24px;
+            padding: 24px 32px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, #10b981, #6366f1);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo p {
+            color: var(--gray);
+            font-size: 0.85rem;
+            margin-top: 4px;
+        }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 12px 28px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .stat-card:first-child {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+
+        .stat-card .number {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .stat-card .label {
+            font-size: 0.75rem;
+            opacity: 0.9;
+        }
+
+        .export-bar {
+            background: white;
+            border-radius: 20px;
+            padding: 20px 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            font-family: inherit;
+        }
+
+        .btn-primary { background: #10b981; color: white; }
+        .btn-primary:hover { background: #059669; transform: translateY(-2px); }
+        .btn-secondary { background: #6366f1; color: white; }
+        .btn-secondary:hover { background: #4f46e5; transform: translateY(-2px); }
+        .btn-danger { background: #ef4444; color: white; }
+        .btn-danger:hover { background: #dc2626; transform: translateY(-2px); }
+        .btn-warning { background: #f59e0b; color: white; }
+        .btn-warning:hover { background: #d97706; transform: translateY(-2px); }
+        .btn-outline { background: transparent; border: 2px solid #10b981; color: #10b981; }
+        .btn-outline:hover { background: #10b981; color: white; }
+        .btn-info { background: #3b82f6; color: white; }
+        .btn-info:hover { background: #2563eb; transform: translateY(-2px); }
+
+        .filters {
+            background: white;
+            border-radius: 20px;
+            padding: 20px 24px;
+            margin-bottom: 24px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 160px;
+        }
+
+        .filter-group label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--gray);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-group input, .filter-group select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 0.9rem;
+        }
+
+        .filter-group input:focus, .filter-group select:focus {
+            outline: none;
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .clear-filters {
+            background: #6b7280;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .clear-filters:hover {
+            background: #4b5563;
+        }
+
+        .filter-badge {
+            background: #e5e7eb;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            color: #374151;
+        }
+
+        .active-filters {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            max-height: 65vh;
+            overflow-y: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: #f8fafc;
+            font-weight: 600;
+            color: var(--dark);
+            cursor: pointer;
+            user-select: none;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        th:hover {
+            background: #f1f5f9;
+        }
+
+        tr:hover {
+            background: #fef9e3;
+        }
+
+        .schedule-cell {
+            max-width: 320px;
+            font-size: 0.8rem;
+        }
+
+        .schedule-item {
+            background: #f3f4f6;
+            padding: 6px 10px;
+            border-radius: 10px;
+            margin: 4px 0;
+            border-left: 3px solid #10b981;
+        }
+
+        .badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .badge-info {
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: var(--gray);
+        }
+
+        .spinner {
+            border: 3px solid var(--border);
+            border-top-color: #10b981;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 28px;
+            padding: 32px;
+            max-width: 550px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .modal-header h3 {
+            font-size: 1.4rem;
+            color: #10b981;
+        }
+
+        .close-modal {
+            cursor: pointer;
+            font-size: 28px;
+            color: var(--gray);
+            transition: all 0.2s;
+        }
+        .close-modal:hover {
+            color: var(--danger);
+        }
+
+        .detail-row {
+            margin-bottom: 18px;
+            padding: 12px;
+            background: #f9fafb;
+            border-radius: 16px;
+        }
+
+        .detail-label {
+            font-weight: 700;
+            color: #10b981;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .detail-value {
+            font-size: 1rem;
+            color: var(--dark);
+            word-break: break-word;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 6px 10px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .icon-btn.view:hover {
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+        .icon-btn.delete:hover {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #1f2937;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            z-index: 1100;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .delete-all-btn {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        .delete-all-btn:hover {
+            background: #b91c1c;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                text-align: center;
+            }
+            .export-bar {
+                flex-direction: column;
+            }
+            .filters {
+                flex-direction: column;
+            }
+            .filter-group {
+                width: 100%;
+            }
+            th, td {
+                padding: 10px 12px;
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="header">
+            <div class="logo">
+                <h1><i class="fas fa-quran"></i> نور التلاوة | Admin Dashboard</h1>
+                <p>Advanced Registration Management | Multi-filter Export System</p>
+            </div>
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="number" id="totalCount">0</div>
+                    <div class="label">Total Registrations</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number" id="filteredCount">0</div>
+                    <div class="label">Filtered Results</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number" id="todayCount">0</div>
+                    <div class="label">Today's Registrations</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="export-bar">
+            <div class="export-buttons">
+                <button class="btn btn-primary" id="exportExcelBtn">
+                    <i class="fas fa-file-excel"></i> Export Filtered to Excel
+                </button>
+                <button class="btn btn-secondary" id="exportCSVBtn">
+                    <i class="fas fa-file-csv"></i> Export Filtered to CSV
+                </button>
+                <button class="btn btn-danger" id="exportPDFBtn">
+                    <i class="fas fa-file-pdf"></i> Export Filtered to PDF
+                </button>
+                <button class="btn btn-warning" id="exportWordBtn">
+                    <i class="fas fa-file-word"></i> Export Filtered to Word
+                </button>
+                <button class="btn btn-outline" id="copyBtn">
+                    <i class="fas fa-copy"></i> Copy Filtered Data
+                </button>
+            </div>
+            <div>
+                <button class="delete-all-btn" id="deleteAllBtn">
+                    <i class="fas fa-trash-alt"></i> Delete All Filtered
+                </button>
+                <button class="btn btn-primary" id="refreshBtn" style="margin-left: 10px;">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+        </div>
+
+        <div class="filters">
+            <div class="filter-group">
+                <label><i class="fas fa-search"></i> Search Name/Phone/Telegram</label>
+                <input type="text" id="searchInput" placeholder="Type to search...">
+            </div>
+            <div class="filter-group">
+                <label><i class="fas fa-building"></i> Department</label>
+                <select id="deptFilter">
+                    <option value="">All Departments</option>
+                    <option value="Medicine">Medicine (طب)</option>
+                    <option value="Pharmacy">Pharmacy (صيدلة)</option>
+                    <option value="Nursing">Nursing (تمريض)</option>
+                    <option value="Dentistry">Dentistry (طب الأسنان)</option>
+                    <option value="Public Health">Public Health (صحة عامة)</option>
+                    <option value="Medical Laboratory">Medical Laboratory (مختبرات طبية)</option>
+                    <option value="Radiology">Radiology (الأشعة)</option>
+                    <option value="Physiotherapy">Physiotherapy (علاج طبيعي)</option>
+                    <option value="Health Informatics">Health Informatics (معلوماتية صحية)</option>
+                    <option value="Other">Other (أخرى)</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label><i class="fas fa-graduation-cap"></i> Batch</label>
+                <select id="batchFilter">
+                    <option value="">All Batches</option>
+                    <option value="2012">2012</option><option value="2013">2013</option><option value="2014">2014</option>
+                    <option value="2015">2015</option><option value="2016">2016</option><option value="2017">2017</option>
+                    <option value="2018">2018</option><option value="2019">2019</option><option value="2020">2020</option>
+                    <option value="2021">2021</option><option value="2022">2022</option><option value="2023">2023</option>
+                    <option value="2024">2024</option><option value="2025">2025</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label><i class="fas fa-calendar"></i> From Date</label>
+                <input type="date" id="dateFrom">
+            </div>
+            <div class="filter-group">
+                <label><i class="fas fa-calendar"></i> To Date</label>
+                <input type="date" id="dateTo">
+            </div>
+            <div class="filter-group">
+                <label><i class="fas fa-sort"></i> Sort By</label>
+                <select id="sortBy">
+                    <option value="date_desc">📅 Latest First</option>
+                    <option value="date_asc">📅 Oldest First</option>
+                    <option value="name_asc">🔤 Name A-Z</option>
+                    <option value="name_desc">🔤 Name Z-A</option>
+                </select>
+            </div>
+            <div class="filter-actions">
+                <button class="clear-filters" id="clearFiltersBtn">
+                    <i class="fas fa-eraser"></i> Clear All Filters
+                </button>
+            </div>
+        </div>
+
+        <div id="activeFiltersDisplay" class="active-filters" style="margin: 0 0 16px 0; background: white; border-radius: 16px; padding: 12px 20px;"></div>
+
+        <div class="table-container">
+            <div class="table-wrapper">
+                <table id="dataTable">
+                    <thead>
+                        <tr>
+                            <th onclick="sortTable('full_name')">Name <i class="fas fa-sort"></i></th>
+                            <th onclick="sortTable('phone')">Phone</th>
+                            <th>Telegram</th>
+                            <th onclick="sortTable('department')">Department <i class="fas fa-sort"></i></th>
+                            <th onclick="sortTable('batch')">Batch <i class="fas fa-sort"></i></th>
+                            <th>Schedules</th>
+                            <th onclick="sortTable('timestamp')">Date Registered <i class="fas fa-sort"></i></th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <tr><td colspan="8" class="loading"><div class="spinner"></div>Loading registrations from Firebase...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-star-and-crescent"></i> Registration Details</h3>
+                <span class="close-modal" onclick="closeModal()">&times;</span>
+            </div>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, deleteDoc, doc, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyAR_g5y04YAGCrTvZCowrE7hw8h7k1du08",
+            authDomain: "jujm-qirat.firebaseapp.com",
+            projectId: "jujm-qirat",
+            storageBucket: "jujm-qirat.firebasestorage.app",
+            messagingSenderId: "253413984903",
+            appId: "1:253413984903:web:c1577e0fdef1711f960622"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        
+        let allRegistrations = [];
+        let filteredRegistrations = [];
+        
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.innerHTML = `<i class="fas ${isError ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i> ${message}`;
+            toast.style.background = isError ? '#dc2626' : '#10b981';
+            toast.style.display = 'flex';
+            setTimeout(() => { toast.style.display = 'none'; }, 3000);
+        }
+        
+        async function loadData() {
+            try {
+                const querySnapshot = await getDocs(collection(db, "registrations"));
+                allRegistrations = [];
+                querySnapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    let timestamp = data.timestamp;
+                    if (timestamp && typeof timestamp.toDate === 'function') timestamp = timestamp.toDate();
+                    else if (timestamp) timestamp = new Date(timestamp);
+                    else timestamp = new Date();
+                    
+                    allRegistrations.push({
+                        id: docSnap.id,
+                        full_name: data.full_name || 'N/A',
+                        phone: data.phone || 'N/A',
+                        telegram: data.telegram || 'N/A',
+                        department: data.department || 'N/A',
+                        batch: data.batch || 'N/A',
+                        schedules: data.schedules || [],
+                        timestamp: timestamp
+                    });
+                });
+                applyFilters();
+                updateStats();
+                showToast(`Loaded ${allRegistrations.length} registrations`);
+            } catch (error) {
+                console.error("Error loading:", error);
+                document.getElementById('tableBody').innerHTML = `<tr><td colspan="8" style="text-align:center;color:red;"><i class="fas fa-exclamation-triangle"></i> Error: ${error.message}<br>Make sure you're running this on a live server with proper Firebase permissions</td></tr>`;
+            }
+        }
+        
+        function updateStats() {
+            document.getElementById('totalCount').textContent = allRegistrations.length;
+            document.getElementById('filteredCount').textContent = filteredRegistrations.length;
+            const today = new Date().toDateString();
+            const todayCount = allRegistrations.filter(r => r.timestamp.toDateString() === today).length;
+            document.getElementById('todayCount').textContent = todayCount;
+        }
+        
+        function applyFilters() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const dept = document.getElementById('deptFilter').value;
+            const batch = document.getElementById('batchFilter').value;
+            const dateFrom = document.getElementById('dateFrom').value;
+            const dateTo = document.getElementById('dateTo').value;
+            const sortBy = document.getElementById('sortBy').value;
+            
+            let filtered = [...allRegistrations];
+            
+            if (search) {
+                filtered = filtered.filter(r => 
+                    (r.full_name || '').toLowerCase().includes(search) ||
+                    (r.phone || '').toLowerCase().includes(search) ||
+                    (r.telegram || '').toLowerCase().includes(search)
+                );
+            }
+            if (dept) filtered = filtered.filter(r => r.department === dept);
+            if (batch) filtered = filtered.filter(r => r.batch === batch);
+            if (dateFrom) filtered = filtered.filter(r => r.timestamp >= new Date(dateFrom));
+            if (dateTo) filtered = filtered.filter(r => r.timestamp <= new Date(dateTo + "T23:59:59"));
+            
+            switch(sortBy) {
+                case 'date_asc': filtered.sort((a, b) => a.timestamp - b.timestamp); break;
+                case 'name_asc': filtered.sort((a, b) => (a.full_name || '').localeCompare(b.full_name || '')); break;
+                case 'name_desc': filtered.sort((a, b) => (b.full_name || '').localeCompare(a.full_name || '')); break;
+                default: filtered.sort((a, b) => b.timestamp - a.timestamp);
+            }
+            
+            filteredRegistrations = filtered;
+            renderTable();
+            updateActiveFiltersDisplay();
+            updateStats();
+        }
+        
+        function updateActiveFiltersDisplay() {
+            const container = document.getElementById('activeFiltersDisplay');
+            const search = document.getElementById('searchInput').value;
+            const dept = document.getElementById('deptFilter').value;
+            const batch = document.getElementById('batchFilter').value;
+            const dateFrom = document.getElementById('dateFrom').value;
+            const dateTo = document.getElementById('dateTo').value;
+            
+            const activeFilters = [];
+            if (search) activeFilters.push(`<span class="filter-badge"><i class="fas fa-search"></i> "${search}"</span>`);
+            if (dept) activeFilters.push(`<span class="filter-badge"><i class="fas fa-building"></i> ${dept}</span>`);
+            if (batch) activeFilters.push(`<span class="filter-badge"><i class="fas fa-graduation-cap"></i> Batch ${batch}</span>`);
+            if (dateFrom) activeFilters.push(`<span class="filter-badge"><i class="fas fa-calendar"></i> From: ${dateFrom}</span>`);
+            if (dateTo) activeFilters.push(`<span class="filter-badge"><i class="fas fa-calendar"></i> To: ${dateTo}</span>`);
+            
+            if (activeFilters.length > 0) {
+                container.innerHTML = `<strong><i class="fas fa-filter"></i> Active Filters:</strong> ${activeFilters.join(' ')} &nbsp;|&nbsp; <strong>Results:</strong> ${filteredRegistrations.length} registrations`;
+            } else {
+                container.innerHTML = `<i class="fas fa-info-circle"></i> No active filters. Showing all ${allRegistrations.length} registrations.`;
+            }
+        }
+        
+        function renderSchedules(schedules) {
+            if (!schedules || schedules.length === 0) return '<span class="badge badge-info">No schedules</span>';
+            return schedules.map(s => `
+                <div class="schedule-item">
+                    <i class="fas fa-calendar-day"></i> ${s.days?.join(', ') || 'No days'}<br>
+                    <i class="fas fa-book-quran"></i> ${escapeHtml(s.qirat_name || s.qirat || 'N/A')}<br>
+                    <i class="fas fa-clock"></i> ${escapeHtml(s.time_preference || s.time || 'N/A')}
+                </div>
+            `).join('');
+        }
+        
+        function formatDate(date) {
+            if (!date) return 'N/A';
+            return date.toLocaleString();
+        }
+        
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+        
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            if (filteredRegistrations.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 40px;"><i class="fas fa-inbox"></i> No registrations found</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = filteredRegistrations.map(reg => `
+                <tr>
+                    <td><strong>${escapeHtml(reg.full_name)}</strong></td>
+                    <td>${escapeHtml(reg.phone)}</td>
+                    <td>@${escapeHtml(reg.telegram)}</td>
+                    <td><span class="badge badge-info">${escapeHtml(reg.department)}</span></td>
+                    <td><span class="badge" style="background:#e5e7eb;">${escapeHtml(reg.batch)}</span></td>
+                    <td class="schedule-cell">${renderSchedules(reg.schedules)}</td>
+                    <td>${formatDate(reg.timestamp)}</td>
+                    <td class="action-buttons">
+                        <button class="icon-btn view" onclick="window.viewDetails('${reg.id}')" title="View Details"><i class="fas fa-eye"></i></button>
+                        <button class="icon-btn delete" onclick="window.deleteSingle('${reg.id}')" title="Delete"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        window.viewDetails = function(id) {
+            const reg = allRegistrations.find(r => r.id === id);
+            if (!reg) return;
+            const modalBody = document.getElementById('modalBody');
+            modalBody.innerHTML = `
+                <div class="detail-row"><div class="detail-label"><i class="fas fa-user"></i> Full Name</div><div class="detail-value">${escapeHtml(reg.full_name)}</div></div>
+                <div class="detail-row"><div class="detail-label"><i class="fas fa-phone"></i> Phone</div><div class="detail-value">${escapeHtml(reg.phone)}</div></div>
+                <div class="detail-row"><div class="detail-label"><i class="fab fa-telegram"></i> Telegram</div><div class="detail-value">@${escapeHtml(reg.telegram)}</div></div>
+                <div class="detail-row"><div class="detail-label"><i class="fas fa-building"></i> Department & Batch</div><div class="detail-value">${escapeHtml(reg.department)} | ${escapeHtml(reg.batch)}</div></div>
+                <div class="detail-row"><div class="detail-label"><i class="fas fa-calendar"></i> Registered</div><div class="detail-value">${formatDate(reg.timestamp)}</div></div>
+                <div class="detail-row"><div class="detail-label"><i class="fas fa-list"></i> Qirat Schedules</div><div class="detail-value">${renderSchedules(reg.schedules)}</div></div>
+            `;
+            document.getElementById('modal').style.display = 'flex';
+        };
+        
+        window.closeModal = function() { document.getElementById('modal').style.display = 'none'; };
+        
+        window.deleteSingle = async function(id) {
+            if (confirm('Delete this registration?')) {
+                try {
+                    await deleteDoc(doc(db, "registrations", id));
+                    showToast('Registration deleted');
+                    await loadData();
+                } catch (error) { showToast('Error: ' + error.message, true); }
+            }
+        };
+        
+        function getExportData() {
+            return filteredRegistrations.map(reg => ({
+                'Full Name': reg.full_name,
+                'Phone': reg.phone,
+                'Telegram': '@' + reg.telegram,
+                'Department': reg.department,
+                'Batch': reg.batch,
+                'Schedules': reg.schedules?.map(s => `${s.days?.join(',')} | ${s.qirat_name || s.qirat} | ${s.time_preference || s.time}`).join(' ; ') || '',
+                'Registration Date': formatDate(reg.timestamp)
+            }));
+        }
+        
+        function exportToExcel() {
+            if (filteredRegistrations.length === 0) { showToast('No data to export', true); return; }
+            const ws = XLSX.utils.json_to_sheet(getExportData());
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Filtered Qirat Registrations');
+            XLSX.writeFile(wb, `qirat_filtered_${new Date().toISOString().slice(0,19)}.xlsx`);
+            showToast(`Exported ${filteredRegistrations.length} records to Excel`);
+        }
+        
+        function exportToCSV() {
+            if (filteredRegistrations.length === 0) { showToast('No data to export', true); return; }
+            const ws = XLSX.utils.json_to_sheet(getExportData());
+            const csv = XLSX.utils.sheet_to_csv(ws);
+            const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `qirat_filtered_${new Date().toISOString().slice(0,19)}.csv`;
+            link.click();
+            URL.revokeObjectURL(link.href);
+            showToast(`Exported ${filteredRegistrations.length} records to CSV`);
+        }
+        
+        function exportToPDF() {
+            if (filteredRegistrations.length === 0) { showToast('No data to export', true); return; }
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'landscape' });
+            const tableData = filteredRegistrations.map(reg => [
+                reg.full_name, reg.phone, '@' + reg.telegram, reg.department, reg.batch,
+                reg.schedules?.map(s => `${s.days?.join(',')} | ${s.qirat_name || s.qirat}`).join('; ') || '',
+                formatDate(reg.timestamp)
+            ]);
+            doc.autoTable({
+                head: [['Name', 'Phone', 'Telegram', 'Dept', 'Batch', 'Schedules', 'Date']],
+                body: tableData,
+                theme: 'striped',
+                headStyles: { fillColor: [16, 185, 129] },
+                margin: { top: 20 }
+            });
+            doc.setFontSize(18);
+            doc.text(`Qirat Registrations (Filtered: ${filteredRegistrations.length} records)`, 14, 15);
+            doc.save(`qirat_filtered_${new Date().toISOString().slice(0,19)}.pdf`);
+            showToast(`Exported ${filteredRegistrations.length} records to PDF`);
+        }
+        
+        function exportToWord() {
+            if (filteredRegistrations.length === 0) { showToast('No data to export', true); return; }
+            let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Qirat Filtered Report</title><style>body{font-family:Arial;}table{border-collapse:collapse;width:100%;}th,td{border:1px solid #ddd;padding:8px;}th{background:#10b981;color:white;}</style></head><body>
+            <h1>Qirat Registrations - Filtered Report</h1><p>Filtered Results: ${filteredRegistrations.length} | Generated: ${new Date().toLocaleString()}</p>
+            <table><thead><tr><th>Name</th><th>Phone</th><th>Telegram</th><th>Dept</th><th>Batch</th><th>Schedules</th><th>Date</th></tr></thead><tbody>
+            ${filteredRegistrations.map(reg => `<tr><td>${escapeHtml(reg.full_name)}</td><td>${escapeHtml(reg.phone)}</td><td>@${escapeHtml(reg.telegram)}</td><td>${escapeHtml(reg.department)}</td><td>${escapeHtml(reg.batch)}</td><td>${reg.schedules?.map(s => `${s.days?.join(',')} | ${s.qirat_name || s.qirat}`).join('; ')}</td><td>${formatDate(reg.timestamp)}</td></tr>`).join('')}
+            </tbody></table></body></html>`;
+            const blob = new Blob([html], { type: 'application/msword' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `qirat_filtered_${new Date().toISOString().slice(0,19)}.doc`;
+            link.click();
+            URL.revokeObjectURL(link.href);
+            showToast(`Exported ${filteredRegistrations.length} records to Word`);
+        }
+        
+        function copyToClipboard() {
+            if (filteredRegistrations.length === 0) { showToast('No data to copy', true); return; }
+            const data = getExportData();
+            const headers = Object.keys(data[0]).join('\t');
+            const rows = data.map(row => Object.values(row).join('\t')).join('\n');
+            navigator.clipboard.writeText(headers + '\n' + rows).then(() => showToast(`Copied ${filteredRegistrations.length} records to clipboard!`));
+        }
+        
+        function clearAllFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('deptFilter').value = '';
+            document.getElementById('batchFilter').value = '';
+            document.getElementById('dateFrom').value = '';
+            document.getElementById('dateTo').value = '';
+            document.getElementById('sortBy').value = 'date_desc';
+            applyFilters();
+        }
+        
+        async function deleteAllFiltered() {
+            if (filteredRegistrations.length === 0) { showToast('No records to delete', true); return; }
+            if (confirm(`⚠️ Delete ALL ${filteredRegistrations.length} filtered registrations? This cannot be undone!`)) {
+                try {
+                    const batch = writeBatch(db);
+                    filteredRegistrations.forEach(reg => batch.delete(doc(db, "registrations", reg.id)));
+                    await batch.commit();
+                    showToast(`Deleted ${filteredRegistrations.length} registrations`);
+                    await loadData();
+                } catch (error) { showToast('Error: ' + error.message, true); }
+            }
+        }
+        
+        function sortTable(column) {
+            const sorted = [...filteredRegistrations];
+            sorted.sort((a, b) => {
+                let valA = a[column] || '', valB = b[column] || '';
+                if (column === 'timestamp') { valA = a.timestamp; valB = b.timestamp; }
+                if (valA < valB) return -1;
+                if (valA > valB) return 1;
+                return 0;
+            });
+            filteredRegistrations = sorted;
+            renderTable();
+        }
+        
+        // Event Listeners
+        document.getElementById('searchInput').addEventListener('input', applyFilters);
+        document.getElementById('deptFilter').addEventListener('change', applyFilters);
+        document.getElementById('batchFilter').addEventListener('change', applyFilters);
+        document.getElementById('dateFrom').addEventListener('change', applyFilters);
+        document.getElementById('dateTo').addEventListener('change', applyFilters);
+        document.getElementById('sortBy').addEventListener('change', applyFilters);
+        document.getElementById('clearFiltersBtn').addEventListener('click', clearAllFilters);
+        document.getElementById('exportExcelBtn').addEventListener('click', exportToExcel);
+        document.getElementById('exportCSVBtn').addEventListener('click', exportToCSV);
+        document.getElementById('exportPDFBtn').addEventListener('click', exportToPDF);
+        document.getElementById('exportWordBtn').addEventListener('click', exportToWord);
+        document.getElementById('copyBtn').addEventListener('click', copyToClipboard);
+        document.getElementById('deleteAllBtn').addEventListener('click', deleteAllFiltered);
+        document.getElementById('refreshBtn').addEventListener('click', () => loadData());
+        
+        window.sortTable = sortTable;
+        window.applyFilters = applyFilters;
+        
+        loadData();
+    </script>
+</body>
+</html>
