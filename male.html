@@ -2,265 +2,764 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Qirat Registration – Brothers</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Qirat Registration | Modern Islamic Platform</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        :root { 
-            --primary: #4a90e2; 
-            --accent: #7ed321; 
-            --light: #f9f9f9; 
-            --dark: #333; 
-            --warning: #ff9800;
-            --success: #4caf50;
-            --error: #f44336;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg-gradient-start: #667eea;
+            --bg-gradient-end: #764ba2;
+            --card-bg: rgba(255, 255, 255, 0.98);
+            --text-primary: #1f2937;
+            --text-secondary: #4b5563;
+            --border-color: #e5e7eb;
+            --input-bg: #ffffff;
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #818cf8;
+            --accent: #10b981;
+            --accent-dark: #059669;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body.dark {
+            --card-bg: rgba(31, 41, 55, 0.98);
+            --text-primary: #f9fafb;
+            --text-secondary: #d1d5db;
+            --border-color: #374151;
+            --input-bg: #1f2937;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
-            display: flex; justify-content: center; align-items: center;
-            min-height: 100vh; padding: 20px;
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            transition: var(--transition);
+            position: relative;
         }
+
+        /* Glassmorphism Container */
         .form-container {
-            background: #fff; border-radius: 20px;
-            box-shadow: 0 8px 30px rgba(0,0,0,.15);
-            padding: 40px; max-width: 700px; width: 100%;
-            animation: fadeIn 0.5s ease-in-out;
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 2rem;
+            box-shadow: var(--shadow-xl);
+            padding: 2rem;
+            transition: var(--transition);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        h2 { 
-            text-align: center; color: var(--primary); margin-bottom: 30px; 
-            font-size: 28px; text-shadow: 1px 1px 2px rgba(0,0,0,.1);
+
+        /* Header with theme toggle */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
-        h3 { color: var(--primary); margin: 30px 0 15px; font-size: 20px; }
-        label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--dark); }
-        input[type=text], select {
-            width: 100%; padding: 12px; margin-bottom: 20px;
-            border: 1px solid #ddd; border-radius: 8px; font-size: 16px;
-            transition: border .3s, box-shadow .3s;
+
+        h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
         }
-        input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 8px rgba(74,144,226,.3); outline: none; }
+
+        .theme-toggle {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 3rem;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: var(--transition);
+            color: var(--text-primary);
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-md);
+        }
+
+        .subhead {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Form Groups */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        label i {
+            color: var(--primary);
+            width: 1.25rem;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 1rem;
+            font-size: 1rem;
+            transition: var(--transition);
+            background: var(--input-bg);
+            color: var(--text-primary);
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        /* Schedule Cards */
         .schedule-group {
-            background: var(--light); border: 1px solid #ddd; border-radius: 12px;
-            padding: 20px; margin-bottom: 20px; transition: transform .2s, box-shadow .2s;
+            background: rgba(99, 102, 241, 0.05);
+            border: 2px solid var(--border-color);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: var(--transition);
+            position: relative;
         }
-        .schedule-group:hover { transform: translateY(-5px); box-shadow: 0 4px 15px rgba(0,0,0,.1); }
+
+        .schedule-group:hover {
+            border-color: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .schedule-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+        }
+
+        .schedule-badge {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 0.25rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .btn-remove {
+            background: rgba(239, 68, 68, 0.1);
+            border: none;
+            color: var(--danger);
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 500;
+            transition: var(--transition);
+            width: auto;
+            margin: 0;
+        }
+
+        .btn-remove:hover {
+            background: var(--danger);
+            color: white;
+            transform: scale(1.02);
+        }
+
+        /* Days Selector Grid */
         .days-selector {
-            display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
         }
+
         .days-selector label {
-            flex: 1 1 auto; display: flex; align-items: center; cursor: pointer;
-            background: #fff; border: 1px solid #ddd; border-radius: 8px;
-            padding: 8px 12px; transition: background .3s, border .3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            background: var(--input-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 2rem;
+            padding: 0.625rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+            margin: 0;
         }
-        .days-selector input[type=checkbox] { margin-right: 8px; }
-        .days-selector label:hover { background: rgba(74,144,226,.1); border-color: var(--primary); }
-        .days-selector input:checked + span { color: var(--primary); font-weight: bold; }
-        button {
-            background: var(--primary); color: #fff; border: none; border-radius: 8px;
-            padding: 12px 20px; font-size: 16px; cursor: pointer;
-            transition: background .3s, transform .2s;
-            display: block; width: 100%; margin-top: 10px;
+
+        .days-selector label:hover {
+            border-color: var(--primary);
+            transform: translateY(-1px);
         }
-        button:hover { background: #357abd; transform: scale(1.02); }
-        #add-schedule {
-            background: var(--accent); width: auto; padding: 10px 20px;
-            font-size: 14px; margin-bottom: 20px; display: inline-block;
+
+        .days-selector input[type="checkbox"] {
+            width: 1rem;
+            height: 1rem;
+            margin: 0;
         }
-        #add-schedule:hover { background: #6ab21c; }
-        #status { margin-top: 15px; text-align: center; font-weight: 600; padding: 10px; border-radius: 8px; }
-        .success { background: rgba(76,175,80,.1); color: var(--success); }
-        .error { background: rgba(244,67,54,.1); color: var(--error); }
-        @media(max-width:480px) {
-            .form-container { padding: 20px; }
-            .days-selector { flex-direction: column; }
+
+        .days-selector input:checked + span {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        /* Two Column Layout for Qirat & Time */
+        .schedule-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        @media (max-width: 640px) {
+            .schedule-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-secondary {
+            background: rgba(16, 185, 129, 0.1);
+            border: 2px solid var(--accent);
+            color: var(--accent);
+            padding: 0.75rem 1.5rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .btn-secondary:hover {
+            background: var(--accent);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        /* Status Messages */
+        #status {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border-radius: 1rem;
+            font-weight: 500;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .success {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent);
+            border-left: 4px solid var(--accent);
+        }
+
+        .error {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+            border-left: 4px solid var(--danger);
+        }
+
+        .loading {
+            background: rgba(99, 102, 241, 0.15);
+            color: var(--primary);
+        }
+
+        /* Animations */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .schedule-group {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        /* Floating Particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float 20s infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-100px) rotate(180deg);
+            }
+        }
+
+        /* Character Counter */
+        .char-counter {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-align: right;
+            margin-top: 0.25rem;
+        }
+
+        /* Required Field Indicator */
+        .required::after {
+            content: "*";
+            color: var(--danger);
+            margin-left: 0.25rem;
         }
     </style>
 </head>
 <body>
-<div class="form-container">
-    <h2>Qirat Registration – Brothers</h2>
-
-    <form id="qiratForm">
-        <label for="full_name">Full Name</label>
-        <input type="text" id="full_name" required>
-
-        <label for="phone">Phone Number</label>
-        <input type="text" id="phone" required>
-
-        <label for="telegram">Telegram Username</label>
-        <input type="text" id="telegram" placeholder="@username" required>
-
-        <h3>Qirat Schedules</h3>
-        <p>Select days once for a single qirat only, if you have more than one qirat per week, ADD another schedule!</p>
-
-        <div id="schedules">
-            <!-- first schedule -->
-            <div class="schedule-group">
-                <div class="days-selector">
-                    <label><input type="checkbox" class="day-check" value="Monday"><span>Monday</span></label>
-                    <label><input type="checkbox" class="day-check" value="Tuesday"><span>Tuesday</span></label>
-                    <label><input type="checkbox" class="day-check" value="Wednesday"><span>Wednesday</span></label>
-                    <label><input type="checkbox" class="day-check" value="Thursday"><span>Thursday</span></label>
-                    <label><input type="checkbox" class="day-check" value="Friday"><span>Friday</span></label>
-                    <label><input type="checkbox" class="day-check" value="Saturday"><span>Saturday</span></label>
-                    <label><input type="checkbox" class="day-check" value="Sunday"><span>Sunday</span></label>
-                </div>
-                <label>Qirat Name</label>
-                <input type="text" class="qirat_name" placeholder="e.g. Shuja, Quran or other" required>
-                <label>When?</label>
-                <input type="text" class="time_preference" placeholder="magrib - isha, or after subhi or .." >
-            </div>
+    <div class="particles" id="particles"></div>
+    
+    <div class="form-container">
+        <div class="header">
+            <h2>
+                <i class="fas fa-quran"></i>
+                Qirat Registration – Brothers
+            </h2>
+            <button class="theme-toggle" id="themeToggle">
+                <i class="fas fa-moon"></i> Dark Mode
+            </button>
+        </div>
+        
+        <div class="subhead">
+            <i class="fas fa-mosque"></i>
+            <span>Join our Qirat circle | Recite, Reflect, Inspire</span>
         </div>
 
-        <button type="button" id="add-schedule">+ I have Additional schedule</button>
+        <form id="qiratForm">
+            <div class="form-group">
+                <label class="required">
+                    <i class="fas fa-user"></i>
+                    Full Name
+                </label>
+                <input type="text" id="full_name" placeholder="Enter your full name" required>
+                <div class="char-counter"><span id="nameCount">0</span>/50 characters</div>
+            </div>
 
-        <button type="submit">Submit Registration</button>
-    </form>
+            <div class="form-group">
+                <label class="required">
+                    <i class="fas fa-phone-alt"></i>
+                    Phone Number
+                </label>
+                <input type="text" id="phone" placeholder="+1234567890" required>
+            </div>
 
-    <div id="status"></div>
-</div>
+            <div class="form-group">
+                <label class="required">
+                    <i class="fab fa-telegram"></i>
+                    Telegram Username
+                </label>
+                <input type="text" id="telegram" placeholder="@username" required>
+            </div>
 
-<script>
-/* ---------- CONFIGURATION ---------- */
-const BOT_TOKEN = '8471368946:AAHXFpFGC5ob5ptDivokYDVpEVBqM0c5iKQ';
+            <div style="margin: 1.5rem 0 1rem;">
+                <h3 style="display: flex; align-items: center; gap: 0.5rem; color: var(--text-primary);">
+                    <i class="fas fa-calendar-alt"></i>
+                    Qirat Schedules
+                </h3>
+                <p style="color: var(--text-secondary); font-size: 0.875rem; margin-top: 0.5rem;">
+                    <i class="fas fa-info-circle"></i> Select days, enter Qirat name & preferred time. Add multiple schedules if needed.
+                </p>
+            </div>
 
-// <<<--- PUT YOUR ADMIN CHAT IDs HERE (strings) --->
-const ADMIN_IDS = ['6672312554','7897840965'];   // Example: ['123456789', '-1001234567890']
+            <div id="schedules">
+                <div class="schedule-group" data-id="0">
+                    <div class="schedule-header">
+                        <span class="schedule-badge">
+                            <i class="fas fa-star-of-life"></i> Schedule 1
+                        </span>
+                        <button type="button" class="btn-remove" onclick="removeSchedule(this)">
+                            <i class="fas fa-trash-alt"></i> Remove
+                        </button>
+                    </div>
+                    <div class="days-selector">
+                        <label><input type="checkbox" class="day-check" value="Monday"><span>Mon</span></label>
+                        <label><input type="checkbox" class="day-check" value="Tuesday"><span>Tue</span></label>
+                        <label><input type="checkbox" class="day-check" value="Wednesday"><span>Wed</span></label>
+                        <label><input type="checkbox" class="day-check" value="Thursday"><span>Thu</span></label>
+                        <label><input type="checkbox" class="day-check" value="Friday"><span>Fri</span></label>
+                        <label><input type="checkbox" class="day-check" value="Saturday"><span>Sat</span></label>
+                        <label><input type="checkbox" class="day-check" value="Sunday"><span>Sun</span></label>
+                    </div>
+                    <div class="schedule-row">
+                        <div>
+                            <label class="required">
+                                <i class="fas fa-music"></i> Qirat Name
+                            </label>
+                            <input type="text" class="qirat_name" placeholder="e.g., Surah Al-Fatiha, Tajweed" required>
+                        </div>
+                        <div>
+                            <label class="required">
+                                <i class="fas fa-clock"></i> When?
+                            </label>
+                            <input type="text" class="time_preference" placeholder="Maghrib - Isha, after Subhi, 7:30 PM" required>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-/* ---------- DYNAMIC SCHEDULES ---------- */
-let scheduleIdx = 1;
-document.getElementById('add-schedule').addEventListener('click', () => {
-    const container = document.getElementById('schedules');
-    const group = document.createElement('div');
-    group.className = 'schedule-group';
+            <button type="button" id="add-schedule" class="btn-secondary">
+                <i class="fas fa-plus-circle"></i> Add Another Schedule
+            </button>
 
-    const daysSel = document.createElement('div');
-    daysSel.className = 'days-selector';
-    daysSel.innerHTML = `
-        <label><input type="checkbox" class="day-check" value="Monday"><span>Monday</span></label>
-        <label><input type="checkbox" class="day-check" value="Tuesday"><span>Tuesday</span></label>
-        <label><input type="checkbox" class="day-check" value="Wednesday"><span>Wednesday</span></label>
-        <label><input type="checkbox" class="day-check" value="Thursday"><span>Thursday</span></label>
-        <label><input type="checkbox" class="day-check" value="Friday"><span>Friday</span></label>
-        <label><input type="checkbox" class="day-check" value="Saturday"><span>Saturday</span></label>
-        <label><input type="checkbox" class="day-check" value="Sunday"><span>Sunday</span></label>
-    `;
+            <button type="submit" class="btn-primary" id="submitBtn">
+                <i class="fas fa-paper-plane"></i> Submit Registration
+            </button>
+        </form>
 
-    const labelQirat = document.createElement('label');
-    labelQirat.textContent = 'Qirat Name';
-    const qiratInp = document.createElement('input');
-    qiratInp.type = 'text';
-    qiratInp.className = 'qirat_name';
-    qiratInp.placeholder = 'e.g. tawhiid';
-    qiratInp.required = true;
+        <div id="status"></div>
+    </div>
 
-    const labelTime = document.createElement('label');
-    labelTime.textContent = 'When?';
-    const timeInp = document.createElement('input');
-    timeInp.type = 'text';
-    timeInp.className = 'time_preference';
-    timeInp.placeholder = 'magrib - isha, or after subhi or ..';
-    timeInp.required = true;
+    <script>
+        // ========== CONFIGURATION ==========
+        const BOT_TOKEN = '8471368946:AAHXFpFGC5ob5ptDivokYDVpEVBqM0c5iKQ';
+        const ADMIN_IDS = ['6672312554', '7897840965'];
 
-    group.append(daysSel, labelQirat, qiratInp, labelTime, timeInp);
-    container.appendChild(group);
-    scheduleIdx++;
-});
-
-/* ---------- TELEGRAM SEND ---------- */
-async function sendToTelegram(chatId, text) {
-    const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
-    const payload = { chat_id: chatId, text, parse_mode: 'HTML' };
-    const resp = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-    });
-    return resp.json();
-}
-
-/* ---------- FORM SUBMISSION ---------- */
-document.getElementById('qiratForm').addEventListener('submit', async e => {
-    e.preventDefault();
-    const status = document.getElementById('status');
-    status.textContent = 'Sending…';
-    status.className = '';
-
-    // ----- collect basic info -----
-    const full_name = document.getElementById('full_name').value.trim();
-    const phone = document.getElementById('phone').value.trim();
-    const telegram = document.getElementById('telegram').value.trim().replace(/^@/, '');
-
-    // ----- collect schedules -----
-    const groups = document.querySelectorAll('.schedule-group');
-    const schedules = [];
-    for (let group of groups) {
-        const checkedDays = Array.from(group.querySelectorAll('.day-check:checked')).map(c => c.value);
-        const qirat = group.querySelector('.qirat_name').value.trim();
-        const timePref = group.querySelector('.time_preference').value.trim();
-        if (checkedDays.length > 0 && qirat && timePref) {
-            schedules.push({ days: checkedDays, qirat, time: timePref });
+        // ========== THEME MANAGEMENT ==========
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+        
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            body.classList.add('dark');
+            themeToggle.innerHTML = '<i class="fas fa-sun"></i> Light Mode';
         }
-    }
 
-    if (schedules.length === 0) {
-        status.textContent = 'Please add at least one schedule with days selected, qirat name, and time preference.';
-        status.className = 'error';
-        return;
-    }
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark');
+            const isDark = body.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            themeToggle.innerHTML = isDark ? '<i class="fas fa-sun"></i> Light Mode' : '<i class="fas fa-moon"></i> Dark Mode';
+        });
 
-    // ----- BUILD BEAUTIFUL MESSAGE -----
-    const scheduleLines = schedules.map(s => 
-        `• <b>${s.days.join(' • ')}</b> → <i>${s.qirat}</i>  |  🕒 ${s.time}`
-    ).join('\n');
+        // ========== PARTICLE BACKGROUND ==========
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                const size = Math.random() * 100 + 20;
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 20 + 's';
+                particle.style.animationDuration = Math.random() * 20 + 10 + 's';
+                particle.style.opacity = Math.random() * 0.3;
+                container.appendChild(particle);
+            }
+        }
+        createParticles();
 
-    const message = `
-<b>New Qirat Registration (Brothers)</b>
+        // ========== CHARACTER COUNTER ==========
+        const nameInput = document.getElementById('full_name');
+        const nameCount = document.getElementById('nameCount');
+        nameInput.addEventListener('input', () => {
+            nameCount.textContent = nameInput.value.length;
+            if (nameInput.value.length > 50) {
+                nameInput.value = nameInput.value.slice(0, 50);
+                nameCount.textContent = 50;
+            }
+        });
 
-<b>Full Name:</b> ${full_name}
-<b>Phone:</b> ${phone}
-<b>Telegram:</b> @${telegram}
+        // ========== SCHEDULE MANAGEMENT ==========
+        let scheduleCounter = 1;
 
-<b>Schedules:</b>
+        window.removeSchedule = function(btn) {
+            const group = btn.closest('.schedule-group');
+            if (document.querySelectorAll('.schedule-group').length > 1) {
+                group.remove();
+                updateScheduleBadges();
+            } else {
+                showStatus('At least one schedule is required!', 'error');
+            }
+        };
+
+        function updateScheduleBadges() {
+            const groups = document.querySelectorAll('.schedule-group');
+            groups.forEach((group, idx) => {
+                const badge = group.querySelector('.schedule-badge');
+                if (badge) {
+                    badge.innerHTML = `<i class="fas fa-star-of-life"></i> Schedule ${idx + 1}`;
+                }
+            });
+        }
+
+        document.getElementById('add-schedule').addEventListener('click', () => {
+            const container = document.getElementById('schedules');
+            const newId = scheduleCounter++;
+            const newGroup = document.createElement('div');
+            newGroup.className = 'schedule-group';
+            newGroup.setAttribute('data-id', newId);
+            newGroup.innerHTML = `
+                <div class="schedule-header">
+                    <span class="schedule-badge"><i class="fas fa-star-of-life"></i> Schedule ${document.querySelectorAll('.schedule-group').length + 1}</span>
+                    <button type="button" class="btn-remove" onclick="removeSchedule(this)"><i class="fas fa-trash-alt"></i> Remove</button>
+                </div>
+                <div class="days-selector">
+                    <label><input type="checkbox" class="day-check" value="Monday"><span>Mon</span></label>
+                    <label><input type="checkbox" class="day-check" value="Tuesday"><span>Tue</span></label>
+                    <label><input type="checkbox" class="day-check" value="Wednesday"><span>Wed</span></label>
+                    <label><input type="checkbox" class="day-check" value="Thursday"><span>Thu</span></label>
+                    <label><input type="checkbox" class="day-check" value="Friday"><span>Fri</span></label>
+                    <label><input type="checkbox" class="day-check" value="Saturday"><span>Sat</span></label>
+                    <label><input type="checkbox" class="day-check" value="Sunday"><span>Sun</span></label>
+                </div>
+                <div class="schedule-row">
+                    <div>
+                        <label class="required"><i class="fas fa-music"></i> Qirat Name</label>
+                        <input type="text" class="qirat_name" placeholder="e.g., Surah Al-Fatiha, Tajweed" required>
+                    </div>
+                    <div>
+                        <label class="required"><i class="fas fa-clock"></i> When?</label>
+                        <input type="text" class="time_preference" placeholder="Maghrib - Isha, after Subhi, 7:30 PM" required>
+                    </div>
+                </div>
+            `;
+            container.appendChild(newGroup);
+            updateScheduleBadges();
+            
+            // Animate new group
+            newGroup.style.animation = 'none';
+            setTimeout(() => {
+                newGroup.style.animation = 'slideIn 0.3s ease-out';
+            }, 10);
+        });
+
+        // ========== TELEGRAM SEND ==========
+        async function sendToTelegram(chatId, text) {
+            const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+            const payload = { chat_id: chatId, text, parse_mode: 'HTML', disable_web_page_preview: true };
+            try {
+                const resp = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                return await resp.json();
+            } catch (err) {
+                return { ok: false, error: err.message };
+            }
+        }
+
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = type;
+            setTimeout(() => {
+                if (statusDiv.className === type) {
+                    statusDiv.className = '';
+                }
+            }, 5000);
+        }
+
+        // ========== FORM SUBMISSION ==========
+        document.getElementById('qiratForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = document.getElementById('submitBtn');
+            const originalBtnText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+            submitBtn.disabled = true;
+
+            const full_name = document.getElementById('full_name').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            let telegram = document.getElementById('telegram').value.trim().replace(/^@/, '');
+            
+            if (!full_name || !phone || !telegram) {
+                showStatus('Please fill all required fields!', 'error');
+                submitBtn.innerHTML = originalBtnText;
+                submitBtn.disabled = false;
+                return;
+            }
+
+            const groups = document.querySelectorAll('.schedule-group');
+            const schedules = [];
+            
+            for (let group of groups) {
+                const checkedDays = Array.from(group.querySelectorAll('.day-check:checked')).map(c => c.value);
+                const qirat = group.querySelector('.qirat_name').value.trim();
+                const timePref = group.querySelector('.time_preference').value.trim();
+                
+                if (checkedDays.length === 0) {
+                    showStatus('Please select at least one day for each schedule', 'error');
+                    submitBtn.innerHTML = originalBtnText;
+                    submitBtn.disabled = false;
+                    return;
+                }
+                if (!qirat) {
+                    showStatus('Please enter Qirat name for all schedules', 'error');
+                    submitBtn.innerHTML = originalBtnText;
+                    submitBtn.disabled = false;
+                    return;
+                }
+                if (!timePref) {
+                    showStatus('Please enter preferred time (When?) for all schedules', 'error');
+                    submitBtn.innerHTML = originalBtnText;
+                    submitBtn.disabled = false;
+                    return;
+                }
+                
+                schedules.push({ days: checkedDays, qirat, time: timePref });
+            }
+            
+            if (schedules.length === 0) {
+                showStatus('Please add at least one schedule', 'error');
+                submitBtn.innerHTML = originalBtnText;
+                submitBtn.disabled = false;
+                return;
+            }
+            
+            // Build beautiful message with emojis and formatting
+            const scheduleLines = schedules.map((s, i) => {
+                const daysEmoji = s.days.map(d => {
+                    const emojis = { Monday: '🌙', Tuesday: '✨', Wednesday: '☪️', Thursday: '🌟', Friday: '⭐', Saturday: '💫', Sunday: '🕌' };
+                    return `${emojis[d] || '📅'} ${d}`;
+                }).join(' • ');
+                return `📌 <b>Schedule ${i+1}</b>\n   🗓️ ${daysEmoji}\n   🎙️ <i>${s.qirat}</i>\n   ⏰ ${s.time}`;
+            }).join('\n\n');
+            
+            const message = `
+<b>🕌 NEW QIRAT REGISTRATION 🕌</b>
+<b>👤 Name:</b> ${full_name}
+<b>📞 Phone:</b> ${phone}
+<b>💬 Telegram:</b> @${telegram}
+
+<b>📖 QIRAT SCHEDULES:</b>
 ${scheduleLines}
 
-──────────────
-Submitted on ${new Date().toLocaleString()}
-`.trim();
-
-    // ----- send to every admin -----
-    const results = await Promise.all(
-        ADMIN_IDS.map(id => sendToTelegram(id, message))
-    );
-
-    const allOk = results.every(r => r.ok);
-    if (allOk) {
-        status.textContent = '👍 REGISTRATION SUCCESSFUL!';
-        status.className = 'success';
-        document.getElementById('qiratForm').reset();
-        document.getElementById('schedules').innerHTML = `
-            <div class="schedule-group">
-                <div class="days-selector">
-                    <label><input type="checkbox" class="day-check" value="Monday"><span>Monday</span></label>
-                    <label><input type="checkbox" class="day-check" value="Tuesday"><span>Tuesday</span></label>
-                    <label><input type="checkbox" class="day-check" value="Wednesday"><span>Wednesday</span></label>
-                    <label><input type="checkbox" class="day-check" value="Thursday"><span>Thursday</span></label>
-                    <label><input type="checkbox" class="day-check" value="Friday"><span>Friday</span></label>
-                    <label><input type="checkbox" class="day-check" value="Saturday"><span>Saturday</span></label>
-                    <label><input type="checkbox" class="day-check" value="Sunday"><span>Sunday</span></label>
-                </div>
-                <label>Qirat Name</label>
-                <input type="text" class="qirat_name" placeholder="e.g. Tawhid" required>
-                <label>When?</label>
-                <input type="text" class="time_preference" placeholder="magrib - isha, or after subhi or .." required>
-            </div>`;
-    } else {
-        status.textContent = 'Error – some messages failed. Check the admin IDs.';
-        status.className = 'error';
-        console.error('Telegram errors:', results);
-    }
-});
-</script>
+──────────────────
+<i>Submitted: ${new Date().toLocaleString('en-US', { hour12: true })}</i>
+<i>Platform: Modern Islamic Portal</i>
+            `.trim();
+            
+            const results = await Promise.all(ADMIN_IDS.map(id => sendToTelegram(id, message)));
+            const allOk = results.every(r => r && r.ok === true);
+            
+            if (allOk) {
+                showStatus('✅ Registration Successful! Your Qirat schedule has been submitted. JazakAllah Khair! ✨', 'success');
+                document.getElementById('qiratForm').reset();
+                nameCount.textContent = '0';
+                // Reset to one clean schedule
+                document.getElementById('schedules').innerHTML = `
+                    <div class="schedule-group" data-id="0">
+                        <div class="schedule-header">
+                            <span class="schedule-badge"><i class="fas fa-star-of-life"></i> Schedule 1</span>
+                            <button type="button" class="btn-remove" onclick="removeSchedule(this)"><i class="fas fa-trash-alt"></i> Remove</button>
+                        </div>
+                        <div class="days-selector">
+                            <label><input type="checkbox" class="day-check" value="Monday"><span>Mon</span></label>
+                            <label><input type="checkbox" class="day-check" value="Tuesday"><span>Tue</span></label>
+                            <label><input type="checkbox" class="day-check" value="Wednesday"><span>Wed</span></label>
+                            <label><input type="checkbox" class="day-check" value="Thursday"><span>Thu</span></label>
+                            <label><input type="checkbox" class="day-check" value="Friday"><span>Fri</span></label>
+                            <label><input type="checkbox" class="day-check" value="Saturday"><span>Sat</span></label>
+                            <label><input type="checkbox" class="day-check" value="Sunday"><span>Sun</span></label>
+                        </div>
+                        <div class="schedule-row">
+                            <div>
+                                <label class="required"><i class="fas fa-music"></i> Qirat Name</label>
+                                <input type="text" class="qirat_name" placeholder="e.g., Surah Al-Fatiha, Tajweed" required>
+                            </div>
+                            <div>
+                                <label class="required"><i class="fas fa-clock"></i> When?</label>
+                                <input type="text" class="time_preference" placeholder="Maghrib - Isha, after Subhi, 7:30 PM" required>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                scheduleCounter = 1;
+                updateScheduleBadges();
+            } else {
+                showStatus('❌ Error submitting registration. Please try again or contact admin.', 'error');
+                console.error('Telegram errors:', results);
+            }
+            
+            submitBtn.innerHTML = originalBtnText;
+            submitBtn.disabled = false;
+        });
+        
+        // Initial badge update
+        updateScheduleBadges();
+    </script>
 </body>
 </html>
