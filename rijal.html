@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>نور التلاوة | Qirat Registration - Islamic Qirat Circle</title>
+    <title>JUMJ - Qirat Registration | نور التلاوة</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -352,12 +352,6 @@
             accent-color: var(--primary-gold);
         }
 
-        .days-selector input:checked + span {
-            color: var(--primary-gold);
-            font-weight: 700;
-            text-shadow: 0 0 5px rgba(212,175,55,0.5);
-        }
-
         .schedule-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -493,13 +487,13 @@
         <div class="header">
             <h2>
                 <i class="fas fa-quran"></i>
-                تسجيل القراءة
+                JUMJ - Qirat Registration
                 <i class="fas fa-quran"></i>
             </h2>
-            <div class="arabic-title">بسم الله الرحمن الرحيم</div>
+            <div class="arabic-title">نور التلاوة | Registration Circle</div>
             <div class="subhead">
                 <i class="fas fa-quran"></i>
-                Qirat Registration – Brothers | نور التلاوة
+                Recite & Reflect | Join the Blessed Circle
                 <i class="fas fa-mosque"></i>
             </div>
         </div>
@@ -507,29 +501,27 @@
         <form id="qiratForm">
             <div class="form-row">
                 <div class="form-group">
-                    <label class="required">
-                        <i class="fas fa-user-circle"></i>
-                        Full Name / الاسم الكامل
-                    </label>
+                    <label class="required"><i class="fas fa-user-circle"></i> Full Name</label>
                     <input type="text" id="full_name" placeholder="Enter your full name" required maxlength="50">
                     <div class="char-counter"><span id="nameCount">0</span>/50 characters</div>
                 </div>
-
                 <div class="form-group">
-                    <label class="required">
-                        <i class="fas fa-phone-alt"></i>
-                        Phone Number / رقم الهاتف
-                    </label>
-                    <input type="tel" id="phone" placeholder="+1234567890" required>
+                    <label class="required"><i class="fas fa-venus-mars"></i> Gender</label>
+                    <select id="gender" required>
+                        <option value="">Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-group">
-                    <label class="required">
-                        <i class="fas fa-building"></i>
-                        Department / القسم
-                    </label>
+                    <label class="required"><i class="fas fa-phone-alt"></i> Phone Number</label>
+                    <input type="tel" id="phone" placeholder="+1234567890" required>
+                </div>
+                <div class="form-group">
+                    <label class="required"><i class="fas fa-building"></i> Department</label>
                     <select id="department" required>
                         <option value="">Select Department</option>
                         <option value="Medicine">Medicine (طب)</option>
@@ -544,59 +536,35 @@
                         <option value="Other">Other (أخرى)</option>
                     </select>
                 </div>
-
-                <div class="form-group">
-                    <label class="required">
-                        <i class="fas fa-graduation-cap"></i>
-                        Batch / الدفعة
-                    </label>
-                    <select id="batch" required>
-                        <option value="">Select Batch</option>
-                        <option value="2012">Batch 2012</option>
-                        <option value="2013">Batch 2013</option>
-                        <option value="2014">Batch 2014</option>
-                        <option value="2015">Batch 2015</option>
-                        <option value="2016">Batch 2016</option>
-                        <option value="2017">Batch 2017</option>
-                        <option value="2018">Batch 2018</option>
-                        <option value="2019">Batch 2019</option>
-                        <option value="2020">Batch 2020</option>
-                        <option value="2021">Batch 2021</option>
-                        <option value="2022">Batch 2022</option>
-                        <option value="2023">Batch 2023</option>
-                        <option value="2024">Batch 2024</option>
-                        <option value="2025">Batch 2025</option>
-                    </select>
-                </div>
             </div>
 
             <div class="form-group">
-                <label class="required">
-                    <i class="fab fa-telegram"></i>
-                    Telegram Username / معرف تيليجرام
-                </label>
+                <label class="required"><i class="fas fa-graduation-cap"></i> Batch / Year</label>
+                <select id="batch" required>
+                    <option value="">Select Batch / Year</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="required"><i class="fab fa-telegram"></i> Telegram Username</label>
                 <input type="text" id="telegram" placeholder="@username" required>
             </div>
 
             <div style="margin: 1.5rem 0 1rem;">
                 <h3 style="display: flex; align-items: center; gap: 0.6rem; background: linear-gradient(135deg, var(--primary-gold), var(--primary-emerald)); -webkit-background-clip: text; background-clip: text; color: transparent; font-size: 1.3rem;">
                     <i class="fas fa-calendar-alt"></i>
-                    Qirat Schedules | جدول التلاوة
+                    Qirat Schedules
                 </h3>
                 <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.5rem;">
-                    <i class="fas fa-hand-peace"></i> Select your available days, Qirat name & preferred time
+                    <i class="fas fa-hand-peace"></i> Select available days, Qirat name & preferred time
                 </p>
             </div>
 
             <div id="schedules">
                 <div class="schedule-group" data-id="0">
                     <div class="schedule-header">
-                        <span class="schedule-badge">
-                            <i class="fas fa-star-of-life"></i> Schedule 1 | الجدول الأول
-                        </span>
-                        <button type="button" class="btn-remove" onclick="removeSchedule(this)">
-                            <i class="fas fa-trash-alt"></i> Remove
-                        </button>
+                        <span class="schedule-badge"><i class="fas fa-star-of-life"></i> Schedule 1</span>
+                        <button type="button" class="btn-remove" onclick="removeSchedule(this)"><i class="fas fa-trash-alt"></i> Remove</button>
                     </div>
                     <div class="days-selector">
                         <label><input type="checkbox" class="day-check" value="Monday"><span>Mon</span></label>
@@ -609,27 +577,23 @@
                     </div>
                     <div class="schedule-row">
                         <div>
-                            <label class="required">
-                                <i class="fas fa-music"></i> Qirat Name / اسم القراءة
-                            </label>
+                            <label class="required"><i class="fas fa-music"></i> Qirat Name</label>
                             <input type="text" class="qirat_name" placeholder="e.g., Surah Al-Fatiha, Tajweed" required>
                         </div>
                         <div>
-                            <label class="required">
-                                <i class="fas fa-clock"></i> When? / متى؟
-                            </label>
-                            <input type="text" class="time_preference" placeholder="Maghrib - Isha, after Subhi, 7:30 PM" required>
+                            <label class="required"><i class="fas fa-clock"></i> Time Preference</label>
+                            <input type="text" class="time_preference" placeholder="Maghrib - Isha, 7:30 PM" required>
                         </div>
                     </div>
                 </div>
             </div>
 
             <button type="button" id="add-schedule" class="btn-secondary">
-                <i class="fas fa-plus-circle"></i> Add Another Schedule | إضافة جدول
+                <i class="fas fa-plus-circle"></i> Add Another Schedule
             </button>
 
             <button type="submit" class="btn-primary" id="submitBtn">
-                <i class="fas fa-paper-plane"></i> Submit Registration | تسجيل
+                <i class="fas fa-paper-plane"></i> Submit Registration
             </button>
         </form>
 
@@ -643,11 +607,9 @@
     </div>
 
     <script type="module">
-        // Import Firebase modules
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         
-        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyAR_g5y04YAGCrTvZCowrE7hw8h7k1du08",
             authDomain: "jujm-qirat.firebaseapp.com",
@@ -657,27 +619,25 @@
             appId: "1:253413984903:web:c1577e0fdef1711f960622"
         };
         
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         
-        // Telegram config
         const BOT_TOKEN = '8471368946:AAHXFpFGC5ob5ptDivokYDVpEVBqM0c5iKQ';
         const ADMIN_IDS = ['7897840965'];
         
-        // Theme management
+        // Theme
         const themeToggle = document.getElementById('themeToggle');
         const body = document.body;
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme === 'dark') {
             body.classList.add('dark');
-            themeToggle.innerHTML = '<i class="fas fa-sun"></i> الوضع المضيء';
+            themeToggle.innerHTML = '<i class="fas fa-sun"></i> Light Mode';
         }
         themeToggle.addEventListener('click', () => {
             body.classList.toggle('dark');
             const isDark = body.classList.contains('dark');
             localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            themeToggle.innerHTML = isDark ? '<i class="fas fa-sun"></i> الوضع المضيء' : '<i class="fas fa-moon"></i> الوضع المظلم';
+            themeToggle.innerHTML = isDark ? '<i class="fas fa-sun"></i> Light Mode' : '<i class="fas fa-moon"></i> Dark Mode';
         });
         
         // Character counter
@@ -685,22 +645,52 @@
         const nameCount = document.getElementById('nameCount');
         nameInput.addEventListener('input', () => {
             nameCount.textContent = nameInput.value.length;
-            if (nameInput.value.length > 50) {
-                nameInput.value = nameInput.value.slice(0, 50);
-                nameCount.textContent = 50;
-            }
+            if (nameInput.value.length > 50) nameInput.value = nameInput.value.slice(0, 50);
         });
+        
+        // Batch options
+        const medicineBatchOptions = [
+            "Pre-Med", "New PC1", "Old PC1", "New PC2", "Old CPC2", "New C1", "Old C1", "New C2", "Old C2", "Intern"
+        ];
+        const otherYearOptions = ["1st Year", "2nd Year", "3rd Year", "4th Year", "5th Year", "6th Year"];
+        
+        function updateBatchOptions() {
+            const deptSelect = document.getElementById('department');
+            const batchSelect = document.getElementById('batch');
+            const selectedDept = deptSelect.value;
+            batchSelect.innerHTML = '<option value="">Select Batch / Year</option>';
+            
+            if (selectedDept === "Medicine") {
+                medicineBatchOptions.forEach(opt => {
+                    const option = document.createElement('option');
+                    option.value = opt;
+                    option.textContent = opt;
+                    batchSelect.appendChild(option);
+                });
+            } else if (selectedDept && selectedDept !== "") {
+                otherYearOptions.forEach(opt => {
+                    const option = document.createElement('option');
+                    option.value = opt;
+                    option.textContent = opt;
+                    batchSelect.appendChild(option);
+                });
+            } else {
+                batchSelect.innerHTML = '<option value="">Select Batch / Year</option>';
+            }
+        }
+        
+        document.getElementById('department').addEventListener('change', updateBatchOptions);
+        updateBatchOptions();
         
         // Schedule management
         let scheduleCounter = 1;
-        
         window.removeSchedule = function(btn) {
-            const group = btn.closest('.schedule-group');
-            if (document.querySelectorAll('.schedule-group').length > 1) {
-                group.remove();
+            const groups = document.querySelectorAll('.schedule-group');
+            if (groups.length > 1) {
+                btn.closest('.schedule-group').remove();
                 updateScheduleBadges();
             } else {
-                showStatus('At least one schedule is required! | مطلوب جدول واحد على الأقل', 'error');
+                showStatus('At least one schedule is required!', 'error');
             }
         };
         
@@ -708,9 +698,7 @@
             const groups = document.querySelectorAll('.schedule-group');
             groups.forEach((group, idx) => {
                 const badge = group.querySelector('.schedule-badge');
-                if (badge) {
-                    badge.innerHTML = `<i class="fas fa-star-of-life"></i> Schedule ${idx + 1} | الجدول ${idx + 1}`;
-                }
+                if (badge) badge.innerHTML = `<i class="fas fa-star-of-life"></i> Schedule ${idx + 1}`;
             });
         }
         
@@ -721,7 +709,7 @@
             newGroup.setAttribute('data-id', scheduleCounter++);
             newGroup.innerHTML = `
                 <div class="schedule-header">
-                    <span class="schedule-badge"><i class="fas fa-star-of-life"></i> Schedule ${document.querySelectorAll('.schedule-group').length + 1} | الجدول الجديد</span>
+                    <span class="schedule-badge"><i class="fas fa-star-of-life"></i> Schedule ${document.querySelectorAll('.schedule-group').length + 1}</span>
                     <button type="button" class="btn-remove" onclick="removeSchedule(this)"><i class="fas fa-trash-alt"></i> Remove</button>
                 </div>
                 <div class="days-selector">
@@ -734,168 +722,100 @@
                     <label><input type="checkbox" class="day-check" value="Sunday"><span>Sun</span></label>
                 </div>
                 <div class="schedule-row">
-                    <div>
-                        <label class="required"><i class="fas fa-music"></i> Qirat Name / اسم القراءة</label>
-                        <input type="text" class="qirat_name" placeholder="e.g., Surah Al-Fatiha, Tajweed" required>
-                    </div>
-                    <div>
-                        <label class="required"><i class="fas fa-clock"></i> When? / متى؟</label>
-                        <input type="text" class="time_preference" placeholder="Maghrib - Isha, after Subhi, 7:30 PM" required>
-                    </div>
+                    <div><label class="required"><i class="fas fa-music"></i> Qirat Name</label><input type="text" class="qirat_name" placeholder="e.g., Surah Al-Fatiha" required></div>
+                    <div><label class="required"><i class="fas fa-clock"></i> Time Preference</label><input type="text" class="time_preference" placeholder="Maghrib - Isha" required></div>
                 </div>
             `;
             container.appendChild(newGroup);
             updateScheduleBadges();
-            newGroup.style.animation = 'none';
-            setTimeout(() => {
-                newGroup.style.animation = 'fadeInUp 0.5s ease-out';
-            }, 10);
+            newGroup.style.animation = 'fadeInUp 0.5s ease-out';
         });
         
-        // Telegram send function
         async function sendToTelegram(chatId, text) {
             const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
-            const payload = { chat_id: chatId, text, parse_mode: 'HTML', disable_web_page_preview: true };
             try {
-                const resp = await fetch(url, {
+                await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify({ chat_id: chatId, text, parse_mode: 'HTML', disable_web_page_preview: true })
                 });
-                return await resp.json();
-            } catch (err) {
-                console.error('Telegram error:', err);
-                return { ok: false, error: err.message };
-            }
+            } catch (err) { console.error(err); }
         }
         
         function showStatus(message, type) {
             const statusDiv = document.getElementById('status');
             statusDiv.textContent = message;
             statusDiv.className = type;
-            setTimeout(() => {
-                if (statusDiv.className === type) {
-                    statusDiv.className = '';
-                }
-            }, 5000);
+            setTimeout(() => { if (statusDiv.className === type) statusDiv.className = ''; }, 5000);
         }
         
-        // Form submission to Firebase
         document.getElementById('qiratForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const submitBtn = document.getElementById('submitBtn');
-            const originalBtnText = submitBtn.innerHTML;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving to Database... جاري الحفظ';
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
             submitBtn.disabled = true;
             
             const full_name = document.getElementById('full_name').value.trim();
+            const gender = document.getElementById('gender').value;
             const phone = document.getElementById('phone').value.trim();
             const department = document.getElementById('department').value;
             const batch = document.getElementById('batch').value;
             const telegram = document.getElementById('telegram').value.trim();
             
-            // Validate required fields
-            if (!full_name || !phone || !department || !batch || !telegram) {
-                showStatus('Please fill all required fields | الرجاء ملء جميع الحقول المطلوبة', 'error');
-                submitBtn.innerHTML = originalBtnText;
+            if (!full_name || !gender || !phone || !department || !batch || !telegram) {
+                showStatus('Please fill all required fields', 'error');
+                submitBtn.innerHTML = originalText;
                 submitBtn.disabled = false;
                 return;
             }
             
-            // Collect schedules
             const scheduleGroups = document.querySelectorAll('.schedule-group');
-            const schedules = Array.from(scheduleGroups).map(group => {
-                const days = Array.from(group.querySelectorAll('.day-check'))
-                    .filter(chk => chk.checked)
-                    .map(chk => chk.value);
-                const qirat_name = group.querySelector('.qirat_name').value.trim();
-                const time_preference = group.querySelector('.time_preference').value.trim();
-                return { days, qirat_name, time_preference };
-            });
+            const schedules = Array.from(scheduleGroups).map(group => ({
+                days: Array.from(group.querySelectorAll('.day-check:checked')).map(cb => cb.value),
+                qirat_name: group.querySelector('.qirat_name').value.trim(),
+                time_preference: group.querySelector('.time_preference').value.trim()
+            }));
             
-            // Validate schedules
             for (let i = 0; i < schedules.length; i++) {
-                const sched = schedules[i];
-                if (sched.days.length === 0) {
-                    showStatus(`Schedule ${i+1}: Please select at least one day | الرجاء اختيار يوم واحد على الأقل`, 'error');
-                    submitBtn.innerHTML = originalBtnText;
-                    submitBtn.disabled = false;
-                    return;
-                }
-                if (!sched.qirat_name) {
-                    showStatus(`Schedule ${i+1}: Please enter Qirat name | الرجاء إدخال اسم القراءة`, 'error');
-                    submitBtn.innerHTML = originalBtnText;
-                    submitBtn.disabled = false;
-                    return;
-                }
-                if (!sched.time_preference) {
-                    showStatus(`Schedule ${i+1}: Please enter time preference | الرجاء إدخال الوقت المفضل`, 'error');
-                    submitBtn.innerHTML = originalBtnText;
+                const s = schedules[i];
+                if (s.days.length === 0 || !s.qirat_name || !s.time_preference) {
+                    showStatus(`Schedule ${i+1}: days, Qirat name and time required`, 'error');
+                    submitBtn.innerHTML = originalText;
                     submitBtn.disabled = false;
                     return;
                 }
             }
             
             try {
-                // Save to Firebase Firestore
                 const docRef = await addDoc(collection(db, 'registrations'), {
-                    full_name,
-                    phone,
-                    department,
-                    batch,
-                    telegram,
-                    schedules,
-                    timestamp: serverTimestamp()
+                    full_name, gender, phone, department, batch, telegram, schedules, timestamp: serverTimestamp()
                 });
                 
-                // Send Telegram notification to admins
-                const schedulesText = schedules.map((s, idx) => 
-                    `📖 Schedule ${idx+1}: ${s.qirat_name} at ${s.time_preference} on ${s.days.join(', ')}`
-                ).join('\n');
+                const schedulesText = schedules.map((s, idx) => `📖 Schedule ${idx+1}: ${s.qirat_name} at ${s.time_preference} on ${s.days.join(', ')}`).join('\n');
+                const msg = `🌟 <b>NEW QIRAT REGISTRATION</b> 🌟\n━━━━━━━━━━━━━━━━\n👤 Name: ${full_name}\n⚧ Gender: ${gender}\n📞 Phone: ${phone}\n🏛 Dept: ${department}\n📚 Batch: ${batch}\n💬 Telegram: ${telegram}\n━━━━━━━━━━━━━━━━\n<b>📅 Schedules:</b>\n${schedulesText}\n🆔 ID: ${docRef.id}`;
+                for (const adminId of ADMIN_IDS) await sendToTelegram(adminId, msg);
                 
-                const message = `
-🌟 <b>NEW QIRAT REGISTRATION</b> 🌟
-━━━━━━━━━━━━━━━━━━━━
-👤 <b>Name:</b> ${full_name}
-📞 <b>Phone:</b> ${phone}
-🏛 <b>Department:</b> ${department}
-📚 <b>Batch:</b> ${batch}
-💬 <b>Telegram:</b> ${telegram}
-━━━━━━━━━━━━━━━━━━━━
-<b>📅 Schedules:</b>
-${schedulesText}
-━━━━━━━━━━━━━━━━━━━━
-🆔 <b>Firebase ID:</b> ${docRef.id}
-✅ <i>Registered via نور التلاوة Portal</i>
-`;
-                for (const adminId of ADMIN_IDS) {
-                    await sendToTelegram(adminId, message);
-                }
-                
-                showStatus('✅ Registration successful! | تم التسجيل بنجاح ✅', 'success');
-                // Reset form
+                showStatus('✅ Registration successful!', 'success');
                 document.getElementById('qiratForm').reset();
                 document.getElementById('nameCount').textContent = '0';
-                // Reset to one schedule only
-                const firstSchedule = scheduleGroups[0].cloneNode(true);
-                firstSchedule.querySelectorAll('.day-check').forEach(cb => cb.checked = false);
-                const qiratInputs = firstSchedule.querySelectorAll('.qirat_name, .time_preference');
-                qiratInputs.forEach(inp => inp.value = '');
-                document.getElementById('schedules').innerHTML = '';
-                document.getElementById('schedules').appendChild(firstSchedule);
+                const container = document.getElementById('schedules');
+                const firstGroup = container.querySelector('.schedule-group').cloneNode(true);
+                firstGroup.querySelectorAll('.day-check').forEach(cb => cb.checked = false);
+                firstGroup.querySelectorAll('.qirat_name, .time_preference').forEach(inp => inp.value = '');
+                container.innerHTML = '';
+                container.appendChild(firstGroup);
                 scheduleCounter = 1;
                 updateScheduleBadges();
-                
+                updateBatchOptions();
             } catch (error) {
-                console.error('Firebase error:', error);
-                showStatus('❌ Error submitting registration. Please check your connection and try again. | خطأ أثناء التسجيل، حاول مرة أخرى', 'error');
+                console.error(error);
+                showStatus('❌ Error submitting. Check connection.', 'error');
             } finally {
-                submitBtn.innerHTML = originalBtnText;
+                submitBtn.innerHTML = originalText;
                 submitBtn.disabled = false;
             }
         });
-        
-        // Initial badge update
         updateScheduleBadges();
     </script>
 </body>
