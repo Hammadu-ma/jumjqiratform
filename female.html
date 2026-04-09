@@ -2,265 +2,1104 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Qirat Registration – Sisters</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>JUMJ - Qirat Registration | نور التلاوة</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { 
-            --primary: #4a90e2; 
-            --accent: #7ed321; 
-            --light: #f9f9f9; 
-            --dark: #333; 
-            --warning: #ff9800;
-            --success: #4caf50;
-            --error: #f44336;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --gradient-1: linear-gradient(135deg, #1e3c2c 0%, #2a6b4e 50%, #c9a03d 100%);
+            --gradient-2: linear-gradient(135deg, #f9e0a0 0%, #f4c542 50%, #e6b422 100%);
+            --gradient-3: linear-gradient(135deg, #0f2b22 0%, #1f5e46 100%);
+            --gradient-gold: linear-gradient(135deg, #f5e7c8 0%, #e9d6a3 30%, #c9a03d 70%, #b88d2e 100%);
+            --gradient-emerald: linear-gradient(135deg, #1e5944 0%, #2f8b68 50%, #4aa57c 100%);
+            --card-bg: rgba(255, 252, 240, 0.96);
+            --text-primary: #2c2418;
+            --text-secondary: #6b4e2e;
+            --text-light: #9b7b4c;
+            --border-glow: rgba(201, 160, 61, 0.5);
+            --primary-gold: #d4af37;
+            --primary-gold-dark: #b88d2e;
+            --primary-emerald: #2d6a4f;
+            --primary-emerald-light: #40916c;
+            --accent-rose: #c97e5a;
+            --accent-saffron: #ff8c42;
+            --shadow-gold: 0 8px 32px rgba(201, 160, 61, 0.25);
+            --shadow-emerald: 0 8px 32px rgba(45, 106, 79, 0.2);
+            --transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+
+        body.dark {
+            --card-bg: rgba(20, 28, 24, 0.94);
+            --text-primary: #faf3e0;
+            --text-secondary: #e6d5b8;
+            --text-light: #c9b07c;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
-            display: flex; justify-content: center; align-items: center;
-            min-height: 100vh; padding: 20px;
+            font-family: 'Poppins', 'Amiri', 'Segoe UI', serif;
+            min-height: 100vh;
+            padding: 1rem;
+            position: relative;
+            background: linear-gradient(135deg, #0a2a1f 0%, #1a4a35 50%, #2d5a3e 100%);
+            overflow-x: hidden;
         }
+
+        /* Mobile-first base styles */
         .form-container {
-            background: #fff; border-radius: 20px;
-            box-shadow: 0 8px 30px rgba(0,0,0,.15);
-            padding: 40px; max-width: 700px; width: 100%;
-            animation: fadeIn 0.5s ease-in-out;
+            width: 100%;
+            max-width: 100%;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 1.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25), 0 0 0 1px rgba(212, 175, 55, 0.3);
+            padding: 1.5rem;
+            transition: var(--transition);
+            animation: containerGlow 3s ease-in-out infinite;
         }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        h2 { 
-            text-align: center; color: var(--primary); margin-bottom: 30px; 
-            font-size: 28px; text-shadow: 1px 1px 2px rgba(0,0,0,.1);
+
+        @keyframes containerGlow {
+            0%, 100% { box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25), 0 0 0 1px rgba(212, 175, 55, 0.3); }
+            50% { box-shadow: 0 25px 50px -12px rgba(212, 175, 55, 0.4), 0 0 0 2px rgba(212, 175, 55, 0.5); }
         }
-        h3 { color: var(--primary); margin: 30px 0 15px; font-size: 20px; }
-        label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--dark); }
-        input[type=text], select {
-            width: 100%; padding: 12px; margin-bottom: 20px;
-            border: 1px solid #ddd; border-radius: 8px; font-size: 16px;
-            transition: border .3s, box-shadow .3s;
+
+        /* Tablet and desktop improvements */
+        @media (min-width: 768px) {
+            body {
+                padding: 2rem;
+            }
+            .form-container {
+                max-width: 800px;
+                padding: 2rem;
+                border-radius: 2rem;
+            }
         }
-        input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 8px rgba(74,144,226,.3); outline: none; }
+
+        @media (min-width: 1024px) {
+            .form-container {
+                max-width: 1000px;
+                padding: 2.5rem;
+                border-radius: 3rem;
+            }
+        }
+
+        .bg-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.08"><path fill="none" stroke="%23f4c542" stroke-width="1.2" d="M50 10 L58 30 L78 32 L63 48 L68 70 L50 58 L32 70 L37 48 L22 32 L42 30 L50 10z"/><circle cx="50" cy="50" r="12" stroke="%23f4c542" fill="none" stroke-width="1"/></svg>');
+            background-repeat: repeat;
+            background-size: 60px;
+            pointer-events: none;
+        }
+
+        .mosque-silhouette {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 150px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.2)), url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 150" preserveAspectRatio="none"><path fill="%23c9a03d" fill-opacity="0.15" d="M0,150 L1200,150 L1200,80 L1050,80 L950,30 L850,80 L750,20 L650,80 L550,25 L450,80 L350,20 L250,80 L150,30 L50,80 L0,80 Z"/></svg>') repeat-x bottom;
+            background-size: 200px auto;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        @media (min-width: 768px) {
+            .mosque-silhouette {
+                height: 200px;
+                background-size: 280px auto;
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            position: relative;
+        }
+
+        @media (min-width: 768px) {
+            .header {
+                margin-bottom: 2rem;
+                padding-bottom: 1.5rem;
+            }
+        }
+
+        .logo-container {
+            margin-bottom: 1rem;
+        }
+
+        .logo-img {
+            width: 70px;
+            height: 70px;
+            object-fit: contain;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-gold), var(--primary-emerald));
+            padding: 5px;
+            box-shadow: var(--shadow-gold);
+        }
+
+        @media (min-width: 768px) {
+            .logo-img {
+                width: 90px;
+                height: 90px;
+            }
+        }
+
+        .header::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 10%;
+            width: 80%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary-gold), var(--primary-emerald), var(--primary-gold), transparent);
+            border-radius: 3px;
+        }
+
+        @media (min-width: 768px) {
+            .header::after {
+                height: 3px;
+            }
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #d4af37, #f4c542, #b88d2e);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        @media (min-width: 768px) {
+            h2 {
+                font-size: 2rem;
+                gap: 1rem;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            h2 {
+                font-size: 2.4rem;
+            }
+        }
+
+        .subhead {
+            text-align: center;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, transparent, rgba(212,175,55,0.1), transparent);
+            padding: 0.6rem;
+            border-radius: 2rem;
+            flex-wrap: wrap;
+        }
+
+        @media (min-width: 768px) {
+            .subhead {
+                font-size: 1rem;
+                margin-bottom: 2rem;
+                gap: 0.75rem;
+            }
+        }
+
+        .form-row {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        @media (min-width: 640px) {
+            .form-row {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 1.2rem;
+                margin-bottom: 1.6rem;
+            }
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .form-group {
+                margin-bottom: 1.6rem;
+            }
+        }
+
+        label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            font-size: 0.85rem;
+        }
+
+        @media (min-width: 768px) {
+            label {
+                gap: 0.6rem;
+                margin-bottom: 0.6rem;
+                font-size: 0.95rem;
+            }
+        }
+
+        label i {
+            color: var(--primary-gold);
+            width: 1.2rem;
+            font-size: 0.9rem;
+        }
+
+        @media (min-width: 768px) {
+            label i {
+                width: 1.4rem;
+                font-size: 1.1rem;
+            }
+        }
+
+        input, select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid rgba(212, 175, 55, 0.3);
+            border-radius: 1rem;
+            font-size: 0.9rem;
+            transition: var(--transition);
+            background: var(--card-bg);
+            color: var(--text-primary);
+            font-family: inherit;
+        }
+
+        @media (min-width: 768px) {
+            input, select {
+                padding: 0.9rem 1.2rem;
+                border-radius: 1.2rem;
+                font-size: 1rem;
+            }
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-gold);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+            transform: translateY(-1px);
+        }
+
         .schedule-group {
-            background: var(--light); border: 1px solid #ddd; border-radius: 12px;
-            padding: 20px; margin-bottom: 20px; transition: transform .2s, box-shadow .2s;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.08), rgba(45, 106, 79, 0.08));
+            border: 2px solid rgba(212, 175, 55, 0.3);
+            border-radius: 1.2rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            transition: var(--transition);
+            backdrop-filter: blur(4px);
         }
-        .schedule-group:hover { transform: translateY(-5px); box-shadow: 0 4px 15px rgba(0,0,0,.1); }
+
+        @media (min-width: 768px) {
+            .schedule-group {
+                padding: 1.6rem;
+                margin-bottom: 1.6rem;
+                border-radius: 2rem;
+            }
+        }
+
+        .schedule-group:hover {
+            border-color: var(--primary-gold);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-gold);
+        }
+
+        .schedule-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .schedule-header {
+                margin-bottom: 1.3rem;
+                gap: 0.8rem;
+            }
+        }
+
+        .schedule-badge {
+            background: linear-gradient(135deg, var(--primary-gold), var(--primary-gold-dark));
+            color: #1e2a1f;
+            padding: 0.3rem 1rem;
+            border-radius: 1.5rem;
+            font-size: 0.7rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        @media (min-width: 768px) {
+            .schedule-badge {
+                padding: 0.4rem 1.3rem;
+                font-size: 0.8rem;
+                gap: 0.6rem;
+            }
+        }
+
+        .btn-remove {
+            background: rgba(201, 126, 90, 0.15);
+            border: 1px solid var(--accent-rose);
+            color: var(--accent-rose);
+            padding: 0.3rem 0.8rem;
+            border-radius: 1.5rem;
+            cursor: pointer;
+            font-size: 0.7rem;
+            font-weight: 500;
+            transition: var(--transition);
+            width: auto;
+            margin: 0;
+        }
+
+        @media (min-width: 768px) {
+            .btn-remove {
+                padding: 0.4rem 1rem;
+                font-size: 0.75rem;
+            }
+        }
+
+        .btn-remove:hover {
+            background: var(--accent-rose);
+            color: white;
+            transform: scale(1.02);
+        }
+
         .days-selector {
-            display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+            gap: 0.5rem;
+            margin-bottom: 1rem;
         }
+
+        @media (min-width: 480px) {
+            .days-selector {
+                grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+                gap: 0.6rem;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .days-selector {
+                grid-template-columns: repeat(auto-fit, minmax(85px, 1fr));
+                gap: 0.7rem;
+                margin-bottom: 1.3rem;
+            }
+        }
+
         .days-selector label {
-            flex: 1 1 auto; display: flex; align-items: center; cursor: pointer;
-            background: #fff; border: 1px solid #ddd; border-radius: 8px;
-            padding: 8px 12px; transition: background .3s, border .3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.3rem;
+            background: var(--card-bg);
+            border: 2px solid rgba(212, 175, 55, 0.3);
+            border-radius: 1.5rem;
+            padding: 0.4rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+            margin: 0;
+            font-size: 0.7rem;
         }
-        .days-selector input[type=checkbox] { margin-right: 8px; }
-        .days-selector label:hover { background: rgba(74,144,226,.1); border-color: var(--primary); }
-        .days-selector input:checked + span { color: var(--primary); font-weight: bold; }
-        button {
-            background: var(--primary); color: #fff; border: none; border-radius: 8px;
-            padding: 12px 20px; font-size: 16px; cursor: pointer;
-            transition: background .3s, transform .2s;
-            display: block; width: 100%; margin-top: 10px;
+
+        @media (min-width: 768px) {
+            .days-selector label {
+                gap: 0.5rem;
+                padding: 0.6rem;
+                font-size: 0.85rem;
+            }
         }
-        button:hover { background: #357abd; transform: scale(1.02); }
-        #add-schedule {
-            background: var(--accent); width: auto; padding: 10px 20px;
-            font-size: 14px; margin-bottom: 20px; display: inline-block;
+
+        .days-selector label:hover {
+            border-color: var(--primary-gold);
+            transform: translateY(-2px);
         }
-        #add-schedule:hover { background: #6ab21c; }
-        #status { margin-top: 15px; text-align: center; font-weight: 600; padding: 10px; border-radius: 8px; }
-        .success { background: rgba(76,175,80,.1); color: var(--success); }
-        .error { background: rgba(244,67,54,.1); color: var(--error); }
-        @media(max-width:480px) {
-            .form-container { padding: 20px; }
-            .days-selector { flex-direction: column; }
+
+        .days-selector input[type="checkbox"] {
+            width: 0.9rem;
+            height: 0.9rem;
+            margin: 0;
+            accent-color: var(--primary-gold);
         }
+
+        @media (min-width: 768px) {
+            .days-selector input[type="checkbox"] {
+                width: 1rem;
+                height: 1rem;
+            }
+        }
+
+        .schedule-row {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin-top: 0.5rem;
+        }
+
+        @media (min-width: 640px) {
+            .schedule-row {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 1rem;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .schedule-row {
+                gap: 1.2rem;
+                margin-top: 0.5rem;
+            }
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #d4af37, #c9a03d, #b88d2e);
+            color: #1e2a1f;
+            border: none;
+            padding: 0.8rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            font-family: inherit;
+            box-shadow: 0 8px 20px rgba(212,175,55,0.3);
+        }
+
+        @media (min-width: 768px) {
+            .btn-primary {
+                padding: 1rem 1.5rem;
+                font-size: 1.1rem;
+                gap: 0.8rem;
+            }
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(212,175,55,0.5);
+            filter: brightness(1.05);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, rgba(212,175,55,0.2), rgba(45,106,79,0.2));
+            border: 2px solid var(--primary-gold);
+            color: var(--primary-gold);
+            padding: 0.6rem 1.2rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 0.8rem;
+            width: 100%;
+            justify-content: center;
+        }
+
+        @media (min-width: 480px) {
+            .btn-secondary {
+                width: auto;
+                padding: 0.7rem 1.5rem;
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .btn-secondary {
+                padding: 0.8rem 1.8rem;
+                font-size: 0.9rem;
+                gap: 0.7rem;
+            }
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, var(--primary-gold), var(--primary-emerald));
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(212,175,55,0.4);
+        }
+
+        #status {
+            margin-top: 1rem;
+            padding: 0.8rem;
+            border-radius: 1rem;
+            font-weight: 600;
+            text-align: center;
+            transition: var(--transition);
+            font-size: 0.85rem;
+        }
+
+        @media (min-width: 768px) {
+            #status {
+                margin-top: 1.5rem;
+                padding: 1rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        .success {
+            background: linear-gradient(135deg, rgba(45, 106, 79, 0.2), rgba(212, 175, 55, 0.1));
+            color: var(--primary-emerald);
+            border-left: 4px solid var(--primary-emerald);
+            border-right: 4px solid var(--primary-emerald);
+        }
+
+        .error {
+            background: linear-gradient(135deg, rgba(201, 126, 90, 0.2), rgba(212, 175, 55, 0.1));
+            color: var(--accent-rose);
+            border-left: 4px solid var(--accent-rose);
+            border-right: 4px solid var(--accent-rose);
+        }
+
+        .islamic-quote {
+            text-align: center;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 2px dashed rgba(212, 175, 55, 0.4);
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        @media (min-width: 768px) {
+            .islamic-quote {
+                margin-top: 2rem;
+                padding-top: 1.2rem;
+                font-size: 0.85rem;
+            }
+        }
+
+        .required::after {
+            content: " *";
+            color: var(--accent-rose);
+            font-weight: bold;
+        }
+
+        .char-counter {
+            font-size: 0.65rem;
+            color: var(--text-light);
+            text-align: right;
+            margin-top: 0.2rem;
+        }
+
+        @media (min-width: 768px) {
+            .char-counter {
+                font-size: 0.7rem;
+                margin-top: 0.25rem;
+            }
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 0.8rem;
+            right: 0.8rem;
+            background: linear-gradient(135deg, rgba(212,175,55,0.2), rgba(45,106,79,0.2));
+            backdrop-filter: blur(12px);
+            border: 2px solid var(--primary-gold);
+            border-radius: 2rem;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: var(--transition);
+            color: var(--primary-gold);
+            z-index: 100;
+            font-weight: 600;
+            font-family: inherit;
+        }
+
+        @media (min-width: 768px) {
+            .theme-toggle {
+                top: 1.2rem;
+                right: 1.2rem;
+                padding: 0.7rem 1.4rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        .theme-toggle:hover {
+            background: linear-gradient(135deg, var(--primary-gold), var(--primary-emerald));
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .schedule-group {
+            animation: fadeInUp 0.4s ease-out;
+        }
+
+        /* Better touch targets for mobile */
+        button, 
+        .btn-remove,
+        .btn-secondary,
+        .btn-primary,
+        .days-selector label,
+        .theme-toggle {
+            touch-action: manipulation;
+        }
+        /* Make container fill 100% width */
+.form-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    box-sizing: border-box !important;
+}
+
+/* Remove body padding/margin for full width */
+body {
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* Optional: Add inner padding for content */
+.form-container {
+    padding: 1.5rem !important;
+}
+
+@media (min-width: 768px) {
+    .form-container {
+        padding: 2rem !important;
+    }
+}
+        /* Enhanced logo styling */
+.logo-container {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.logo-img {
+    width: 80px;
+    height: auto;
+    object-fit: contain;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-gold), var(--primary-emerald));
+    padding: 4px;
+    box-shadow: var(--shadow-gold);
+    transition: var(--transition);
+}
+
+.logo-img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 25px rgba(212, 175, 55, 0.4);
+}
+
+/* Responsive logo sizes */
+@media (min-width: 768px) {
+    .logo-img {
+        width: 100px;
+        padding: 5px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .logo-img {
+        width: 120px;
+        padding: 6px;
+    }
+}
     </style>
 </head>
 <body>
-<div class="form-container">
-    <h2>Qirat Registration – Sisters</h2>
+    <div class="bg-pattern"></div>
+    <div class="mosque-silhouette"></div>
+    
+    <button class="theme-toggle" id="themeToggle">
+        <i class="fas fa-moon"></i> Dark Mode
+    </button>
 
-    <form id="qiratForm">
-        <label for="full_name">Full Name</label>
-        <input type="text" id="full_name" required>
-
-        <label for="phone">Phone Number</label>
-        <input type="text" id="phone" required>
-
-        <label for="telegram">Telegram Username</label>
-        <input type="text" id="telegram" placeholder="@username" required>
-
-        <h3>Qirat Schedules</h3>
-        <p>Select days once for a single qirat only, if you have more than one qiart per week, ADD another schedule!</p>
-
-        <div id="schedules">
-            <!-- first schedule -->
-            <div class="schedule-group">
-                <div class="days-selector">
-                    <label><input type="checkbox" class="day-check" value="Monday"><span>Monday</span></label>
-                    <label><input type="checkbox" class="day-check" value="Tuesday"><span>Tuesday</span></label>
-                    <label><input type="checkbox" class="day-check" value="Wednesday"><span>Wednesday</span></label>
-                    <label><input type="checkbox" class="day-check" value="Thursday"><span>Thursday</span></label>
-                    <label><input type="checkbox" class="day-check" value="Friday"><span>Friday</span></label>
-                    <label><input type="checkbox" class="day-check" value="Saturday"><span>Saturday</span></label>
-                    <label><input type="checkbox" class="day-check" value="Sunday"><span>Sunday</span></label>
-                </div>
-                <label>Qirat Name</label>
-                <input type="text" class="qirat_name" placeholder="e.g. Shuja, Quran or other" required>
-                <label>When?</label>
-                <input type="text" class="time_preference" placeholder="magrib - isha, or after subhi or .." >
+    <div class="form-container">
+        <div class="header">
+            <div class="logo-container">
+    <img src="logo.png" alt="JUMJ Logo" class="logo-img" id="logoImage">
+</div>
+            <h2>
+                <i class="fas "></i>
+                JUMJ - Qirat Registration
+                <i class="fas "></i>
+            </h2>
+            <div class="subhead">
+                <i class="fas fa-quran"></i>
+                Recite & Reflect | Join the Blessed Circle
+                <i class="fas fa-mosque"></i>
             </div>
         </div>
 
-        <button type="button" id="add-schedule">+ I have Additional schedule</button>
-
-        <button type="submit">Submit Registration</button>
-    </form>
-
-    <div id="status"></div>
-</div>
-
-<script>
-/* ---------- CONFIGURATION ---------- */
-const BOT_TOKEN = '8471368946:AAHXFpFGC5ob5ptDivokYDVpEVBqM0c5iKQ';
-
-// <<<--- PUT YOUR ADMIN CHAT IDs HERE (strings) --->
-const ADMIN_IDS = ['7897840965', '5699316636'];   // Example: ['123456789', '-1001234567890']
-
-/* ---------- DYNAMIC SCHEDULES ---------- */
-let scheduleIdx = 1;
-document.getElementById('add-schedule').addEventListener('click', () => {
-    const container = document.getElementById('schedules');
-    const group = document.createElement('div');
-    group.className = 'schedule-group';
-
-    const daysSel = document.createElement('div');
-    daysSel.className = 'days-selector';
-    daysSel.innerHTML = `
-        <label><input type="checkbox" class="day-check" value="Monday"><span>Monday</span></label>
-        <label><input type="checkbox" class="day-check" value="Tuesday"><span>Tuesday</span></label>
-        <label><input type="checkbox" class="day-check" value="Wednesday"><span>Wednesday</span></label>
-        <label><input type="checkbox" class="day-check" value="Thursday"><span>Thursday</span></label>
-        <label><input type="checkbox" class="day-check" value="Friday"><span>Friday</span></label>
-        <label><input type="checkbox" class="day-check" value="Saturday"><span>Saturday</span></label>
-        <label><input type="checkbox" class="day-check" value="Sunday"><span>Sunday</span></label>
-    `;
-
-    const labelQirat = document.createElement('label');
-    labelQirat.textContent = 'Qirat Name';
-    const qiratInp = document.createElement('input');
-    qiratInp.type = 'text';
-    qiratInp.className = 'qirat_name';
-    qiratInp.placeholder = 'e.g. tawhiid';
-    qiratInp.required = true;
-
-    const labelTime = document.createElement('label');
-    labelTime.textContent = 'When?';
-    const timeInp = document.createElement('input');
-    timeInp.type = 'text';
-    timeInp.className = 'time_preference';
-    timeInp.placeholder = 'magrib - isha, or after subhi or ..';
-    timeInp.required = true;
-
-    group.append(daysSel, labelQirat, qiratInp, labelTime, timeInp);
-    container.appendChild(group);
-    scheduleIdx++;
-});
-
-/* ---------- TELEGRAM SEND ---------- */
-async function sendToTelegram(chatId, text) {
-    const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
-    const payload = { chat_id: chatId, text, parse_mode: 'HTML' };
-    const resp = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-    });
-    return resp.json();
-}
-
-/* ---------- FORM SUBMISSION ---------- */
-document.getElementById('qiratForm').addEventListener('submit', async e => {
-    e.preventDefault();
-    const status = document.getElementById('status');
-    status.textContent = 'Sending…';
-    status.className = '';
-
-    // ----- collect basic info -----
-    const full_name = document.getElementById('full_name').value.trim();
-    const phone = document.getElementById('phone').value.trim();
-    const telegram = document.getElementById('telegram').value.trim().replace(/^@/, '');
-
-    // ----- collect schedules -----
-    const groups = document.querySelectorAll('.schedule-group');
-    const schedules = [];
-    for (let group of groups) {
-        const checkedDays = Array.from(group.querySelectorAll('.day-check:checked')).map(c => c.value);
-        const qirat = group.querySelector('.qirat_name').value.trim();
-        const timePref = group.querySelector('.time_preference').value.trim();
-        if (checkedDays.length > 0 && qirat && timePref) {
-            schedules.push({ days: checkedDays, qirat, time: timePref });
-        }
-    }
-
-    if (schedules.length === 0) {
-        status.textContent = 'Please add at least one schedule with days selected, qirat name, and time preference.';
-        status.className = 'error';
-        return;
-    }
-
-    // ----- BUILD BEAUTIFUL MESSAGE -----
-    const scheduleLines = schedules.map(s => 
-        `• <b>${s.days.join(' • ')}</b> → <i>${s.qirat}</i>  |  🕒 ${s.time}`
-    ).join('\n');
-
-    const message = `
-<b>New Qirat Registration</b>
-
-<b>Full Name:</b> ${full_name}
-<b>Phone:</b> ${phone}
-<b>Telegram:</b> @${telegram}
-
-<b>Schedules:</b>
-${scheduleLines}
-
-──────────────
-Submitted on ${new Date().toLocaleString()}
-`.trim();
-
-    // ----- send to every admin -----
-    const results = await Promise.all(
-        ADMIN_IDS.map(id => sendToTelegram(id, message))
-    );
-
-    const allOk = results.every(r => r.ok);
-    if (allOk) {
-        status.textContent = '👍REGISTRATION SUCCESFUL!';
-        status.className = 'success';
-        document.getElementById('qiratForm').reset();
-        document.getElementById('schedules').innerHTML = `
-            <div class="schedule-group">
-                <div class="days-selector">
-                    <label><input type="checkbox" class="day-check" value="Monday"><span>Monday</span></label>
-                    <label><input type="checkbox" class="day-check" value="Tuesday"><span>Tuesday</span></label>
-                    <label><input type="checkbox" class="day-check" value="Wednesday"><span>Wednesday</span></label>
-                    <label><input type="checkbox" class="day-check" value="Thursday"><span>Thursday</span></label>
-                    <label><input type="checkbox" class="day-check" value="Friday"><span>Friday</span></label>
-                    <label><input type="checkbox" class="day-check" value="Saturday"><span>Saturday</span></label>
-                    <label><input type="checkbox" class="day-check" value="Sunday"><span>Sunday</span></label>
+        <form id="qiratForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="required"><i class="fas fa-user-circle"></i> Full Name</label>
+                    <input type="text" id="full_name" placeholder="Enter your full name" required maxlength="50">
+                    <div class="char-counter"><span id="nameCount">0</span>/50 characters</div>
                 </div>
-                <label>Qirat Name</label>
-                <input type="text" class="qirat_name" placeholder="e.g. Tawhid" required>
-                <label>When?</label>
-                <input type="text" class="time_preference" placeholder="magrib - isha, or after subhi or .." required>
-            </div>`;
-    } else {
-        status.textContent = 'Error – some messages failed. Check the admin IDs.';
-        status.className = 'error';
-        console.error('Telegram errors:', results);
-    }
-});
-</script>
+                <div class="form-group">
+                    <label class="required"><i class="fas fa-venus-mars"></i> Gender</label>
+                    <select id="gender" required>
+                        <option value="">Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="required"><i class="fas fa-phone-alt"></i> Phone Number</label>
+                    <input type="tel" id="phone" placeholder="+1234567890" required>
+                </div>
+                <div class="form-group">
+                    <label class="required"><i class="fas fa-building"></i> Department</label>
+                    <select id="department" required>
+                        <option value="">Select Department</option>
+                        <option value="Medicine">Medicine</option>
+                        <option value="Pharmacy">Pharmacy</option>
+                        <option value="Nursing">Nursing</option>
+                        <option value="Dentistry">Dentistry</option>
+                        <option value="Public Health">Public Health</option>
+                        <option value="Medical Laboratory">Medical Laboratory</option>
+                        <option value="Radiology">Radiology</option>
+                        <option value="Physiotherapy">Physiotherapy</option>
+                        <option value="Health Informatics">Health Informatics</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="required"><i class="fas fa-graduation-cap"></i> Batch / Year</label>
+                <select id="batch" required>
+                    <option value="">Select Batch / Year</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="required"><i class="fab fa-telegram"></i> Telegram Username</label>
+                <input type="text" id="telegram" placeholder="@username" required>
+            </div>
+
+            <div style="margin: 1rem 0 0.8rem;">
+                <h3 style="display: flex; align-items: center; gap: 0.5rem; font-size: 1.1rem;">
+                    <i class="fas fa-calendar-alt"></i>
+                    Qirat Schedules
+                </h3>
+                <p style="color: var(--text-secondary); font-size: 0.75rem; margin-top: 0.3rem;">
+                    <i class="fas fa-hand-peace"></i> Select available days, Qirat name & preferred time
+                </p>
+            </div>
+
+            <div id="schedules">
+                <div class="schedule-group" data-id="0">
+                    <div class="schedule-header">
+                        <span class="schedule-badge"><i class="fas fa-star-of-life"></i> Schedule 1</span>
+                        <button type="button" class="btn-remove" onclick="removeSchedule(this)"><i class="fas fa-trash-alt"></i> Remove</button>
+                    </div>
+                    <div class="days-selector">
+                        <label><input type="checkbox" class="day-check" value="Monday"><span>Mon</span></label>
+                        <label><input type="checkbox" class="day-check" value="Tuesday"><span>Tue</span></label>
+                        <label><input type="checkbox" class="day-check" value="Wednesday"><span>Wed</span></label>
+                        <label><input type="checkbox" class="day-check" value="Thursday"><span>Thu</span></label>
+                        <label><input type="checkbox" class="day-check" value="Friday"><span>Fri</span></label>
+                        <label><input type="checkbox" class="day-check" value="Saturday"><span>Sat</span></label>
+                        <label><input type="checkbox" class="day-check" value="Sunday"><span>Sun</span></label>
+                    </div>
+                    <div class="schedule-row">
+                        <div>
+                            <label class="required"><i class="fas fa-music"></i> Qirat Name</label>
+                            <input type="text" class="qirat_name" placeholder="e.g., Surah Al-Fatiha, Tajweed" required>
+                        </div>
+                        <div>
+                            <label class="required"><i class="fas fa-clock"></i> Time Preference</label>
+                            <input type="text" class="time_preference" placeholder="Maghrib - Isha, 7:30 PM" required>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button type="button" id="add-schedule" class="btn-secondary">
+                <i class="fas fa-plus-circle"></i> Add Additional Schedule
+            </button>
+
+            <button type="submit" class="btn-primary" id="submitBtn">
+                <i class="fas fa-paper-plane"></i> Submit Registration
+            </button>
+        </form>
+
+        <div id="status"></div>
+        
+        <div class="islamic-quote">
+            <i class="fas fa-quote-right"></i> 
+            "And recite the Qur'an with measured recitation."
+            <i class="fas fa-quote-left"></i>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyAR_g5y04YAGCrTvZCowrE7hw8h7k1du08",
+            authDomain: "jujm-qirat.firebaseapp.com",
+            projectId: "jujm-qirat",
+            storageBucket: "jujm-qirat.firebasestorage.app",
+            messagingSenderId: "253413984903",
+            appId: "1:253413984903:web:c1577e0fdef1711f960622"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        
+        const BOT_TOKEN = '8471368946:AAHXFpFGC5ob5ptDivokYDVpEVBqM0c5iKQ';
+        const ADMIN_IDS = ['7897840965', '6672312554', '5699316636'];
+        
+        // Try to load actual logo if exists
+        const logoImg = document.getElementById('logoImage');
+        // If you have an actual logo.png in your project, uncomment the line below
+        // logoImg.src = 'logo.png';
+        
+        // Theme
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            body.classList.add('dark');
+            themeToggle.innerHTML = '<i class="fas fa-sun"></i> Light Mode';
+        }
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark');
+            const isDark = body.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            themeToggle.innerHTML = isDark ? '<i class="fas fa-sun"></i> Light Mode' : '<i class="fas fa-moon"></i> Dark Mode';
+        });
+        
+        // Character counter
+        const nameInput = document.getElementById('full_name');
+        const nameCount = document.getElementById('nameCount');
+        nameInput.addEventListener('input', () => {
+            nameCount.textContent = nameInput.value.length;
+            if (nameInput.value.length > 50) nameInput.value = nameInput.value.slice(0, 50);
+        });
+        
+        // Batch options
+        const medicineBatchOptions = [
+            "Pre-Med", "New PC1", "Old PC1", "New PC2", "Old CPC2", "New C1", "Old C1", "New C2", "Old C2", "Intern"
+        ];
+        const otherYearOptions = ["1st Year", "2nd Year", "3rd Year", "4th Year", "5th Year", "6th Year"];
+        
+        function updateBatchOptions() {
+            const deptSelect = document.getElementById('department');
+            const batchSelect = document.getElementById('batch');
+            const selectedDept = deptSelect.value;
+            batchSelect.innerHTML = '<option value="">Select Batch / Year</option>';
+            
+            if (selectedDept === "Medicine") {
+                medicineBatchOptions.forEach(opt => {
+                    const option = document.createElement('option');
+                    option.value = opt;
+                    option.textContent = opt;
+                    batchSelect.appendChild(option);
+                });
+            } else if (selectedDept && selectedDept !== "") {
+                otherYearOptions.forEach(opt => {
+                    const option = document.createElement('option');
+                    option.value = opt;
+                    option.textContent = opt;
+                    batchSelect.appendChild(option);
+                });
+            }
+        }
+        
+        document.getElementById('department').addEventListener('change', updateBatchOptions);
+        updateBatchOptions();
+        
+        // Schedule management
+        let scheduleCounter = 1;
+        window.removeSchedule = function(btn) {
+            const groups = document.querySelectorAll('.schedule-group');
+            if (groups.length > 1) {
+                btn.closest('.schedule-group').remove();
+                updateScheduleBadges();
+            } else {
+                showStatus('At least one schedule is required!', 'error');
+            }
+        };
+        
+        function updateScheduleBadges() {
+            const groups = document.querySelectorAll('.schedule-group');
+            groups.forEach((group, idx) => {
+                const badge = group.querySelector('.schedule-badge');
+                if (badge) badge.innerHTML = `<i class="fas fa-star-of-life"></i> Schedule ${idx + 1}`;
+            });
+        }
+        
+        document.getElementById('add-schedule').addEventListener('click', () => {
+            const container = document.getElementById('schedules');
+            const newGroup = document.createElement('div');
+            newGroup.className = 'schedule-group';
+            newGroup.setAttribute('data-id', scheduleCounter++);
+            newGroup.innerHTML = `
+                <div class="schedule-header">
+                    <span class="schedule-badge"><i class="fas fa-star-of-life"></i> Schedule ${document.querySelectorAll('.schedule-group').length + 1}</span>
+                    <button type="button" class="btn-remove" onclick="removeSchedule(this)"><i class="fas fa-trash-alt"></i> Remove</button>
+                </div>
+                <div class="days-selector">
+                    <label><input type="checkbox" class="day-check" value="Monday"><span>Mon</span></label>
+                    <label><input type="checkbox" class="day-check" value="Tuesday"><span>Tue</span></label>
+                    <label><input type="checkbox" class="day-check" value="Wednesday"><span>Wed</span></label>
+                    <label><input type="checkbox" class="day-check" value="Thursday"><span>Thu</span></label>
+                    <label><input type="checkbox" class="day-check" value="Friday"><span>Fri</span></label>
+                    <label><input type="checkbox" class="day-check" value="Saturday"><span>Sat</span></label>
+                    <label><input type="checkbox" class="day-check" value="Sunday"><span>Sun</span></label>
+                </div>
+                <div class="schedule-row">
+                    <div><label class="required"><i class="fas fa-music"></i> Qirat Name</label><input type="text" class="qirat_name" placeholder="e.g., Surah Al-Fatiha" required></div>
+                    <div><label class="required"><i class="fas fa-clock"></i> Time Preference</label><input type="text" class="time_preference" placeholder="Maghrib - Isha" required></div>
+                </div>
+            `;
+            container.appendChild(newGroup);
+            updateScheduleBadges();
+            newGroup.style.animation = 'fadeInUp 0.4s ease-out';
+        });
+        
+        async function sendToTelegram(chatId, text) {
+            const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+            try {
+                await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: chatId, text, parse_mode: 'HTML', disable_web_page_preview: true })
+                });
+            } catch (err) { console.error(err); }
+        }
+        
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = type;
+            setTimeout(() => { if (statusDiv.className === type) statusDiv.className = ''; }, 5000);
+        }
+        
+        document.getElementById('qiratForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = document.getElementById('submitBtn');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            submitBtn.disabled = true;
+            
+            const full_name = document.getElementById('full_name').value.trim();
+            const gender = document.getElementById('gender').value;
+            const phone = document.getElementById('phone').value.trim();
+            const department = document.getElementById('department').value;
+            const batch = document.getElementById('batch').value;
+            const telegram = document.getElementById('telegram').value.trim();
+            
+            if (!full_name || !gender || !phone || !department || !batch || !telegram) {
+                showStatus('Please fill all required fields', 'error');
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+                return;
+            }
+            
+            const scheduleGroups = document.querySelectorAll('.schedule-group');
+            const schedules = Array.from(scheduleGroups).map(group => ({
+                days: Array.from(group.querySelectorAll('.day-check:checked')).map(cb => cb.value),
+                qirat_name: group.querySelector('.qirat_name').value.trim(),
+                time_preference: group.querySelector('.time_preference').value.trim()
+            }));
+            
+            for (let i = 0; i < schedules.length; i++) {
+                const s = schedules[i];
+                if (s.days.length === 0 || !s.qirat_name || !s.time_preference) {
+                    showStatus(`Schedule ${i+1}: days, Qirat name and time required`, 'error');
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                    return;
+                }
+            }
+            
+            try {
+                const docRef = await addDoc(collection(db, 'registrations'), {
+                    full_name, gender, phone, department, batch, telegram, schedules, timestamp: serverTimestamp()
+                });
+                
+                const schedulesText = schedules.map((s, idx) => `📖 Schedule ${idx+1}: ${s.qirat_name} at ${s.time_preference} on ${s.days.join(', ')}`).join('\n');
+                const msg = `🌟 <b>NEW QIRAT REGISTRATION</b> 🌟\n━━━━━━━━━━━━━━━━\n👤 Name: ${full_name}\n⚧ Gender: ${gender}\n📞 Phone: ${phone}\n🏛 Dept: ${department}\n📚 Batch: ${batch}\n💬 Telegram: ${telegram}\n━━━━━━━━━━━━━━━━\n<b>📅 Schedules:</b>\n${schedulesText}\n🆔 ID: ${docRef.id}`;
+                for (const adminId of ADMIN_IDS) await sendToTelegram(adminId, msg);
+                
+                showStatus('Registration successful!', 'success');
+                document.getElementById('qiratForm').reset();
+                document.getElementById('nameCount').textContent = '0';
+                const container = document.getElementById('schedules');
+                const firstGroup = container.querySelector('.schedule-group').cloneNode(true);
+                firstGroup.querySelectorAll('.day-check').forEach(cb => cb.checked = false);
+                firstGroup.querySelectorAll('.qirat_name, .time_preference').forEach(inp => inp.value = '');
+                container.innerHTML = '';
+                container.appendChild(firstGroup);
+                scheduleCounter = 1;
+                updateScheduleBadges();
+                updateBatchOptions();
+            } catch (error) {
+                console.error(error);
+                showStatus('Error submitting. Check connection.', 'error');
+            } finally {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+        updateScheduleBadges();
+    </script>
 </body>
 </html>
