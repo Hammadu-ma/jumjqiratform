@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Noor Academy | Admin Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #10b981;
+            --primary-dark: #059669;
+            --primary-light: #d1fae5;
+            --secondary: #6366f1;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --dark: #0f172a;
+            --card-bg: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e6f7f0 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* Glass Header */
+        .glass-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(16, 185, 129, 0.2);
+            padding: 16px 24px;
+            margin-bottom: 24px;
+            border-radius: 32px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, #10b981, #059669);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .back-btn {
+            background: var(--primary-light);
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            color: var(--primary-dark);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .back-btn:hover { background: var(--primary); color: white; }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 28px;
+            padding: 20px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .stat-value { font-size: 2rem; font-weight: 800; color: var(--primary); }
+        .stat-label { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
+
+        /* Main Content Layout */
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 24px;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border-radius: 32px;
+            padding: 24px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title i { color: var(--primary); }
+
+        /* Admin List */
+        .admin-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .admin-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .admin-item:hover {
+            background: var(--primary-light);
+            border-radius: 20px;
+        }
+
+        .admin-item.selected {
+            background: var(--primary-light);
+            border-left: 4px solid var(--primary);
+            border-radius: 20px;
+        }
+
+        .admin-avatar {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .admin-info {
+            flex: 1;
+            margin-left: 15px;
+        }
+
+        .admin-name {
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .admin-email {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .admin-role-badge {
+            background: var(--primary-light);
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        .admin-status {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #10b981;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.75rem;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+
+        .form-group label i { color: var(--primary); margin-right: 6px; }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrapper i.input-icon {
+            position: absolute;
+            left: 14px;
+            color: var(--text-muted);
+            z-index: 1;
+        }
+
+        .input-wrapper input, .input-wrapper select {
+            width: 100%;
+            padding: 12px 16px 12px 42px;
+            border: 2px solid var(--border);
+            border-radius: 24px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            background: white;
+        }
+
+        .input-wrapper input:focus, .input-wrapper select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(16,185,129,0.3); }
+        .btn-danger { background: #ef4444; color: white; border: none; padding: 12px 24px; border-radius: 40px; font-weight: 600; cursor: pointer; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-secondary { background: #e2e8f0; color: #334155; border: none; padding: 10px 20px; border-radius: 40px; font-weight: 600; cursor: pointer; }
+
+        /* Activity Log */
+        .activity-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .activity-item {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .activity-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--primary-light);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+        }
+
+        .activity-detail { flex: 1; }
+        .activity-action { font-weight: 600; font-size: 0.85rem; }
+        .activity-time { font-size: 0.7rem; color: var(--text-muted); margin-top: 4px; }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: white;
+            border-radius: 32px;
+            padding: 28px;
+            max-width: 450px;
+            width: 90%;
+            text-align: center;
+        }
+        .modal-buttons { display: flex; gap: 12px; justify-content: center; margin-top: 24px; }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #1f2937;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            display: none;
+            z-index: 1100;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        .empty-state { text-align: center; padding: 60px; color: var(--text-muted); }
+
+        @media (max-width: 1024px) { .two-columns { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) { body { padding: 16px; } .card { padding: 18px; } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="glass-header">
+        <div class="header-content">
+            <div class="logo"><h1><i class="fas fa-user-cog"></i> Admin Management</h1></div>
+            <button class="back-btn" onclick="window.location.href='index.html'"><i class="fas fa-arrow-left"></i> Back to Dashboard</button>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+        <div class="stat-card"><div class="stat-value" id="totalAdmins">0</div><div class="stat-label">Total Admins</div></div>
+        <div class="stat-card"><div class="stat-value" id="activeAdmins">0</div><div class="stat-label">Active Admins</div></div>
+        <div class="stat-card"><div class="stat-value" id="totalActions">0</div><div class="stat-label">Total Actions</div></div>
+    </div>
+
+    <!-- Two Column Layout -->
+    <div class="two-columns">
+        <!-- Left: Admin List -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title"><i class="fas fa-users"></i> All Administrators</div>
+                <button class="btn-primary" id="addAdminBtn" style="padding: 8px 20px;"><i class="fas fa-plus"></i> Add Admin</button>
+            </div>
+            <div class="admin-list" id="adminList">
+                <div class="empty-state"><i class="fas fa-spinner fa-pulse"></i> Loading admins...</div>
+            </div>
+        </div>
+
+        <!-- Right: Admin Details & Actions -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title"><i class="fas fa-user-edit"></i> Admin Details</div>
+                <div id="selectedAdminBadge" style="font-size:0.75rem; color:var(--text-muted);">No admin selected</div>
+            </div>
+            <div id="adminDetailsPanel">
+                <div class="empty-state" style="padding: 60px 20px;">
+                    <i class="fas fa-user-circle fa-3x" style="color:var(--text-muted); margin-bottom: 16px;"></i>
+                    <p>Select an admin from the left to view and edit details</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Activity Log Section (Full Width) -->
+    <div class="card" style="margin-top: 24px;">
+        <div class="card-header">
+            <div class="card-title"><i class="fas fa-history"></i> Recent Admin Actions</div>
+            <button class="btn-secondary" id="refreshActivityBtn" style="padding: 6px 16px;"><i class="fas fa-sync-alt"></i> Refresh</button>
+        </div>
+        <div class="activity-list" id="activityList">
+            <div class="empty-state"><i class="fas fa-spinner fa-pulse"></i> Loading activities...</div>
+        </div>
+    </div>
+</div>
+
+<!-- Add/Edit Admin Modal -->
+<div id="adminModal" class="modal">
+    <div class="modal-content" style="max-width: 500px; text-align: left;">
+        <h3 id="modalTitle" style="margin-bottom: 20px; color: var(--primary);"><i class="fas fa-user-plus"></i> Add New Admin</h3>
+        <form id="adminForm">
+            <div class="form-group"><label><i class="fas fa-user"></i> Full Name</label><div class="input-wrapper"><i class="fas fa-user input-icon"></i><input type="text" id="modalName" placeholder="Enter full name"></div></div>
+            <div class="form-group"><label><i class="fas fa-envelope"></i> Email</label><div class="input-wrapper"><i class="fas fa-envelope input-icon"></i><input type="email" id="modalEmail" placeholder="admin@example.com"></div></div>
+            <div class="form-group"><label><i class="fas fa-lock"></i> Password <span style="font-size:0.7rem;">(leave blank to keep unchanged)</span></label><div class="input-wrapper"><i class="fas fa-lock input-icon"></i><input type="password" id="modalPassword" placeholder="New password"></div></div>
+            <div class="form-group"><label><i class="fas fa-tag"></i> Role</label><div class="input-wrapper"><i class="fas fa-tag input-icon"></i><select id="modalRole"><option value="admin">Admin</option><option value="super-admin">Super Admin</option><option value="viewer">Viewer</option></select></div></div>
+            <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px;">
+                <button type="button" class="btn-secondary" onclick="closeAdminModal()">Cancel</button>
+                <button type="submit" class="btn-primary">Save Admin</button>
+            </div>
+        </form>
+        <button onclick="closeAdminModal()" style="position: absolute; top: 20px; right: 24px; background: none; border: none; font-size: 24px; cursor: pointer;">&times;</button>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="modal">
+    <div class="modal-content">
+        <i class="fas fa-exclamation-triangle" style="font-size: 48px; color: #ef4444; margin-bottom: 16px;"></i>
+        <h3>Delete Admin</h3>
+        <p id="deleteAdminName">Are you sure you want to delete this admin?</p>
+        <div class="modal-buttons">
+            <button class="btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+            <button class="btn-danger" id="confirmDeleteBtn">Delete</button>
+        </div>
+    </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, orderBy, where, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    
+    const firebaseConfig = {
+        apiKey: "AIzaSyAR_g5y04YAGCrTvZCowrE7hw8h7k1du08",
+        authDomain: "jujm-qirat.firebaseapp.com",
+        projectId: "jujm-qirat",
+        storageBucket: "jujm-qirat.firebasestorage.app",
+        messagingSenderId: "253413984903",
+        appId: "1:253413984903:web:c1577e0fdef1711f960622"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const adminsCollection = collection(db, "admins");
+    const activityCollection = collection(db, "adminActivities");
+    
+    let allAdmins = [];
+    let selectedAdminId = null;
+    let pendingDeleteId = null;
+    
+    const toast = document.getElementById('toast');
+    function showToast(msg, isErr = false) { toast.textContent = msg; toast.style.background = isErr ? '#ef4444' : '#10b981'; toast.style.display = 'block'; setTimeout(() => toast.style.display = 'none', 3000); }
+    
+    function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
+    function formatDate(date) { if (!date) return 'Unknown'; return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+    function hashPassword(password) { return btoa(password + 'noor_salt_2024'); }
+    
+    async function logActivity(adminId, adminName, action, details) {
+        try {
+            await addDoc(activityCollection, {
+                adminId, adminName, action, details,
+                timestamp: new Date(),
+                ip: 'web'
+            });
+        } catch (e) { console.error("Log error:", e); }
+    }
+    
+    async function loadAdmins() {
+        try {
+            const q = query(adminsCollection, orderBy('createdAt', 'desc'));
+            const querySnapshot = await getDocs(q);
+            allAdmins = [];
+            querySnapshot.forEach((docSnap) => {
+                const data = docSnap.data();
+                allAdmins.push({ id: docSnap.id, name: data.name, email: data.email, role: data.role || 'admin', createdAt: data.createdAt?.toDate?.() || new Date(data.createdAt), password: data.password });
+            });
+            document.getElementById('totalAdmins').textContent = allAdmins.length;
+            document.getElementById('activeAdmins').textContent = allAdmins.length;
+            renderAdminList();
+            if (selectedAdminId) loadAdminDetails(selectedAdminId);
+        } catch (error) { console.error(error); }
+    }
+    
+    function renderAdminList() {
+        const container = document.getElementById('adminList');
+        if (allAdmins.length === 0) { container.innerHTML = '<div class="empty-state">No admins found</div>'; return; }
+        container.innerHTML = allAdmins.map(admin => `
+            <div class="admin-item ${selectedAdminId === admin.id ? 'selected' : ''}" onclick="window.selectAdmin('${admin.id}')">
+                <div class="admin-avatar">${(admin.name.charAt(0) || 'A').toUpperCase()}</div>
+                <div class="admin-info">
+                    <div class="admin-name">${escapeHtml(admin.name)} <span class="admin-role-badge">${escapeHtml(admin.role)}</span></div>
+                    <div class="admin-email">${escapeHtml(admin.email)}</div>
+                </div>
+                <div class="admin-status"></div>
+            </div>
+        `).join('');
+    }
+    
+    window.selectAdmin = async (id) => {
+        selectedAdminId = id;
+        renderAdminList();
+        await loadAdminDetails(id);
+        await loadAdminActivities(id);
+    };
+    
+    async function loadAdminDetails(id) {
+        const admin = allAdmins.find(a => a.id === id);
+        if (!admin) return;
+        document.getElementById('selectedAdminBadge').innerHTML = `<i class="fas fa-check-circle"></i> Editing: ${escapeHtml(admin.name)}`;
+        const panel = document.getElementById('adminDetailsPanel');
+        panel.innerHTML = `
+            <form id="editAdminForm">
+                <div class="form-group"><label><i class="fas fa-user"></i> Full Name</label><div class="input-wrapper"><i class="fas fa-user input-icon"></i><input type="text" id="editName" value="${escapeHtml(admin.name)}"></div></div>
+                <div class="form-group"><label><i class="fas fa-envelope"></i> Email</label><div class="input-wrapper"><i class="fas fa-envelope input-icon"></i><input type="email" id="editEmail" value="${escapeHtml(admin.email)}"></div></div>
+                <div class="form-group"><label><i class="fas fa-lock"></i> New Password <span style="font-size:0.7rem;">(leave blank to keep current)</span></label><div class="input-wrapper"><i class="fas fa-lock input-icon"></i><input type="password" id="editPassword" placeholder="Enter new password"></div></div>
+                <div class="form-group"><label><i class="fas fa-tag"></i> Role</label><div class="input-wrapper"><i class="fas fa-tag input-icon"></i><select id="editRole"><option value="admin" ${admin.role === 'admin' ? 'selected' : ''}>Admin</option><option value="super-admin" ${admin.role === 'super-admin' ? 'selected' : ''}>Super Admin</option><option value="viewer" ${admin.role === 'viewer' ? 'selected' : ''}>Viewer</option></select></div></div>
+                <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px;">
+                    <button type="button" class="btn-danger" id="deleteAdminBtn"><i class="fas fa-trash"></i> Delete Admin</button>
+                    <button type="submit" class="btn-primary"><i class="fas fa-save"></i> Save Changes</button>
+                </div>
+            </form>
+        `;
+        document.getElementById('editAdminForm').addEventListener('submit', async (e) => { e.preventDefault(); await updateAdmin(id); });
+        document.getElementById('deleteAdminBtn').addEventListener('click', () => showDeleteConfirm(id, admin.name));
+    }
+    
+    async function updateAdmin(id) {
+        const name = document.getElementById('editName').value.trim();
+        const email = document.getElementById('editEmail').value.trim();
+        const newPassword = document.getElementById('editPassword').value;
+        const role = document.getElementById('editRole').value;
+        if (!name || !email) { showToast('Name and email are required', true); return; }
+        const adminRef = doc(db, "admins", id);
+        const updateData = { name, email: email.toLowerCase(), role, updatedAt: new Date() };
+        if (newPassword && newPassword.length >= 6) updateData.password = hashPassword(newPassword);
+        try {
+            await updateDoc(adminRef, updateData);
+            await logActivity(id, name, 'UPDATE', `Admin profile updated. Role: ${role}`);
+            showToast('Admin updated successfully');
+            await loadAdmins();
+            if (selectedAdminId === id) loadAdminDetails(id);
+        } catch (error) { showToast('Update failed: ' + error.message, true); }
+    }
+    
+    async function addAdmin(name, email, password, role) {
+        const hashedPassword = hashPassword(password);
+        const newAdmin = { name, email: email.toLowerCase(), password: hashedPassword, role, createdAt: new Date(), updatedAt: new Date() };
+        try {
+            const docRef = await addDoc(adminsCollection, newAdmin);
+            await logActivity(docRef.id, name, 'CREATE', `New admin created with role: ${role}`);
+            showToast('Admin added successfully');
+            await loadAdmins();
+            return true;
+        } catch (error) { showToast('Add failed: ' + error.message, true); return false; }
+    }
+    
+    async function deleteAdmin(id, name) {
+        try {
+            await deleteDoc(doc(db, "admins", id));
+            await logActivity(id, name, 'DELETE', `Admin account deleted`);
+            showToast('Admin deleted successfully');
+            if (selectedAdminId === id) { selectedAdminId = null; document.getElementById('selectedAdminBadge').innerHTML = 'No admin selected'; document.getElementById('adminDetailsPanel').innerHTML = '<div class="empty-state" style="padding:60px 20px;"><i class="fas fa-user-circle fa-3x"></i><p>Select an admin to view details</p></div>'; }
+            await loadAdmins();
+        } catch (error) { showToast('Delete failed: ' + error.message, true); }
+    }
+    
+    async function loadAdminActivities(adminId) {
+        try {
+            const q = query(activityCollection, where('adminId', '==', adminId), orderBy('timestamp', 'desc'));
+            const snapshot = await getDocs(q);
+            const activities = [];
+            snapshot.forEach(doc => activities.push({ id: doc.id, ...doc.data() }));
+            renderActivityLog(activities);
+        } catch (error) { console.error(error); }
+    }
+    
+    async function loadAllActivities() {
+        try {
+            const q = query(activityCollection, orderBy('timestamp', 'desc'));
+            const snapshot = await getDocs(q);
+            const activities = [];
+            snapshot.forEach(doc => activities.push({ id: doc.id, ...doc.data() }));
+            renderActivityLog(activities);
+            document.getElementById('totalActions').textContent = activities.length;
+        } catch (error) { console.error(error); }
+    }
+    
+    function renderActivityLog(activities) {
+        const container = document.getElementById('activityList');
+        if (activities.length === 0) { container.innerHTML = '<div class="empty-state">No activities recorded yet</div>'; return; }
+        container.innerHTML = activities.slice(0, 50).map(act => `
+            <div class="activity-item">
+                <div class="activity-icon"><i class="fas ${getActionIcon(act.action)}"></i></div>
+                <div class="activity-detail">
+                    <div class="activity-action"><strong>${escapeHtml(act.adminName || 'Unknown')}</strong> ${escapeHtml(act.action)}</div>
+                    <div class="activity-action" style="font-size:0.75rem; color:var(--text-muted);">${escapeHtml(act.details || '')}</div>
+                    <div class="activity-time"><i class="far fa-clock"></i> ${formatDate(act.timestamp?.toDate?.() || new Date(act.timestamp))}</div>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    function getActionIcon(action) {
+        if (action === 'CREATE') return 'fa-plus-circle';
+        if (action === 'UPDATE') return 'fa-edit';
+        if (action === 'DELETE') return 'fa-trash-alt';
+        if (action === 'LOGIN') return 'fa-sign-in-alt';
+        return 'fa-bell';
+    }
+    
+    // Modal Functions
+    function openAddAdminModal() {
+        document.getElementById('modalTitle').innerHTML = '<i class="fas fa-user-plus"></i> Add New Admin';
+        document.getElementById('modalName').value = '';
+        document.getElementById('modalEmail').value = '';
+        document.getElementById('modalPassword').value = '';
+        document.getElementById('modalRole').value = 'admin';
+        document.getElementById('adminModal').classList.add('active');
+    }
+    
+    function closeAdminModal() { document.getElementById('adminModal').classList.remove('active'); }
+    
+    document.getElementById('adminForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = document.getElementById('modalName').value.trim();
+        const email = document.getElementById('modalEmail').value.trim();
+        const password = document.getElementById('modalPassword').value;
+        const role = document.getElementById('modalRole').value;
+        if (!name || !email || !password) { showToast('All fields required', true); return; }
+        if (password.length < 6) { showToast('Password must be at least 6 characters', true); return; }
+        await addAdmin(name, email, password, role);
+        closeAdminModal();
+    });
+    
+    function showDeleteConfirm(id, name) {
+        pendingDeleteId = id;
+        document.getElementById('deleteAdminName').innerHTML = `Are you sure you want to delete "<strong>${escapeHtml(name)}</strong>"?`;
+        document.getElementById('deleteModal').classList.add('active');
+    }
+    
+    function closeDeleteModal() { document.getElementById('deleteModal').classList.remove('active'); pendingDeleteId = null; }
+    
+    document.getElementById('confirmDeleteBtn').onclick = async () => {
+        if (pendingDeleteId) {
+            const admin = allAdmins.find(a => a.id === pendingDeleteId);
+            await deleteAdmin(pendingDeleteId, admin?.name || 'Unknown');
+            closeDeleteModal();
+        }
+    };
+    
+    document.getElementById('addAdminBtn').onclick = openAddAdminModal;
+    document.getElementById('refreshActivityBtn').onclick = () => { if (selectedAdminId) loadAdminActivities(selectedAdminId); else loadAllActivities(); };
+    
+    window.closeAdminModal = closeAdminModal;
+    window.closeDeleteModal = closeDeleteModal;
+    
+    // Initial load
+    loadAdmins();
+    loadAllActivities();
+</script>
+</body>
+</html>
