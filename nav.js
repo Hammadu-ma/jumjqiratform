@@ -5,7 +5,7 @@
  * Navigation Configuration
  * Add all your pages here with their respective icons and display names
  */
-const NAVIGATION_ITEMS = [
+export const NAVIGATION_ITEMS = [
     { path: 'index.html', name: 'Home', icon: 'fa-home', mobileOnly: false },
     { path: 'groups.html', name: 'Groups', icon: 'fa-layer-group', mobileOnly: false },
     { path: 'tables.html', name: 'Tables', icon: 'fa-table', mobileOnly: false },
@@ -16,9 +16,7 @@ const NAVIGATION_ITEMS = [
 ];
 
 // Additional mobile-only items that don't appear in desktop header
-const MOBILE_ONLY_ITEMS = [
-    // Add any mobile-specific navigation items here if needed
-];
+const MOBILE_ONLY_ITEMS = [];
 
 // Combine all navigation items for mobile
 const ALL_MOBILE_ITEMS = [...NAVIGATION_ITEMS.filter(item => !item.mobileOnly), ...MOBILE_ONLY_ITEMS];
@@ -27,7 +25,7 @@ const ALL_MOBILE_ITEMS = [...NAVIGATION_ITEMS.filter(item => !item.mobileOnly), 
  * Get current page filename from window location
  * @returns {string} Current page filename
  */
-function getCurrentPage() {
+export function getCurrentPage() {
     const path = window.location.pathname;
     const filename = path.split('/').pop();
     return filename || 'index.html';
@@ -38,7 +36,7 @@ function getCurrentPage() {
  * @param {string} path - Page path to check
  * @returns {boolean} True if current page matches
  */
-function isActivePage(path) {
+export function isActivePage(path) {
     const currentPage = getCurrentPage();
     const targetPage = path.split('/').pop();
     return currentPage === targetPage;
@@ -48,7 +46,7 @@ function isActivePage(path) {
  * Create desktop navigation HTML
  * @returns {string} HTML string for desktop navigation
  */
-function createDesktopNav() {
+export function createDesktopNav() {
     const desktopNavItems = NAVIGATION_ITEMS.filter(item => !item.mobileOnly);
     
     return `
@@ -66,7 +64,7 @@ function createDesktopNav() {
  * Create mobile bottom navigation HTML
  * @returns {string} HTML string for mobile bottom navigation
  */
-function createMobileNav() {
+export function createMobileNav() {
     return `
         <div class="bottom-nav">
             ${ALL_MOBILE_ITEMS.map(item => `
@@ -84,7 +82,7 @@ function createMobileNav() {
  * Looks for elements with IDs 'desktopNavContainer' and 'mobileNavContainer'
  * If not found, creates them at appropriate positions
  */
-function injectNavigation() {
+export function injectNavigation() {
     // Check if desktop nav container exists, if not create it
     let desktopContainer = document.getElementById('desktopNavContainer');
     if (!desktopContainer) {
@@ -133,7 +131,7 @@ function injectNavigation() {
 /**
  * Add navigation styles to the page
  */
-function addNavigationStyles() {
+export function addNavigationStyles() {
     const styleId = 'navigation-styles';
     if (document.getElementById(styleId)) return;
     
@@ -182,7 +180,7 @@ function addNavigationStyles() {
             right: 0;
             background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(20px);
-            display: flex;
+            display: none;
             justify-content: space-around;
             align-items: center;
             padding: 12px 20px 20px;
@@ -317,14 +315,18 @@ function addNavigationStyles() {
  * @param {Object} options - Configuration options
  * @param {boolean} options.addAuth - Whether to add authentication elements
  */
-function initNavigation(options = {}) {
+export function initNavigation(options = {}) {
     addNavigationStyles();
     injectNavigation();
     
     // Add logout functionality if logout button exists
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
-        logoutBtn.addEventListener('click', async () => {
+        // Remove existing listeners to avoid duplicates
+        const newLogoutBtn = logoutBtn.cloneNode(true);
+        logoutBtn.parentNode.replaceChild(newLogoutBtn, logoutBtn);
+        newLogoutBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
             if (window.Auth && typeof window.Auth.logout === 'function') {
                 await window.Auth.logout();
             }
@@ -337,7 +339,7 @@ function initNavigation(options = {}) {
  * Update active navigation item based on current page
  * Call this after dynamic content changes
  */
-function updateActiveNav() {
+export function updateActiveNav() {
     const currentPage = getCurrentPage();
     
     // Update desktop nav
@@ -365,42 +367,23 @@ function updateActiveNav() {
  * Get navigation HTML as string (for manual insertion)
  * @returns {Object} Object containing desktop and mobile navigation HTML
  */
-function getNavigationHTML() {
+export function getNavigationHTML() {
     return {
         desktop: createDesktopNav(),
         mobile: createMobileNav()
     };
 }
 
-// Export for use in modules
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {
-        NAVIGATION_ITEMS,
-        getCurrentPage,
-        isActivePage,
-        createDesktopNav,
-        createMobileNav,
-        injectNavigation,
-        addNavigationStyles,
-        initNavigation,
-        updateActiveNav,
-        getNavigationHTML
-    };
-}
-
-// Make available globally for non-module scripts
-if (typeof window !== 'undefined') {
-    window.Nav = {
-        initNavigation,
-        updateActiveNav,
-        getNavigationHTML,
-        NAVIGATION_ITEMS
-    };
-    
-    // Auto-initialize when DOM is ready if body has data-auto-nav attribute
-    document.addEventListener('DOMContentLoaded', () => {
-        if (document.body.hasAttribute('data-auto-nav')) {
-            initNavigation();
-        }
-    });
-}
+// Default export for convenience
+export default {
+    NAVIGATION_ITEMS,
+    getCurrentPage,
+    isActivePage,
+    createDesktopNav,
+    createMobileNav,
+    injectNavigation,
+    addNavigationStyles,
+    initNavigation,
+    updateActiveNav,
+    getNavigationHTML
+};
