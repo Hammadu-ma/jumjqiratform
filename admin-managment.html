@@ -480,6 +480,14 @@
 <div id="toast" class="toast"></div>
 
 <script type="module">
+    import { protectPageWithRole, initAuthUI } from './auth.js';
+
+// Only allow 'super-admin' role to access this page
+if (!protectPageWithRole(['super-admin', 'admin'], 'admin-login.html')) {
+    throw new Error('Redirecting');
+}
+
+const admin = initAuthUI();
     import { 
         initializeApp, getCurrentAdmin, isLoggedIn, protectPage, initAuthUI, setupAutoLogout, logout,
         getAllAdmins, getAllActivities, getRecentActivities, getActivityStats, updateAdmin, deleteAdmin, 
