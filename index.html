@@ -656,6 +656,14 @@
 
 <div id="toast" class="toast"></div>
 <!-- Add this at the beginning of your protected pages, before any other scripts -->
+    <script type="module">
+    import { initNavigation } from './nav.js';
+    
+    // Initialize navigation when DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+        initNavigation();
+    });
+</script>
 <script type="module">
     import { protectPage, initAuthUI, setupAutoLogout, getCurrentAdmin } from './auth.js';
     
@@ -996,13 +1004,6 @@
     loadData();
     setInterval(loadData, 30000);
     // In your page-specific JavaScript
-import { initNavigation, updateActiveNav } from './nav.js';
-
-// Initialize
-initNavigation();
-
-// Update active state when needed
-updateActiveNav();
 </script>
 </body>
 </html>
