@@ -664,27 +664,22 @@
         initNavigation();
     });
 </script>
-<script type="module">
-    import { protectPage, initAuthUI, setupAutoLogout, getCurrentAdmin } from './auth.js';
-    
-    // Protect this page - redirects to login if not authenticated
-    if (!protectPage('admin-login.html')) {
-        // The redirect will happen automatically
-        throw new Error('Redirecting to login');
-    }
-    
-    // Initialize UI components (shows admin name, sets up logout buttons)
-    const admin = initAuthUI();
-    
-    // Setup auto-logout after 60 minutes of inactivity
-    setupAutoLogout(60);
-    
-    // Optional: Display admin info in console for debugging
-    console.log('Logged in as:', admin?.name, admin?.email);
-    
-    // Your page-specific code continues here...
-    console.log('Page loaded successfully with admin access');
-</script>
+import { protectPage, initAuthUI, setupAutoLogout, getCurrentAdmin } from './auth.js';
+
+// Protect this page - redirects to login if not authenticated
+if (!protectPage('admin-login.html')) {
+    throw new Error('Redirecting to login');
+}
+
+// Initialize UI components (shows admin name, sets up logout buttons)
+const admin = await initAuthUI();
+
+// Setup auto-logout after 60 minutes of inactivity
+setupAutoLogout(60);
+
+// Display admin info in console for debugging
+console.log('Logged in as:', admin?.name, admin?.email);
+console.log('Page loaded successfully with admin access');
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
