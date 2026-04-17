@@ -477,6 +477,29 @@
 <div id="toast" class="toast"></div>
 
 <script type="module">
+    import { protectPageWithRole, initAuthUI, setupAutoLogout, getCurrentAdmin } from './auth.js';
+
+// Only allow 'super-admin' role to access this page
+if (!protectPageWithRole(['super-admin'], 'admin-login.html')) {
+    throw new Error('Redirecting');
+}
+
+const currentAdmin = initAuthUI();
+setupAutoLogout(60);
+
+// Update header with current admin
+if (currentAdmin) {
+    const nameElement = document.getElementById('currentAdminName');
+    const avatarElement = document.getElementById('currentAdminAvatar');
+    if (nameElement) nameElement.textContent = currentAdmin.name;
+    if (avatarElement) avatarElement.textContent = currentAdmin.name.charAt(0).toUpperCase();
+}
+
+// Optional: Hide elements that shouldn't be visible to non-super-admins
+if (currentAdmin?.role !== 'super-admin') {
+    // Hide super-admin only features
+    document.querySelectorAll('.super-admin-only').forEach(el => el.style.display = 'none');
+}
     import { 
         getCurrentAdmin, protectPageWithRole, initAuthUI, setupAutoLogout, logout,
         getAllAdmins, getAllActivities, getActivityStats, updateAdmin, deleteAdmin, logActivity
