@@ -71,6 +71,31 @@
             gap: 10px;
         }
 
+        .desktop-nav {
+            display: flex;
+            gap: 8px;
+            background: var(--card-bg);
+            padding: 6px;
+            border-radius: 60px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+        }
+
+        .nav-link {
+            padding: 10px 24px;
+            border-radius: 40px;
+            text-decoration: none;
+            font-weight: 600;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-link:hover { background: var(--primary-light); color: var(--primary-dark); }
+        .nav-link.active { background: linear-gradient(135deg, #10b981, #059669); color: white; }
+
         .back-btn {
             background: var(--primary-light);
             border: none;
@@ -147,10 +172,10 @@
         .btn-clear { background: #64748b; color: white; border: none; padding: 10px 24px; border-radius: 16px; font-weight: 600; cursor: pointer; }
 
         /* Qirat Performance Grid */
-        .section-title { font-size: 1.2rem; font-weight: 700; margin: 32px 0 20px 0; display: flex; align-items: center; gap: 10px; }
+        .section-title { font-size: 1.2rem; font-weight: 700; margin: 32px 0 20px 0; display: flex; align-items: center; gap: 10px; justify-content: space-between; flex-wrap: wrap; }
         .qirat-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
             gap: 20px;
             margin-bottom: 32px;
         }
@@ -160,6 +185,7 @@
             padding: 18px;
             border: 1px solid var(--border);
             transition: all 0.2s;
+            position: relative;
         }
         .qirat-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
         .qirat-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
@@ -168,9 +194,18 @@
         .rank-gold { background: #fef3c7; color: #92400e; }
         .rank-rising { background: #d1fae5; color: #065f46; }
         .rank-low { background: #fee2e2; color: #991b1b; }
+        .qirat-actions { display: flex; gap: 6px; }
+        .qirat-action-btn { background: none; border: none; padding: 6px 10px; border-radius: 20px; cursor: pointer; color: var(--text-muted); transition: all 0.2s; }
+        .qirat-action-btn:hover { background: var(--primary-light); color: var(--primary); }
+        .qirat-action-btn.delete-qirat:hover { background: #fee2e2; color: var(--danger); }
         .progress-bar { height: 6px; background: var(--border); border-radius: 10px; overflow: hidden; margin: 8px 0; }
         .progress-fill { height: 100%; background: var(--primary); border-radius: 10px; }
         .qirat-stats { font-size: 0.75rem; margin: 12px 0; display: flex; flex-direction: column; gap: 6px; }
+        .stat-row { display: flex; justify-content: space-between; align-items: center; }
+        .stat-tag { padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; }
+        .gender-mixed { background: #e0e7ff; color: #3730a3; }
+        .gender-male { background: #dbeafe; color: #1e40af; }
+        .gender-female { background: #fce7f3; color: #be185d; }
         .drill-btn { background: var(--border); border: none; padding: 8px 16px; border-radius: 30px; font-weight: 600; cursor: pointer; width: 100%; margin-top: 12px; transition: all 0.2s; }
         .drill-btn:hover { background: var(--primary); color: white; }
 
@@ -191,7 +226,6 @@
             border-left: 5px solid #f59e0b;
             transition: transform 0.2s;
         }
-        body.dark-mode .insight-card { background: linear-gradient(135deg, #1e293b, #334155); }
         .insight-card:hover { transform: translateX(4px); }
         .insight-icon { font-size: 2rem; }
         .insight-content { flex: 1; }
@@ -224,7 +258,10 @@
             max-height: 85vh;
             overflow-y: auto;
         }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 16px; }
+        .modal-filters { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; padding: 16px; background: #f8fafc; border-radius: 20px; }
+        .modal-filter-group { display: flex; align-items: center; gap: 8px; }
+        .modal-filter-group input, .modal-filter-group select { padding: 6px 12px; border-radius: 20px; border: 1px solid var(--border); }
         .export-buttons { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
         .export-btn { background: #e2e8f0; border: none; padding: 8px 18px; border-radius: 30px; font-weight: 600; cursor: pointer; }
         .export-btn:hover { background: var(--primary); color: white; }
@@ -234,6 +271,8 @@
         .badge { padding: 4px 10px; border-radius: 30px; font-size: 0.7rem; font-weight: 600; display: inline-block; }
         .badge-male { background: #dbeafe; color: #1e40af; }
         .badge-female { background: #fce7f3; color: #be185d; }
+        .delete-qirat-btn { background: none; border: none; color: var(--danger); cursor: pointer; padding: 4px 8px; border-radius: 20px; }
+        .delete-qirat-btn:hover { background: #fee2e2; }
 
         .toast {
             position: fixed;
@@ -265,6 +304,7 @@
             padding: 12px 20px 20px;
             border-top: 1px solid var(--border);
             z-index: 200;
+            display: none;
         }
         .nav-item {
             display: flex;
@@ -283,393 +323,13 @@
         .nav-item.active { color: var(--primary); background: var(--primary-light); }
 
         @media (min-width: 768px) { body { padding-bottom: 0; } .bottom-nav { display: none; } }
-        @media (max-width: 768px) { .main-container { padding: 16px; padding-bottom: 80px; } .charts-row { grid-template-columns: 1fr; } .filters-bar { flex-direction: column; } }
-        /* Qirat Performance Card - Enhanced Styling */
-.qirat-card {
-    background: var(--card-bg);
-    border-radius: 28px;
-    padding: 20px;
-    border: 1px solid var(--border);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    overflow: hidden;
-}
-
-.qirat-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, var(--primary), var(--accent), var(--primary));
-    opacity: 0;
-    transition: opacity 0.3s;
-}
-
-.qirat-card:hover::before {
-    opacity: 1;
-}
-
-.qirat-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-lg);
-}
-
-/* Card Header */
-.qirat-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin-bottom: 16px;
-}
-
-.qirat-name {
-    font-weight: 800;
-    font-size: 1.1rem;
-    background: linear-gradient(135deg, var(--primary-dark), var(--primary));
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.qirat-name i {
-    font-size: 1rem;
-    color: var(--primary);
-}
-
-/* Rank Badges */
-.rank-badge {
-    padding: 4px 12px;
-    border-radius: 40px;
-    font-size: 0.7rem;
-    font-weight: 700;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    backdrop-filter: blur(4px);
-}
-
-.rank-gold {
-    background: linear-gradient(135deg, #fef3c7, #fde68a);
-    color: #92400e;
-    border: 1px solid #fbbf24;
-}
-
-.rank-rising {
-    background: linear-gradient(135deg, #d1fae5, #a7f3d0);
-    color: #065f46;
-    border: 1px solid #10b981;
-}
-
-.rank-low {
-    background: linear-gradient(135deg, #fee2e2, #fecaca);
-    color: #991b1b;
-    border: 1px solid #ef4444;
-}
-
-.qirat-count {
-    background: var(--primary-light);
-    padding: 4px 12px;
-    border-radius: 40px;
-    font-size: 0.7rem;
-    font-weight: 700;
-    color: var(--primary-dark);
-}
-
-/* Progress Bar */
-.progress-bar {
-    height: 8px;
-    background: var(--border);
-    border-radius: 10px;
-    overflow: hidden;
-    margin: 12px 0;
-}
-
-.progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--primary), var(--primary-dark));
-    border-radius: 10px;
-    transition: width 0.5s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-.progress-fill::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-    animation: shimmer 2s infinite;
-}
-
-@keyframes shimmer {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
-}
-
-/* Stats Container */
-.qirat-stats {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin: 16px 0;
-}
-
-/* Individual Stat Row */
-.stat-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 8px;
-}
-
-.stat-label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.7rem;
-    font-weight: 600;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.stat-label i {
-    font-size: 0.8rem;
-    width: 20px;
-    color: var(--primary);
-}
-
-/* Tag Groups */
-.tags-group {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    align-items: center;
-}
-
-/* Modern Tags for Stats */
-.stat-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 14px;
-    border-radius: 40px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    transition: all 0.2s;
-}
-
-/* Gender Tags */
-.gender-tag-male {
-    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
-    color: #1e40af;
-    border: 1px solid #93c5fd;
-}
-
-.gender-tag-female {
-    background: linear-gradient(135deg, #fce7f3, #fbcfe8);
-    color: #be185d;
-    border: 1px solid #f9a8d4;
-}
-
-.gender-tag-mixed {
-    background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
-    color: #3730a3;
-    border: 1px solid #a5b4fc;
-}
-
-/* Department Tag */
-.dept-tag {
-    background: linear-gradient(135deg, #e0f2fe, #bae6fd);
-    color: #0369a1;
-    border: 1px solid #7dd3fc;
-}
-
-/* Batch Tag */
-.batch-tag {
-    background: linear-gradient(135deg, #f3e8ff, #e9d5ff);
-    color: #6b21a5;
-    border: 1px solid #d8b4fe;
-}
-
-/* Engagement Tag */
-.engagement-tag {
-    background: linear-gradient(135deg, #d1fae5, #a7f3d0);
-    color: #065f46;
-    border: 1px solid #6ee7b7;
-}
-
-.engagement-tag-low {
-    background: linear-gradient(135deg, #fee2e2, #fecaca);
-    color: #991b1b;
-    border: 1px solid #fca5a5;
-}
-
-.engagement-tag-medium {
-    background: linear-gradient(135deg, #fef3c7, #fde68a);
-    color: #92400e;
-    border: 1px solid #fcd34d;
-}
-
-.engagement-tag-high {
-    background: linear-gradient(135deg, #d1fae5, #a7f3d0);
-    color: #065f46;
-    border: 1px solid #34d399;
-}
-
-/* Divider */
-.stat-divider {
-    width: 100%;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--border), transparent);
-    margin: 4px 0;
-}
-
-/* Two Column Layout for Stats */
-.stats-two-column {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin: 12px 0;
-}
-
-.stat-block {
-    background: var(--bg);
-    border-radius: 20px;
-    padding: 10px 12px;
-    text-align: center;
-    transition: all 0.2s;
-}
-
-.stat-block:hover {
-    transform: scale(1.02);
-    background: var(--primary-light);
-}
-
-.stat-block-value {
-    font-size: 1.2rem;
-    font-weight: 800;
-    color: var(--text-primary);
-}
-
-.stat-block-label {
-    font-size: 0.6rem;
-    font-weight: 600;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-top: 4px;
-}
-
-/* Compact Row Layout */
-.info-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 8px 0;
-    border-bottom: 1px dashed var(--border);
-}
-
-.info-row:last-child {
-    border-bottom: none;
-}
-
-.info-label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-}
-
-.info-value {
-    font-weight: 700;
-    font-size: 0.85rem;
-    color: var(--text-primary);
-}
-
-/* Drill Button */
-.drill-btn {
-    background: linear-gradient(135deg, var(--border), var(--gray-100));
-    border: none;
-    padding: 10px 20px;
-    border-radius: 40px;
-    font-weight: 700;
-    font-size: 0.75rem;
-    cursor: pointer;
-    width: 100%;
-    margin-top: 16px;
-    transition: all 0.3s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    color: var(--text-primary);
-}
-
-.drill-btn i {
-    font-size: 0.8rem;
-    transition: transform 0.2s;
-}
-
-.drill-btn:hover {
-    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-    color: white;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-}
-
-.drill-btn:hover i {
-    transform: translateX(3px);
-    color: white;
-}
-
-/* Engagement Circle Indicator */
-.engagement-circle {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    font-size: 0.7rem;
-    font-weight: 800;
-    background: conic-gradient(var(--primary) 0deg, var(--border) 0deg);
-}
-
-/* Responsive Adjustments */
-@media (max-width: 768px) {
-    .stats-two-column {
-        gap: 8px;
-    }
-    
-    .stat-tag {
-        padding: 4px 10px;
-        font-size: 0.7rem;
-    }
-    
-    .qirat-stats {
-        gap: 8px;
-    }
-    
-    .info-row {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 4px;
-    }
-}
+        @media (max-width: 768px) { 
+            .desktop-nav { display: none; } 
+            .bottom-nav { display: flex; } 
+            .main-container { padding: 16px; padding-bottom: 80px; } 
+            .charts-row { grid-template-columns: 1fr; }
+            .filters-bar { flex-direction: column; }
+        }
     </style>
 </head>
 <body>
@@ -677,6 +337,13 @@
 <div class="glass-header">
     <div class="header-content">
         <div class="logo"><h1><i class="fas fa-chart-line"></i> Analytics Studio</h1></div>
+        <div class="desktop-nav">
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="groups.html" class="nav-link">Groups</a>
+            <a href="tables.html" class="nav-link">Tables</a>
+            <a href="analytics.html" class="nav-link active">Analytics</a>
+            <a href="import.html" class="nav-link">Import</a>
+        </div>
         <button class="back-btn" onclick="window.location.href='index.html'"><i class="fas fa-arrow-left"></i> Back</button>
     </div>
 </div>
@@ -698,15 +365,19 @@
         <div class="filter-group"><label><i class="fas fa-venus-mars"></i> Gender</label><select id="genderFilter"><option value="">All</option><option value="Male">Male</option><option value="Female">Female</option></select></div>
         <div class="filter-group"><label><i class="fas fa-building"></i> Department</label><select id="deptFilter"><option value="">All</option></select></div>
         <div class="filter-group"><label><i class="fas fa-calendar"></i> Batch</label><select id="batchFilter"><option value="">All</option></select></div>
+        <div class="filter-group"><label><i class="fas fa-book-quran"></i> Qirat</label><select id="qiratFilter"><option value="">All Qirats</option></select></div>
         <button class="btn-clear" id="clearFiltersBtn"><i class="fas fa-eraser"></i> Clear Filters</button>
     </div>
 
     <!-- Smart Insights -->
-    <div class="section-title"><i class="fas fa-lightbulb"></i> Smart Insights (Click to Analyze)</div>
+    <div class="section-title"><i class="fas fa-lightbulb"></i> Smart Insights <span style="font-size:0.8rem;">(Click to analyze with filters)</span></div>
     <div class="insights-grid" id="insightsContainer"></div>
 
     <!-- Qirat Performance -->
-    <div class="section-title"><i class="fas fa-chart-simple"></i> Qirat Performance Analytics</div>
+    <div class="section-title">
+        <span><i class="fas fa-chart-simple"></i> Qirat Performance Analytics</span>
+        <button class="btn-clear" id="deleteAllQiratsBtn" style="background:#ef4444; padding:8px 16px;"><i class="fas fa-trash"></i> Delete All Qirats</button>
+    </div>
     <div class="qirat-grid" id="qiratGrid"></div>
 </div>
 
@@ -716,12 +387,23 @@
     <button class="nav-item" onclick="window.location.href='groups.html'"><i class="fas fa-layer-group"></i><span>Groups</span></button>
     <button class="nav-item" onclick="window.location.href='tables.html'"><i class="fas fa-table"></i><span>Tables</span></button>
     <button class="nav-item active" onclick="window.location.href='analytics.html'"><i class="fas fa-chart-line"></i><span>Analytics</span></button>
+    <button class="nav-item" onclick="window.location.href='import.html'"><i class="fas fa-upload"></i><span>Import</span></button>
 </div>
 
 <!-- Drill Modal -->
 <div id="drillModal" class="modal">
     <div class="modal-content">
-        <div class="modal-header"><h3 id="drillTitle">Student Details</h3><button id="closeModal" style="background:none; border:none; font-size:24px; cursor:pointer;">&times;</button></div>
+        <div class="modal-header">
+            <h3 id="drillTitle">Student Details</h3>
+            <button id="closeModal" style="background:none; border:none; font-size:24px; cursor:pointer;">&times;</button>
+        </div>
+        <div class="modal-filters" id="modalFilters">
+            <div class="modal-filter-group"><i class="fas fa-search"></i><input type="text" id="modalSearch" placeholder="Search..."></div>
+            <div class="modal-filter-group"><i class="fas fa-venus-mars"></i><select id="modalGender"><option value="">All Genders</option><option value="Male">Male</option><option value="Female">Female</option></select></div>
+            <div class="modal-filter-group"><i class="fas fa-building"></i><select id="modalDept"><option value="">All Depts</option></select></div>
+            <div class="modal-filter-group"><i class="fas fa-calendar"></i><select id="modalBatch"><option value="">All Batches</option></select></div>
+            <button class="btn-clear" id="clearModalFilters" style="padding:6px 16px;">Clear</button>
+        </div>
         <div class="export-buttons">
             <button id="modalExportCSV" class="export-btn"><i class="fas fa-file-csv"></i> CSV</button>
             <button id="modalExportExcel" class="export-btn"><i class="fas fa-file-excel"></i> Excel</button>
@@ -730,7 +412,7 @@
         </div>
         <div style="overflow-x: auto;">
             <table class="drill-table">
-                <thead><tr><th>Name</th><th>Gender</th><th>Phone</th><th>Department</th><th>Batch</th><th>Qirats</th><th>Reg Date</th></tr></thead>
+                <thead><tr><th>Name</th><th>Gender</th><th>Phone</th><th>Department</th><th>Batch</th><th>Qirats</th><th>Reg Date</th><th>Actions</th></tr></thead>
                 <tbody id="drillTableBody"></tbody>
             </table>
         </div>
@@ -741,7 +423,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     
     const firebaseConfig = {
         apiKey: "AIzaSyAR_g5y04YAGCrTvZCowrE7hw8h7k1du08",
@@ -758,13 +440,15 @@
     let allStudents = [];
     let filteredStudents = [];
     let charts = {};
-    let currentDrillData = { data: [], title: "" };
+    let currentDrillData = { originalData: [], filteredData: [], title: "", insightType: null, kpi: null };
+    let currentQiratToDelete = null;
     
     // DOM Elements
     const searchInput = document.getElementById('searchInput');
     const genderFilter = document.getElementById('genderFilter');
     const deptFilter = document.getElementById('deptFilter');
     const batchFilter = document.getElementById('batchFilter');
+    const qiratFilter = document.getElementById('qiratFilter');
     const clearFiltersBtn = document.getElementById('clearFiltersBtn');
     const kpiGrid = document.getElementById('kpiGrid');
     const insightsContainer = document.getElementById('insightsContainer');
@@ -774,13 +458,17 @@
     const drillTableBody = document.getElementById('drillTableBody');
     const closeModal = document.getElementById('closeModal');
     const toast = document.getElementById('toast');
-    
-    // Helper Functions
-    function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
-    function getQiratNames(student) { return (student.schedules || []).map(s => s.qirat_name).filter(Boolean); }
-    function formatStudent(s) { return { Name: s.full_name, Gender: s.gender, Phone: s.phone, Department: s.department, Batch: s.batch, Qirats: getQiratNames(s).join(', ') || '-', RegistrationDate: s.timestamp.toLocaleDateString() }; }
+    const modalSearch = document.getElementById('modalSearch');
+    const modalGender = document.getElementById('modalGender');
+    const modalDept = document.getElementById('modalDept');
+    const modalBatch = document.getElementById('modalBatch');
+    const clearModalFilters = document.getElementById('clearModalFilters');
+    const deleteAllQiratsBtn = document.getElementById('deleteAllQiratsBtn');
     
     function showToast(msg, isErr = false) { toast.textContent = msg; toast.style.background = isErr ? '#ef4444' : '#10b981'; toast.style.display = 'block'; setTimeout(() => toast.style.display = 'none', 3000); }
+    function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
+    function getQiratNames(student) { return (student.schedules || []).map(s => s.qirat_name).filter(Boolean); }
+    function formatStudent(s) { return { Name: s.full_name, Gender: s.gender, Phone: s.phone, Department: s.department, Batch: s.batch, Qirats: getQiratNames(s).join(', ') || '-', RegistrationDate: s.timestamp.toLocaleDateString(), id: s.id, schedules: s.schedules }; }
     
     async function loadData() {
         try {
@@ -788,9 +476,7 @@
             allStudents = [];
             querySnapshot.forEach((docSnap) => {
                 const data = docSnap.data();
-                let timestamp = data.timestamp;
-                if (timestamp && typeof timestamp.toDate === 'function') timestamp = timestamp.toDate();
-                else timestamp = new Date();
+                let timestamp = data.timestamp?.toDate?.() || new Date(data.timestamp) || new Date();
                 allStudents.push({
                     id: docSnap.id, full_name: data.full_name || 'N/A', gender: data.gender || 'Not Specified',
                     phone: data.phone || '', telegram: data.telegram || '', department: data.department || 'Other',
@@ -805,8 +491,10 @@
     function populateFilters() {
         const departments = [...new Set(allStudents.map(s => s.department))];
         const batches = [...new Set(allStudents.map(s => s.batch))];
+        const allQirats = [...new Set(allStudents.flatMap(s => getQiratNames(s)))];
         deptFilter.innerHTML = '<option value="">All Departments</option>' + departments.map(d => `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join('');
         batchFilter.innerHTML = '<option value="">All Batches</option>' + batches.map(b => `<option value="${escapeHtml(b)}">${escapeHtml(b)}</option>`).join('');
+        qiratFilter.innerHTML = '<option value="">All Qirats</option>' + allQirats.map(q => `<option value="${escapeHtml(q)}">${escapeHtml(q)}</option>`).join('');
     }
     
     function applyFilters() {
@@ -814,13 +502,15 @@
         const gender = genderFilter.value;
         const department = deptFilter.value;
         const batch = batchFilter.value;
+        const qirat = qiratFilter.value;
         
         filteredStudents = allStudents.filter(s => {
             const matchSearch = s.full_name.toLowerCase().includes(search) || s.phone.includes(search);
             const matchGender = !gender || s.gender === gender;
             const matchDept = !department || s.department === department;
             const matchBatch = !batch || s.batch === batch;
-            return matchSearch && matchGender && matchDept && matchBatch;
+            const matchQirat = !qirat || getQiratNames(s).includes(qirat);
+            return matchSearch && matchGender && matchDept && matchBatch && matchQirat;
         });
         
         renderKPIs();
@@ -829,191 +519,191 @@
         renderInsights();
     }
     
-    function getKPIs() {
-        const total = filteredStudents.length;
-        const allQirats = new Set(); filteredStudents.forEach(s => getQiratNames(s).forEach(q => allQirats.add(q)));
+    function getKPIs(data = filteredStudents) {
+        const total = data.length;
+        const allQirats = new Set(); data.forEach(s => getQiratNames(s).forEach(q => allQirats.add(q)));
         const activeQirats = allQirats.size;
-        const male = filteredStudents.filter(s => s.gender === 'Male').length;
-        const female = filteredStudents.filter(s => s.gender === 'Female').length;
-        const multi = filteredStudents.filter(s => getQiratNames(s).length > 1).length;
+        const male = data.filter(s => s.gender === 'Male').length;
+        const female = data.filter(s => s.gender === 'Female').length;
+        const multi = data.filter(s => getQiratNames(s).length > 1).length;
         const now = new Date(); const weekStart = new Date(now); weekStart.setDate(now.getDate() - 7);
-        const lastWeek = filteredStudents.filter(s => s.timestamp >= weekStart).length;
-        const prevWeek = filteredStudents.filter(s => s.timestamp >= new Date(weekStart.getTime() - 7*86400000) && s.timestamp < weekStart).length;
+        const lastWeek = data.filter(s => s.timestamp >= weekStart).length;
+        const prevWeek = data.filter(s => s.timestamp >= new Date(weekStart.getTime() - 7*86400000) && s.timestamp < weekStart).length;
         const growth = prevWeek === 0 ? (lastWeek > 0 ? 100 : 0) : Math.round(((lastWeek - prevWeek) / prevWeek) * 100);
         return { total, activeQirats, male, female, multi, growth, lastWeek };
     }
     
-    function renderKPIs() {
-        const kpi = getKPIs();
-        kpiGrid.innerHTML = `
-            <div class="kpi-card"><div class="kpi-title">Total Students</div><div class="kpi-value">${kpi.total}</div><div class="kpi-trend ${kpi.growth >= 0 ? 'trend-up' : 'trend-down'}"><i class="fas fa-arrow-${kpi.growth >= 0 ? 'up' : 'down'}"></i> ${Math.abs(kpi.growth)}% vs last week</div></div>
-            <div class="kpi-card"><div class="kpi-title">Active Qirats</div><div class="kpi-value">${kpi.activeQirats}</div></div>
-            <div class="kpi-card"><div class="kpi-title">Gender Split</div><div class="kpi-value">♂ ${kpi.male} | ♀ ${kpi.female}</div></div>
-            <div class="kpi-card"><div class="kpi-title">Multi-Enrolled</div><div class="kpi-value">${kpi.multi}</div><div class="kpi-trend">students in >1 Qirat</div></div>
-        `;
-    }
+    function renderKPIs() { const kpi = getKPIs(); kpiGrid.innerHTML = `<div class="kpi-card"><div class="kpi-title">Total Students</div><div class="kpi-value">${kpi.total}</div><div class="kpi-trend ${kpi.growth >= 0 ? 'trend-up' : 'trend-down'}"><i class="fas fa-arrow-${kpi.growth >= 0 ? 'up' : 'down'}"></i> ${Math.abs(kpi.growth)}% vs last week</div></div><div class="kpi-card"><div class="kpi-title">Active Qirats</div><div class="kpi-value">${kpi.activeQirats}</div></div><div class="kpi-card"><div class="kpi-title">Gender Split</div><div class="kpi-value">♂ ${kpi.male} | ♀ ${kpi.female}</div></div><div class="kpi-card"><div class="kpi-title">Multi-Enrolled</div><div class="kpi-value">${kpi.multi}</div></div>`; }
     
-    function getDailyTrend() {
-        const today = new Date(); const days = [];
-        for (let i = 29; i >= 0; i--) { const d = new Date(); d.setDate(today.getDate() - i); d.setHours(0,0,0,0); days.push(d); }
-        const map = new Map(); filteredStudents.forEach(s => { const key = s.timestamp.toISOString().slice(0,10); map.set(key, (map.get(key)||0)+1); });
-        return { labels: days.map(d => d.toISOString().slice(5,10)), counts: days.map(d => map.get(d.toISOString().slice(0,10)) || 0) };
-    }
-    
-    function getTopQirats() {
-        const qCount = new Map(); filteredStudents.forEach(s => getQiratNames(s).forEach(q => qCount.set(q, (qCount.get(q)||0)+1)));
-        return Array.from(qCount.entries()).map(([n,c]) => ({ name: n, count: c })).sort((a,b)=>b.count-a.count).slice(0,6);
-    }
+    function getDailyTrend() { const today = new Date(); const days = []; for (let i = 29; i >= 0; i--) { const d = new Date(); d.setDate(today.getDate() - i); d.setHours(0,0,0,0); days.push(d); } const map = new Map(); filteredStudents.forEach(s => { const key = s.timestamp.toISOString().slice(0,10); map.set(key, (map.get(key)||0)+1); }); return { labels: days.map(d => d.toISOString().slice(5,10)), counts: days.map(d => map.get(d.toISOString().slice(0,10)) || 0) }; }
+    function getTopQirats() { const qCount = new Map(); filteredStudents.forEach(s => getQiratNames(s).forEach(q => qCount.set(q, (qCount.get(q)||0)+1))); return Array.from(qCount.entries()).map(([n,c]) => ({ name: n, count: c })).sort((a,b)=>b.count-a.count).slice(0,6); }
     
     function renderCharts() {
-        const trend = getDailyTrend();
-        if (charts.trend) charts.trend.destroy();
-        charts.trend = new Chart(document.getElementById('trendChart'), { type: 'line', data: { labels: trend.labels, datasets: [{ label: 'Registrations', data: trend.counts, borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.1)', fill: true, tension: 0.3 }] }, options: { responsive: true, maintainAspectRatio: false } });
-        
-        const top = getTopQirats();
-        if (charts.bar) charts.bar.destroy();
-        charts.bar = new Chart(document.getElementById('barChart'), { type: 'bar', data: { labels: top.map(t=>t.name), datasets: [{ label: 'Students', data: top.map(t=>t.count), backgroundColor: '#10b981', borderRadius: 8 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'none' } } } });
-        
-        const kpi = getKPIs();
-        if (charts.pie) charts.pie.destroy();
-        charts.pie = new Chart(document.getElementById('pieChart'), { type: 'pie', data: { labels: ['Male', 'Female'], datasets: [{ data: [kpi.male, kpi.female], backgroundColor: ['#3b82f6', '#ec489a'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false } });
+        const trend = getDailyTrend(); if (charts.trend) charts.trend.destroy(); charts.trend = new Chart(document.getElementById('trendChart'), { type: 'line', data: { labels: trend.labels, datasets: [{ label: 'Registrations', data: trend.counts, borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.1)', fill: true, tension: 0.3 }] }, options: { responsive: true, maintainAspectRatio: false } });
+        const top = getTopQirats(); if (charts.bar) charts.bar.destroy(); charts.bar = new Chart(document.getElementById('barChart'), { type: 'bar', data: { labels: top.map(t=>t.name), datasets: [{ label: 'Students', data: top.map(t=>t.count), backgroundColor: '#10b981', borderRadius: 8 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'none' } } } });
+        const kpi = getKPIs(); if (charts.pie) charts.pie.destroy(); charts.pie = new Chart(document.getElementById('pieChart'), { type: 'pie', data: { labels: ['Male', 'Female'], datasets: [{ data: [kpi.male, kpi.female], backgroundColor: ['#3b82f6', '#ec489a'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false } });
     }
     
     function getQiratPerformance() {
         const qMap = new Map();
-        filteredStudents.forEach(s => {
-            getQiratNames(s).forEach(q => {
-                if (!qMap.has(q)) qMap.set(q, { students: [], male: 0, female: 0, depts: new Set(), batches: new Set() });
-                const p = qMap.get(q);
-                p.students.push(s);
-                if (s.gender === 'Male') p.male++; else if (s.gender === 'Female') p.female++;
-                p.depts.add(s.department); p.batches.add(s.batch);
-            });
-        });
-        return Array.from(qMap.entries()).map(([name, d]) => ({
-            name, total: d.students.length, male: d.male, female: d.female,
-            deptCount: d.depts.size, batchCount: d.batches.size,
-            engagement: filteredStudents.length ? Math.round((d.students.length / filteredStudents.length) * 100) : 0,
-            students: d.students
-        })).sort((a,b) => b.total - a.total);
+        filteredStudents.forEach(s => { getQiratNames(s).forEach(q => { if (!qMap.has(q)) qMap.set(q, { students: [], male: 0, female: 0, depts: new Set(), batches: new Set() }); const p = qMap.get(q); p.students.push(s); if (s.gender === 'Male') p.male++; else if (s.gender === 'Female') p.female++; p.depts.add(s.department); p.batches.add(s.batch); }); });
+        return Array.from(qMap.entries()).map(([name, d]) => ({ name, total: d.students.length, male: d.male, female: d.female, deptCount: d.depts.size, batchCount: d.batches.size, engagement: filteredStudents.length ? Math.round((d.students.length / filteredStudents.length) * 100) : 0, students: d.students })).sort((a,b) => b.total - a.total);
     }
     
-    // Inside your renderQiratPerformance function, use this HTML structure:
-function renderQiratPerformance() {
-    const perf = getQiratPerformance();
-    if (perf.length === 0) {
-        qiratGrid.innerHTML = '<div class="empty-state">No Qirats found</div>';
-        return;
-    }
-    
-    qiratGrid.innerHTML = perf.map((q, idx) => {
-        let rankBadge = '';
-        let engagementClass = 'engagement-tag';
-        if (q.engagement >= 70) engagementClass = 'engagement-tag-high';
-        else if (q.engagement >= 30) engagementClass = 'engagement-tag-medium';
-        else engagementClass = 'engagement-tag-low';
-        
-        if (idx === 0) rankBadge = '<span class="rank-badge rank-gold"><i class="fas fa-crown"></i> Top Qirat</span>';
-        else if (q.engagement > 70) rankBadge = '<span class="rank-badge rank-rising"><i class="fas fa-chart-line"></i> Rising</span>';
-        else if (q.total <= 2) rankBadge = '<span class="rank-badge rank-low"><i class="fas fa-exclamation-triangle"></i> Low Engagement</span>';
-        
-        // Gender tag logic
-        let genderTag = '';
-        if (q.male > 0 && q.female > 0) {
-            genderTag = `<span class="stat-tag gender-tag-mixed"><i class="fas fa-venus-mars"></i> ${q.male} ♂ | ${q.female} ♀</span>`;
-        } else if (q.male > 0) {
-            genderTag = `<span class="stat-tag gender-tag-male"><i class="fas fa-mars"></i> ${q.male} Male</span>`;
-        } else if (q.female > 0) {
-            genderTag = `<span class="stat-tag gender-tag-female"><i class="fas fa-venus"></i> ${q.female} Female</span>`;
+    async function deleteQiratFromAllStudents(qiratName) {
+        if (!confirm(`⚠️ Remove "${qiratName}" from ALL students? This action cannot be undone.`)) return;
+        showLoading("Removing Qirat...");
+        let updatedCount = 0;
+        for (const student of allStudents) {
+            const currentQirats = student.schedules || [];
+            const hasQirat = currentQirats.some(s => s.qirat_name === qiratName);
+            if (hasQirat) {
+                const newSchedules = currentQirats.filter(s => s.qirat_name !== qiratName);
+                const studentRef = doc(db, "registrations", student.id);
+                await updateDoc(studentRef, { schedules: newSchedules });
+                updatedCount++;
+            }
         }
-        
-        return `
-            <div class="qirat-card">
-                <div class="qirat-header">
-                    <span class="qirat-name"><i class="fas fa-book-quran"></i> ${escapeHtml(q.name)}</span>
-                    <div class="tags-group">
-                        ${rankBadge}
-                        <span class="qirat-count">${q.total} student${q.total !== 1 ? 's' : ''}</span>
-                    </div>
-                </div>
-                
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: ${q.engagement}%;"></div>
-                </div>
-                
-                <div class="stats-two-column">
-                    <div class="stat-block">
-                        <div class="stat-block-value">${genderTag || '—'}</div>
-                        <div class="stat-block-label">Gender Distribution</div>
-                    </div>
-                    <div class="stat-block">
-                        <div class="stat-block-value">
-                            <span class="stat-tag dept-tag"><i class="fas fa-building"></i> ${q.deptCount} dept${q.deptCount !== 1 ? 's' : ''}</span>
-                            <span class="stat-tag batch-tag"><i class="fas fa-graduation-cap"></i> ${q.batchCount} batch${q.batchCount !== 1 ? 'es' : ''}</span>
-                        </div>
-                        <div class="stat-block-label">Coverage</div>
-                    </div>
-                </div>
-                
-                <div class="info-row">
-                    <span class="info-label"><i class="fas fa-chart-line"></i> Engagement Score</span>
-                    <span class="stat-tag ${engagementClass}">${q.engagement}%</span>
-                </div>
-                
-                <button class="drill-btn" onclick="window.openDrill(${JSON.stringify(q.students.map(formatStudent)).replace(/"/g, '&quot;')}, '${escapeHtml(q.name)} (${q.total} students)')">
-                    <i class="fas fa-users-viewfinder"></i> View ${q.total} Student${q.total !== 1 ? 's' : ''}
-                    <i class="fas fa-arrow-right"></i>
-                </button>
-            </div>
-        `;
-    }).join('');
-}
+        hideLoading();
+        showToast(`✅ Removed "${qiratName}" from ${updatedCount} student(s)`);
+        await loadData();
+    }
+    
+    async function deleteAllQirats() {
+        if (!confirm("⚠️ DELETE ALL QIRATS from ALL students? This will remove every Qirat from every student. This cannot be undone!")) return;
+        showLoading("Removing all Qirats...");
+        let updatedCount = 0;
+        for (const student of allStudents) {
+            if (student.schedules && student.schedules.length > 0) {
+                const studentRef = doc(db, "registrations", student.id);
+                await updateDoc(studentRef, { schedules: [] });
+                updatedCount++;
+            }
+        }
+        hideLoading();
+        showToast(`✅ Removed all Qirats from ${updatedCount} student(s)`);
+        await loadData();
+    }
+    
+    function renderQiratPerformance() {
+        const perf = getQiratPerformance();
+        if (perf.length === 0) { qiratGrid.innerHTML = '<div class="empty-state">No Qirats found</div>'; return; }
+        qiratGrid.innerHTML = perf.map((q, idx) => {
+            let rankBadge = ''; let genderTag = '';
+            if (idx === 0) rankBadge = '<span class="rank-badge rank-gold"><i class="fas fa-crown"></i> Top</span>';
+            else if (q.engagement > 70) rankBadge = '<span class="rank-badge rank-rising"><i class="fas fa-chart-line"></i> Rising</span>';
+            else if (q.total <= 2) rankBadge = '<span class="rank-badge rank-low"><i class="fas fa-exclamation-triangle"></i> Low</span>';
+            if (q.male > 0 && q.female > 0) genderTag = `<span class="stat-tag gender-mixed"><i class="fas fa-venus-mars"></i> ${q.male}♂ | ${q.female}♀</span>`;
+            else if (q.male > 0) genderTag = `<span class="stat-tag gender-male"><i class="fas fa-mars"></i> ${q.male} Male</span>`;
+            else if (q.female > 0) genderTag = `<span class="stat-tag gender-female"><i class="fas fa-venus"></i> ${q.female} Female</span>`;
+            return `<div class="qirat-card"><div class="qirat-header"><span class="qirat-name">📖 ${escapeHtml(q.name)}</span><div class="qirat-actions"><button class="qirat-action-btn delete-qirat" data-qirat="${escapeHtml(q.name)}" title="Delete this Qirat from all students"><i class="fas fa-trash-alt"></i></button></div>${rankBadge}</div><div class="progress-bar"><div class="progress-fill" style="width: ${q.engagement}%;"></div></div><div class="qirat-stats"><div class="stat-row"><span>${genderTag}</span><span class="stat-tag"><i class="fas fa-building"></i> ${q.deptCount} depts</span><span class="stat-tag"><i class="fas fa-graduation-cap"></i> ${q.batchCount} batches</span></div><div class="stat-row"><span>Engagement: ${q.engagement}%</span><span class="stat-tag">${q.total} students</span></div></div><button class="drill-btn" onclick="window.openDrillModal(${JSON.stringify(q.students.map(formatStudent)).replace(/"/g, '&quot;')}, '${escapeHtml(q.name)} (${q.total} students)', 'qirat')">View Students <i class="fas fa-external-link-alt"></i></button></div>`;
+        }).join('');
+        document.querySelectorAll('.delete-qirat').forEach(btn => btn.addEventListener('click', (e) => { e.stopPropagation(); deleteQiratFromAllStudents(btn.dataset.qirat); }));
+    }
     
     function generateInsights() {
         const perf = getQiratPerformance(); const kpi = getKPIs(); const insights = [];
-        if (perf[0]) insights.push({ icon: '🏆', title: 'Most Popular Qirat', desc: `${perf[0].name} leads with ${perf[0].total} students`, data: perf[0].students.map(formatStudent) });
-        insights.push({ icon: kpi.growth >= 0 ? '📈' : '📉', title: kpi.growth >= 0 ? 'Weekly Growth Increasing' : 'Registrations Dropped', desc: `${kpi.lastWeek} new this week (${Math.abs(kpi.growth)}% ${kpi.growth >= 0 ? 'increase' : 'decrease'})`, data: filteredStudents.filter(s => { const w = new Date(); w.setDate(w.getDate() - 7); return s.timestamp >= w; }).map(formatStudent) });
-        const low = perf.filter(q => q.total <= 2); if (low.length) insights.push({ icon: '⚠️', title: 'Low Engagement Warning', desc: `${low.map(q=>q.name).join(', ')} have very few students`, data: low.flatMap(q => q.students.map(formatStudent)) });
-        const diverse = [...perf].sort((a,b) => (b.deptCount + b.batchCount) - (a.deptCount + a.batchCount))[0]; if (diverse) insights.push({ icon: '🌐', title: 'Highest Diversity', desc: `${diverse.name} spans ${diverse.deptCount} departments & ${diverse.batchCount} batches`, data: diverse.students.map(formatStudent) });
-        const cross = filteredStudents.filter(s => getQiratNames(s).length > 1); if (cross.length) insights.push({ icon: '🔄', title: 'Cross-Enrollment', desc: `${cross.length} students in multiple Qirats`, data: cross.map(formatStudent) });
+        if (perf[0]) insights.push({ icon: '🏆', title: 'Most Popular Qirat', desc: `${perf[0].name} leads with ${perf[0].total} students`, data: perf[0].students.map(formatStudent), type: 'popular' });
+        insights.push({ icon: kpi.growth >= 0 ? '📈' : '📉', title: kpi.growth >= 0 ? 'Weekly Growth Increasing' : 'Registrations Dropped', desc: `${kpi.lastWeek} new this week (${Math.abs(kpi.growth)}% ${kpi.growth >= 0 ? 'increase' : 'decrease'})`, data: filteredStudents.filter(s => { const w = new Date(); w.setDate(w.getDate() - 7); return s.timestamp >= w; }).map(formatStudent), type: 'growth' });
+        const low = perf.filter(q => q.total <= 2); if (low.length) insights.push({ icon: '⚠️', title: 'Low Engagement Warning', desc: `${low.map(q=>q.name).join(', ')} have very few students`, data: low.flatMap(q => q.students.map(formatStudent)), type: 'warning' });
+        const diverse = [...perf].sort((a,b) => (b.deptCount + b.batchCount) - (a.deptCount + a.batchCount))[0]; if (diverse) insights.push({ icon: '🌐', title: 'Highest Diversity', desc: `${diverse.name} spans ${diverse.deptCount} departments & ${diverse.batchCount} batches`, data: diverse.students.map(formatStudent), type: 'diversity' });
+        const cross = filteredStudents.filter(s => getQiratNames(s).length > 1); if (cross.length) insights.push({ icon: '🔄', title: 'Cross-Enrollment', desc: `${cross.length} students in multiple Qirats`, data: cross.map(formatStudent), type: 'cross' });
         return insights;
     }
     
     function renderInsights() {
         const insights = generateInsights();
-        insightsContainer.innerHTML = insights.map(ins => `<div class="insight-card"><div class="insight-icon">${ins.icon}</div><div class="insight-content"><div class="insight-title">${ins.title}</div><div class="insight-desc">${ins.desc}</div></div><button class="insight-btn" onclick="window.openDrill(${JSON.stringify(ins.data).replace(/"/g, '&quot;')}, '${ins.title}')">Analyze <i class="fas fa-arrow-right"></i></button></div>`).join('');
+        insightsContainer.innerHTML = insights.map(ins => `<div class="insight-card"><div class="insight-icon">${ins.icon}</div><div class="insight-content"><div class="insight-title">${ins.title}</div><div class="insight-desc">${ins.desc}</div></div><button class="insight-btn" onclick="window.openDrillModal(${JSON.stringify(ins.data).replace(/"/g, '&quot;')}, '${ins.title}', '${ins.type}')">Analyze <i class="fas fa-arrow-right"></i></button></div>`).join('');
     }
     
-    window.openDrill = (data, title) => {
-        currentDrillData = { data, title };
+    window.openDrillModal = (data, title, type) => {
+        currentDrillData = { originalData: data, filteredData: data, title: title, insightType: type, kpi: getKPIs(data.map(d => ({ ...d, full_name: d.Name, gender: d.Gender, timestamp: new Date() }))) };
         drillTitle.textContent = title;
-        if (!data.length) drillTableBody.innerHTML = `<tr><td colspan="7" class="empty-state">No data</td></tr>`;
-        else drillTableBody.innerHTML = data.map(s => `<tr><td><strong>${escapeHtml(s.Name)}</strong></td><td><span class="badge ${s.Gender === 'Male' ? 'badge-male' : 'badge-female'}">${escapeHtml(s.Gender)}</span></td><td>${escapeHtml(s.Phone)}</td><td>${escapeHtml(s.Department)}</td><td>${escapeHtml(s.Batch)}</td><td>${escapeHtml(s.Qirats)}</td><td>${escapeHtml(s.RegistrationDate)}</td></tr>`).join('');
+        populateModalFilters(data);
+        renderModalTable();
         drillModal.classList.add('active');
     };
     
-    function closeDrill() { drillModal.classList.remove('active'); }
+    function populateModalFilters(data) {
+        const departments = [...new Set(data.map(s => s.Department))];
+        const batches = [...new Set(data.map(s => s.Batch))];
+        modalDept.innerHTML = '<option value="">All Departments</option>' + departments.map(d => `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join('');
+        modalBatch.innerHTML = '<option value="">All Batches</option>' + batches.map(b => `<option value="${escapeHtml(b)}">${escapeHtml(b)}</option>`).join('');
+        modalSearch.value = ''; modalGender.value = ''; modalDept.value = ''; modalBatch.value = '';
+        applyModalFilters();
+    }
     
-    // Export Functions
-    function exportCSV() { if (!currentDrillData.data.length) return; const headers = ['Name','Gender','Phone','Department','Batch','Qirats','RegistrationDate']; const rows = currentDrillData.data.map(r => headers.map(h => `"${String(r[h]||'').replace(/"/g,'""')}"`).join(',')); const blob = new Blob(["\uFEFF" + [headers.join(','), ...rows].join('\n')], {type:'text/csv'}); download(`${currentDrillData.title.replace(/[^a-z0-9]/gi,'_')}.csv`, blob); showToast('CSV exported'); }
-    function exportExcel() { if (!currentDrillData.data.length) return; const ws = XLSX.utils.json_to_sheet(currentDrillData.data); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Data'); XLSX.writeFile(wb, `${currentDrillData.title.replace(/[^a-z0-9]/gi,'_')}.xlsx`); showToast('Excel exported'); }
-    async function exportPDF() { if (!currentDrillData.data.length) return; const { jsPDF } = window.jspdf; const doc = new jsPDF({ orientation: 'landscape' }); doc.setFontSize(18); doc.setTextColor(16,185,129); doc.text("Noor Academy - Insight Report", 14, 20); doc.setFontSize(12); doc.text(currentDrillData.title, 14, 32); doc.setFontSize(9); doc.text(`Generated: ${new Date().toLocaleString()} | Total: ${currentDrillData.data.length} students`, 14, 40); doc.autoTable({ head: [['Name','Gender','Phone','Department','Batch','Qirats','Date']], body: currentDrillData.data.map(r => [r.Name, r.Gender, r.Phone, r.Department, r.Batch, r.Qirats, r.RegistrationDate]), startY: 48, headStyles: { fillColor: [16,185,129] } }); doc.save(`${currentDrillData.title.replace(/[^a-z0-9]/gi,'_')}_report.pdf`); showToast('PDF exported'); }
-    function exportWord() { if (!currentDrillData.data.length) return; let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${currentDrillData.title}</title><style>body{font-family:Arial;} table{border-collapse:collapse;width:100%;} th,td{border:1px solid #ddd;padding:8px;} th{background:#10b981;color:white;}</style></head><body><h1>Noor Academy Report</h1><h2>${currentDrillData.title}</h2><p>Generated: ${new Date().toLocaleString()} | Total: ${currentDrillData.data.length}</p><table><thead><tr><th>Name</th><th>Gender</th><th>Phone</th><th>Department</th><th>Batch</th><th>Qirats</th><th>Date</th></tr></thead><tbody>${currentDrillData.data.map(r => `<tr><td>${escapeHtml(r.Name)}</td><td>${escapeHtml(r.Gender)}</td><td>${escapeHtml(r.Phone)}</td><td>${escapeHtml(r.Department)}</td><td>${escapeHtml(r.Batch)}</td><td>${escapeHtml(r.Qirats)}</td><td>${escapeHtml(r.RegistrationDate)}</td></tr>`).join('')}</tbody></table></body></html>`;
-        const blob = new Blob([html], { type: 'application/msword' }); download(`${currentDrillData.title.replace(/[^a-z0-9]/gi,'_')}.doc`, blob); showToast('Word exported'); }
-    function download(filename, blob) { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; a.click(); URL.revokeObjectURL(a.href); }
+    function applyModalFilters() {
+        const search = modalSearch.value.toLowerCase();
+        const gender = modalGender.value;
+        const dept = modalDept.value;
+        const batch = modalBatch.value;
+        currentDrillData.filteredData = currentDrillData.originalData.filter(s => {
+            const matchSearch = s.Name.toLowerCase().includes(search) || (s.Phone && s.Phone.includes(search));
+            const matchGender = !gender || s.Gender === gender;
+            const matchDept = !dept || s.Department === dept;
+            const matchBatch = !batch || s.Batch === batch;
+            return matchSearch && matchGender && matchDept && matchBatch;
+        });
+        renderModalTable();
+    }
     
-    // Event Listeners
+    function renderModalTable() {
+        if (!currentDrillData.filteredData.length) { drillTableBody.innerHTML = `<tr><td colspan="8" class="empty-state">No students found</td></tr>`; return; }
+        drillTableBody.innerHTML = currentDrillData.filteredData.map(s => `
+            <tr>
+                <td><strong>${escapeHtml(s.Name)}</strong></td>
+                <td><span class="badge ${s.Gender === 'Male' ? 'badge-male' : 'badge-female'}">${escapeHtml(s.Gender)}</span></td>
+                <td>${escapeHtml(s.Phone)}</td>
+                <td>${escapeHtml(s.Department)}</td>
+                <td>${escapeHtml(s.Batch)}</td>
+                <td>${escapeHtml(s.Qirats)}</td>
+                <td>${escapeHtml(s.RegistrationDate)}</td>
+                <td><button class="delete-qirat-btn" onclick="window.deleteStudentFromModal('${s.id}')" title="Delete Student"><i class="fas fa-trash"></i></button></td>
+            </tr>
+        `).join('');
+    }
+    
+    window.deleteStudentFromModal = async (id) => {
+        if (confirm('Delete this student?')) {
+            await deleteDoc(doc(db, "registrations", id));
+            showToast('Student deleted');
+            await loadData();
+            const newData = currentDrillData.originalData.filter(s => s.id !== id);
+            currentDrillData.originalData = newData;
+            applyModalFilters();
+        }
+    };
+    
+    function getModalExportData() { return currentDrillData.filteredData.map(s => ({ Name: s.Name, Gender: s.Gender, Phone: s.Phone, Department: s.Department, Batch: s.Batch, Qirats: s.Qirats, RegistrationDate: s.RegistrationDate })); }
+    
+    function modalExportCSV() { const data = getModalExportData(); if (!data.length) return alert('No data'); const headers = ['Name','Gender','Phone','Department','Batch','Qirats','RegistrationDate']; const rows = data.map(r => headers.map(h => `"${String(r[h]||'').replace(/"/g,'""')}"`).join(',')); const blob = new Blob(["\uFEFF" + [headers.join(','), ...rows].join('\n')], {type:'text/csv'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${currentDrillData.title.replace(/[^a-z0-9]/gi,'_')}.csv`; a.click(); URL.revokeObjectURL(a.href); showToast('CSV exported'); }
+    function modalExportExcel() { const data = getModalExportData(); if (!data.length) return alert('No data'); const ws = XLSX.utils.json_to_sheet(data); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Data'); XLSX.writeFile(wb, `${currentDrillData.title.replace(/[^a-z0-9]/gi,'_')}.xlsx`); showToast('Excel exported'); }
+    async function modalExportPDF() { const data = getModalExportData(); if (!data.length) return alert('No data'); const { jsPDF } = window.jspdf; const doc = new jsPDF({ orientation: 'landscape' }); const kpi = currentDrillData.kpi || getKPIs(); doc.setFontSize(18); doc.setTextColor(16,185,129); doc.text("Noor Academy - Insight Report", 14, 20); doc.setFontSize(12); doc.text(currentDrillData.title, 14, 32); doc.setFontSize(9); doc.text(`Generated: ${new Date().toLocaleString()} | Total: ${data.length} students`, 14, 40); if(currentDrillData.insightType) { doc.setFontSize(10); doc.setTextColor(245,158,11); doc.text(`Context: ${currentDrillData.insightType}`, 14, 48); } let y = 56; doc.setFontSize(10); doc.text("Summary KPIs", 14, y); y+=6; doc.setFontSize(9); doc.text(`Total Students: ${kpi.total}`, 14, y); y+=5; doc.text(`Active Qirats: ${kpi.activeQirats}`, 14, y); y+=5; doc.text(`Gender: ♂ ${kpi.male} | ♀ ${kpi.female}`, 14, y); y+=5; doc.text(`Multi-Enrolled: ${kpi.multi}`, 14, y); y+=8; doc.autoTable({ head: [['Name','Gender','Phone','Department','Batch','Qirats','Date']], body: data.map(r => [r.Name, r.Gender, r.Phone, r.Department, r.Batch, r.Qirats, r.RegistrationDate]), startY: y+2, headStyles: { fillColor: [16,185,129] }, styles: { fontSize: 8 } }); doc.save(`${currentDrillData.title.replace(/[^a-z0-9]/gi,'_')}_report.pdf`); showToast('PDF exported'); }
+    function modalExportWord() { const data = getModalExportData(); if (!data.length) return alert('No data'); let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${currentDrillData.title}</title><style>body{font-family:Arial;} table{border-collapse:collapse;width:100%;} th,td{border:1px solid #ddd;padding:8px;} th{background:#10b981;color:white;}</style></head><body><h1>Noor Academy Report</h1><h2>${currentDrillData.title}</h2><p>Generated: ${new Date().toLocaleString()} | Total: ${data.length}</p>${currentDrillData.insightType ? `<p><strong>Insight:</strong> ${currentDrillData.insightType}</p>` : ''}<h3>Student List</h3><table><thead><tr><th>Name</th><th>Gender</th><th>Phone</th><th>Department</th><th>Batch</th><th>Qirats</th><th>Date</th></tr></thead><tbody>${data.map(r => `<tr><td>${escapeHtml(r.Name)}</td><td>${escapeHtml(r.Gender)}</td><td>${escapeHtml(r.Phone)}</td><td>${escapeHtml(r.Department)}</td><td>${escapeHtml(r.Batch)}</td><td>${escapeHtml(r.Qirats)}</td><td>${escapeHtml(r.RegistrationDate)}</td>`).join('')}</tbody></table></body></html>`;
+        const blob = new Blob([html], { type: 'application/msword' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${currentDrillData.title.replace(/[^a-z0-9]/gi,'_')}.doc`; a.click(); URL.revokeObjectURL(a.href); showToast('Word exported'); }
+    
+    function showLoading(msg) { const overlay = document.createElement('div'); overlay.id = 'customLoading'; overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);display:flex;justify-content:center;align-items:center;z-index:2000;'; overlay.innerHTML = `<div style="background:white;padding:30px;border-radius:30px;text-align:center;"><div class="loading-spinner" style="width:50px;height:50px;border:4px solid #d1fae5;border-top-color:#10b981;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px;"></div><p>${msg}</p></div>`; document.body.appendChild(overlay); }
+    function hideLoading() { const el = document.getElementById('customLoading'); if (el) el.remove(); }
+    
     searchInput.addEventListener('input', applyFilters);
     genderFilter.addEventListener('change', applyFilters);
     deptFilter.addEventListener('change', applyFilters);
     batchFilter.addEventListener('change', applyFilters);
-    clearFiltersBtn.addEventListener('click', () => { searchInput.value = ''; genderFilter.value = ''; deptFilter.value = ''; batchFilter.value = ''; applyFilters(); });
-    closeModal.addEventListener('click', closeDrill);
-    window.addEventListener('click', (e) => { if (e.target === drillModal) closeDrill(); });
-    document.getElementById('modalExportCSV').addEventListener('click', exportCSV);
-    document.getElementById('modalExportExcel').addEventListener('click', exportExcel);
-    document.getElementById('modalExportPDF').addEventListener('click', exportPDF);
-    document.getElementById('modalExportWord').addEventListener('click', exportWord);
+    qiratFilter.addEventListener('change', applyFilters);
+    clearFiltersBtn.addEventListener('click', () => { searchInput.value = ''; genderFilter.value = ''; deptFilter.value = ''; batchFilter.value = ''; qiratFilter.value = ''; applyFilters(); });
+    deleteAllQiratsBtn.addEventListener('click', deleteAllQirats);
+    modalSearch.addEventListener('input', applyModalFilters);
+    modalGender.addEventListener('change', applyModalFilters);
+    modalDept.addEventListener('change', applyModalFilters);
+    modalBatch.addEventListener('change', applyModalFilters);
+    clearModalFilters.addEventListener('click', () => { modalSearch.value = ''; modalGender.value = ''; modalDept.value = ''; modalBatch.value = ''; applyModalFilters(); });
+    closeModal.addEventListener('click', () => drillModal.classList.remove('active'));
+    window.addEventListener('click', (e) => { if (e.target === drillModal) drillModal.classList.remove('active'); });
+    document.getElementById('modalExportCSV').addEventListener('click', modalExportCSV);
+    document.getElementById('modalExportExcel').addEventListener('click', modalExportExcel);
+    document.getElementById('modalExportPDF').addEventListener('click', modalExportPDF);
+    document.getElementById('modalExportWord').addEventListener('click', modalExportWord);
     
     loadData();
     setInterval(loadData, 30000);
