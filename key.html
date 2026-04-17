@@ -50,6 +50,7 @@
             z-index: 100;
             box-shadow: var(--shadow-sm);
             margin-bottom: 24px;
+            border-radius: 32px;
         }
 
         .header-content {
@@ -71,6 +72,42 @@
             display: flex;
             align-items: center;
             gap: 10px;
+        }
+
+        .admin-info-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: var(--primary-light);
+            padding: 6px 20px 6px 16px;
+            border-radius: 50px;
+        }
+
+        .admin-avatar-sm {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+        }
+
+        .logout-btn {
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 8px;
+            border-radius: 30px;
+            transition: all 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: #fee2e2;
         }
 
         .back-btn {
@@ -130,7 +167,9 @@
             box-shadow: var(--shadow-md);
             border: 1px solid var(--border);
             text-align: center;
+            transition: all 0.3s;
         }
+        .stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
         .stat-value { font-size: 2rem; font-weight: 800; color: var(--primary); }
         .stat-label { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
 
@@ -358,6 +397,8 @@
         @media (max-width: 768px) {
             body { padding: 16px; }
             .hero-title { font-size: 1.3rem; }
+            .admin-info-header { padding: 4px 12px 4px 8px; }
+            .admin-avatar-sm { width: 28px; height: 28px; font-size: 0.8rem; }
         }
     </style>
 </head>
@@ -366,24 +407,29 @@
 <div class="glass-header">
     <div class="header-content">
         <div class="logo"><h1><i class="fas fa-key"></i> Secret Key Manager</h1></div>
-        <button class="back-btn" onclick="window.location.href='index.html'"><i class="fas fa-arrow-left"></i> Back to Dashboard</button>
+        <div style="display: flex; gap: 12px; align-items: center;">
+            <div class="admin-info-header">
+                <div class="admin-avatar-sm" id="currentAdminAvatar">A</div>
+                <span id="currentAdminName">Loading...</span>
+                <button class="logout-btn" id="logoutBtn" title="Logout"><i class="fas fa-sign-out-alt"></i></button>
+            </div>
+            <button class="back-btn" onclick="window.location.href='index.html'"><i class="fas fa-arrow-left"></i> Dashboard</button>
+        </div>
     </div>
 </div>
 
 <div class="main-container">
-    <!-- Hero -->
     <div class="hero-section">
         <div class="hero-title"><i class="fas fa-shield-alt"></i> Secure Key Management</div>
         <div class="hero-subtitle">Create, manage, and revoke secret keys for API access and authentication</div>
     </div>
 
-    <!-- Stats -->
     <div class="stats-grid">
         <div class="stat-card"><div class="stat-value" id="totalKeys">0</div><div class="stat-label">Total Keys</div></div>
         <div class="stat-card"><div class="stat-value" id="activeKeys">0</div><div class="stat-label">Active Keys</div></div>
+        <div class="stat-card"><div class="stat-value" id="keysCreatedByMe">0</div><div class="stat-label">Created by You</div></div>
     </div>
 
-    <!-- Create Key Card -->
     <div class="create-card">
         <div class="card-title"><i class="fas fa-plus-circle"></i> Create New Secret Key</div>
         <form id="createKeyForm">
@@ -399,7 +445,6 @@
         </form>
     </div>
 
-    <!-- Keys List -->
     <div class="keys-card">
         <div class="keys-header">
             <div class="card-title" style="margin-bottom:0;"><i class="fas fa-list"></i> Registered Secret Keys</div>
@@ -411,7 +456,6 @@
     </div>
 </div>
 
-<!-- Delete Confirmation Modal -->
 <div id="deleteModal" class="modal">
     <div class="modal-content">
         <i class="fas fa-exclamation-triangle" style="font-size: 48px; color: #ef4444; margin-bottom: 16px;"></i>
@@ -426,15 +470,24 @@
 </div>
 
 <div id="toast" class="toast"></div>
+
 <script type="module">
-    import { protectPageWithRole, initAuthUI } from './auth.js';
+    import { protectPageWithRole, initAuthUI, setupAutoLogout, logout, logActivity, getCurrentAdmin } from './auth.js';
 
-// Only allow 'super-admin' role to access this page
-if (!protectPageWithRole(['super-admin', 'admin'], 'admin-login.html')) {
-    throw new Error('Redirecting');
-}
+    // Only allow 'super-admin' and 'admin' roles to access this page
+    if (!protectPageWithRole(['super-admin', 'admin'], 'admin-login.html')) {
+        throw new Error('Redirecting');
+    }
 
-const admin = initAuthUI();
+    const currentAdmin = initAuthUI();
+    setupAutoLogout(60);
+
+    // Update header with current admin
+    if (currentAdmin) {
+        document.getElementById('currentAdminName').textContent = currentAdmin.name;
+        document.getElementById('currentAdminAvatar').textContent = currentAdmin.name.charAt(0).toUpperCase();
+    }
+
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     
@@ -459,12 +512,14 @@ const admin = initAuthUI();
     const keysListDiv = document.getElementById('keysList');
     const totalKeysSpan = document.getElementById('totalKeys');
     const activeKeysSpan = document.getElementById('activeKeys');
+    const keysCreatedByMeSpan = document.getElementById('keysCreatedByMe');
     const refreshBtn = document.getElementById('refreshBtn');
     const toast = document.getElementById('toast');
     const deleteModal = document.getElementById('deleteModal');
     const deleteKeyNameSpan = document.getElementById('deleteKeyName');
     const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
     const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
     
     let pendingDeleteId = null;
     
@@ -476,7 +531,6 @@ const admin = initAuthUI();
     }
     
     function generateSecretKey() {
-        // Generate a cryptographically secure random key
         const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
         const keyLength = 32;
         let result = 'noor_';
@@ -508,17 +562,20 @@ const admin = initAuthUI();
                 createdAt: new Date(),
                 updatedAt: new Date(),
                 isActive: true,
-                createdBy: 'admin'
+                createdBy: currentAdmin?.name || 'admin',
+                createdById: currentAdmin?.id || 'unknown'
             };
             
             await addDoc(secretKeysCollection, keyData);
+            
+            // Log activity
+            await logActivity(currentAdmin.id, currentAdmin.name, 'CREATE', `Created secret key: ${name}`);
             
             showToast(`✅ Secret key "${name}" created successfully!`);
             keyNameInput.value = '';
             keyDescription.value = '';
             await loadSecretKeys();
             
-            // Show the new key in a special alert
             setTimeout(() => {
                 alert(`🔐 NEW SECRET KEY\n\nName: ${name}\nKey: ${secretKey}\n\n⚠️ Copy this key now! It will not be shown again.`);
             }, 100);
@@ -546,12 +603,15 @@ const admin = initAuthUI();
                     description: data.description || '',
                     secretKey: data.secretKey,
                     createdAt: data.createdAt?.toDate?.() || new Date(data.createdAt),
-                    isActive: data.isActive !== false
+                    isActive: data.isActive !== false,
+                    createdBy: data.createdBy || 'Unknown',
+                    createdById: data.createdById
                 });
             });
             
             totalKeysSpan.textContent = keys.length;
             activeKeysSpan.textContent = keys.filter(k => k.isActive).length;
+            keysCreatedByMeSpan.textContent = keys.filter(k => k.createdById === currentAdmin?.id || k.createdBy === currentAdmin?.name).length;
             renderKeysList(keys);
         } catch (error) {
             console.error("Error loading keys:", error);
@@ -572,6 +632,7 @@ const admin = initAuthUI();
                         <i class="fas fa-key"></i>
                         <strong>${escapeHtml(key.name)}</strong>
                         ${key.isActive ? '<span style="background:#d1fae5; color:#065f46; padding:2px 8px; border-radius:20px; font-size:0.65rem;">Active</span>' : '<span style="background:#fee2e2; color:#991b1b; padding:2px 8px; border-radius:20px; font-size:0.65rem;">Inactive</span>'}
+                        <span style="background:#e0e7ff; color:#3730a3; padding:2px 8px; border-radius:20px; font-size:0.65rem;"><i class="fas fa-user"></i> ${escapeHtml(key.createdBy)}</span>
                     </div>
                     <div class="key-actions">
                         <button class="copy-btn" onclick="window.copyToClipboard('${escapeHtml(key.secretKey)}', '${escapeHtml(key.name)}')"><i class="fas fa-copy"></i> Copy Key</button>
@@ -609,15 +670,16 @@ const admin = initAuthUI();
     window.copyToClipboard = async (key, name) => {
         try {
             await navigator.clipboard.writeText(key);
+            await logActivity(currentAdmin.id, currentAdmin.name, 'EXPORT', `Copied secret key: ${name}`);
             showToast(`✅ Copied secret key for "${name}" to clipboard`);
         } catch (err) {
-            // Fallback
             const textarea = document.createElement('textarea');
             textarea.value = key;
             document.body.appendChild(textarea);
             textarea.select();
             document.execCommand('copy');
             document.body.removeChild(textarea);
+            await logActivity(currentAdmin.id, currentAdmin.name, 'EXPORT', `Copied secret key: ${name}`);
             showToast(`✅ Copied secret key for "${name}"`);
         }
     };
@@ -632,7 +694,14 @@ const admin = initAuthUI();
         if (!pendingDeleteId) return;
         
         try {
+            const keyDoc = await getDocs(query(secretKeysCollection));
+            let keyName = '';
+            keyDoc.forEach(doc => {
+                if (doc.id === pendingDeleteId) keyName = doc.data().name;
+            });
+            
             await deleteDoc(doc(db, "secretKeys", pendingDeleteId));
+            await logActivity(currentAdmin.id, currentAdmin.name, 'DELETE', `Deleted secret key: ${keyName}`);
             showToast('✅ Secret key deleted successfully');
             await loadSecretKeys();
         } catch (error) {
@@ -649,6 +718,12 @@ const admin = initAuthUI();
         pendingDeleteId = null;
     }
     
+    // Logout handler
+    logoutBtn.addEventListener('click', async () => {
+        await logout();
+        window.location.href = 'admin-login.html';
+    });
+    
     // Event Listeners
     createForm.addEventListener('submit', createSecretKey);
     refreshBtn.addEventListener('click', loadSecretKeys);
@@ -664,6 +739,5 @@ const admin = initAuthUI();
     style.textContent = `@keyframes spin { to { transform: rotate(360deg); } }`;
     document.head.appendChild(style);
 </script>
-
 </body>
 </html>
