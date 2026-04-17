@@ -36,27 +36,32 @@
             font-family: 'Inter', sans-serif;
             background: linear-gradient(135deg, #f0f9ff 0%, #e6f7f0 100%);
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             padding: 20px;
         }
 
         .register-container {
-            max-width: 580px;
+            max-width: 1400px;
             width: 100%;
             margin: 0 auto;
         }
 
+        /* Two Column Layout */
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+        }
+
         /* Glass Card */
-        .register-card {
+        .register-card, .admin-list-card {
             background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(10px);
             border-radius: 48px;
-            padding: 40px 32px;
+            padding: 32px;
             box-shadow: var(--shadow-xl);
             border: 1px solid rgba(16, 185, 129, 0.2);
             transition: all 0.3s ease;
+            height: fit-content;
         }
 
         .logo {
@@ -115,9 +120,11 @@
 
         .input-wrapper {
             position: relative;
+            display: flex;
+            align-items: center;
         }
 
-        .input-wrapper i {
+        .input-wrapper i.input-icon {
             position: absolute;
             left: 16px;
             top: 50%;
@@ -125,11 +132,12 @@
             color: var(--text-muted);
             font-size: 1rem;
             z-index: 1;
+            pointer-events: none;
         }
 
-        .input-wrapper input {
+        .input-wrapper input, .input-wrapper select {
             width: 100%;
-            padding: 14px 16px 14px 48px;
+            padding: 14px 50px 14px 48px;
             border: 2px solid var(--border);
             border-radius: 28px;
             font-family: 'Inter', sans-serif;
@@ -138,13 +146,13 @@
             background: white;
         }
 
-        .input-wrapper input:focus {
+        .input-wrapper input:focus, .input-wrapper select:focus {
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
         }
 
-        .input-wrapper input.error {
+        .input-wrapper input.error, .input-wrapper select.error {
             border-color: var(--danger);
         }
 
@@ -159,8 +167,25 @@
             color: var(--text-muted);
             font-size: 1rem;
             z-index: 1;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s;
         }
 
+        .toggle-visibility:hover {
+            color: var(--primary);
+        }
+
+        .error-message {
+            color: var(--danger);
+            font-size: 0.7rem;
+            margin-top: 6px;
+            display: block;
+        }
+
+        /* Password Strength */
         .password-strength {
             margin-top: 8px;
             display: flex;
@@ -193,37 +218,23 @@
         .strength-good { background: #10b981; }
         .strength-strong { background: #059669; }
 
-        .error-message {
-            color: var(--danger);
-            font-size: 0.7rem;
-            margin-top: 6px;
-            display: block;
+        .password-requirements {
+            margin-top: 8px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            font-size: 0.65rem;
         }
 
-        /* Secret Key Input */
-        .secret-key-wrapper {
-            position: relative;
-        }
-
-        .secret-key-wrapper i {
-            position: absolute;
-            left: 16px;
-            top: 50%;
-            transform: translateY(-50%);
+        .req-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
             color: var(--text-muted);
-            z-index: 1;
         }
 
-        .secret-key-wrapper input {
-            width: 100%;
-            padding: 14px 16px 14px 48px;
-            padding-right: 50px;
-            border: 2px solid var(--border);
-            border-radius: 28px;
-            font-family: 'Monaco', 'Courier New', monospace;
-            font-size: 0.85rem;
-            letter-spacing: 0.5px;
-            background: white;
+        .req-item.valid {
+            color: var(--primary);
         }
 
         /* Button */
@@ -254,6 +265,117 @@
             opacity: 0.6;
             cursor: not-allowed;
             transform: none;
+        }
+
+        /* Admin List Styles */
+        .admin-list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .admin-list-header h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .refresh-btn {
+            background: var(--primary-light);
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .refresh-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .admin-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .admin-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.2s;
+        }
+
+        .admin-item:hover {
+            background: var(--primary-light);
+        }
+
+        .admin-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .admin-name {
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .admin-name i {
+            color: var(--primary);
+        }
+
+        .admin-email {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .admin-date {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+        }
+
+        .admin-role {
+            background: var(--primary-light);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        .delete-admin {
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 30px;
+            transition: all 0.2s;
+        }
+
+        .delete-admin:hover {
+            background: #fee2e2;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px;
+            color: var(--text-muted);
         }
 
         /* Messages */
@@ -291,6 +413,21 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
+        /* Spinner */
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
         /* Login Link */
         .login-link {
             text-align: center;
@@ -309,146 +446,17 @@
             text-decoration: underline;
         }
 
-        /* Admin List Section */
-        .admin-list-section {
-            margin-top: 32px;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 32px;
-            padding: 24px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(16, 185, 129, 0.2);
-        }
-
-        .admin-list-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        .admin-list-header h3 {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        .refresh-btn {
-            background: var(--primary-light);
-            border: none;
-            padding: 8px 16px;
-            border-radius: 30px;
-            cursor: pointer;
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: var(--primary-dark);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .admin-list {
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
-        .admin-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .admin-item:last-child {
-            border-bottom: none;
-        }
-
-        .admin-info {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .admin-name {
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        .admin-email {
-            font-size: 0.7rem;
-            color: var(--text-muted);
-        }
-
-        .admin-date {
-            font-size: 0.65rem;
-            color: var(--text-muted);
-        }
-
-        .delete-admin {
-            background: none;
-            border: none;
-            color: var(--danger);
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 30px;
-            transition: all 0.2s;
-        }
-
-        .delete-admin:hover {
-            background: #fee2e2;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px;
-            color: var(--text-muted);
-        }
-
-        /* Spinner */
-        .spinner {
-            width: 20px;
-            height: 20px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-top-color: white;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            display: inline-block;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Password Requirements */
-        .password-requirements {
-            margin-top: 8px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            font-size: 0.65rem;
-        }
-
-        .req-item {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            color: var(--text-muted);
-        }
-
-        .req-item.valid {
-            color: var(--primary);
-        }
-
-        .req-item.invalid {
-            color: var(--text-muted);
-        }
-
         /* Responsive */
+        @media (max-width: 1024px) {
+            .two-columns {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+        }
+
         @media (max-width: 768px) {
             body { padding: 16px; }
-            .register-card { padding: 28px 20px; }
+            .register-card, .admin-list-card { padding: 24px 20px; }
             .logo h1 { font-size: 1.4rem; }
         }
     </style>
@@ -456,106 +464,108 @@
 <body>
 
 <div class="register-container">
-    <!-- Registration Card -->
-    <div class="register-card">
-        <div class="logo">
-            <h1><i class="fas fa-user-shield"></i> Admin Registration</h1>
-            <p>Create your admin account with secure password</p>
+    <div class="two-columns">
+        <!-- Registration Form Column -->
+        <div class="register-card">
+            <div class="logo">
+                <h1><i class="fas fa-user-shield"></i> Admin Registration</h1>
+                <p>Create a new administrator account</p>
+            </div>
+
+            <div id="messageContainer"></div>
+
+            <form id="registerForm">
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> Full Name <span class="required">*</span></label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-user-circle input-icon"></i>
+                        <input type="text" id="adminName" placeholder="Enter full name" autocomplete="off">
+                    </div>
+                    <span class="error-message" id="nameError"></span>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-envelope"></i> Email Address <span class="required">*</span></label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-envelope input-icon"></i>
+                        <input type="email" id="adminEmail" placeholder="admin@example.com" autocomplete="off">
+                    </div>
+                    <span class="error-message" id="emailError"></span>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Password <span class="required">*</span></label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-lock input-icon"></i>
+                        <input type="password" id="password" placeholder="Create a strong password" autocomplete="new-password">
+                        <button type="button" class="toggle-visibility" data-target="password">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="password-strength">
+                        <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+                        <span class="strength-text" id="strengthText">Not set</span>
+                    </div>
+                    <div class="password-requirements" id="passwordReqs">
+                        <span class="req-item" id="reqLength"><i class="fas fa-circle"></i> 8+ characters</span>
+                        <span class="req-item" id="reqUpper"><i class="fas fa-circle"></i> Uppercase</span>
+                        <span class="req-item" id="reqLower"><i class="fas fa-circle"></i> Lowercase</span>
+                        <span class="req-item" id="reqNumber"><i class="fas fa-circle"></i> Number</span>
+                        <span class="req-item" id="reqSpecial"><i class="fas fa-circle"></i> Special character</span>
+                    </div>
+                    <span class="error-message" id="passwordError"></span>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-check-circle"></i> Confirm Password <span class="required">*</span></label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-check-circle input-icon"></i>
+                        <input type="password" id="confirmPassword" placeholder="Confirm your password" autocomplete="off">
+                        <button type="button" class="toggle-visibility" data-target="confirmPassword">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <span class="error-message" id="confirmError"></span>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-key"></i> Secret Key <span class="required">*</span></label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-key input-icon"></i>
+                        <input type="password" id="secretKey" placeholder="Enter your secret key" autocomplete="off">
+                        <button type="button" class="toggle-visibility" data-target="secretKey">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <span class="error-message" id="keyError"></span>
+                    <div style="font-size:0.65rem; color:var(--text-muted); margin-top:6px;">
+                        <i class="fas fa-info-circle"></i> Contact the system administrator to get a valid secret key
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-register" id="registerBtn">
+                    <i class="fas fa-user-plus"></i>
+                    <span>Register as Admin</span>
+                </button>
+            </form>
+
+            <div class="login-link">
+                Already have an account? <a href="admin-login.html">Login here</a>
+            </div>
         </div>
 
-        <div id="messageContainer"></div>
-
-        <form id="registerForm">
-            <div class="form-group">
-                <label><i class="fas fa-user"></i> Full Name <span class="required">*</span></label>
-                <div class="input-wrapper">
-                    <i class="fas fa-user-circle"></i>
-                    <input type="text" id="adminName" placeholder="Enter your full name" autocomplete="off">
-                </div>
-                <span class="error-message" id="nameError"></span>
+        <!-- Admin List Column -->
+        <div class="admin-list-card">
+            <div class="admin-list-header">
+                <h3><i class="fas fa-users"></i> Registered Administrators</h3>
+                <button class="refresh-btn" id="refreshAdminsBtn">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
             </div>
-
-            <div class="form-group">
-                <label><i class="fas fa-envelope"></i> Email Address <span class="required">*</span></label>
-                <div class="input-wrapper">
-                    <i class="fas fa-envelope"></i>
-                    <input type="email" id="adminEmail" placeholder="admin@example.com" autocomplete="off">
+            <div class="admin-list" id="adminList">
+                <div class="empty-state">
+                    <i class="fas fa-spinner fa-pulse"></i> Loading admins...
                 </div>
-                <span class="error-message" id="emailError"></span>
-            </div>
-
-            <div class="form-group">
-                <label><i class="fas fa-lock"></i> Password <span class="required">*</span></label>
-                <div class="input-wrapper">
-                    <i class="fas fa-lock"></i>
-                    <input type="password" id="password" placeholder="Create a strong password" autocomplete="new-password">
-                    <button type="button" class="toggle-visibility" data-target="password">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                </div>
-                <div class="password-strength">
-                    <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
-                    <span class="strength-text" id="strengthText">Not set</span>
-                </div>
-                <div class="password-requirements" id="passwordReqs">
-                    <span class="req-item" id="reqLength"><i class="fas fa-circle"></i> 8+ characters</span>
-                    <span class="req-item" id="reqUpper"><i class="fas fa-circle"></i> Uppercase</span>
-                    <span class="req-item" id="reqLower"><i class="fas fa-circle"></i> Lowercase</span>
-                    <span class="req-item" id="reqNumber"><i class="fas fa-circle"></i> Number</span>
-                    <span class="req-item" id="reqSpecial"><i class="fas fa-circle"></i> Special character</span>
-                </div>
-                <span class="error-message" id="passwordError"></span>
-            </div>
-
-            <div class="form-group">
-                <label><i class="fas fa-check-circle"></i> Confirm Password <span class="required">*</span></label>
-                <div class="input-wrapper">
-                    <i class="fas fa-check-circle"></i>
-                    <input type="password" id="confirmPassword" placeholder="Confirm your password" autocomplete="off">
-                    <button type="button" class="toggle-visibility" data-target="confirmPassword">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                </div>
-                <span class="error-message" id="confirmError"></span>
-            </div>
-
-            <div class="form-group">
-                <label><i class="fas fa-key"></i> Secret Key <span class="required">*</span></label>
-                <div class="secret-key-wrapper">
-                    <i class="fas fa-lock"></i>
-                    <input type="password" id="secretKey" placeholder="Enter your secret key" autocomplete="off">
-                    <button type="button" class="toggle-visibility" data-target="secretKey">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                </div>
-                <span class="error-message" id="keyError"></span>
-                <div style="font-size:0.65rem; color:var(--text-muted); margin-top:6px;">
-                    <i class="fas fa-info-circle"></i> Contact the system administrator to get a valid secret key
-                </div>
-            </div>
-
-            <button type="submit" class="btn-register" id="registerBtn">
-                <i class="fas fa-user-plus"></i>
-                <span>Verify & Register as Admin</span>
-            </button>
-        </form>
-
-        <div class="login-link">
-            Already have an account? <a href="admin-login.html">Login here</a>
-        </div>
-    </div>
-
-    <!-- Admin List Section -->
-    <div class="admin-list-section">
-        <div class="admin-list-header">
-            <h3><i class="fas fa-users"></i> Registered Administrators</h3>
-            <button class="refresh-btn" id="refreshAdminsBtn">
-                <i class="fas fa-sync-alt"></i> Refresh
-            </button>
-        </div>
-        <div class="admin-list" id="adminList">
-            <div class="empty-state">
-                <i class="fas fa-spinner fa-pulse"></i> Loading admins...
             </div>
         </div>
     </div>
@@ -602,7 +612,8 @@
     
     // Toggle password visibility for all fields
     document.querySelectorAll('.toggle-visibility').forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
             const targetId = btn.getAttribute('data-target');
             const targetInput = document.getElementById(targetId);
             if (targetInput) {
@@ -624,23 +635,17 @@
             special: /[^A-Za-z0-9]/.test(password)
         };
         
-        // Update requirement indicators
         reqLength.className = `req-item ${checks.length ? 'valid' : 'invalid'}`;
         reqLength.innerHTML = checks.length ? '<i class="fas fa-check-circle"></i> 8+ characters' : '<i class="fas fa-circle"></i> 8+ characters';
-        
         reqUpper.className = `req-item ${checks.upper ? 'valid' : 'invalid'}`;
         reqUpper.innerHTML = checks.upper ? '<i class="fas fa-check-circle"></i> Uppercase' : '<i class="fas fa-circle"></i> Uppercase';
-        
         reqLower.className = `req-item ${checks.lower ? 'valid' : 'invalid'}`;
         reqLower.innerHTML = checks.lower ? '<i class="fas fa-check-circle"></i> Lowercase' : '<i class="fas fa-circle"></i> Lowercase';
-        
         reqNumber.className = `req-item ${checks.number ? 'valid' : 'invalid'}`;
         reqNumber.innerHTML = checks.number ? '<i class="fas fa-check-circle"></i> Number' : '<i class="fas fa-circle"></i> Number';
-        
         reqSpecial.className = `req-item ${checks.special ? 'valid' : 'invalid'}`;
         reqSpecial.innerHTML = checks.special ? '<i class="fas fa-check-circle"></i> Special character' : '<i class="fas fa-circle"></i> Special character';
         
-        // Calculate strength score
         if (checks.length) strength++;
         if (checks.upper) strength++;
         if (checks.lower) strength++;
@@ -651,82 +656,25 @@
         let strengthLabel = '';
         let strengthClass = '';
         
-        if (strength <= 2) {
-            strengthLabel = 'Weak';
-            strengthClass = 'strength-weak';
-        } else if (strength === 3) {
-            strengthLabel = 'Fair';
-            strengthClass = 'strength-fair';
-        } else if (strength === 4) {
-            strengthLabel = 'Good';
-            strengthClass = 'strength-good';
-        } else {
-            strengthLabel = 'Strong';
-            strengthClass = 'strength-strong';
-        }
+        if (strength <= 2) { strengthLabel = 'Weak'; strengthClass = 'strength-weak'; }
+        else if (strength === 3) { strengthLabel = 'Fair'; strengthClass = 'strength-fair'; }
+        else if (strength === 4) { strengthLabel = 'Good'; strengthClass = 'strength-good'; }
+        else { strengthLabel = 'Strong'; strengthClass = 'strength-strong'; }
         
         strengthFill.style.width = `${percentage}%`;
         strengthFill.className = `strength-fill ${strengthClass}`;
         strengthText.textContent = strengthLabel;
-        strengthText.style.color = getComputedStyle(document.documentElement).getPropertyValue(`--${strengthClass.split('-')[1]}`) || '#10b981';
         
         return { valid: strength >= 3, strength };
     }
     
     function validatePassword(password) {
-        if (!password) {
-            return { valid: false, message: 'Password is required' };
-        }
-        if (password.length < 8) {
-            return { valid: false, message: 'Password must be at least 8 characters' };
-        }
-        if (!/[A-Z]/.test(password)) {
-            return { valid: false, message: 'Password must contain at least one uppercase letter' };
-        }
-        if (!/[a-z]/.test(password)) {
-            return { valid: false, message: 'Password must contain at least one lowercase letter' };
-        }
-        if (!/[0-9]/.test(password)) {
-            return { valid: false, message: 'Password must contain at least one number' };
-        }
-        if (!/[^A-Za-z0-9]/.test(password)) {
-            return { valid: false, message: 'Password must contain at least one special character' };
-        }
-        return { valid: true, message: '' };
-    }
-    
-    function validateConfirmPassword(password, confirm) {
-        if (password !== confirm) {
-            return { valid: false, message: 'Passwords do not match' };
-        }
-        return { valid: true, message: '' };
-    }
-    
-    function validateName(name) {
-        if (!name || name.trim() === '') {
-            return { valid: false, message: 'Full name is required' };
-        }
-        if (name.trim().length < 3) {
-            return { valid: false, message: 'Name must be at least 3 characters' };
-        }
-        return { valid: true, message: '' };
-    }
-    
-    function validateEmail(email) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!email || email.trim() === '') {
-            return { valid: false, message: 'Email address is required' };
-        }
-        if (!emailRegex.test(email)) {
-            return { valid: false, message: 'Please enter a valid email address' };
-        }
-        return { valid: true, message: '' };
-    }
-    
-    function validateSecretKey(key) {
-        if (!key || key.trim() === '') {
-            return { valid: false, message: 'Secret key is required' };
-        }
+        if (!password) return { valid: false, message: 'Password is required' };
+        if (password.length < 8) return { valid: false, message: 'Password must be at least 8 characters' };
+        if (!/[A-Z]/.test(password)) return { valid: false, message: 'Password must contain an uppercase letter' };
+        if (!/[a-z]/.test(password)) return { valid: false, message: 'Password must contain a lowercase letter' };
+        if (!/[0-9]/.test(password)) return { valid: false, message: 'Password must contain a number' };
+        if (!/[^A-Za-z0-9]/.test(password)) return { valid: false, message: 'Password must contain a special character' };
         return { valid: true, message: '' };
     }
     
@@ -740,9 +688,7 @@
         setTimeout(() => {
             if (messageDiv.parentNode === messageContainer) {
                 messageDiv.style.opacity = '0';
-                setTimeout(() => {
-                    if (messageDiv.parentNode === messageContainer) messageContainer.innerHTML = '';
-                }, 300);
+                setTimeout(() => { if (messageDiv.parentNode === messageContainer) messageContainer.innerHTML = ''; }, 300);
             }
         }, 5000);
     }
@@ -769,10 +715,7 @@
             const q = query(adminsCollection, where('email', '==', email.toLowerCase()));
             const querySnapshot = await getDocs(q);
             return !querySnapshot.empty;
-        } catch (error) {
-            console.error("Error checking email:", error);
-            return false;
-        }
+        } catch (error) { return false; }
     }
     
     async function validateSecretKeyAgainstDB(secretKey) {
@@ -789,7 +732,6 @@
             });
             return { valid: isValid, keyInfo: validKey };
         } catch (error) {
-            console.error("Error validating secret key:", error);
             return { valid: false, keyInfo: null };
         }
     }
@@ -804,48 +746,39 @@
         const confirmPassword = confirmPasswordInput.value;
         const secretKey = secretKeyInput.value;
         
-        const nameValidation = validateName(name);
-        const emailValidation = validateEmail(email);
+        const nameValidation = { valid: name && name.trim().length >= 3, message: 'Name must be at least 3 characters' };
+        const emailValidation = { valid: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email), message: 'Valid email required' };
         const passwordValidation = validatePassword(password);
-        const confirmValidation = validateConfirmPassword(password, confirmPassword);
-        const keyValidation = validateSecretKey(secretKey);
+        const confirmValidation = { valid: password === confirmPassword, message: 'Passwords do not match' };
+        const keyValidation = { valid: secretKey && secretKey.trim() !== '', message: 'Secret key is required' };
         
         let isValid = true;
-        
         if (!nameValidation.valid) { showFieldError('name', nameValidation.message); isValid = false; }
         if (!emailValidation.valid) { showFieldError('email', emailValidation.message); isValid = false; }
         if (!passwordValidation.valid) { showFieldError('password', passwordValidation.message); isValid = false; }
         if (!confirmValidation.valid) { showFieldError('confirm', confirmValidation.message); isValid = false; }
         if (!keyValidation.valid) { showFieldError('key', keyValidation.message); isValid = false; }
-        
         if (!isValid) return;
         
         const emailExists = await isEmailExists(email);
-        if (emailExists) {
-            showFieldError('email', 'This email is already registered');
-            showMessage('This email is already registered. Please use a different email or login.', 'error');
-            return;
-        }
+        if (emailExists) { showFieldError('email', 'Email already registered'); showMessage('This email is already registered', 'error'); return; }
         
         registerBtn.disabled = true;
         registerBtn.innerHTML = '<span class="spinner"></span> Verifying secret key...';
         
         const keyValidationResult = await validateSecretKeyAgainstDB(secretKey);
-        
         if (!keyValidationResult.valid) {
             registerBtn.disabled = false;
-            registerBtn.innerHTML = '<i class="fas fa-user-plus"></i> Verify & Register as Admin';
-            showFieldError('key', 'Invalid or expired secret key');
-            showMessage('❌ Invalid secret key. Please contact the system administrator for a valid key.', 'error');
+            registerBtn.innerHTML = '<i class="fas fa-user-plus"></i> Register as Admin';
+            showFieldError('key', 'Invalid secret key');
+            showMessage('❌ Invalid secret key', 'error');
             return;
         }
         
         registerBtn.innerHTML = '<span class="spinner"></span> Creating admin account...';
         
         try {
-            // Simple hash for demo - in production use proper bcrypt/scrypt
             const hashedPassword = btoa(password + 'noor_salt_2024');
-            
             const adminData = {
                 name: name.trim(),
                 email: email.trim().toLowerCase(),
@@ -855,24 +788,14 @@
                 createdAt: new Date(),
                 updatedAt: new Date()
             };
-            
             await addDoc(adminsCollection, adminData);
-            showMessage('✅ Admin registered successfully! You can now login with your credentials.', 'success');
-            adminName.value = '';
-            adminEmail.value = '';
-            passwordInput.value = '';
-            confirmPasswordInput.value = '';
-            secretKeyInput.value = '';
+            showMessage('✅ Admin registered successfully!', 'success');
+            adminName.value = ''; adminEmail.value = ''; passwordInput.value = ''; confirmPasswordInput.value = ''; secretKeyInput.value = '';
             checkPasswordStrength('');
             await loadAdmins();
-            
             setTimeout(() => { window.location.href = 'admin-login.html'; }, 2000);
-        } catch (error) {
-            showMessage('Registration failed: ' + error.message, 'error');
-        } finally {
-            registerBtn.disabled = false;
-            registerBtn.innerHTML = '<i class="fas fa-user-plus"></i> Verify & Register as Admin';
-        }
+        } catch (error) { showMessage('Registration failed: ' + error.message, 'error'); }
+        finally { registerBtn.disabled = false; registerBtn.innerHTML = '<i class="fas fa-user-plus"></i> Register as Admin'; }
     }
     
     async function loadAdmins() {
@@ -883,16 +806,12 @@
             querySnapshot.forEach((docSnap) => {
                 const data = docSnap.data();
                 admins.push({
-                    id: docSnap.id,
-                    name: data.name,
-                    email: data.email,
+                    id: docSnap.id, name: data.name, email: data.email, role: data.role || 'admin',
                     createdAt: data.createdAt?.toDate?.() || new Date(data.createdAt) || new Date()
                 });
             });
             renderAdminList(admins);
-        } catch (error) {
-            adminList.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i> Failed to load admins</div>';
-        }
+        } catch (error) { adminList.innerHTML = '<div class="empty-state">Failed to load admins</div>'; }
     }
     
     async function deleteAdmin(id, name) {
@@ -901,25 +820,20 @@
                 await deleteDoc(doc(db, "admins", id));
                 showMessage(`Admin "${name}" removed successfully`, 'success');
                 await loadAdmins();
-            } catch (error) {
-                showMessage('Failed to remove admin: ' + error.message, 'error');
-            }
+            } catch (error) { showMessage('Failed to remove admin: ' + error.message, 'error'); }
         }
     }
     
     function renderAdminList(admins) {
-        if (admins.length === 0) {
-            adminList.innerHTML = '<div class="empty-state"><i class="fas fa-user-slash"></i> No admins registered yet</div>';
-            return;
-        }
+        if (admins.length === 0) { adminList.innerHTML = '<div class="empty-state">No admins registered yet</div>'; return; }
         adminList.innerHTML = admins.map(admin => `
             <div class="admin-item">
                 <div class="admin-info">
-                    <span class="admin-name"><i class="fas fa-user-shield"></i> ${escapeHtml(admin.name)}</span>
-                    <span class="admin-email"><i class="fas fa-envelope"></i> ${escapeHtml(admin.email)}</span>
-                    <span class="admin-date"><i class="fas fa-calendar-alt"></i> Registered: ${formatDate(admin.createdAt)}</span>
+                    <div class="admin-name"><i class="fas fa-user-shield"></i> ${escapeHtml(admin.name)} <span class="admin-role">${escapeHtml(admin.role)}</span></div>
+                    <div class="admin-email"><i class="fas fa-envelope"></i> ${escapeHtml(admin.email)}</div>
+                    <div class="admin-date"><i class="fas fa-calendar-alt"></i> Registered: ${formatDate(admin.createdAt)}</div>
                 </div>
-                <button class="delete-admin" onclick="window.deleteAdmin('${admin.id}', '${escapeHtml(admin.name)}')"><i class="fas fa-trash-alt"></i></button>
+                <button class="delete-admin" onclick="window.deleteAdmin('${admin.id}', '${escapeHtml(admin.name)}')" title="Remove Admin"><i class="fas fa-trash-alt"></i></button>
             </div>
         `).join('');
     }
@@ -940,29 +854,8 @@
     refreshBtn.addEventListener('click', loadAdmins);
     passwordInput.addEventListener('input', () => checkPasswordStrength(passwordInput.value));
     confirmPasswordInput.addEventListener('input', () => {
-        if (confirmPasswordInput.value && passwordInput.value !== confirmPasswordInput.value) {
-            showFieldError('confirm', 'Passwords do not match');
-        } else {
-            document.getElementById('confirmError').textContent = '';
-            confirmPasswordInput.classList.remove('error');
-        }
-    });
-    
-    adminName.addEventListener('input', () => {
-        const validation = validateName(adminName.value);
-        if (!validation.valid) showFieldError('name', validation.message);
-        else { document.getElementById('nameError').textContent = ''; adminName.classList.remove('error'); }
-    });
-    
-    adminEmail.addEventListener('input', () => {
-        const validation = validateEmail(adminEmail.value);
-        if (!validation.valid) showFieldError('email', validation.message);
-        else { document.getElementById('emailError').textContent = ''; adminEmail.classList.remove('error'); }
-    });
-    
-    secretKeyInput.addEventListener('input', () => {
-        if (secretKeyInput.value.trim() === '') showFieldError('key', 'Secret key is required');
-        else { document.getElementById('keyError').textContent = ''; secretKeyInput.classList.remove('error'); }
+        if (confirmPasswordInput.value && passwordInput.value !== confirmPasswordInput.value) showFieldError('confirm', 'Passwords do not match');
+        else { document.getElementById('confirmError').textContent = ''; confirmPasswordInput.classList.remove('error'); }
     });
     
     loadAdmins();
