@@ -700,6 +700,14 @@
     
     loadData();
     setInterval(loadData, 30000);
+    // In your page-specific JavaScript
+import { initNavigation, updateActiveNav } from './nav.js';
+
+// Initialize
+initNavigation();
+
+// Update active state when needed
+updateActiveNav();
 </script>
 </body>
 </html>
