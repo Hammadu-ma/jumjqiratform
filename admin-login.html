@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>JUMJ Irshad | Admin Login</title>
+    <title>Noor Academy | Admin Login</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -48,7 +48,6 @@
             margin: 0 auto;
         }
 
-        /* Glass Card */
         .login-card {
             background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(10px);
@@ -90,7 +89,6 @@
             margin-top: 8px;
         }
 
-        /* Form Styles */
         .form-group {
             margin-bottom: 24px;
         }
@@ -175,7 +173,6 @@
             display: block;
         }
 
-        /* Button */
         .btn-login {
             width: 100%;
             background: linear-gradient(135deg, #10b981, #059669);
@@ -205,7 +202,6 @@
             transform: none;
         }
 
-        /* Messages */
         .message {
             padding: 12px 16px;
             border-radius: 20px;
@@ -240,7 +236,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Register Link */
         .register-link {
             text-align: center;
             margin-top: 24px;
@@ -258,7 +253,6 @@
             text-decoration: underline;
         }
 
-        /* Spinner */
         .spinner {
             width: 20px;
             height: 20px;
@@ -273,7 +267,6 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Responsive */
         @media (max-width: 768px) {
             body { padding: 16px; }
             .login-card { padding: 28px 20px; }
@@ -328,7 +321,8 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     
     const firebaseConfig = {
         apiKey: "AIzaSyAR_g5y04YAGCrTvZCowrE7hw8h7k1du08",
@@ -340,8 +334,8 @@
     };
     
     const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
     const db = getFirestore(app);
-    const adminsCollection = collection(db, "admins");
     
     // DOM Elements
     const adminEmail = document.getElementById('adminEmail');
@@ -411,9 +405,34 @@
         return { valid: true, message: '' };
     }
     
-    // Simple hash function for demo (matches registration)
-    function hashPassword(password) {
-        return btoa(password + 'noor_salt_2024');
+    // Create session after successful login
+    async function createSession(user) {
+        try {
+            // Get admin data from Firestore
+            const adminDoc = await getDoc(doc(db, "admins", user.uid));
+            
+            if (!adminDoc.exists()) {
+                throw new Error('Admin account not found in database');
+            }
+            
+            const adminData = adminDoc.data();
+            
+            const sessionData = {
+                adminId: user.uid,
+                name: adminData.name,
+                email: adminData.email,
+                role: adminData.role || 'admin',
+                loginTime: new Date().toISOString()
+            };
+            
+            localStorage.setItem('adminSession', JSON.stringify(sessionData));
+            sessionStorage.setItem('adminLoggedIn', 'true');
+            
+            return sessionData;
+        } catch (error) {
+            console.error("Error creating session:", error);
+            throw error;
+        }
     }
     
     async function loginAdmin(event) {
@@ -446,48 +465,12 @@
         loginBtn.innerHTML = '<span class="spinner"></span> Authenticating...';
         
         try {
-            // Query for admin with matching email
-            const q = query(adminsCollection, where('email', '==', email.trim().toLowerCase()));
-            const querySnapshot = await getDocs(q);
+            // Sign in with Firebase Auth
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
             
-            if (querySnapshot.empty) {
-                showMessage('❌ Invalid email or password. Please try again.', 'error');
-                showFieldError('email', 'Account not found');
-                loginBtn.disabled = false;
-                loginBtn.innerHTML = originalBtnText;
-                return;
-            }
-            
-            let adminData = null;
-            let adminId = null;
-            
-            querySnapshot.forEach((docSnap) => {
-                adminData = docSnap.data();
-                adminId = docSnap.id;
-            });
-            
-            // Verify password
-            const hashedInputPassword = hashPassword(password);
-            
-            if (adminData.password !== hashedInputPassword) {
-                showMessage('❌ Invalid email or password. Please try again.', 'error');
-                showFieldError('password', 'Incorrect password');
-                loginBtn.disabled = false;
-                loginBtn.innerHTML = originalBtnText;
-                return;
-            }
-            
-            // Login successful - store session
-            const sessionData = {
-                adminId: adminId,
-                name: adminData.name,
-                email: adminData.email,
-                role: adminData.role || 'admin',
-                loginTime: new Date().toISOString()
-            };
-            
-            localStorage.setItem('adminSession', JSON.stringify(sessionData));
-            sessionStorage.setItem('adminLoggedIn', 'true');
+            // Create session
+            await createSession(user);
             
             showMessage('✅ Login successful! Redirecting to dashboard...', 'success');
             
@@ -498,14 +481,26 @@
             
         } catch (error) {
             console.error("Login error:", error);
-            showMessage('Login failed: ' + error.message, 'error');
+            
+            let errorMessage = 'Login failed';
+            if (error.code === 'auth/user-not-found') {
+                errorMessage = 'No account found with this email';
+            } else if (error.code === 'auth/wrong-password') {
+                errorMessage = 'Incorrect password';
+            } else if (error.code === 'auth/invalid-email') {
+                errorMessage = 'Invalid email format';
+            } else if (error.code === 'auth/too-many-requests') {
+                errorMessage = 'Too many failed attempts. Try again later';
+            }
+            
+            showMessage('❌ ' + errorMessage, 'error');
             loginBtn.disabled = false;
             loginBtn.innerHTML = originalBtnText;
         }
     }
     
     // Check if already logged in
-    function checkExistingSession() {
+    async function checkExistingSession() {
         const session = localStorage.getItem('adminSession');
         if (session) {
             try {
@@ -516,10 +511,16 @@
                 
                 // Session expires after 24 hours
                 if (hoursDiff < 24) {
-                    // Auto-redirect to dashboard
-                    window.location.href = 'index.html';
+                    // Verify with Firebase Auth that user still exists
+                    onAuthStateChanged(auth, (user) => {
+                        if (user && user.uid === sessionData.adminId) {
+                            window.location.href = 'index.html';
+                        } else {
+                            localStorage.removeItem('adminSession');
+                            sessionStorage.removeItem('adminLoggedIn');
+                        }
+                    });
                 } else {
-                    // Session expired, clear it
                     localStorage.removeItem('adminSession');
                     sessionStorage.removeItem('adminLoggedIn');
                 }
@@ -566,46 +567,6 @@
     
     // Check for existing session on page load
     checkExistingSession();
-</script>
-<!-- Add this to your admin-login.html script -->
-<script type="module">
-    import { loginAdmin, protectPage, getCurrentAdmin } from './auth.js';
-    
-    // Check if already logged in
-    const checkSession = async () => {
-        const admin = await getCurrentAdmin();
-        if (admin) {
-            window.location.href = 'index.html';
-        }
-    };
-    checkSession();
-    
-    // Login form handler
-    const loginForm = document.getElementById('loginForm');
-    const loginBtn = document.getElementById('loginBtn');
-    
-    loginForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        const email = document.getElementById('adminEmail').value;
-        const password = document.getElementById('adminPassword').value;
-        
-        loginBtn.disabled = true;
-        loginBtn.innerHTML = '<span class="spinner"></span> Authenticating...';
-        
-        const result = await loginAdmin(email, password);
-        
-        if (result.success) {
-            showMessage('✅ Login successful! Redirecting...', 'success');
-            setTimeout(() => {
-                window.location.href = 'index.html';
-            }, 1500);
-        } else {
-            showMessage('❌ ' + result.message, 'error');
-            loginBtn.disabled = false;
-            loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login to Dashboard';
-        }
-    });
 </script>
 </body>
 </html>
