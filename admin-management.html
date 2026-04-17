@@ -37,6 +37,7 @@
             background: linear-gradient(135deg, #f0f9ff 0%, #e6f7f0 100%);
             min-height: 100vh;
             padding: 20px;
+            padding-bottom: 80px;
         }
 
         .container {
@@ -110,10 +111,26 @@
             background: #fee2e2;
         }
 
+        .back-btn {
+            background: var(--primary-light);
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            color: var(--primary-dark);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .back-btn:hover { background: var(--primary); color: white; }
+
         /* Stats Grid */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 20px;
             margin-bottom: 28px;
         }
@@ -171,7 +188,7 @@
 
         /* Admin List */
         .admin-list {
-            max-height: 550px;
+            max-height: 500px;
             overflow-y: auto;
         }
 
@@ -234,6 +251,13 @@
             font-size: 0.65rem;
             font-weight: 600;
             color: var(--primary-dark);
+        }
+
+        .admin-status {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #10b981;
         }
 
         /* Form Styles */
@@ -369,6 +393,19 @@
 
         .empty-state { text-align: center; padding: 60px; color: var(--text-muted); }
 
+        /* View Only Message */
+        .view-only-message {
+            background: #dbeafe;
+            color: #1e40af;
+            border-left: 4px solid #3b82f6;
+            padding: 12px 20px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
         @media (max-width: 1024px) { .two-columns { grid-template-columns: 1fr; } }
         @media (max-width: 768px) { body { padding: 16px; } .card { padding: 18px; } }
     </style>
@@ -379,10 +416,13 @@
     <div class="glass-header">
         <div class="header-content">
             <div class="logo"><h1><i class="fas fa-user-cog"></i> Admin Management Center</h1></div>
-            <div class="admin-info-header">
-                <div class="admin-avatar-sm" id="currentAdminAvatar">A</div>
-                <span id="currentAdminName">Loading...</span>
-                <button class="logout-btn" id="logoutBtn" title="Logout"><i class="fas fa-sign-out-alt"></i></button>
+            <div style="display: flex; gap: 12px; align-items: center;">
+                <div class="admin-info-header">
+                    <div class="admin-avatar-sm" id="currentAdminAvatar">A</div>
+                    <span id="currentAdminName">Loading...</span>
+                    <button class="logout-btn" id="logoutBtn" title="Logout"><i class="fas fa-sign-out-alt"></i></button>
+                </div>
+                <button class="back-btn" onclick="window.location.href='index.html'"><i class="fas fa-arrow-left"></i> Dashboard</button>
             </div>
         </div>
     </div>
@@ -390,8 +430,8 @@
     <!-- Stats -->
     <div class="stats-grid">
         <div class="stat-card"><div class="stat-value" id="totalAdmins">0</div><div class="stat-label">Total Admins</div></div>
+        <div class="stat-card"><div class="stat-value" id="activeAdmins">0</div><div class="stat-label">Active Admins</div></div>
         <div class="stat-card"><div class="stat-value" id="totalActions">0</div><div class="stat-label">Total Actions</div></div>
-        <div class="stat-card"><div class="stat-value" id="todayActions">0</div><div class="stat-label">Today's Actions</div></div>
     </div>
 
     <!-- Two Column Layout -->
@@ -477,33 +517,7 @@
 <div id="toast" class="toast"></div>
 
 <script type="module">
-    import { protectPageWithRole, initAuthUI, setupAutoLogout, getCurrentAdmin } from './auth.js';
-
-// Only allow 'super-admin' role to access this page
-if (!protectPageWithRole(['super-admin'], 'admin-login.html')) {
-    throw new Error('Redirecting');
-}
-
-const currentAdmin = initAuthUI();
-setupAutoLogout(60);
-
-// Update header with current admin
-if (currentAdmin) {
-    const nameElement = document.getElementById('currentAdminName');
-    const avatarElement = document.getElementById('currentAdminAvatar');
-    if (nameElement) nameElement.textContent = currentAdmin.name;
-    if (avatarElement) avatarElement.textContent = currentAdmin.name.charAt(0).toUpperCase();
-}
-
-// Optional: Hide elements that shouldn't be visible to non-super-admins
-if (currentAdmin?.role !== 'super-admin') {
-    // Hide super-admin only features
-    document.querySelectorAll('.super-admin-only').forEach(el => el.style.display = 'none');
-}
-    import { 
-        getCurrentAdmin, protectPageWithRole, initAuthUI, setupAutoLogout, logout,
-        getAllAdmins, getAllActivities, getActivityStats, updateAdmin, deleteAdmin, logActivity
-    } from './auth.js';
+    import { protectPageWithRole, initAuthUI, setupAutoLogout, logout, getCurrentAdmin, logActivity, getAllAdmins, getAllActivities, getActivityStats, updateAdmin, deleteAdmin } from './auth.js';
     
     // DOM Elements
     const toast = document.getElementById('toast');
@@ -512,7 +526,6 @@ if (currentAdmin?.role !== 'super-admin') {
     const activityList = document.getElementById('activityList');
     const totalAdminsSpan = document.getElementById('totalAdmins');
     const totalActionsSpan = document.getElementById('totalActions');
-    const todayActionsSpan = document.getElementById('todayActions');
     const addAdminBtn = document.getElementById('addAdminBtn');
     const refreshActivityBtn = document.getElementById('refreshActivityBtn');
     const activityFilter = document.getElementById('activityFilter');
@@ -522,6 +535,8 @@ if (currentAdmin?.role !== 'super-admin') {
     let selectedAdminId = null;
     let pendingDeleteId = null;
     let allActivities = [];
+    let currentAdminUser = null;
+    let isSuperAdmin = false;
     
     function showToast(msg, isErr = false) { 
         toast.textContent = msg; 
@@ -540,17 +555,32 @@ if (currentAdmin?.role !== 'super-admin') {
         return new Date(date).toLocaleString(); 
     }
     
-    // Protect page - only super admins and admins can access
+    // Protect page - only super-admin can access full features, admin can view only
     if (!protectPageWithRole(['super-admin', 'admin'], 'admin-login.html')) {
         throw new Error('Redirecting');
     }
     
-    const currentAdmin = initAuthUI();
+    currentAdminUser = initAuthUI();
     setupAutoLogout(60);
+    isSuperAdmin = currentAdminUser?.role === 'super-admin';
     
-    if (currentAdmin) {
-        document.getElementById('currentAdminName').textContent = currentAdmin.name;
-        document.getElementById('currentAdminAvatar').textContent = currentAdmin.name.charAt(0).toUpperCase();
+    // Update header
+    if (currentAdminUser) {
+        document.getElementById('currentAdminName').textContent = currentAdminUser.name;
+        document.getElementById('currentAdminAvatar').textContent = currentAdminUser.name.charAt(0).toUpperCase();
+    }
+    
+    // Role-based UI restrictions
+    if (!isSuperAdmin) {
+        if (addAdminBtn) addAdminBtn.style.display = 'none';
+        
+        const viewOnlyMessage = document.createElement('div');
+        viewOnlyMessage.className = 'view-only-message';
+        viewOnlyMessage.innerHTML = '<i class="fas fa-info-circle"></i> You are in view-only mode. Contact a Super Admin to add, edit, or delete admins.';
+        const container = document.querySelector('.container');
+        if (container && !document.querySelector('.view-only-message')) {
+            container.insertBefore(viewOnlyMessage, container.firstChild);
+        }
     }
     
     // Load all admins
@@ -569,7 +599,7 @@ if (currentAdmin?.role !== 'super-admin') {
             return; 
         }
         adminListDiv.innerHTML = allAdmins.map(admin => `
-            <div class="admin-item ${selectedAdminId === admin.id ? 'selected' : ''}" onclick="selectAdmin('${admin.id}')">
+            <div class="admin-item ${selectedAdminId === admin.id ? 'selected' : ''}" onclick="window.selectAdmin('${admin.id}')">
                 <div class="admin-avatar">${(admin.name.charAt(0) || 'A').toUpperCase()}</div>
                 <div class="admin-info">
                     <div class="admin-name">${escapeHtml(admin.name)} <span class="admin-role-badge">${escapeHtml(admin.role)}</span></div>
@@ -590,7 +620,20 @@ if (currentAdmin?.role !== 'super-admin') {
     async function loadAdminDetails(id) {
         const admin = allAdmins.find(a => a.id === id);
         if (!admin) return;
-        document.getElementById('selectedAdminBadge').innerHTML = `<i class="fas fa-check-circle"></i> Editing: ${escapeHtml(admin.name)}`;
+        document.getElementById('selectedAdminBadge').innerHTML = `<i class="fas fa-check-circle"></i> ${escapeHtml(admin.name)}`;
+        
+        if (!isSuperAdmin) {
+            adminDetailsPanel.innerHTML = `
+                <div style="padding: 20px;">
+                    <div class="form-group"><label><i class="fas fa-user"></i> Full Name</label><div><strong>${escapeHtml(admin.name)}</strong></div></div>
+                    <div class="form-group"><label><i class="fas fa-envelope"></i> Email</label><div><strong>${escapeHtml(admin.email)}</strong></div></div>
+                    <div class="form-group"><label><i class="fas fa-tag"></i> Role</label><div><span class="admin-role-badge">${escapeHtml(admin.role)}</span></div></div>
+                    <div class="form-group"><label><i class="fas fa-calendar"></i> Registered</label><div>${formatDate(admin.createdAt)}</div></div>
+                </div>
+            `;
+            return;
+        }
+        
         adminDetailsPanel.innerHTML = `
             <form id="editAdminForm">
                 <div class="form-group"><label><i class="fas fa-user"></i> Full Name</label><div class="input-wrapper"><i class="fas fa-user input-icon"></i><input type="text" id="editName" value="${escapeHtml(admin.name)}"></div></div>
@@ -616,7 +659,7 @@ if (currentAdmin?.role !== 'super-admin') {
         const updateData = { name, email: email.toLowerCase(), role, updatedAt: new Date() };
         if (newPassword && newPassword.length >= 6) updateData.password = btoa(newPassword + 'noor_salt_2024');
         try {
-            const success = await updateAdmin(id, updateData, currentAdmin.id, currentAdmin.name);
+            const success = await updateAdmin(id, updateData, currentAdminUser.id, currentAdminUser.name);
             if (success) {
                 showToast('Admin updated successfully');
                 await loadAdmins();
@@ -629,17 +672,27 @@ if (currentAdmin?.role !== 'super-admin') {
     async function addAdminHandler(name, email, password, role) {
         if (!name || !email || !password) { showToast('All fields required', true); return false; }
         if (password.length < 6) { showToast('Password must be at least 6 characters', true); return false; }
-        const hashedPassword = btoa(password + 'noor_salt_2024');
+        
         const { getFirestore, collection, addDoc } = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js');
         const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js');
-        const app = initializeApp(firebaseConfig);
+        const firebaseConfigLocal = {
+            apiKey: "AIzaSyAR_g5y04YAGCrTvZCowrE7hw8h7k1du08",
+            authDomain: "jujm-qirat.firebaseapp.com",
+            projectId: "jujm-qirat",
+            storageBucket: "jujm-qirat.firebasestorage.app",
+            messagingSenderId: "253413984903",
+            appId: "1:253413984903:web:c1577e0fdef1711f960622"
+        };
+        const app = initializeApp(firebaseConfigLocal);
         const db = getFirestore(app);
+        const hashedPassword = btoa(password + 'noor_salt_2024');
+        
         try {
             await addDoc(collection(db, "admins"), {
                 name, email: email.toLowerCase(), password: hashedPassword, role,
                 createdAt: new Date(), updatedAt: new Date()
             });
-            await logActivity(currentAdmin.id, currentAdmin.name, 'CREATE', `Added new admin: ${name} (${email})`);
+            await logActivity(currentAdminUser.id, currentAdminUser.name, 'CREATE', `Added new admin: ${name} (${email})`);
             showToast('Admin added successfully');
             await loadAdmins();
             await loadAllActivities();
@@ -649,7 +702,7 @@ if (currentAdmin?.role !== 'super-admin') {
     
     async function deleteAdminHandler(id, name) {
         try {
-            const success = await deleteAdmin(id, currentAdmin.id, currentAdmin.name);
+            const success = await deleteAdmin(id, currentAdminUser.id, currentAdminUser.name);
             if (success) {
                 showToast('Admin deleted successfully');
                 if (selectedAdminId === id) { 
@@ -668,12 +721,6 @@ if (currentAdmin?.role !== 'super-admin') {
             allActivities = await getAllActivities(100);
             const stats = await getActivityStats();
             totalActionsSpan.textContent = stats.total || 0;
-            const today = new Date().toDateString();
-            const todayCount = allActivities.filter(a => {
-                const d = a.timestamp?.toDate?.() || new Date(a.timestamp);
-                return d.toDateString() === today;
-            }).length;
-            todayActionsSpan.textContent = todayCount;
             renderActivityLog(allActivities);
         } catch (error) { console.error(error); }
     }
@@ -715,6 +762,7 @@ if (currentAdmin?.role !== 'super-admin') {
     }
     
     function openAddAdminModal() {
+        if (!isSuperAdmin) { showToast('Only Super Admins can add new admins', true); return; }
         document.getElementById('modalTitle').innerHTML = '<i class="fas fa-user-plus"></i> Add New Admin';
         document.getElementById('modalName').value = '';
         document.getElementById('modalEmail').value = '';
@@ -727,6 +775,7 @@ if (currentAdmin?.role !== 'super-admin') {
     window.closeDeleteModal = () => document.getElementById('deleteModal').classList.remove('active');
     
     function showDeleteConfirm(id, name) { 
+        if (!isSuperAdmin) { showToast('Only Super Admins can delete admins', true); return; }
         pendingDeleteId = id; 
         document.getElementById('deleteAdminName').innerHTML = `Are you sure you want to delete "<strong>${escapeHtml(name)}</strong>"?`; 
         document.getElementById('deleteModal').classList.add('active'); 
@@ -755,15 +804,7 @@ if (currentAdmin?.role !== 'super-admin') {
     activityFilter.addEventListener('change', () => { if (selectedAdminId) loadAdminActivities(selectedAdminId); else renderActivityLog(allActivities); });
     logoutBtn.addEventListener('click', async () => { await logout(); window.location.href = 'admin-login.html'; });
     
-    const firebaseConfig = {
-        apiKey: "AIzaSyAR_g5y04YAGCrTvZCowrE7hw8h7k1du08",
-        authDomain: "jujm-qirat.firebaseapp.com",
-        projectId: "jujm-qirat",
-        storageBucket: "jujm-qirat.firebasestorage.app",
-        messagingSenderId: "253413984903",
-        appId: "1:253413984903:web:c1577e0fdef1711f960622"
-    };
-    
+    // Initial loads
     await loadAdmins();
     await loadAllActivities();
 </script>
