@@ -6,6 +6,20 @@
     <title>Noor Academy | Secret Key Management</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Add this script tag to include the navigation system -->
+<script type="module">
+    import { initNavigation, updateActiveNav } from './nav.js';
+    
+    // Initialize navigation when DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+        initNavigation();
+    });
+    
+    // Optional: Update active nav when page changes (for SPAs)
+    window.addEventListener('popstate', () => {
+        updateActiveNav();
+    });
+</script>
     <style>
         * {
             margin: 0;
