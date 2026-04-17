@@ -426,7 +426,8 @@
 </div>
 
 <div id="toast" class="toast"></div>
-import { protectPageWithRole, initAuthUI } from './auth.js';
+<script type="module">
+    import { protectPageWithRole, initAuthUI } from './auth.js';
 
 // Only allow 'super-admin' role to access this page
 if (!protectPageWithRole(['super-admin', 'admin'], 'admin-login.html')) {
@@ -434,7 +435,6 @@ if (!protectPageWithRole(['super-admin', 'admin'], 'admin-login.html')) {
 }
 
 const admin = initAuthUI();
-<script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     
