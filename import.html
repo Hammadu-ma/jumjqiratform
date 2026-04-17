@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>Noor Academy | Smart Data Import Center</title>
+    <title>Noor Academy | Smart Import Center - AI Duplicate Detection</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -19,6 +19,8 @@
             --secondary: #6366f1;
             --accent: #f59e0b;
             --danger: #ef4444;
+            --warning: #f59e0b;
+            --success: #10b981;
             --dark: #0f172a;
             --card-bg: #ffffff;
             --text-primary: #0f172a;
@@ -70,6 +72,31 @@
             gap: 10px;
         }
 
+        .desktop-nav {
+            display: flex;
+            gap: 8px;
+            background: var(--card-bg);
+            padding: 6px;
+            border-radius: 60px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+        }
+
+        .nav-link {
+            padding: 10px 24px;
+            border-radius: 40px;
+            text-decoration: none;
+            font-weight: 600;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-link:hover { background: var(--primary-light); color: var(--primary-dark); }
+        .nav-link.active { background: linear-gradient(135deg, #10b981, #059669); color: white; }
+
         .back-btn {
             background: var(--primary-light);
             border: none;
@@ -87,7 +114,6 @@
 
         .main-container { max-width: 1400px; margin: 0 auto; padding: 24px; }
 
-        /* Hero Section */
         .hero-import {
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             border-radius: 32px;
@@ -100,7 +126,6 @@
         .hero-import h2 { font-size: 1.8rem; margin-bottom: 8px; }
         .hero-import p { opacity: 0.9; margin-bottom: 20px; }
 
-        /* Upload Zone */
         .upload-zone {
             background: var(--card-bg);
             border-radius: 28px;
@@ -111,16 +136,9 @@
             cursor: pointer;
             margin-bottom: 24px;
         }
-        .upload-zone:hover {
-            border-color: var(--primary);
-            background: var(--primary-light);
-            transform: translateY(-2px);
-        }
+        .upload-zone:hover { border-color: var(--primary); background: var(--primary-light); transform: translateY(-2px); }
         .upload-zone i { font-size: 3rem; color: var(--primary); margin-bottom: 16px; }
-        .upload-zone h3 { margin-bottom: 8px; }
-        .upload-zone p { color: var(--text-muted); font-size: 0.85rem; }
 
-        /* File Type Buttons */
         .file-types {
             display: flex;
             gap: 12px;
@@ -143,8 +161,7 @@
         .type-btn:hover { border-color: var(--primary); background: var(--primary-light); }
         .type-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
 
-        /* Preview Table */
-        .preview-container {
+        .preview-container, .mapping-section, .duplicate-section {
             background: var(--card-bg);
             border-radius: 28px;
             padding: 24px;
@@ -152,16 +169,7 @@
             box-shadow: var(--shadow-md);
             border: 1px solid var(--border);
         }
-        .preview-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 16px;
-            margin-bottom: 20px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid var(--border);
-        }
+
         .table-wrapper {
             overflow-x: auto;
             max-height: 400px;
@@ -177,41 +185,18 @@
             text-align: left;
             border-bottom: 1px solid var(--border);
         }
-        .preview-table th {
-            background: #f8fafc;
-            position: sticky;
-            top: 0;
-            font-weight: 700;
-        }
+        .preview-table th { background: #f8fafc; position: sticky; top: 0; font-weight: 700; }
 
-        /* Field Mapping */
-        .mapping-section {
-            background: var(--card-bg);
-            border-radius: 28px;
-            padding: 24px;
-            margin-bottom: 24px;
-            border: 1px solid var(--border);
-        }
         .mapping-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 16px;
             margin-top: 16px;
         }
-        .mapping-item {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
+        .mapping-item { display: flex; flex-direction: column; gap: 6px; }
         .mapping-item label { font-weight: 600; font-size: 0.8rem; color: var(--primary-dark); }
-        .mapping-item select {
-            padding: 8px 12px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            background: white;
-        }
+        .mapping-item select { padding: 8px 12px; border-radius: 12px; border: 1px solid var(--border); background: white; }
 
-        /* Stats Cards */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -228,7 +213,24 @@
         .stat-value { font-size: 1.5rem; font-weight: 800; color: var(--primary); }
         .stat-label { font-size: 0.7rem; color: var(--text-muted); }
 
-        /* Buttons */
+        .duplicate-item {
+            background: #fef3c7;
+            border-left: 4px solid var(--warning);
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; }
+        .badge-success { background: #d1fae5; color: #065f46; }
+        .badge-warning { background: #fef3c7; color: #92400e; }
+        .badge-info { background: #dbeafe; color: #1e40af; }
+
         .action-buttons { display: flex; gap: 16px; justify-content: flex-end; flex-wrap: wrap; }
         .btn-primary {
             background: linear-gradient(135deg, #10b981, #059669);
@@ -242,15 +244,7 @@
             align-items: center;
             gap: 8px;
         }
-        .btn-secondary {
-            background: #e2e8f0;
-            color: #334155;
-            border: none;
-            padding: 12px 28px;
-            border-radius: 40px;
-            font-weight: 700;
-            cursor: pointer;
-        }
+        .btn-secondary { background: #e2e8f0; color: #334155; border: none; padding: 12px 28px; border-radius: 40px; font-weight: 700; cursor: pointer; }
 
         .toast {
             position: fixed;
@@ -279,6 +273,7 @@
             padding: 12px 20px 20px;
             border-top: 1px solid var(--border);
             z-index: 200;
+            display: none;
         }
         .nav-item {
             display: flex;
@@ -297,11 +292,13 @@
         .nav-item.active { color: var(--primary); background: var(--primary-light); }
 
         @media (min-width: 768px) { body { padding-bottom: 0; } .bottom-nav { display: none; } }
-        @media (max-width: 768px) { .main-container { padding: 16px; padding-bottom: 80px; } .hero-import { padding: 24px; } .upload-zone { padding: 24px; } }
-        
-        .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; }
-        .badge-success { background: #d1fae5; color: #065f46; }
-        .badge-warning { background: #fef3c7; color: #92400e; }
+        @media (max-width: 768px) { 
+            .desktop-nav { display: none; } 
+            .bottom-nav { display: flex; } 
+            .main-container { padding: 16px; padding-bottom: 80px; } 
+            .hero-import { padding: 24px; } 
+            .upload-zone { padding: 24px; }
+        }
     </style>
 </head>
 <body>
@@ -309,43 +306,47 @@
 <div class="glass-header">
     <div class="header-content">
         <div class="logo"><h1><i class="fas fa-cloud-upload-alt"></i> Smart Import Center</h1></div>
+        <div class="desktop-nav">
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="groups.html" class="nav-link">Groups</a>
+            <a href="tables.html" class="nav-link">Tables</a>
+            <a href="analytics.html" class="nav-link">Analytics</a>
+            <a href="import.html" class="nav-link active">Import</a>
+        </div>
         <button class="back-btn" onclick="window.location.href='index.html'"><i class="fas fa-arrow-left"></i> Back</button>
     </div>
 </div>
 
 <div class="main-container">
-    <!-- Hero -->
     <div class="hero-import">
-        <h2><i class="fas fa-database"></i> Bulk Data Import</h2>
-        <p>Import student registrations from CSV, Excel, PDF, Word, or JSON files with smart field mapping</p>
+        <h2><i class="fas fa-brain"></i> AI-Powered Smart Import</h2>
+        <p>Auto-detects duplicates • Merges Qirats intelligently • Updates existing records</p>
         <div class="file-types" id="fileTypeButtons">
-            <button class="type-btn" data-type="csv"><i class="fas fa-file-csv"></i> CSV</button>
+            <button class="type-btn active" data-type="csv"><i class="fas fa-file-csv"></i> CSV</button>
             <button class="type-btn" data-type="excel"><i class="fas fa-file-excel"></i> Excel</button>
-            <button class="type-btn" data-type="pdf"><i class="fas fa-file-pdf"></i> PDF (Tables)</button>
-            <button class="type-btn" data-type="word"><i class="fas fa-file-word"></i> Word (Tables)</button>
+            <button class="type-btn" data-type="pdf"><i class="fas fa-file-pdf"></i> PDF</button>
+            <button class="type-btn" data-type="word"><i class="fas fa-file-word"></i> Word</button>
             <button class="type-btn" data-type="json"><i class="fas fa-code"></i> JSON</button>
         </div>
     </div>
 
-    <!-- Upload Zone -->
     <div class="upload-zone" id="uploadZone">
         <i class="fas fa-cloud-upload-alt"></i>
         <h3>Drag & Drop or Click to Upload</h3>
-        <p>Supports CSV, Excel (.xlsx, .xls), PDF (with tables), Word (.docx with tables), JSON</p>
+        <p>Supports CSV, Excel, PDF, Word, JSON</p>
         <input type="file" id="fileInput" accept=".csv,.xlsx,.xls,.pdf,.docx,.json" style="display:none">
     </div>
 
-    <!-- Stats Preview -->
     <div class="stats-grid" id="statsGrid" style="display:none;">
         <div class="stat-card"><div class="stat-value" id="rowCount">0</div><div class="stat-label">Rows Detected</div></div>
-        <div class="stat-card"><div class="stat-value" id="columnCount">0</div><div class="stat-label">Columns</div></div>
-        <div class="stat-card"><div class="stat-value" id="validCount">0</div><div class="stat-label">Valid Records</div></div>
+        <div class="stat-card"><div class="stat-value" id="newCount">0</div><div class="stat-label">New Students</div></div>
+        <div class="stat-card"><div class="stat-value" id="updateCount">0</div><div class="stat-label">Updates</div></div>
+        <div class="stat-card"><div class="stat-value" id="mergeCount">0</div><div class="stat-label">Qirats Merged</div></div>
     </div>
 
-    <!-- Preview Table -->
     <div class="preview-container" id="previewContainer" style="display:none;">
         <div class="preview-header">
-            <h3><i class="fas fa-eye"></i> Data Preview (First 20 rows)</h3>
+            <h3><i class="fas fa-eye"></i> Data Preview</h3>
             <span class="badge badge-success" id="fileInfo">File loaded</span>
         </div>
         <div class="table-wrapper">
@@ -356,21 +357,24 @@
         </div>
     </div>
 
-    <!-- Field Mapping -->
     <div class="mapping-section" id="mappingSection" style="display:none;">
         <h3><i class="fas fa-code-branch"></i> Field Mapping</h3>
         <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:16px;">Map your file columns to database fields</p>
         <div class="mapping-grid" id="mappingGrid"></div>
     </div>
 
-    <!-- Action Buttons -->
+    <div class="duplicate-section" id="duplicateSection" style="display:none;">
+        <h3><i class="fas fa-clone"></i> Smart Duplicate Detection</h3>
+        <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:16px;">Records that will UPDATE existing students (same name) or MERGE Qirats</p>
+        <div id="duplicateList"></div>
+    </div>
+
     <div class="action-buttons" id="actionButtons" style="display:none;">
         <button class="btn-secondary" id="cancelBtn"><i class="fas fa-times"></i> Cancel</button>
-        <button class="btn-primary" id="importBtn"><i class="fas fa-database"></i> Import to Database</button>
+        <button class="btn-primary" id="importBtn"><i class="fas fa-database"></i> Smart Import (Auto-Merge)</button>
     </div>
 </div>
 
-<!-- Bottom Navigation -->
 <div class="bottom-nav">
     <button class="nav-item" onclick="window.location.href='index.html'"><i class="fas fa-home"></i><span>Home</span></button>
     <button class="nav-item" onclick="window.location.href='groups.html'"><i class="fas fa-layer-group"></i><span>Groups</span></button>
@@ -383,7 +387,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, doc, updateDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     
     const firebaseConfig = {
         apiKey: "AIzaSyAR_g5y04YAGCrTvZCowrE7hw8h7k1du08",
@@ -400,20 +404,25 @@
     let parsedData = [];
     let headers = [];
     let currentFileType = 'csv';
-    let currentFileName = '';
+    let existingStudents = [];
+    let duplicateMap = new Map(); // name -> existing student data
+    let importPlan = []; // { action: 'new' or 'update', data, existingId, newQirats }
     
     const toast = document.getElementById('toast');
     const uploadZone = document.getElementById('uploadZone');
     const fileInput = document.getElementById('fileInput');
     const previewContainer = document.getElementById('previewContainer');
     const mappingSection = document.getElementById('mappingSection');
+    const duplicateSection = document.getElementById('duplicateSection');
     const actionButtons = document.getElementById('actionButtons');
     const statsGrid = document.getElementById('statsGrid');
     const previewTable = document.getElementById('previewTable');
     const mappingGrid = document.getElementById('mappingGrid');
+    const duplicateList = document.getElementById('duplicateList');
     const rowCountSpan = document.getElementById('rowCount');
-    const columnCountSpan = document.getElementById('columnCount');
-    const validCountSpan = document.getElementById('validCount');
+    const newCountSpan = document.getElementById('newCount');
+    const updateCountSpan = document.getElementById('updateCount');
+    const mergeCountSpan = document.getElementById('mergeCount');
     const fileInfoSpan = document.getElementById('fileInfo');
     const cancelBtn = document.getElementById('cancelBtn');
     const importBtn = document.getElementById('importBtn');
@@ -423,6 +432,32 @@
         toast.style.background = isErr ? '#ef4444' : '#10b981';
         toast.style.display = 'block';
         setTimeout(() => toast.style.display = 'none', 3000);
+    }
+    
+    // Load existing students from Firebase
+    async function loadExistingStudents() {
+        const snapshot = await getDocs(collection(db, "registrations"));
+        existingStudents = [];
+        snapshot.forEach(docSnap => {
+            const data = docSnap.data();
+            existingStudents.push({
+                id: docSnap.id,
+                full_name: (data.full_name || '').toLowerCase().trim(),
+                original_name: data.full_name,
+                gender: data.gender,
+                phone: data.phone,
+                telegram: data.telegram,
+                department: data.department,
+                batch: data.batch,
+                schedules: data.schedules || [],
+                qirats: (data.schedules || []).map(s => s.qirat_name).filter(Boolean)
+            });
+        });
+        // Build duplicate map
+        duplicateMap.clear();
+        existingStudents.forEach(s => {
+            duplicateMap.set(s.full_name, s);
+        });
     }
     
     // File type selection
@@ -436,7 +471,6 @@
         });
     });
     
-    // Upload zone click
     uploadZone.addEventListener('click', () => fileInput.click());
     uploadZone.addEventListener('dragover', (e) => { e.preventDefault(); uploadZone.style.borderColor = 'var(--primary)'; });
     uploadZone.addEventListener('dragleave', () => { uploadZone.style.borderColor = 'var(--border)'; });
@@ -444,6 +478,7 @@
     fileInput.addEventListener('change', (e) => { if (e.target.files[0]) processFile(e.target.files[0]); });
     
     async function processFile(file) {
+        await loadExistingStudents();
         currentFileName = file.name;
         fileInfoSpan.textContent = `${file.name} (${(file.size/1024).toFixed(1)} KB)`;
         
@@ -455,7 +490,6 @@
             else if (currentFileType === 'json') await parseJSON(file);
         } catch (error) {
             showToast(`Error parsing file: ${error.message}`, true);
-            console.error(error);
         }
     }
     
@@ -464,7 +498,7 @@
         const lines = text.split(/\r?\n/).filter(l => l.trim());
         if (lines.length < 2) throw new Error('CSV must have headers and data');
         headers = lines[0].split(',').map(h => h.replace(/^"|"$/g, '').trim());
-        parsedData = lines.slice(1, 101).map(line => {
+        parsedData = lines.slice(1, 501).map(line => {
             const values = line.split(',').map(v => v.replace(/^"|"$/g, '').trim());
             const obj = {};
             headers.forEach((h, i) => obj[h] = values[i] || '');
@@ -480,7 +514,7 @@
         const json = XLSX.utils.sheet_to_json(sheet);
         if (json.length === 0) throw new Error('No data found in Excel');
         headers = Object.keys(json[0]);
-        parsedData = json.slice(0, 100);
+        parsedData = json.slice(0, 500);
         renderPreview();
     }
     
@@ -495,13 +529,11 @@
             const pageText = textContent.items.map(item => item.str).join(' ');
             allText += pageText + '\n';
         }
-        // Simple table extraction from PDF text (line-based)
         const lines = allText.split(/\r?\n/).filter(l => l.trim().length > 5);
         if (lines.length < 2) throw new Error('Could not extract table data from PDF');
         const possibleHeaders = lines[0].split(/\s{2,}/);
-        if (possibleHeaders.length > 1) headers = possibleHeaders;
-        else headers = ['Name', 'Gender', 'Phone', 'Department', 'Batch', 'Qirats'];
-        parsedData = lines.slice(1, 51).map(line => {
+        headers = possibleHeaders.length > 1 ? possibleHeaders : ['Name', 'Gender', 'Phone', 'Department', 'Batch', 'Qirats'];
+        parsedData = lines.slice(1, 101).map(line => {
             const parts = line.split(/\s{2,}/);
             const obj = {};
             headers.forEach((h, i) => obj[h] = parts[i] || '');
@@ -513,13 +545,11 @@
     async function parseWord(file) {
         const arrayBuffer = await file.arrayBuffer();
         const result = await mammoth.extractRawText({ arrayBuffer: arrayBuffer });
-        const text = result.value;
-        const lines = text.split(/\r?\n/).filter(l => l.trim().length > 3);
+        const lines = result.value.split(/\r?\n/).filter(l => l.trim().length > 3);
         if (lines.length < 2) throw new Error('Could not extract table data from Word');
         const possibleHeaders = lines[0].split(/\t|\s{2,}/);
-        if (possibleHeaders.length > 1) headers = possibleHeaders;
-        else headers = ['Name', 'Gender', 'Phone', 'Department', 'Batch', 'Qirats'];
-        parsedData = lines.slice(1, 51).map(line => {
+        headers = possibleHeaders.length > 1 ? possibleHeaders : ['Name', 'Gender', 'Phone', 'Department', 'Batch', 'Qirats'];
+        parsedData = lines.slice(1, 101).map(line => {
             const parts = line.split(/\t|\s{2,}/);
             const obj = {};
             headers.forEach((h, i) => obj[h] = parts[i] || '');
@@ -534,14 +564,115 @@
         if (Array.isArray(json)) {
             if (json.length === 0) throw new Error('JSON array is empty');
             headers = Object.keys(json[0]);
-            parsedData = json.slice(0, 100);
+            parsedData = json.slice(0, 500);
         } else if (json.data && Array.isArray(json.data)) {
             headers = Object.keys(json.data[0]);
-            parsedData = json.data.slice(0, 100);
+            parsedData = json.data.slice(0, 500);
         } else {
             throw new Error('JSON must be an array or have a "data" array');
         }
         renderPreview();
+    }
+    
+    function getMappedValue(row, fieldKey, selectElement = null) {
+        const select = selectElement || document.querySelector(`.mapping-select[data-field="${fieldKey}"]`);
+        if (!select) return '';
+        const mapping = select.value;
+        if (!mapping || mapping === '') {
+            // Auto-detect
+            const autoMap = {
+                'full_name': ['Name', 'full_name', 'Student Name', 'Full Name', 'NAME'],
+                'gender': ['Gender', 'gender', 'Sex'],
+                'phone': ['Phone', 'phone', 'Mobile', 'Contact'],
+                'telegram': ['Telegram', 'telegram', 'TG'],
+                'department': ['Department', 'department', 'Dept'],
+                'batch': ['Batch', 'batch', 'Year', 'Class'],
+                'qirats': ['Qirats', 'qirats', 'Qirat', 'Qiraat']
+            };
+            const possibleNames = autoMap[fieldKey] || [];
+            for (const pn of possibleNames) {
+                if (row[pn]) return row[pn];
+            }
+            return '';
+        }
+        if (mapping.startsWith('Constant:')) return mapping.replace('Constant: ', '');
+        return row[mapping] || '';
+    }
+    
+    function analyzeDuplicatesAndPlan() {
+        importPlan = [];
+        let newCount = 0;
+        let updateCount = 0;
+        let mergeCount = 0;
+        const processedNames = new Set();
+        
+        for (const row of parsedData) {
+            const full_name_raw = getMappedValue(row, 'full_name');
+            if (!full_name_raw) continue;
+            
+            const full_name = full_name_raw.toLowerCase().trim();
+            const existing = duplicateMap.get(full_name);
+            const newQiratsRaw = getMappedValue(row, 'qirats');
+            const newQirats = newQiratsRaw ? newQiratsRaw.split(',').map(q => q.trim()).filter(q => q) : [];
+            
+            if (existing && !processedNames.has(full_name)) {
+                // Check if there are new Qirats to add
+                const existingQirats = existing.qirats;
+                const qiratsToAdd = newQirats.filter(q => !existingQirats.includes(q));
+                
+                if (qiratsToAdd.length > 0) {
+                    mergeCount += qiratsToAdd.length;
+                    importPlan.push({
+                        action: 'merge',
+                        existingId: existing.id,
+                        existingData: existing,
+                        newQirats: qiratsToAdd,
+                        row: row,
+                        full_name: full_name_raw
+                    });
+                    updateCount++;
+                } else {
+                    // Update other fields if they differ
+                    importPlan.push({
+                        action: 'update',
+                        existingId: existing.id,
+                        existingData: existing,
+                        row: row,
+                        full_name: full_name_raw,
+                        newQirats: []
+                    });
+                    updateCount++;
+                }
+                processedNames.add(full_name);
+            } else if (!existing) {
+                importPlan.push({
+                    action: 'new',
+                    row: row,
+                    full_name: full_name_raw,
+                    newQirats: newQirats
+                });
+                newCount++;
+            }
+        }
+        
+        rowCountSpan.textContent = parsedData.length;
+        newCountSpan.textContent = newCount;
+        updateCountSpan.textContent = updateCount;
+        mergeCountSpan.textContent = mergeCount;
+        
+        // Show duplicate detection results
+        const duplicates = importPlan.filter(p => p.action !== 'new');
+        if (duplicates.length > 0) {
+            duplicateSection.style.display = 'block';
+            duplicateList.innerHTML = duplicates.map(p => `
+                <div class="duplicate-item">
+                    <div><i class="fas fa-user-check"></i> <strong>${escapeHtml(p.full_name)}</strong></div>
+                    <div><span class="badge badge-warning">${p.action === 'merge' ? `➕ Adding ${p.newQirats.length} new Qirat(s)` : '🔄 Updating fields'}</span></div>
+                </div>
+            `).join('');
+        } else {
+            duplicateSection.style.display = 'none';
+        }
     }
     
     function renderPreview() {
@@ -555,11 +686,6 @@
         mappingSection.style.display = 'block';
         actionButtons.style.display = 'flex';
         
-        rowCountSpan.textContent = parsedData.length;
-        columnCountSpan.textContent = headers.length;
-        validCountSpan.textContent = parsedData.filter(row => row[headers[0]]).length;
-        
-        // Render preview table
         const previewRows = parsedData.slice(0, 20);
         const thead = `<tr>${headers.map(h => `<th>${escapeHtml(h)}</th>`).join('')}</tr>`;
         const tbody = previewRows.map(row => 
@@ -567,7 +693,6 @@
         ).join('');
         previewTable.innerHTML = `<thead>${thead}</thead><tbody>${tbody}</tbody>`;
         
-        // Render mapping UI
         const dbFields = [
             { key: 'full_name', label: 'Full Name', required: true },
             { key: 'gender', label: 'Gender', required: false },
@@ -583,27 +708,27 @@
                 <label>${field.label} ${field.required ? '<span style="color:#ef4444;">*</span>' : ''}</label>
                 <select data-field="${field.key}" class="mapping-select">
                     <option value="">-- Auto-detect --</option>
-                    ${headers.map(h => `<option value="${escapeHtml(h)}" ${h.toLowerCase().includes(field.key.replace('_', ' ')) || (field.key === 'full_name' && (h.toLowerCase().includes('name'))) ? 'selected' : ''}>${escapeHtml(h)}</option>`).join('')}
+                    ${headers.map(h => `<option value="${escapeHtml(h)}">${escapeHtml(h)}</option>`).join('')}
                     <option value="[constant]">Set constant: ${field.label}</option>
                 </select>
             </div>
         `).join('');
         
-        // Add constant value inputs
+        // Auto-select best matches
         document.querySelectorAll('.mapping-select').forEach(select => {
-            select.addEventListener('change', (e) => {
-                if (e.target.value === '[constant]') {
-                    const constantVal = prompt(`Enter constant value for ${e.target.parentElement.querySelector('label').innerText.replace('*', '')}:`);
-                    if (constantVal) {
-                        const option = document.createElement('option');
-                        option.value = constantVal;
-                        option.text = `Constant: ${constantVal}`;
-                        option.selected = true;
-                        e.target.appendChild(option);
-                    } else e.target.value = '';
-                }
+            const field = select.dataset.field;
+            const bestMatch = headers.find(h => 
+                h.toLowerCase().includes(field.replace('_', ' ')) || 
+                (field === 'full_name' && h.toLowerCase().includes('name'))
+            );
+            if (bestMatch) select.value = bestMatch;
+            
+            select.addEventListener('change', () => {
+                analyzeDuplicatesAndPlan();
             });
         });
+        
+        analyzeDuplicatesAndPlan();
     }
     
     function escapeHtml(str) {
@@ -611,29 +736,11 @@
         return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m]));
     }
     
-    function getMappedValue(row, fieldKey) {
-        const select = document.querySelector(`.mapping-select[data-field="${fieldKey}"]`);
-        if (!select) return '';
-        const mapping = select.value;
-        if (!mapping) {
-            // Auto-detect
-            if (fieldKey === 'full_name') return row['Name'] || row['full_name'] || row['Student Name'] || '';
-            if (fieldKey === 'gender') return row['Gender'] || row['gender'] || '';
-            if (fieldKey === 'phone') return row['Phone'] || row['phone'] || '';
-            if (fieldKey === 'telegram') return row['Telegram'] || row['telegram'] || '';
-            if (fieldKey === 'department') return row['Department'] || row['department'] || '';
-            if (fieldKey === 'batch') return row['Batch'] || row['batch'] || '';
-            if (fieldKey === 'qirats') return row['Qirats'] || row['qirats'] || '';
-            return '';
-        }
-        if (mapping.startsWith('Constant:')) return mapping.replace('Constant: ', '');
-        return row[mapping] || '';
-    }
-    
     cancelBtn.addEventListener('click', () => {
         parsedData = [];
         previewContainer.style.display = 'none';
         mappingSection.style.display = 'none';
+        duplicateSection.style.display = 'none';
         actionButtons.style.display = 'none';
         statsGrid.style.display = 'none';
         fileInput.value = '';
@@ -641,72 +748,97 @@
     });
     
     importBtn.addEventListener('click', async () => {
-        if (parsedData.length === 0) {
+        if (importPlan.length === 0) {
             showToast('No data to import', true);
             return;
         }
         
-        const batch = writeBatch(db);
-        const registrationsRef = collection(db, "registrations");
-        let successCount = 0;
-        let errorCount = 0;
+        let newCount = 0;
+        let updateCount = 0;
+        let mergeCount = 0;
         
-        for (const row of parsedData) {
+        for (const plan of importPlan) {
             try {
-                const full_name = getMappedValue(row, 'full_name');
-                if (!full_name) {
-                    errorCount++;
-                    continue;
+                const full_name = plan.full_name;
+                const gender = getMappedValue(plan.row, 'gender') || 'Not Specified';
+                const phone = getMappedValue(plan.row, 'phone') || '';
+                const telegram = getMappedValue(plan.row, 'telegram') || '';
+                const department = getMappedValue(plan.row, 'department') || 'Other';
+                const batch = getMappedValue(plan.row, 'batch') || 'General';
+                
+                if (plan.action === 'new') {
+                    const schedules = plan.newQirats.map(q => ({ qirat_name: q, days: ["Flexible"], time_preference: "Evening" }));
+                    await addDoc(collection(db, "registrations"), {
+                        full_name, gender, phone, telegram, department, batch,
+                        schedules, timestamp: new Date()
+                    });
+                    newCount++;
+                } else if (plan.action === 'merge' || plan.action === 'update') {
+                    // Get existing student to update
+                    const existingDoc = await getDocs(collection(db, "registrations"));
+                    let existingStudent = null;
+                    existingDoc.forEach(docSnap => {
+                        if (docSnap.id === plan.existingId) existingStudent = { id: docSnap.id, data: docSnap.data() };
+                    });
+                    
+                    if (existingStudent) {
+                        let existingSchedules = existingStudent.data.schedules || [];
+                        const existingQirats = existingSchedules.map(s => s.qirat_name);
+                        
+                        if (plan.newQirats.length > 0) {
+                            // Merge new Qirats
+                            const newSchedules = [...existingSchedules];
+                            for (const q of plan.newQirats) {
+                                if (!existingQirats.includes(q)) {
+                                    newSchedules.push({ qirat_name: q, days: ["Flexible"], time_preference: "Evening" });
+                                    mergeCount++;
+                                }
+                            }
+                            await updateDoc(doc(db, "registrations", plan.existingId), {
+                                schedules: newSchedules,
+                                gender, phone, telegram, department, batch,
+                                timestamp: new Date()
+                            });
+                        } else {
+                            // Simple update
+                            await updateDoc(doc(db, "registrations", plan.existingId), {
+                                gender, phone, telegram, department, batch,
+                                timestamp: new Date()
+                            });
+                        }
+                        updateCount++;
+                    }
                 }
-                
-                const qiratsRaw = getMappedValue(row, 'qirats');
-                const schedules = qiratsRaw ? qiratsRaw.split(',').map(q => ({ qirat_name: q.trim(), days: ["Flexible"], time_preference: "Evening" })) : [];
-                
-                const studentData = {
-                    full_name: full_name,
-                    gender: getMappedValue(row, 'gender') || 'Not Specified',
-                    phone: getMappedValue(row, 'phone') || '',
-                    telegram: getMappedValue(row, 'telegram') || '',
-                    department: getMappedValue(row, 'department') || 'Other',
-                    batch: getMappedValue(row, 'batch') || 'General',
-                    schedules: schedules,
-                    timestamp: new Date()
-                };
-                
-                await addDoc(registrationsRef, studentData);
-                successCount++;
             } catch (err) {
-                errorCount++;
                 console.error(err);
             }
         }
         
-        showToast(`Import complete: ${successCount} added, ${errorCount} failed`);
+        showToast(`✅ Import complete: ${newCount} new, ${updateCount} updated, ${mergeCount} Qirats merged`);
         
-        if (successCount > 0) {
-            parsedData = [];
-            previewContainer.style.display = 'none';
-            mappingSection.style.display = 'none';
-            actionButtons.style.display = 'none';
-            statsGrid.style.display = 'none';
-            fileInput.value = '';
-        }
+        // Reset UI
+        parsedData = [];
+        previewContainer.style.display = 'none';
+        mappingSection.style.display = 'none';
+        duplicateSection.style.display = 'none';
+        actionButtons.style.display = 'none';
+        statsGrid.style.display = 'none';
+        fileInput.value = '';
+        await loadExistingStudents();
     });
     
-    // Template download
     function downloadTemplate() {
         const template = [
             { 'Full Name': 'Ahmed Hassan', 'Gender': 'Male', 'Phone': '+1234567890', 'Telegram': 'ahmed_h', 'Department': 'Medicine', 'Batch': '1st Year', 'Qirats': 'Hafs, Warsh' },
-            { 'Full Name': 'Fatima Ali', 'Gender': 'Female', 'Phone': '+1234567891', 'Telegram': 'fatima_a', 'Department': 'Pharmacy', 'Batch': '2nd Year', 'Qirats': 'Qaloon' }
+            { 'Full Name': 'Ahmed Hassan', 'Gender': 'Male', 'Phone': '+1234567890', 'Telegram': 'ahmed_h', 'Department': 'Medicine', 'Batch': '1st Year', 'Qirats': 'Qaloon' }
         ];
         const ws = XLSX.utils.json_to_sheet(template);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, 'Template');
         XLSX.writeFile(wb, 'student_import_template.xlsx');
-        showToast('Template downloaded');
+        showToast('Template downloaded - Same name = Auto merge Qirats!');
     }
     
-    // Add template download button to header
     const headerContent = document.querySelector('.header-content');
     const templateBtn = document.createElement('button');
     templateBtn.className = 'back-btn';
@@ -715,6 +847,8 @@
     templateBtn.style.color = 'white';
     templateBtn.onclick = downloadTemplate;
     headerContent.appendChild(templateBtn);
+    
+    loadExistingStudents();
 </script>
 </body>
 </html>
