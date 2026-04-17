@@ -36,6 +36,9 @@
             font-family: 'Inter', sans-serif;
             background: linear-gradient(135deg, #f0f9ff 0%, #e6f7f0 100%);
             min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             padding: 20px;
         }
 
@@ -45,7 +48,6 @@
             margin: 0 auto;
         }
 
-        /* Single Column Layout - Responsive */
         .register-card {
             background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(10px);
@@ -88,7 +90,6 @@
             margin-top: 8px;
         }
 
-        /* Form Styles */
         .form-group {
             margin-bottom: 20px;
         }
@@ -178,7 +179,6 @@
             display: block;
         }
 
-        /* Password Strength */
         .password-strength {
             margin-top: 8px;
             display: flex;
@@ -230,7 +230,6 @@
             color: var(--primary);
         }
 
-        /* Button */
         .btn-register {
             width: 100%;
             background: linear-gradient(135deg, #10b981, #059669);
@@ -260,7 +259,6 @@
             transform: none;
         }
 
-        /* Messages */
         .message {
             padding: 12px 16px;
             border-radius: 20px;
@@ -295,7 +293,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Spinner */
         .spinner {
             width: 20px;
             height: 20px;
@@ -310,7 +307,6 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Login Link */
         .login-link {
             text-align: center;
             margin-top: 24px;
@@ -328,107 +324,31 @@
             text-decoration: underline;
         }
 
-        /* Responsive Design */
         @media (max-width: 768px) {
-            body { 
-                padding: 16px; 
-            }
-            .register-card { 
-                padding: 24px 20px;
-                border-radius: 32px;
-            }
-            .logo h1 { 
-                font-size: 1.4rem; 
-            }
-            .logo i {
-                font-size: 1.6rem;
-            }
+            body { padding: 16px; }
+            .register-card { padding: 24px 20px; border-radius: 32px; }
+            .logo h1 { font-size: 1.4rem; }
+            .logo i { font-size: 1.6rem; }
             .input-wrapper input, .input-wrapper select {
                 padding: 12px 45px 12px 42px;
                 font-size: 0.9rem;
             }
-            .btn-register {
-                padding: 12px 24px;
-                font-size: 0.9rem;
-            }
-            .password-requirements {
-                gap: 8px;
-                font-size: 0.6rem;
-            }
-            .req-item {
-                font-size: 0.6rem;
-            }
+            .btn-register { padding: 12px 24px; font-size: 0.9rem; }
         }
 
         @media (max-width: 480px) {
-            body { 
-                padding: 12px; 
-            }
-            .register-card { 
-                padding: 20px 16px;
-                border-radius: 28px;
-            }
-            .logo h1 { 
-                font-size: 1.2rem; 
-            }
-            .logo i {
-                font-size: 1.4rem;
-            }
-            .logo p {
-                font-size: 0.75rem;
-            }
-            .form-group {
-                margin-bottom: 16px;
-            }
-            .form-group label {
-                font-size: 0.75rem;
-            }
+            body { padding: 12px; }
+            .register-card { padding: 20px 16px; border-radius: 28px; }
+            .logo h1 { font-size: 1.2rem; }
+            .logo i { font-size: 1.4rem; }
+            .form-group { margin-bottom: 16px; }
             .input-wrapper input, .input-wrapper select {
                 padding: 10px 40px 10px 38px;
                 font-size: 0.85rem;
             }
-            .input-wrapper i.input-icon {
-                left: 12px;
-                font-size: 0.85rem;
-            }
-            .toggle-visibility {
-                right: 12px;
-                padding: 6px;
-            }
-            .btn-register {
-                padding: 10px 20px;
-                font-size: 0.85rem;
-            }
-            .password-requirements {
-                gap: 6px;
-            }
-            .req-item {
-                font-size: 0.55rem;
-            }
-            .message {
-                padding: 10px 12px;
-                font-size: 0.75rem;
-                margin-bottom: 20px;
-            }
-            .login-link {
-                margin-top: 20px;
-                padding-top: 20px;
-                font-size: 0.85rem;
-            }
-        }
-
-        @media (max-width: 360px) {
-            .register-card {
-                padding: 16px 12px;
-                border-radius: 24px;
-            }
-            .logo h1 {
-                font-size: 1.1rem;
-            }
-            .password-requirements {
-                flex-direction: column;
-                gap: 4px;
-            }
+            .btn-register { padding: 10px 20px; font-size: 0.85rem; }
+            .password-requirements { gap: 6px; }
+            .req-item { font-size: 0.55rem; }
         }
     </style>
 </head>
@@ -526,7 +446,8 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, addDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, collection, getDocs, doc, setDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     
     const firebaseConfig = {
         apiKey: "AIzaSyAR_g5y04YAGCrTvZCowrE7hw8h7k1du08",
@@ -538,6 +459,7 @@
     };
     
     const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
     const db = getFirestore(app);
     const adminsCollection = collection(db, "admins");
     const secretKeysCollection = collection(db, "secretKeys");
@@ -561,7 +483,7 @@
     const reqNumber = document.getElementById('reqNumber');
     const reqSpecial = document.getElementById('reqSpecial');
     
-    // Toggle password visibility for all fields
+    // Toggle password visibility
     document.querySelectorAll('.toggle-visibility').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.preventDefault();
@@ -575,7 +497,6 @@
         });
     });
     
-    // Password strength checker
     function checkPasswordStrength(password) {
         let strength = 0;
         const checks = {
@@ -729,31 +650,63 @@
         registerBtn.innerHTML = '<span class="spinner"></span> Creating admin account...';
         
         try {
-            const hashedPassword = btoa(password + 'noor_salt_2024');
-            const adminData = {
+            // Create user in Firebase Authentication
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+            
+            // Create admin document in Firestore with the user's UID
+            await setDoc(doc(db, "admins", user.uid), {
                 name: name.trim(),
                 email: email.trim().toLowerCase(),
-                password: hashedPassword,
                 role: 'admin',
                 registeredWithKey: keyValidationResult.keyInfo?.name || 'Unknown Key',
                 createdAt: new Date(),
                 updatedAt: new Date()
-            };
-            await addDoc(adminsCollection, adminData);
-            showMessage('✅ Admin registered successfully!', 'success');
-            adminName.value = ''; adminEmail.value = ''; passwordInput.value = ''; confirmPasswordInput.value = ''; secretKeyInput.value = '';
+            });
+            
+            showMessage('✅ Admin registered successfully! You can now login.', 'success');
+            
+            // Clear form
+            adminName.value = '';
+            adminEmail.value = '';
+            passwordInput.value = '';
+            confirmPasswordInput.value = '';
+            secretKeyInput.value = '';
             checkPasswordStrength('');
-            setTimeout(() => { window.location.href = 'admin-login.html'; }, 2000);
-        } catch (error) { showMessage('Registration failed: ' + error.message, 'error'); }
-        finally { registerBtn.disabled = false; registerBtn.innerHTML = '<i class="fas fa-user-plus"></i> Register as Admin'; }
+            
+            // Redirect to login after 2 seconds
+            setTimeout(() => {
+                window.location.href = 'admin-login.html';
+            }, 2000);
+            
+        } catch (error) {
+            console.error("Registration error:", error);
+            let errorMessage = 'Registration failed';
+            if (error.code === 'auth/email-already-in-use') {
+                errorMessage = 'Email already in use. Please use a different email.';
+            } else if (error.code === 'auth/weak-password') {
+                errorMessage = 'Password is too weak. Please use a stronger password.';
+            } else if (error.code === 'auth/invalid-email') {
+                errorMessage = 'Invalid email format.';
+            }
+            showMessage('❌ ' + errorMessage, 'error');
+        } finally {
+            registerBtn.disabled = false;
+            registerBtn.innerHTML = '<i class="fas fa-user-plus"></i> Register as Admin';
+        }
     }
     
     registerForm.addEventListener('submit', registerAdmin);
     passwordInput.addEventListener('input', () => checkPasswordStrength(passwordInput.value));
     confirmPasswordInput.addEventListener('input', () => {
-        if (confirmPasswordInput.value && passwordInput.value !== confirmPasswordInput.value) showFieldError('confirm', 'Passwords do not match');
-        else { document.getElementById('confirmError').textContent = ''; confirmPasswordInput.classList.remove('error'); }
+        if (confirmPasswordInput.value && passwordInput.value !== confirmPasswordInput.value) {
+            showFieldError('confirm', 'Passwords do not match');
+        } else {
+            document.getElementById('confirmError').textContent = '';
+            confirmPasswordInput.classList.remove('error');
+        }
     });
 </script>
+
 </body>
 </html>
