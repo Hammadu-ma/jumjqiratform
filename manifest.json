@@ -2,7 +2,7 @@
   "name": "ALIF",
   "short_name": "ALIF",
   "description": "Your medical academic success partner",
-  "start_url": "/dashboard.html",
+  "start_url": "/index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#0A192F",
