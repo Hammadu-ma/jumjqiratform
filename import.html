@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Noor Academy | Smart Data Import Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mammoth@1.4.2/mammoth.browser.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary: #10b981;
+            --primary-dark: #059669;
+            --primary-light: #d1fae5;
+            --secondary: #6366f1;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --dark: #0f172a;
+            --card-bg: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e6f7f0 100%);
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        .glass-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(16, 185, 129, 0.2);
+            padding: 16px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, #10b981, #059669);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .back-btn {
+            background: var(--primary-light);
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            color: var(--primary-dark);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        .back-btn:hover { background: var(--primary); color: white; }
+
+        .main-container { max-width: 1400px; margin: 0 auto; padding: 24px; }
+
+        /* Hero Section */
+        .hero-import {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-radius: 32px;
+            padding: 40px 32px;
+            margin-bottom: 32px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-import h2 { font-size: 1.8rem; margin-bottom: 8px; }
+        .hero-import p { opacity: 0.9; margin-bottom: 20px; }
+
+        /* Upload Zone */
+        .upload-zone {
+            background: var(--card-bg);
+            border-radius: 28px;
+            padding: 40px;
+            text-align: center;
+            border: 2px dashed var(--border);
+            transition: all 0.3s;
+            cursor: pointer;
+            margin-bottom: 24px;
+        }
+        .upload-zone:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            transform: translateY(-2px);
+        }
+        .upload-zone i { font-size: 3rem; color: var(--primary); margin-bottom: 16px; }
+        .upload-zone h3 { margin-bottom: 8px; }
+        .upload-zone p { color: var(--text-muted); font-size: 0.85rem; }
+
+        /* File Type Buttons */
+        .file-types {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+            justify-content: center;
+        }
+        .type-btn {
+            background: white;
+            border: 2px solid var(--border);
+            padding: 12px 24px;
+            border-radius: 60px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .type-btn:hover { border-color: var(--primary); background: var(--primary-light); }
+        .type-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+        /* Preview Table */
+        .preview-container {
+            background: var(--card-bg);
+            border-radius: 28px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border);
+        }
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        .table-wrapper {
+            overflow-x: auto;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .preview-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+        .preview-table th, .preview-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        .preview-table th {
+            background: #f8fafc;
+            position: sticky;
+            top: 0;
+            font-weight: 700;
+        }
+
+        /* Field Mapping */
+        .mapping-section {
+            background: var(--card-bg);
+            border-radius: 28px;
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border);
+        }
+        .mapping-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+        .mapping-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .mapping-item label { font-weight: 600; font-size: 0.8rem; color: var(--primary-dark); }
+        .mapping-item select {
+            padding: 8px 12px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: white;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 16px;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+        .stat-value { font-size: 1.5rem; font-weight: 800; color: var(--primary); }
+        .stat-label { font-size: 0.7rem; color: var(--text-muted); }
+
+        /* Buttons */
+        .action-buttons { display: flex; gap: 16px; justify-content: flex-end; flex-wrap: wrap; }
+        .btn-primary {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 40px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #334155;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 40px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            right: 24px;
+            background: #1f2937;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            display: none;
+            z-index: 1100;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 12px 20px 20px;
+            border-top: 1px solid var(--border);
+            z-index: 200;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 40px;
+            color: var(--text-muted);
+        }
+        .nav-item i { font-size: 1.4rem; }
+        .nav-item span { font-size: 0.7rem; font-weight: 500; }
+        .nav-item.active { color: var(--primary); background: var(--primary-light); }
+
+        @media (min-width: 768px) { body { padding-bottom: 0; } .bottom-nav { display: none; } }
+        @media (max-width: 768px) { .main-container { padding: 16px; padding-bottom: 80px; } .hero-import { padding: 24px; } .upload-zone { padding: 24px; } }
+        
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; }
+        .badge-success { background: #d1fae5; color: #065f46; }
+        .badge-warning { background: #fef3c7; color: #92400e; }
+    </style>
+</head>
+<body>
+
+<div class="glass-header">
+    <div class="header-content">
+        <div class="logo"><h1><i class="fas fa-cloud-upload-alt"></i> Smart Import Center</h1></div>
+        <button class="back-btn" onclick="window.location.href='index.html'"><i class="fas fa-arrow-left"></i> Back</button>
+    </div>
+</div>
+
+<div class="main-container">
+    <!-- Hero -->
+    <div class="hero-import">
+        <h2><i class="fas fa-database"></i> Bulk Data Import</h2>
+        <p>Import student registrations from CSV, Excel, PDF, Word, or JSON files with smart field mapping</p>
+        <div class="file-types" id="fileTypeButtons">
+            <button class="type-btn" data-type="csv"><i class="fas fa-file-csv"></i> CSV</button>
+            <button class="type-btn" data-type="excel"><i class="fas fa-file-excel"></i> Excel</button>
+            <button class="type-btn" data-type="pdf"><i class="fas fa-file-pdf"></i> PDF (Tables)</button>
+            <button class="type-btn" data-type="word"><i class="fas fa-file-word"></i> Word (Tables)</button>
+            <button class="type-btn" data-type="json"><i class="fas fa-code"></i> JSON</button>
+        </div>
+    </div>
+
+    <!-- Upload Zone -->
+    <div class="upload-zone" id="uploadZone">
+        <i class="fas fa-cloud-upload-alt"></i>
+        <h3>Drag & Drop or Click to Upload</h3>
+        <p>Supports CSV, Excel (.xlsx, .xls), PDF (with tables), Word (.docx with tables), JSON</p>
+        <input type="file" id="fileInput" accept=".csv,.xlsx,.xls,.pdf,.docx,.json" style="display:none">
+    </div>
+
+    <!-- Stats Preview -->
+    <div class="stats-grid" id="statsGrid" style="display:none;">
+        <div class="stat-card"><div class="stat-value" id="rowCount">0</div><div class="stat-label">Rows Detected</div></div>
+        <div class="stat-card"><div class="stat-value" id="columnCount">0</div><div class="stat-label">Columns</div></div>
+        <div class="stat-card"><div class="stat-value" id="validCount">0</div><div class="stat-label">Valid Records</div></div>
+    </div>
+
+    <!-- Preview Table -->
+    <div class="preview-container" id="previewContainer" style="display:none;">
+        <div class="preview-header">
+            <h3><i class="fas fa-eye"></i> Data Preview (First 20 rows)</h3>
+            <span class="badge badge-success" id="fileInfo">File loaded</span>
+        </div>
+        <div class="table-wrapper">
+            <table class="preview-table" id="previewTable">
+                <thead><tr><th>Loading...</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Field Mapping -->
+    <div class="mapping-section" id="mappingSection" style="display:none;">
+        <h3><i class="fas fa-code-branch"></i> Field Mapping</h3>
+        <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:16px;">Map your file columns to database fields</p>
+        <div class="mapping-grid" id="mappingGrid"></div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons" id="actionButtons" style="display:none;">
+        <button class="btn-secondary" id="cancelBtn"><i class="fas fa-times"></i> Cancel</button>
+        <button class="btn-primary" id="importBtn"><i class="fas fa-database"></i> Import to Database</button>
+    </div>
+</div>
+
+<!-- Bottom Navigation -->
+<div class="bottom-nav">
+    <button class="nav-item" onclick="window.location.href='index.html'"><i class="fas fa-home"></i><span>Home</span></button>
+    <button class="nav-item" onclick="window.location.href='groups.html'"><i class="fas fa-layer-group"></i><span>Groups</span></button>
+    <button class="nav-item" onclick="window.location.href='tables.html'"><i class="fas fa-table"></i><span>Tables</span></button>
+    <button class="nav-item" onclick="window.location.href='analytics.html'"><i class="fas fa-chart-line"></i><span>Analytics</span></button>
+    <button class="nav-item active" onclick="window.location.href='import.html'"><i class="fas fa-upload"></i><span>Import</span></button>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    
+    const firebaseConfig = {
+        apiKey: "AIzaSyAR_g5y04YAGCrTvZCowrE7hw8h7k1du08",
+        authDomain: "jujm-qirat.firebaseapp.com",
+        projectId: "jujm-qirat",
+        storageBucket: "jujm-qirat.firebasestorage.app",
+        messagingSenderId: "253413984903",
+        appId: "1:253413984903:web:c1577e0fdef1711f960622"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    
+    let parsedData = [];
+    let headers = [];
+    let currentFileType = 'csv';
+    let currentFileName = '';
+    
+    const toast = document.getElementById('toast');
+    const uploadZone = document.getElementById('uploadZone');
+    const fileInput = document.getElementById('fileInput');
+    const previewContainer = document.getElementById('previewContainer');
+    const mappingSection = document.getElementById('mappingSection');
+    const actionButtons = document.getElementById('actionButtons');
+    const statsGrid = document.getElementById('statsGrid');
+    const previewTable = document.getElementById('previewTable');
+    const mappingGrid = document.getElementById('mappingGrid');
+    const rowCountSpan = document.getElementById('rowCount');
+    const columnCountSpan = document.getElementById('columnCount');
+    const validCountSpan = document.getElementById('validCount');
+    const fileInfoSpan = document.getElementById('fileInfo');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const importBtn = document.getElementById('importBtn');
+    
+    function showToast(msg, isErr = false) {
+        toast.textContent = msg;
+        toast.style.background = isErr ? '#ef4444' : '#10b981';
+        toast.style.display = 'block';
+        setTimeout(() => toast.style.display = 'none', 3000);
+    }
+    
+    // File type selection
+    document.querySelectorAll('.type-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentFileType = btn.dataset.type;
+            const acceptMap = { csv: '.csv', excel: '.xlsx,.xls', pdf: '.pdf', word: '.docx', json: '.json' };
+            fileInput.accept = acceptMap[currentFileType];
+        });
+    });
+    
+    // Upload zone click
+    uploadZone.addEventListener('click', () => fileInput.click());
+    uploadZone.addEventListener('dragover', (e) => { e.preventDefault(); uploadZone.style.borderColor = 'var(--primary)'; });
+    uploadZone.addEventListener('dragleave', () => { uploadZone.style.borderColor = 'var(--border)'; });
+    uploadZone.addEventListener('drop', (e) => { e.preventDefault(); uploadZone.style.borderColor = 'var(--border)'; const file = e.dataTransfer.files[0]; if (file) processFile(file); });
+    fileInput.addEventListener('change', (e) => { if (e.target.files[0]) processFile(e.target.files[0]); });
+    
+    async function processFile(file) {
+        currentFileName = file.name;
+        fileInfoSpan.textContent = `${file.name} (${(file.size/1024).toFixed(1)} KB)`;
+        
+        try {
+            if (currentFileType === 'csv') await parseCSV(file);
+            else if (currentFileType === 'excel') await parseExcel(file);
+            else if (currentFileType === 'pdf') await parsePDF(file);
+            else if (currentFileType === 'word') await parseWord(file);
+            else if (currentFileType === 'json') await parseJSON(file);
+        } catch (error) {
+            showToast(`Error parsing file: ${error.message}`, true);
+            console.error(error);
+        }
+    }
+    
+    async function parseCSV(file) {
+        const text = await file.text();
+        const lines = text.split(/\r?\n/).filter(l => l.trim());
+        if (lines.length < 2) throw new Error('CSV must have headers and data');
+        headers = lines[0].split(',').map(h => h.replace(/^"|"$/g, '').trim());
+        parsedData = lines.slice(1, 101).map(line => {
+            const values = line.split(',').map(v => v.replace(/^"|"$/g, '').trim());
+            const obj = {};
+            headers.forEach((h, i) => obj[h] = values[i] || '');
+            return obj;
+        }).filter(row => Object.values(row).some(v => v));
+        renderPreview();
+    }
+    
+    async function parseExcel(file) {
+        const data = await file.arrayBuffer();
+        const workbook = XLSX.read(data);
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const json = XLSX.utils.sheet_to_json(sheet);
+        if (json.length === 0) throw new Error('No data found in Excel');
+        headers = Object.keys(json[0]);
+        parsedData = json.slice(0, 100);
+        renderPreview();
+    }
+    
+    async function parsePDF(file) {
+        const arrayBuffer = await file.arrayBuffer();
+        const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+        const pdf = await loadingTask.promise;
+        let allText = '';
+        for (let i = 1; i <= Math.min(pdf.numPages, 10); i++) {
+            const page = await pdf.getPage(i);
+            const textContent = await page.getTextContent();
+            const pageText = textContent.items.map(item => item.str).join(' ');
+            allText += pageText + '\n';
+        }
+        // Simple table extraction from PDF text (line-based)
+        const lines = allText.split(/\r?\n/).filter(l => l.trim().length > 5);
+        if (lines.length < 2) throw new Error('Could not extract table data from PDF');
+        const possibleHeaders = lines[0].split(/\s{2,}/);
+        if (possibleHeaders.length > 1) headers = possibleHeaders;
+        else headers = ['Name', 'Gender', 'Phone', 'Department', 'Batch', 'Qirats'];
+        parsedData = lines.slice(1, 51).map(line => {
+            const parts = line.split(/\s{2,}/);
+            const obj = {};
+            headers.forEach((h, i) => obj[h] = parts[i] || '');
+            return obj;
+        }).filter(row => row[headers[0]]);
+        renderPreview();
+    }
+    
+    async function parseWord(file) {
+        const arrayBuffer = await file.arrayBuffer();
+        const result = await mammoth.extractRawText({ arrayBuffer: arrayBuffer });
+        const text = result.value;
+        const lines = text.split(/\r?\n/).filter(l => l.trim().length > 3);
+        if (lines.length < 2) throw new Error('Could not extract table data from Word');
+        const possibleHeaders = lines[0].split(/\t|\s{2,}/);
+        if (possibleHeaders.length > 1) headers = possibleHeaders;
+        else headers = ['Name', 'Gender', 'Phone', 'Department', 'Batch', 'Qirats'];
+        parsedData = lines.slice(1, 51).map(line => {
+            const parts = line.split(/\t|\s{2,}/);
+            const obj = {};
+            headers.forEach((h, i) => obj[h] = parts[i] || '');
+            return obj;
+        }).filter(row => row[headers[0]]);
+        renderPreview();
+    }
+    
+    async function parseJSON(file) {
+        const text = await file.text();
+        const json = JSON.parse(text);
+        if (Array.isArray(json)) {
+            if (json.length === 0) throw new Error('JSON array is empty');
+            headers = Object.keys(json[0]);
+            parsedData = json.slice(0, 100);
+        } else if (json.data && Array.isArray(json.data)) {
+            headers = Object.keys(json.data[0]);
+            parsedData = json.data.slice(0, 100);
+        } else {
+            throw new Error('JSON must be an array or have a "data" array');
+        }
+        renderPreview();
+    }
+    
+    function renderPreview() {
+        if (parsedData.length === 0) {
+            showToast('No valid data found in file', true);
+            return;
+        }
+        
+        statsGrid.style.display = 'grid';
+        previewContainer.style.display = 'block';
+        mappingSection.style.display = 'block';
+        actionButtons.style.display = 'flex';
+        
+        rowCountSpan.textContent = parsedData.length;
+        columnCountSpan.textContent = headers.length;
+        validCountSpan.textContent = parsedData.filter(row => row[headers[0]]).length;
+        
+        // Render preview table
+        const previewRows = parsedData.slice(0, 20);
+        const thead = `<tr>${headers.map(h => `<th>${escapeHtml(h)}</th>`).join('')}</tr>`;
+        const tbody = previewRows.map(row => 
+            `<tr>${headers.map(h => `<td>${escapeHtml(String(row[h] || '-'))}</td>`).join('')}</tr>`
+        ).join('');
+        previewTable.innerHTML = `<thead>${thead}</thead><tbody>${tbody}</tbody>`;
+        
+        // Render mapping UI
+        const dbFields = [
+            { key: 'full_name', label: 'Full Name', required: true },
+            { key: 'gender', label: 'Gender', required: false },
+            { key: 'phone', label: 'Phone', required: false },
+            { key: 'telegram', label: 'Telegram', required: false },
+            { key: 'department', label: 'Department', required: false },
+            { key: 'batch', label: 'Batch', required: false },
+            { key: 'qirats', label: 'Qirats (comma separated)', required: false }
+        ];
+        
+        mappingGrid.innerHTML = dbFields.map(field => `
+            <div class="mapping-item">
+                <label>${field.label} ${field.required ? '<span style="color:#ef4444;">*</span>' : ''}</label>
+                <select data-field="${field.key}" class="mapping-select">
+                    <option value="">-- Auto-detect --</option>
+                    ${headers.map(h => `<option value="${escapeHtml(h)}" ${h.toLowerCase().includes(field.key.replace('_', ' ')) || (field.key === 'full_name' && (h.toLowerCase().includes('name'))) ? 'selected' : ''}>${escapeHtml(h)}</option>`).join('')}
+                    <option value="[constant]">Set constant: ${field.label}</option>
+                </select>
+            </div>
+        `).join('');
+        
+        // Add constant value inputs
+        document.querySelectorAll('.mapping-select').forEach(select => {
+            select.addEventListener('change', (e) => {
+                if (e.target.value === '[constant]') {
+                    const constantVal = prompt(`Enter constant value for ${e.target.parentElement.querySelector('label').innerText.replace('*', '')}:`);
+                    if (constantVal) {
+                        const option = document.createElement('option');
+                        option.value = constantVal;
+                        option.text = `Constant: ${constantVal}`;
+                        option.selected = true;
+                        e.target.appendChild(option);
+                    } else e.target.value = '';
+                }
+            });
+        });
+    }
+    
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m]));
+    }
+    
+    function getMappedValue(row, fieldKey) {
+        const select = document.querySelector(`.mapping-select[data-field="${fieldKey}"]`);
+        if (!select) return '';
+        const mapping = select.value;
+        if (!mapping) {
+            // Auto-detect
+            if (fieldKey === 'full_name') return row['Name'] || row['full_name'] || row['Student Name'] || '';
+            if (fieldKey === 'gender') return row['Gender'] || row['gender'] || '';
+            if (fieldKey === 'phone') return row['Phone'] || row['phone'] || '';
+            if (fieldKey === 'telegram') return row['Telegram'] || row['telegram'] || '';
+            if (fieldKey === 'department') return row['Department'] || row['department'] || '';
+            if (fieldKey === 'batch') return row['Batch'] || row['batch'] || '';
+            if (fieldKey === 'qirats') return row['Qirats'] || row['qirats'] || '';
+            return '';
+        }
+        if (mapping.startsWith('Constant:')) return mapping.replace('Constant: ', '');
+        return row[mapping] || '';
+    }
+    
+    cancelBtn.addEventListener('click', () => {
+        parsedData = [];
+        previewContainer.style.display = 'none';
+        mappingSection.style.display = 'none';
+        actionButtons.style.display = 'none';
+        statsGrid.style.display = 'none';
+        fileInput.value = '';
+        showToast('Import cancelled');
+    });
+    
+    importBtn.addEventListener('click', async () => {
+        if (parsedData.length === 0) {
+            showToast('No data to import', true);
+            return;
+        }
+        
+        const batch = writeBatch(db);
+        const registrationsRef = collection(db, "registrations");
+        let successCount = 0;
+        let errorCount = 0;
+        
+        for (const row of parsedData) {
+            try {
+                const full_name = getMappedValue(row, 'full_name');
+                if (!full_name) {
+                    errorCount++;
+                    continue;
+                }
+                
+                const qiratsRaw = getMappedValue(row, 'qirats');
+                const schedules = qiratsRaw ? qiratsRaw.split(',').map(q => ({ qirat_name: q.trim(), days: ["Flexible"], time_preference: "Evening" })) : [];
+                
+                const studentData = {
+                    full_name: full_name,
+                    gender: getMappedValue(row, 'gender') || 'Not Specified',
+                    phone: getMappedValue(row, 'phone') || '',
+                    telegram: getMappedValue(row, 'telegram') || '',
+                    department: getMappedValue(row, 'department') || 'Other',
+                    batch: getMappedValue(row, 'batch') || 'General',
+                    schedules: schedules,
+                    timestamp: new Date()
+                };
+                
+                await addDoc(registrationsRef, studentData);
+                successCount++;
+            } catch (err) {
+                errorCount++;
+                console.error(err);
+            }
+        }
+        
+        showToast(`Import complete: ${successCount} added, ${errorCount} failed`);
+        
+        if (successCount > 0) {
+            parsedData = [];
+            previewContainer.style.display = 'none';
+            mappingSection.style.display = 'none';
+            actionButtons.style.display = 'none';
+            statsGrid.style.display = 'none';
+            fileInput.value = '';
+        }
+    });
+    
+    // Template download
+    function downloadTemplate() {
+        const template = [
+            { 'Full Name': 'Ahmed Hassan', 'Gender': 'Male', 'Phone': '+1234567890', 'Telegram': 'ahmed_h', 'Department': 'Medicine', 'Batch': '1st Year', 'Qirats': 'Hafs, Warsh' },
+            { 'Full Name': 'Fatima Ali', 'Gender': 'Female', 'Phone': '+1234567891', 'Telegram': 'fatima_a', 'Department': 'Pharmacy', 'Batch': '2nd Year', 'Qirats': 'Qaloon' }
+        ];
+        const ws = XLSX.utils.json_to_sheet(template);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Template');
+        XLSX.writeFile(wb, 'student_import_template.xlsx');
+        showToast('Template downloaded');
+    }
+    
+    // Add template download button to header
+    const headerContent = document.querySelector('.header-content');
+    const templateBtn = document.createElement('button');
+    templateBtn.className = 'back-btn';
+    templateBtn.innerHTML = '<i class="fas fa-download"></i> Get Template';
+    templateBtn.style.background = '#10b981';
+    templateBtn.style.color = 'white';
+    templateBtn.onclick = downloadTemplate;
+    headerContent.appendChild(templateBtn);
+</script>
+</body>
+</html>
