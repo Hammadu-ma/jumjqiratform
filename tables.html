@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Noor Academy | Advanced Tables View</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary: #10b981;
+            --primary-dark: #059669;
+            --primary-light: #d1fae5;
+            --secondary: #6366f1;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --dark: #0f172a;
+            --card-bg: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e6f7f0 100%);
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        .glass-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(16, 185, 129, 0.2);
+            padding: 16px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .header-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, #10b981, #059669);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .back-btn {
+            background: var(--primary-light);
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            color: var(--primary-dark);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .back-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .main-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+        }
+
+        .stat-pill {
+            background: var(--card-bg);
+            padding: 12px 24px;
+            border-radius: 60px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+        }
+
+        .stat-pill i { font-size: 1.3rem; color: var(--primary); }
+        .stat-pill .value { font-weight: 800; font-size: 1.2rem; }
+        .stat-pill .label { color: var(--text-muted); font-size: 0.75rem; }
+
+        /* Filters Row */
+        .filters-row {
+            background: var(--card-bg);
+            border-radius: 28px;
+            padding: 20px 24px;
+            margin-bottom: 24px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: flex-end;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border);
+        }
+
+        .filter-group { flex: 1; min-width: 140px; }
+        .filter-group label { font-size: 0.7rem; font-weight: 700; color: var(--primary); display: block; margin-bottom: 6px; text-transform: uppercase; }
+        .filter-group input, .filter-group select { width: 100%; padding: 10px 14px; border: 2px solid var(--border); border-radius: 16px; font-family: inherit; font-size: 0.85rem; background: white; }
+        .filter-group input:focus, .filter-group select:focus { outline: none; border-color: var(--primary); }
+
+        .btn-clear { background: #64748b; color: white; border: none; padding: 10px 24px; border-radius: 16px; font-weight: 600; cursor: pointer; }
+        .btn-primary { background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; padding: 10px 24px; border-radius: 16px; font-weight: 600; cursor: pointer; }
+
+        /* Export Bar */
+        .export-bar {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 16px 24px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            border: 1px solid var(--border);
+        }
+
+        .export-buttons { display: flex; gap: 12px; flex-wrap: wrap; }
+        .export-btn { padding: 8px 20px; border: none; border-radius: 40px; font-weight: 600; font-size: 0.8rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; }
+        .export-csv { background: #10b981; color: white; }
+        .export-excel { background: #059669; color: white; }
+        .export-pdf { background: #ef4444; color: white; }
+        .export-word { background: #3b82f6; color: white; }
+        .export-btn:hover { transform: translateY(-2px); filter: brightness(1.05); }
+
+        /* Table Container */
+        .table-container {
+            background: var(--card-bg);
+            border-radius: 28px;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border);
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+
+        th, td {
+            padding: 14px 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: #f8fafc;
+            font-weight: 700;
+            color: var(--text-primary);
+            position: sticky;
+            top: 0;
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+        }
+
+        th:hover { background: #f1f5f9; }
+        th i { margin-left: 6px; opacity: 0.5; }
+
+        .badge {
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .badge-male { background: #dbeafe; color: #1e40af; }
+        .badge-female { background: #fce7f3; color: #be185d; }
+        .badge-dept { background: #e0f2fe; color: #0369a1; }
+
+        .action-buttons { display: flex; gap: 8px; white-space: nowrap; }
+        .icon-btn { background: none; border: none; cursor: pointer; padding: 6px 10px; border-radius: 10px; transition: all 0.2s; color: #64748b; }
+        .icon-btn.edit:hover { background: #d1fae5; color: #10b981; }
+        .icon-btn.delete:hover { background: #fee2e2; color: #ef4444; }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            padding: 20px;
+            border-top: 1px solid var(--border);
+            flex-wrap: wrap;
+        }
+        .page-btn {
+            background: white;
+            border: 1px solid var(--border);
+            padding: 8px 14px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .page-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        .page-btn:hover:not(.active) { background: var(--primary-light); }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: white;
+            border-radius: 32px;
+            padding: 28px;
+            max-width: 550px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        .form-group { margin-bottom: 18px; }
+        .form-group label { font-weight: 600; display: block; margin-bottom: 6px; color: var(--text-primary); }
+        .form-group input, .form-group select { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 16px; }
+
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            right: 24px;
+            background: #1f2937;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            display: none;
+            z-index: 1100;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        .empty-state { text-align: center; padding: 60px; color: var(--text-muted); }
+        .checkbox-col { width: 30px; text-align: center; }
+        .batch-actions { display: flex; gap: 12px; margin-left: auto; }
+
+        /* Bottom Nav */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 12px 20px 20px;
+            border-top: 1px solid var(--border);
+            z-index: 200;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 40px;
+            color: var(--text-muted);
+        }
+        .nav-item i { font-size: 1.4rem; }
+        .nav-item span { font-size: 0.7rem; font-weight: 500; }
+        .nav-item.active { color: var(--primary); background: var(--primary-light); }
+
+        @media (min-width: 768px) { body { padding-bottom: 0; } .bottom-nav { display: none; } }
+        @media (max-width: 768px) { .main-container { padding: 16px; padding-bottom: 80px; } .filters-row { flex-direction: column; } .export-bar { flex-direction: column; align-items: stretch; } }
+    </style>
+</head>
+<body>
+
+<div class="glass-header">
+    <div class="header-content">
+        <div class="logo"><h1><i class="fas fa-table"></i> Advanced Tables</h1></div>
+        <button class="back-btn" onclick="window.location.href='home.html'"><i class="fas fa-arrow-left"></i> Back</button>
+    </div>
+</div>
+
+<div class="main-container">
+    <!-- Stats Bar -->
+    <div class="stats-bar">
+        <div class="stat-pill"><i class="fas fa-users"></i><div><span class="value" id="totalCount">0</span><span class="label"> Total</span></div></div>
+        <div class="stat-pill"><i class="fas fa-filter"></i><div><span class="value" id="filteredCount">0</span><span class="label"> Filtered</span></div></div>
+        <div class="stat-pill"><i class="fas fa-check-square"></i><div><span class="value" id="selectedCount">0</span><span class="label"> Selected</span></div></div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-row">
+        <div class="filter-group"><label><i class="fas fa-search"></i> Search</label><input type="text" id="searchInput" placeholder="Name / Phone / Telegram"></div>
+        <div class="filter-group"><label><i class="fas fa-venus-mars"></i> Gender</label><select id="genderFilter"><option value="">All</option><option value="Male">Male</option><option value="Female">Female</option></select></div>
+        <div class="filter-group"><label><i class="fas fa-building"></i> Department</label><select id="deptFilter"><option value="">All</option></select></div>
+        <div class="filter-group"><label><i class="fas fa-graduation-cap"></i> Batch</label><select id="batchFilter"><option value="">All</option></select></div>
+        <button class="btn-clear" id="clearFiltersBtn"><i class="fas fa-eraser"></i> Clear</button>
+        <button class="btn-primary" id="addStudentBtn"><i class="fas fa-plus"></i> Add Student</button>
+    </div>
+
+    <!-- Export Bar -->
+    <div class="export-bar">
+        <div class="export-buttons">
+            <button class="export-btn export-csv" id="exportCSVBtn"><i class="fas fa-file-csv"></i> CSV</button>
+            <button class="export-btn export-excel" id="exportExcelBtn"><i class="fas fa-file-excel"></i> Excel</button>
+            <button class="export-btn export-pdf" id="exportPDFBtn"><i class="fas fa-file-pdf"></i> PDF Report</button>
+            <button class="export-btn export-word" id="exportWordBtn"><i class="fas fa-file-word"></i> Word</button>
+        </div>
+        <div class="batch-actions">
+            <button class="btn-clear" id="deleteSelectedBtn" style="background:#ef4444;"><i class="fas fa-trash"></i> Delete Selected</button>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-container">
+        <div class="table-wrapper">
+            <table id="dataTable">
+                <thead>
+                    <tr>
+                        <th class="checkbox-col"><input type="checkbox" id="selectAllCheckbox"></th>
+                        <th onclick="sortTable('full_name')">Name <i class="fas fa-sort"></i></th>
+                        <th onclick="sortTable('gender')">Gender <i class="fas fa-sort"></i></th>
+                        <th>Phone</th>
+                        <th>Telegram</th>
+                        <th onclick="sortTable('department')">Department <i class="fas fa-sort"></i></th>
+                        <th onclick="sortTable('batch')">Batch <i class="fas fa-sort"></i></th>
+                        <th>Qirats</th>
+                        <th onclick="sortTable('timestamp')">Date <i class="fas fa-sort"></i></th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+        <div class="pagination" id="pagination"></div>
+    </div>
+</div>
+
+<!-- Bottom Navigation -->
+<div class="bottom-nav">
+    <button class="nav-item" onclick="window.location.href='home.html'"><i class="fas fa-home"></i><span>Home</span></button>
+    <button class="nav-item" onclick="window.location.href='groups.html'"><i class="fas fa-layer-group"></i><span>Groups</span></button>
+    <button class="nav-item active" onclick="window.location.href='tables.html'"><i class="fas fa-table"></i><span>Tables</span></button>
+    <button class="nav-item" onclick="window.location.href='analytics.html'"><i class="fas fa-chart-line"></i><span>Analytics</span></button>
+</div>
+
+<div id="studentModal" class="modal"><div class="modal-content"><h3 id="modalTitle">Add Student</h3><form id="studentForm"><div class="form-group"><label>Full Name *</label><input type="text" id="full_name" required></div><div class="form-group"><label>Gender</label><select id="gender"><option>Male</option><option>Female</option></select></div><div class="form-group"><label>Phone</label><input type="text" id="phone"></div><div class="form-group"><label>Telegram</label><input type="text" id="telegram"></div><div class="form-group"><label>Department</label><select id="department"><option>Medicine</option><option>Pharmacy</option><option>Nursing</option><option>Other</option></select></div><div class="form-group"><label>Batch</label><input type="text" id="batch" placeholder="e.g., 1st Year"></div><div class="form-group"><label>Qirats (comma)</label><input type="text" id="qirats" placeholder="Hafs, Warsh"></div><div style="display:flex; gap:12px; justify-content:flex-end;"><button type="button" class="btn-clear" id="cancelModalBtn">Cancel</button><button type="submit" class="btn-primary">Save</button></div></form><button id="modalClose" style="position:absolute; top:20px; right:24px; background:none; border:none; font-size:24px;">&times;</button></div></div>
+
+<div id="toast" class="toast"></div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, deleteDoc, doc, addDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    
+    const firebaseConfig = {
+        apiKey: "AIzaSyAR_g5y04YAGCrTvZCowrE7hw8h7k1du08",
+        authDomain: "jujm-qirat.firebaseapp.com",
+        projectId: "jujm-qirat",
+        storageBucket: "jujm-qirat.firebasestorage.app",
+        messagingSenderId: "253413984903",
+        appId: "1:253413984903:web:c1577e0fdef1711f960622"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    
+    let allStudents = [];
+    let filteredStudents = [];
+    let currentPage = 1;
+    let rowsPerPage = 15;
+    let sortColumn = 'timestamp';
+    let sortDirection = 'desc';
+    let selectedIds = new Set();
+    let currentEditId = null;
+    
+    // DOM Elements
+    const searchInput = document.getElementById('searchInput');
+    const genderFilter = document.getElementById('genderFilter');
+    const deptFilter = document.getElementById('deptFilter');
+    const batchFilter = document.getElementById('batchFilter');
+    const clearFiltersBtn = document.getElementById('clearFiltersBtn');
+    const tableBody = document.getElementById('tableBody');
+    const totalCountSpan = document.getElementById('totalCount');
+    const filteredCountSpan = document.getElementById('filteredCount');
+    const selectedCountSpan = document.getElementById('selectedCount');
+    const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+    const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+    const addStudentBtn = document.getElementById('addStudentBtn');
+    const studentModal = document.getElementById('studentModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const studentForm = document.getElementById('studentForm');
+    const cancelModalBtn = document.getElementById('cancelModalBtn');
+    const modalClose = document.getElementById('modalClose');
+    const toast = document.getElementById('toast');
+    const exportCSV = document.getElementById('exportCSVBtn');
+    const exportExcel = document.getElementById('exportExcelBtn');
+    const exportPDF = document.getElementById('exportPDFBtn');
+    const exportWord = document.getElementById('exportWordBtn');
+    
+    function showToast(msg, isErr = false) {
+        toast.textContent = msg;
+        toast.style.background = isErr ? '#ef4444' : '#10b981';
+        toast.style.display = 'block';
+        setTimeout(() => toast.style.display = 'none', 3000);
+    }
+    
+    function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
+    function getQiratNames(student) { return (student.schedules || []).map(s => s.qirat_name).filter(Boolean); }
+    
+    async function loadData() {
+        try {
+            const querySnapshot = await getDocs(collection(db, "registrations"));
+            allStudents = [];
+            querySnapshot.forEach((docSnap) => {
+                const data = docSnap.data();
+                let timestamp = data.timestamp;
+                if (timestamp && typeof timestamp.toDate === 'function') timestamp = timestamp.toDate();
+                else timestamp = new Date();
+                allStudents.push({
+                    id: docSnap.id,
+                    full_name: data.full_name || 'N/A',
+                    gender: data.gender || 'Not Specified',
+                    phone: data.phone || '',
+                    telegram: data.telegram || '',
+                    department: data.department || 'Other',
+                    batch: data.batch || 'General',
+                    schedules: data.schedules || [],
+                    timestamp: timestamp
+                });
+            });
+            populateFilters();
+            applyFiltersAndRender();
+        } catch (error) { showToast("Error: " + error.message, true); }
+    }
+    
+    function populateFilters() {
+        const departments = [...new Set(allStudents.map(s => s.department))];
+        const batches = [...new Set(allStudents.map(s => s.batch))];
+        deptFilter.innerHTML = '<option value="">All Departments</option>' + departments.map(d => `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join('');
+        batchFilter.innerHTML = '<option value="">All Batches</option>' + batches.map(b => `<option value="${escapeHtml(b)}">${escapeHtml(b)}</option>`).join('');
+    }
+    
+    function applyFiltersAndRender() {
+        const search = searchInput.value.toLowerCase();
+        const gender = genderFilter.value;
+        const department = deptFilter.value;
+        const batch = batchFilter.value;
+        
+        filteredStudents = allStudents.filter(s => {
+            const matchSearch = s.full_name.toLowerCase().includes(search) || s.phone.includes(search) || s.telegram.toLowerCase().includes(search);
+            const matchGender = !gender || s.gender === gender;
+            const matchDept = !department || s.department === department;
+            const matchBatch = !batch || s.batch === batch;
+            return matchSearch && matchGender && matchDept && matchBatch;
+        });
+        
+        // Apply sorting
+        filteredStudents.sort((a, b) => {
+            let valA = a[sortColumn], valB = b[sortColumn];
+            if (sortColumn === 'timestamp') { valA = a.timestamp; valB = b.timestamp; }
+            if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
+            if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
+            return 0;
+        });
+        
+        totalCountSpan.textContent = allStudents.length;
+        filteredCountSpan.textContent = filteredStudents.length;
+        selectedCountSpan.textContent = selectedIds.size;
+        
+        renderTable();
+        renderPagination();
+    }
+    
+    function renderTable() {
+        const start = (currentPage - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+        const pageData = filteredStudents.slice(start, end);
+        
+        if (pageData.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="10" class="empty-state">No students found</td></tr>`;
+            return;
+        }
+        
+        tableBody.innerHTML = pageData.map(student => `
+            <tr data-id="${student.id}">
+                <td class="checkbox-col"><input type="checkbox" class="row-checkbox" value="${student.id}" ${selectedIds.has(student.id) ? 'checked' : ''}></td>
+                <td><strong>${escapeHtml(student.full_name)}</strong></td>
+                <td><span class="badge ${student.gender === 'Male' ? 'badge-male' : 'badge-female'}">${escapeHtml(student.gender)}</span></td>
+                <td>${escapeHtml(student.phone)}</td>
+                <td>@${escapeHtml(student.telegram)}</td>
+                <td><span class="badge badge-dept">${escapeHtml(student.department)}</span></td>
+                <td>${escapeHtml(student.batch)}</td>
+                <td>${escapeHtml(getQiratNames(student).slice(0, 2).join(', ') || '-')}</td>
+                <td>${student.timestamp.toLocaleDateString()}</td>
+                <td class="action-buttons">
+                    <button class="icon-btn edit" onclick="window.editStudent('${student.id}')"><i class="fas fa-edit"></i></button>
+                    <button class="icon-btn delete" onclick="window.deleteStudent('${student.id}')"><i class="fas fa-trash"></i></button>
+                </td>
+            </tr>
+        `).join('');
+        
+        // Re-attach checkbox events
+        document.querySelectorAll('.row-checkbox').forEach(cb => {
+            cb.addEventListener('change', (e) => {
+                const id = cb.value;
+                if (cb.checked) selectedIds.add(id);
+                else selectedIds.delete(id);
+                selectedCountSpan.textContent = selectedIds.size;
+                updateSelectAllCheckbox();
+            });
+        });
+    }
+    
+    function renderPagination() {
+        const totalPages = Math.ceil(filteredStudents.length / rowsPerPage);
+        const paginationDiv = document.getElementById('pagination');
+        if (totalPages <= 1) { paginationDiv.innerHTML = ''; return; }
+        
+        let html = `<button class="page-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}><i class="fas fa-chevron-left"></i></button>`;
+        for (let i = 1; i <= Math.min(totalPages, 5); i++) {
+            html += `<button class="page-btn ${currentPage === i ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
+        }
+        if (totalPages > 5) html += `<span>...</span><button class="page-btn" onclick="changePage(${totalPages})">${totalPages}</button>`;
+        html += `<button class="page-btn" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}><i class="fas fa-chevron-right"></i></button>`;
+        paginationDiv.innerHTML = html;
+    }
+    
+    window.changePage = (page) => { if (page >= 1 && page <= Math.ceil(filteredStudents.length / rowsPerPage)) { currentPage = page; renderTable(); renderPagination(); } };
+    window.sortTable = (column) => { if (sortColumn === column) sortDirection = sortDirection === 'asc' ? 'desc' : 'asc'; else { sortColumn = column; sortDirection = 'asc'; } applyFiltersAndRender(); };
+    
+    function updateSelectAllCheckbox() {
+        const visibleIds = filteredStudents.slice((currentPage-1)*rowsPerPage, currentPage*rowsPerPage).map(s => s.id);
+        const allSelected = visibleIds.length > 0 && visibleIds.every(id => selectedIds.has(id));
+        selectAllCheckbox.checked = allSelected;
+        selectAllCheckbox.indeterminate = !allSelected && visibleIds.some(id => selectedIds.has(id));
+    }
+    
+    selectAllCheckbox.addEventListener('change', (e) => {
+        const visibleIds = filteredStudents.slice((currentPage-1)*rowsPerPage, currentPage*rowsPerPage).map(s => s.id);
+        if (e.target.checked) visibleIds.forEach(id => selectedIds.add(id));
+        else visibleIds.forEach(id => selectedIds.delete(id));
+        renderTable();
+        selectedCountSpan.textContent = selectedIds.size;
+    });
+    
+    window.editStudent = async (id) => {
+        const student = allStudents.find(s => s.id === id);
+        if (!student) return;
+        currentEditId = id;
+        modalTitle.textContent = "Edit Student";
+        document.getElementById('full_name').value = student.full_name;
+        document.getElementById('gender').value = student.gender;
+        document.getElementById('phone').value = student.phone;
+        document.getElementById('telegram').value = student.telegram;
+        document.getElementById('department').value = student.department;
+        document.getElementById('batch').value = student.batch;
+        document.getElementById('qirats').value = getQiratNames(student).join(', ');
+        studentModal.classList.add('active');
+    };
+    
+    window.deleteStudent = async (id) => {
+        if (confirm('Delete this student?')) {
+            await deleteDoc(doc(db, "registrations", id));
+            selectedIds.delete(id);
+            showToast('Deleted successfully');
+            await loadData();
+        }
+    };
+    
+    deleteSelectedBtn.addEventListener('click', async () => {
+        if (selectedIds.size === 0) { showToast('No students selected', true); return; }
+        if (confirm(`Delete ${selectedIds.size} selected student(s)?`)) {
+            for (const id of selectedIds) await deleteDoc(doc(db, "registrations", id));
+            selectedIds.clear();
+            showToast(`Deleted ${selectedIds.size} students`);
+            await loadData();
+        }
+    });
+    
+    addStudentBtn.addEventListener('click', () => { currentEditId = null; modalTitle.textContent = "Add Student"; studentForm.reset(); studentModal.classList.add('active'); });
+    function closeModal() { studentModal.classList.remove('active'); currentEditId = null; }
+    cancelModalBtn.addEventListener('click', closeModal);
+    modalClose.addEventListener('click', closeModal);
+    
+    studentForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const full_name = document.getElementById('full_name').value.trim();
+        if (!full_name) { showToast('Name required', true); return; }
+        const schedules = document.getElementById('qirats').value.split(',').filter(s => s.trim()).map(q => ({ qirat_name: q.trim(), days: ["Flexible"], time_preference: "Evening" }));
+        const studentData = {
+            full_name, gender: document.getElementById('gender').value, phone: document.getElementById('phone').value,
+            telegram: document.getElementById('telegram').value, department: document.getElementById('department').value,
+            batch: document.getElementById('batch').value, schedules, timestamp: new Date()
+        };
+        try {
+            if (currentEditId) await updateDoc(doc(db, "registrations", currentEditId), studentData);
+            else await addDoc(collection(db, "registrations"), studentData);
+            showToast(currentEditId ? 'Updated' : 'Added');
+            closeModal();
+            await loadData();
+        } catch (error) { showToast("Error: " + error.message, true); }
+    });
+    
+    // Export Functions
+    function getExportData() { return filteredStudents.map(s => ({ 'Name': s.full_name, 'Gender': s.gender, 'Phone': s.phone, 'Telegram': s.telegram, 'Department': s.department, 'Batch': s.batch, 'Qirats': getQiratNames(s).join(', '), 'Registration Date': s.timestamp.toLocaleDateString() })); }
+    
+    exportCSV.addEventListener('click', () => {
+        const data = getExportData();
+        const headers = Object.keys(data[0] || {});
+        const rows = data.map(row => headers.map(h => `"${String(row[h] || '').replace(/"/g, '""')}"`).join(','));
+        const blob = new Blob(["\uFEFF" + [headers.join(','), ...rows].join('\n')], { type: 'text/csv' });
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `students_${new Date().toISOString().slice(0,19)}.csv`; a.click(); URL.revokeObjectURL(a.href);
+        showToast('CSV exported');
+    });
+    
+    exportExcel.addEventListener('click', () => {
+        const ws = XLSX.utils.json_to_sheet(getExportData());
+        const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Students');
+        XLSX.writeFile(wb, `students_${new Date().toISOString().slice(0,19)}.xlsx`);
+        showToast('Excel exported');
+    });
+    
+    exportPDF.addEventListener('click', async () => {
+        const { jsPDF } = window.jspdf; const doc = new jsPDF({ orientation: 'landscape' });
+        const data = getExportData(); const kpi = { total: filteredStudents.length, male: filteredStudents.filter(s=>s.gender==='Male').length, female: filteredStudents.filter(s=>s.gender==='Female').length };
+        doc.setFontSize(18); doc.setTextColor(16,185,129); doc.text("Noor Academy - Student Report", 14, 20);
+        doc.setFontSize(10); doc.text(`Generated: ${new Date().toLocaleString()} | Total: ${kpi.total} | Male: ${kpi.male} | Female: ${kpi.female}`, 14, 30);
+        doc.autoTable({ head: [['Name','Gender','Phone','Department','Batch','Qirats','Date']], body: data.map(r => [r.Name, r.Gender, r.Phone, r.Department, r.Batch, r.Qirats, r['Registration Date']]), startY: 40, headStyles: { fillColor: [16,185,129] } });
+        doc.save(`students_report.pdf`);
+        showToast('PDF exported');
+    });
+    
+    exportWord.addEventListener('click', () => {
+        const data = getExportData();
+        let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Students Report</title><style>body{font-family:Arial;} table{border-collapse:collapse;width:100%;} th,td{border:1px solid #ddd;padding:8px;} th{background:#10b981;color:white;}</style></head><body><h1>Student Report</h1><p>Generated: ${new Date().toLocaleString()} | Total: ${data.length}</p><table><thead><tr><th>Name</th><th>Gender</th><th>Phone</th><th>Department</th><th>Batch</th><th>Qirats</th><th>Date</th></tr></thead><tbody>${data.map(r => `<tr><td>${escapeHtml(r.Name)}</td><td>${escapeHtml(r.Gender)}</td><td>${escapeHtml(r.Phone)}</td><td>${escapeHtml(r.Department)}</td><td>${escapeHtml(r.Batch)}</td><td>${escapeHtml(r.Qirats)}</td><td>${escapeHtml(r['Registration Date'])}</td></tr>`).join('')}</tbody></table></body></html>`;
+        const blob = new Blob([html], { type: 'application/msword' });
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `students_report.doc`; a.click(); URL.revokeObjectURL(a.href);
+        showToast('Word exported');
+    });
+    
+    searchInput.addEventListener('input', () => { currentPage = 1; applyFiltersAndRender(); });
+    genderFilter.addEventListener('change', () => { currentPage = 1; applyFiltersAndRender(); });
+    deptFilter.addEventListener('change', () => { currentPage = 1; applyFiltersAndRender(); });
+    batchFilter.addEventListener('change', () => { currentPage = 1; applyFiltersAndRender(); });
+    clearFiltersBtn.addEventListener('click', () => { searchInput.value = ''; genderFilter.value = ''; deptFilter.value = ''; batchFilter.value = ''; currentPage = 1; applyFiltersAndRender(); });
+    
+    loadData();
+    setInterval(loadData, 30000);
+</script>
+</body>
+</html>
