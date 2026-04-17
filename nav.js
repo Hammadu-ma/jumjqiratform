@@ -1,25 +1,53 @@
 // nav.js - Universal Navigation System for Noor Academy Admin Dashboard
-// Handles desktop header navigation and mobile bottom navigation
+// Handles desktop header navigation and mobile bottom navigation with role-based access
+
+import { getCurrentAdmin } from './auth.js';
 
 /**
  * Navigation Configuration
  * Add all your pages here with their respective icons and display names
+ * role: 'all' = visible to everyone, 'super-admin' = only super admins
  */
 export const NAVIGATION_ITEMS = [
-    { path: 'index.html', name: 'Home', icon: 'fa-home', mobileOnly: false },
-    { path: 'groups.html', name: 'Groups', icon: 'fa-layer-group', mobileOnly: false },
-    { path: 'tables.html', name: 'Tables', icon: 'fa-table', mobileOnly: false },
-    { path: 'analytics.html', name: 'Analytics', icon: 'fa-chart-line', mobileOnly: false },
-    { path: 'import.html', name: 'Import', icon: 'fa-upload', mobileOnly: false },
-    { path: 'secret-keys.html', name: 'Keys', icon: 'fa-key', mobileOnly: false },
-    { path: 'admin-management.html', name: 'Admins', icon: 'fa-user-shield', mobileOnly: false }
+    { path: 'index.html', name: 'Home', icon: 'fa-home', mobileOnly: false, role: 'all' },
+    { path: 'groups.html', name: 'Groups', icon: 'fa-layer-group', mobileOnly: false, role: 'all' },
+    { path: 'tables.html', name: 'Tables', icon: 'fa-table', mobileOnly: false, role: 'all' },
+    { path: 'analytics.html', name: 'Analytics', icon: 'fa-chart-line', mobileOnly: false, role: 'all' },
+    { path: 'import.html', name: 'Import', icon: 'fa-upload', mobileOnly: false, role: 'all' },
+    { path: 'secret-keys.html', name: 'Keys', icon: 'fa-key', mobileOnly: false, role: 'super-admin' },
+    { path: 'admin-management.html', name: 'Admins', icon: 'fa-user-shield', mobileOnly: false, role: 'super-admin' }
 ];
 
 // Additional mobile-only items that don't appear in desktop header
 const MOBILE_ONLY_ITEMS = [];
 
-// Combine all navigation items for mobile
-const ALL_MOBILE_ITEMS = [...NAVIGATION_ITEMS.filter(item => !item.mobileOnly), ...MOBILE_ONLY_ITEMS];
+/**
+ * Get current admin role
+ * @returns {string|null} Admin role or null if not logged in
+ */
+function getCurrentAdminRole() {
+    try {
+        const admin = getCurrentAdmin();
+        return admin?.role || null;
+    } catch (error) {
+        console.error("Error getting admin role:", error);
+        return null;
+    }
+}
+
+/**
+ * Check if user can see a navigation item based on role
+ * @param {Object} item - Navigation item
+ * @returns {boolean} True if user can see the item
+ */
+function canSeeItem(item) {
+    if (item.role === 'all') return true;
+    const adminRole = getCurrentAdminRole();
+    if (item.role === 'super-admin') {
+        return adminRole === 'super-admin';
+    }
+    return true;
+}
 
 /**
  * Get current page filename from window location
@@ -43,11 +71,13 @@ export function isActivePage(path) {
 }
 
 /**
- * Create desktop navigation HTML
+ * Create desktop navigation HTML (role-aware)
  * @returns {string} HTML string for desktop navigation
  */
 export function createDesktopNav() {
-    const desktopNavItems = NAVIGATION_ITEMS.filter(item => !item.mobileOnly);
+    const desktopNavItems = NAVIGATION_ITEMS.filter(item => !item.mobileOnly && canSeeItem(item));
+    
+    if (desktopNavItems.length === 0) return '';
     
     return `
         <div class="desktop-nav">
@@ -61,13 +91,17 @@ export function createDesktopNav() {
 }
 
 /**
- * Create mobile bottom navigation HTML
+ * Create mobile bottom navigation HTML (role-aware)
  * @returns {string} HTML string for mobile bottom navigation
  */
 export function createMobileNav() {
+    const mobileItems = [...NAVIGATION_ITEMS.filter(item => canSeeItem(item)), ...MOBILE_ONLY_ITEMS];
+    
+    if (mobileItems.length === 0) return '';
+    
     return `
         <div class="bottom-nav">
-            ${ALL_MOBILE_ITEMS.map(item => `
+            ${mobileItems.map(item => `
                 <button class="nav-item ${isActivePage(item.path) ? 'active' : ''}" onclick="window.location.href='${item.path}'">
                     <i class="fas ${item.icon}"></i>
                     <span>${item.name}</span>
@@ -313,7 +347,6 @@ export function addNavigationStyles() {
  * Initialize navigation system
  * Call this function on every page that needs navigation
  * @param {Object} options - Configuration options
- * @param {boolean} options.addAuth - Whether to add authentication elements
  */
 export function initNavigation(options = {}) {
     addNavigationStyles();
@@ -374,6 +407,21 @@ export function getNavigationHTML() {
     };
 }
 
+/**
+ * Refresh navigation (call after login/role change)
+ */
+export function refreshNavigation() {
+    const desktopContainer = document.getElementById('desktopNavContainer');
+    const mobileContainer = document.getElementById('mobileNavContainer');
+    
+    if (desktopContainer) {
+        desktopContainer.innerHTML = createDesktopNav();
+    }
+    if (mobileContainer) {
+        mobileContainer.innerHTML = createMobileNav();
+    }
+}
+
 // Default export for convenience
 export default {
     NAVIGATION_ITEMS,
@@ -385,5 +433,6 @@ export default {
     addNavigationStyles,
     initNavigation,
     updateActiveNav,
-    getNavigationHTML
+    getNavigationHTML,
+    refreshNavigation
 };
