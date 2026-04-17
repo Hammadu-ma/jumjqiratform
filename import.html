@@ -454,7 +454,28 @@
     <div class="loading-text" id="loadingText">Processing file...</div>
     <div class="loading-progress"><div class="loading-progress-bar" id="loadingProgressBar"></div></div>
 </div>
-
+<!-- Add this at the beginning of your protected pages, before any other scripts -->
+<script type="module">
+    import { protectPage, initAuthUI, setupAutoLogout, getCurrentAdmin } from './auth.js';
+    
+    // Protect this page - redirects to login if not authenticated
+    if (!protectPage('admin-login.html')) {
+        // The redirect will happen automatically
+        throw new Error('Redirecting to login');
+    }
+    
+    // Initialize UI components (shows admin name, sets up logout buttons)
+    const admin = initAuthUI();
+    
+    // Setup auto-logout after 60 minutes of inactivity
+    setupAutoLogout(60);
+    
+    // Optional: Display admin info in console for debugging
+    console.log('Logged in as:', admin?.name, admin?.email);
+    
+    // Your page-specific code continues here...
+    console.log('Page loaded successfully with admin access');
+</script>
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, getDocs, doc, updateDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
