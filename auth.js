@@ -1,8 +1,8 @@
-// auth.js - Complete Authentication System for Noor Academy Admin Dashboard
+// auth.js - Complete Authentication System with Activity Logging
 // Import this file in all protected pages to verify admin access
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getFirestore, collection, getDocs, query, where, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, getDoc, query, where, orderBy, updateDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 // Firebase Configuration (same as your existing config)
 const firebaseConfig = {
@@ -17,6 +17,138 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const adminsCollection = collection(db, "admins");
+const activityCollection = collection(db, "adminActivities");
+const secretKeysCollection = collection(db, "secretKeys");
+
+// ==================== ACTIVITY LOGGING ====================
+
+/**
+ * Log admin activity to Firestore
+ * @param {string} adminId - Admin document ID
+ * @param {string} adminName - Admin full name
+ * @param {string} action - Action type (LOGIN, LOGOUT, CREATE, UPDATE, DELETE, VIEW, EXPORT, IMPORT)
+ * @param {string} details - Detailed description of the action
+ * @param {Object} additionalData - Optional additional data (IP, userAgent, etc.)
+ * @returns {Promise<void>}
+ */
+export async function logActivity(adminId, adminName, action, details, additionalData = {}) {
+    try {
+        const activityData = {
+            adminId: adminId,
+            adminName: adminName,
+            action: action,
+            details: details,
+            timestamp: new Date(),
+            userAgent: navigator.userAgent,
+            ...additionalData
+        };
+        await addDoc(activityCollection, activityData);
+        console.log(`Activity logged: ${action} - ${details}`);
+    } catch (error) {
+        console.error("Failed to log activity:", error);
+    }
+}
+
+/**
+ * Get activity logs for a specific admin
+ * @param {string} adminId - Admin document ID
+ * @param {number} limit - Maximum number of logs to return
+ * @returns {Promise<Array>} Array of activity logs
+ */
+export async function getAdminActivities(adminId, limit = 50) {
+    try {
+        const q = query(activityCollection, where('adminId', '==', adminId), orderBy('timestamp', 'desc'));
+        const snapshot = await getDocs(q);
+        const activities = [];
+        snapshot.forEach((doc) => {
+            activities.push({ id: doc.id, ...doc.data() });
+        });
+        return activities.slice(0, limit);
+    } catch (error) {
+        console.error("Error getting activities:", error);
+        return [];
+    }
+}
+
+/**
+ * Get all activity logs (for super admins)
+ * @param {number} limit - Maximum number of logs to return
+ * @returns {Promise<Array>} Array of all activity logs
+ */
+export async function getAllActivities(limit = 100) {
+    try {
+        const q = query(activityCollection, orderBy('timestamp', 'desc'));
+        const snapshot = await getDocs(q);
+        const activities = [];
+        snapshot.forEach((doc) => {
+            activities.push({ id: doc.id, ...doc.data() });
+        });
+        return activities.slice(0, limit);
+    } catch (error) {
+        console.error("Error getting all activities:", error);
+        return [];
+    }
+}
+
+/**
+ * Get recent activities within a time range
+ * @param {number} hours - Hours to look back
+ * @returns {Promise<Array>} Array of recent activities
+ */
+export async function getRecentActivities(hours = 24) {
+    try {
+        const cutoffTime = new Date(Date.now() - hours * 60 * 60 * 1000);
+        const q = query(activityCollection, orderBy('timestamp', 'desc'));
+        const snapshot = await getDocs(q);
+        const activities = [];
+        snapshot.forEach((doc) => {
+            const data = doc.data();
+            const timestamp = data.timestamp?.toDate?.() || new Date(data.timestamp);
+            if (timestamp >= cutoffTime) {
+                activities.push({ id: doc.id, ...data });
+            }
+        });
+        return activities;
+    } catch (error) {
+        console.error("Error getting recent activities:", error);
+        return [];
+    }
+}
+
+/**
+ * Get activity statistics (counts by action type)
+ * @returns {Promise<Object>} Statistics object
+ */
+export async function getActivityStats() {
+    try {
+        const snapshot = await getDocs(activityCollection);
+        const stats = {
+            total: 0,
+            byAction: {
+                LOGIN: 0,
+                LOGOUT: 0,
+                CREATE: 0,
+                UPDATE: 0,
+                DELETE: 0,
+                VIEW: 0,
+                EXPORT: 0,
+                IMPORT: 0
+            }
+        };
+        snapshot.forEach((doc) => {
+            const data = doc.data();
+            stats.total++;
+            if (stats.byAction[data.action] !== undefined) {
+                stats.byAction[data.action]++;
+            }
+        });
+        return stats;
+    } catch (error) {
+        console.error("Error getting activity stats:", error);
+        return { total: 0, byAction: {} };
+    }
+}
 
 // ==================== SESSION MANAGEMENT ====================
 
@@ -72,22 +204,27 @@ export function getCurrentAdmin() {
 }
 
 /**
- * Logout current admin
+ * Logout current admin and record the action
  */
-export function logout() {
+export async function logout() {
+    const admin = getCurrentAdmin();
+    if (admin) {
+        await logActivity(admin.id, admin.name, 'LOGOUT', 'Admin logged out');
+    }
     localStorage.removeItem('adminSession');
     sessionStorage.removeItem('adminLoggedIn');
+    sessionStorage.removeItem('redirectAfterLogin');
     
     // Dispatch logout event for any listeners
     window.dispatchEvent(new CustomEvent('admin-logout'));
 }
 
 /**
- * Create admin session after successful login
+ * Create admin session after successful login and log the action
  * @param {Object} adminData - Admin data from database
  * @param {string} adminId - Admin document ID
  */
-export function createSession(adminData, adminId) {
+export async function createSession(adminData, adminId) {
     const sessionData = {
         adminId: adminId,
         name: adminData.name,
@@ -98,6 +235,9 @@ export function createSession(adminData, adminId) {
     
     localStorage.setItem('adminSession', JSON.stringify(sessionData));
     sessionStorage.setItem('adminLoggedIn', 'true');
+    
+    // Log login activity
+    await logActivity(adminId, adminData.name, 'LOGIN', `Admin logged in from ${navigator.userAgent}`);
     
     // Dispatch login event
     window.dispatchEvent(new CustomEvent('admin-login', { detail: sessionData }));
@@ -113,7 +253,7 @@ export function createSession(adminData, adminId) {
  */
 export async function verifyAdminCredentials(email, password) {
     try {
-        const q = query(collection(db, "admins"), where('email', '==', email.trim().toLowerCase()));
+        const q = query(adminsCollection, where('email', '==', email.trim().toLowerCase()));
         const querySnapshot = await getDocs(q);
         
         if (querySnapshot.empty) {
@@ -132,6 +272,8 @@ export async function verifyAdminCredentials(email, password) {
         const hashedInputPassword = btoa(password + 'noor_salt_2024');
         
         if (adminData.password !== hashedInputPassword) {
+            // Log failed login attempt
+            await logActivity(adminId, adminData.name, 'LOGIN_FAILED', `Failed login attempt for ${email}`);
             return { success: false, message: 'Invalid email or password' };
         }
         
@@ -171,7 +313,7 @@ export async function adminExists(adminId) {
  */
 export async function validateSecretKey(secretKey) {
     try {
-        const querySnapshot = await getDocs(collection(db, "secretKeys"));
+        const querySnapshot = await getDocs(secretKeysCollection);
         let isValid = false;
         let validKey = null;
         
@@ -234,6 +376,7 @@ export function protectPageWithRole(allowedRoles, redirectUrl = 'admin-login.htm
 /**
  * Initialize auth UI components on a page
  * Shows admin name in header, adds logout button functionality
+ * @returns {Object|null} Current admin or null
  */
 export function initAuthUI() {
     const admin = getCurrentAdmin();
@@ -251,18 +394,146 @@ export function initAuthUI() {
             adminEmailElement.textContent = admin.email;
         }
         
-        // Add logout functionality to logout buttons
+        // Update admin role display if element exists
+        const adminRoleElement = document.getElementById('adminRoleDisplay');
+        if (adminRoleElement) {
+            adminRoleElement.textContent = admin.role;
+        }
+        
+        // Add logout functionality to logout buttons with activity logging
         const logoutButtons = document.querySelectorAll('.logout-btn, #logoutBtn');
         logoutButtons.forEach(btn => {
-            btn.addEventListener('click', (e) => {
+            btn.addEventListener('click', async (e) => {
                 e.preventDefault();
-                logout();
+                await logout();
                 window.location.href = 'admin-login.html';
             });
         });
     }
     
     return admin;
+}
+
+// ==================== ADMIN MANAGEMENT FUNCTIONS ====================
+
+/**
+ * Get all admins (for super admin panel)
+ * @returns {Promise<Array>} List of all admins
+ */
+export async function getAllAdmins() {
+    try {
+        const snapshot = await getDocs(adminsCollection);
+        const admins = [];
+        snapshot.forEach((doc) => {
+            const data = doc.data();
+            admins.push({
+                id: doc.id,
+                name: data.name,
+                email: data.email,
+                role: data.role || 'admin',
+                createdAt: data.createdAt?.toDate?.() || new Date(data.createdAt)
+            });
+        });
+        return admins;
+    } catch (error) {
+        console.error("Error getting admins:", error);
+        return [];
+    }
+}
+
+/**
+ * Update admin information with activity logging
+ * @param {string} adminId - Admin ID to update
+ * @param {Object} updateData - Data to update
+ * @param {string} updaterId - ID of admin performing the update
+ * @param {string} updaterName - Name of admin performing the update
+ * @returns {Promise<boolean>} Success status
+ */
+export async function updateAdmin(adminId, updateData, updaterId, updaterName) {
+    try {
+        const adminRef = doc(db, "admins", adminId);
+        const oldAdmin = await getDoc(adminRef);
+        const oldData = oldAdmin.data();
+        
+        await updateDoc(adminRef, {
+            ...updateData,
+            updatedAt: new Date()
+        });
+        
+        // Log the update action
+        const changes = [];
+        if (updateData.name && updateData.name !== oldData.name) changes.push(`name: ${oldData.name} → ${updateData.name}`);
+        if (updateData.role && updateData.role !== oldData.role) changes.push(`role: ${oldData.role} → ${updateData.role}`);
+        if (updateData.email && updateData.email !== oldData.email) changes.push(`email: ${oldData.email} → ${updateData.email}`);
+        
+        await logActivity(updaterId, updaterName, 'UPDATE', `Updated admin ${oldData.name}: ${changes.join(', ')}`);
+        return true;
+    } catch (error) {
+        console.error("Error updating admin:", error);
+        return false;
+    }
+}
+
+/**
+ * Delete admin with activity logging
+ * @param {string} adminId - Admin ID to delete
+ * @param {string} deleterId - ID of admin performing the deletion
+ * @param {string} deleterName - Name of admin performing the deletion
+ * @returns {Promise<boolean>} Success status
+ */
+export async function deleteAdmin(adminId, deleterId, deleterName) {
+    try {
+        const adminRef = doc(db, "admins", adminId);
+        const admin = await getDoc(adminRef);
+        const adminData = admin.data();
+        
+        await deleteDoc(adminRef);
+        
+        await logActivity(deleterId, deleterName, 'DELETE', `Deleted admin ${adminData?.name || adminId}`);
+        return true;
+    } catch (error) {
+        console.error("Error deleting admin:", error);
+        return false;
+    }
+}
+
+// ==================== PAGE VIEW TRACKING ====================
+
+/**
+ * Track page view for analytics
+ * @param {string} pageName - Name of the page being viewed
+ */
+export async function trackPageView(pageName) {
+    const admin = getCurrentAdmin();
+    if (admin) {
+        await logActivity(admin.id, admin.name, 'VIEW', `Viewed page: ${pageName}`);
+    }
+}
+
+// ==================== EXPORT FUNCTIONS ====================
+
+/**
+ * Log export action
+ * @param {string} exportType - Type of export (CSV, Excel, PDF, Word)
+ * @param {number} recordCount - Number of records exported
+ */
+export async function logExport(exportType, recordCount) {
+    const admin = getCurrentAdmin();
+    if (admin) {
+        await logActivity(admin.id, admin.name, 'EXPORT', `Exported ${recordCount} records as ${exportType}`);
+    }
+}
+
+/**
+ * Log import action
+ * @param {number} recordCount - Number of records imported
+ * @param {string} source - Source file type
+ */
+export async function logImport(recordCount, source) {
+    const admin = getCurrentAdmin();
+    if (admin) {
+        await logActivity(admin.id, admin.name, 'IMPORT', `Imported ${recordCount} records from ${source}`);
+    }
 }
 
 // ==================== API PROTECTION HELPERS ====================
@@ -305,9 +576,9 @@ export function setupAutoLogout(timeoutMinutes = 60) {
     
     function resetTimer() {
         if (logoutTimer) clearTimeout(logoutTimer);
-        logoutTimer = setTimeout(() => {
+        logoutTimer = setTimeout(async () => {
             if (isLoggedIn()) {
-                logout();
+                await logout();
                 alert('Your session has expired. Please login again.');
                 window.location.href = 'admin-login.html';
             }
@@ -315,7 +586,7 @@ export function setupAutoLogout(timeoutMinutes = 60) {
     }
     
     // Reset timer on user activity
-    const events = ['mousedown', 'keypress', 'scroll', 'touchstart'];
+    const events = ['mousedown', 'keypress', 'scroll', 'touchstart', 'click'];
     events.forEach(event => {
         document.addEventListener(event, resetTimer);
     });
@@ -326,14 +597,16 @@ export function setupAutoLogout(timeoutMinutes = 60) {
 // ==================== REGISTRATION HELPER ====================
 
 /**
- * Register a new admin
+ * Register a new admin with activity logging
  * @param {Object} adminData - Admin data { name, email, password, secretKey }
+ * @param {string} registrarId - ID of admin performing registration (if any)
+ * @param {string} registrarName - Name of admin performing registration
  * @returns {Promise<Object>} { success, message, adminId }
  */
-export async function registerAdmin(adminData) {
+export async function registerAdmin(adminData, registrarId = null, registrarName = null) {
     try {
         // Check if email already exists
-        const emailQuery = query(collection(db, "admins"), where('email', '==', adminData.email.toLowerCase()));
+        const emailQuery = query(adminsCollection, where('email', '==', adminData.email.toLowerCase()));
         const emailSnapshot = await getDocs(emailQuery);
         
         if (!emailSnapshot.empty) {
@@ -360,7 +633,15 @@ export async function registerAdmin(adminData) {
             updatedAt: new Date()
         };
         
-        const docRef = await addDoc(collection(db, "admins"), newAdmin);
+        const docRef = await addDoc(adminsCollection, newAdmin);
+        
+        // Log registration
+        if (registrarId && registrarName) {
+            await logActivity(registrarId, registrarName, 'CREATE', `Registered new admin: ${adminData.name} (${adminData.email})`);
+        } else {
+            // Self-registration
+            await logActivity(docRef.id, adminData.name, 'CREATE', `Self-registration completed`);
+        }
         
         return { success: true, message: 'Admin registered successfully', adminId: docRef.id };
         
@@ -389,7 +670,18 @@ if (typeof window !== 'undefined') {
         setupAutoLogout,
         validateSecretKey,
         registerAdmin,
-        adminExists
+        adminExists,
+        logActivity,
+        getAdminActivities,
+        getAllActivities,
+        getRecentActivities,
+        getActivityStats,
+        getAllAdmins,
+        updateAdmin,
+        deleteAdmin,
+        trackPageView,
+        logExport,
+        logImport
     };
 }
 
@@ -409,5 +701,16 @@ export default {
     setupAutoLogout,
     validateSecretKey,
     registerAdmin,
-    adminExists
+    adminExists,
+    logActivity,
+    getAdminActivities,
+    getAllActivities,
+    getRecentActivities,
+    getActivityStats,
+    getAllAdmins,
+    updateAdmin,
+    deleteAdmin,
+    trackPageView,
+    logExport,
+    logImport
 };
