@@ -1,6 +1,6 @@
 {
-  "name": "ALIF",
-  "short_name": "ALIF",
+  "name": "Irshad App",
+  "short_name": "Irshad",
   "description": "Your medical academic success partner",
   "start_url": "/index.html",
   "display": "standalone",
