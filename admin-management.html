@@ -396,7 +396,6 @@
 
     <!-- Two Column Layout -->
     <div class="two-columns">
-        <!-- Left: Admin List -->
         <div class="card">
             <div class="card-header">
                 <div class="card-title"><i class="fas fa-users"></i> All Administrators</div>
@@ -407,7 +406,6 @@
             </div>
         </div>
 
-        <!-- Right: Admin Details -->
         <div class="card">
             <div class="card-header">
                 <div class="card-title"><i class="fas fa-user-edit"></i> Admin Details</div>
@@ -422,7 +420,6 @@
         </div>
     </div>
 
-    <!-- Activity Log Section -->
     <div class="card" style="margin-top: 24px;">
         <div class="card-header">
             <div class="card-title"><i class="fas fa-history"></i> Admin Activity Log</div>
@@ -481,28 +478,53 @@
 
 <script type="module">
     import { 
-        initializeApp, getCurrentAdmin, isLoggedIn, protectPage, initAuthUI, setupAutoLogout, logout,
-        getAllAdmins, getAllActivities, getRecentActivities, getActivityStats, updateAdmin, deleteAdmin, 
-        registerAdmin, logActivity, getAdminActivities
+        getCurrentAdmin, protectPageWithRole, initAuthUI, setupAutoLogout, logout,
+        getAllAdmins, getAllActivities, getActivityStats, updateAdmin, deleteAdmin, logActivity
     } from './auth.js';
     
-    // Re-initialize Firebase for this page (auth.js already does this)
+    // DOM Elements
+    const toast = document.getElementById('toast');
+    const adminListDiv = document.getElementById('adminList');
+    const adminDetailsPanel = document.getElementById('adminDetailsPanel');
+    const activityList = document.getElementById('activityList');
+    const totalAdminsSpan = document.getElementById('totalAdmins');
+    const totalActionsSpan = document.getElementById('totalActions');
+    const todayActionsSpan = document.getElementById('todayActions');
+    const addAdminBtn = document.getElementById('addAdminBtn');
+    const refreshActivityBtn = document.getElementById('refreshActivityBtn');
+    const activityFilter = document.getElementById('activityFilter');
+    const logoutBtn = document.getElementById('logoutBtn');
+    
     let allAdmins = [];
     let selectedAdminId = null;
     let pendingDeleteId = null;
     let allActivities = [];
     
-    const toast = document.getElementById('toast');
-    function showToast(msg, isErr = false) { toast.textContent = msg; toast.style.background = isErr ? '#ef4444' : '#10b981'; toast.style.display = 'block'; setTimeout(() => toast.style.display = 'none', 3000); }
-    function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
-    function formatDate(date) { if (!date) return 'Unknown'; return new Date(date).toLocaleString(); }
+    function showToast(msg, isErr = false) { 
+        toast.textContent = msg; 
+        toast.style.background = isErr ? '#ef4444' : '#10b981'; 
+        toast.style.display = 'block'; 
+        setTimeout(() => toast.style.display = 'none', 3000); 
+    }
     
-    // Protect page
-    if (!protectPage('admin-login.html')) throw new Error('Redirecting');
+    function escapeHtml(str) { 
+        if (!str) return ''; 
+        return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); 
+    }
+    
+    function formatDate(date) { 
+        if (!date) return 'Unknown'; 
+        return new Date(date).toLocaleString(); 
+    }
+    
+    // Protect page - only super admins and admins can access
+    if (!protectPageWithRole(['super-admin', 'admin'], 'admin-login.html')) {
+        throw new Error('Redirecting');
+    }
+    
     const currentAdmin = initAuthUI();
     setupAutoLogout(60);
     
-    // Update header with current admin
     if (currentAdmin) {
         document.getElementById('currentAdminName').textContent = currentAdmin.name;
         document.getElementById('currentAdminAvatar').textContent = currentAdmin.name.charAt(0).toUpperCase();
@@ -512,17 +534,19 @@
     async function loadAdmins() {
         try {
             allAdmins = await getAllAdmins();
-            document.getElementById('totalAdmins').textContent = allAdmins.length;
+            totalAdminsSpan.textContent = allAdmins.length;
             renderAdminList();
             if (selectedAdminId) loadAdminDetails(selectedAdminId);
         } catch (error) { console.error(error); }
     }
     
     function renderAdminList() {
-        const container = document.getElementById('adminList');
-        if (allAdmins.length === 0) { container.innerHTML = '<div class="empty-state">No admins found</div>'; return; }
-        container.innerHTML = allAdmins.map(admin => `
-            <div class="admin-item ${selectedAdminId === admin.id ? 'selected' : ''}" onclick="window.selectAdmin('${admin.id}')">
+        if (allAdmins.length === 0) { 
+            adminListDiv.innerHTML = '<div class="empty-state">No admins found</div>'; 
+            return; 
+        }
+        adminListDiv.innerHTML = allAdmins.map(admin => `
+            <div class="admin-item ${selectedAdminId === admin.id ? 'selected' : ''}" onclick="selectAdmin('${admin.id}')">
                 <div class="admin-avatar">${(admin.name.charAt(0) || 'A').toUpperCase()}</div>
                 <div class="admin-info">
                     <div class="admin-name">${escapeHtml(admin.name)} <span class="admin-role-badge">${escapeHtml(admin.role)}</span></div>
@@ -544,8 +568,7 @@
         const admin = allAdmins.find(a => a.id === id);
         if (!admin) return;
         document.getElementById('selectedAdminBadge').innerHTML = `<i class="fas fa-check-circle"></i> Editing: ${escapeHtml(admin.name)}`;
-        const panel = document.getElementById('adminDetailsPanel');
-        panel.innerHTML = `
+        adminDetailsPanel.innerHTML = `
             <form id="editAdminForm">
                 <div class="form-group"><label><i class="fas fa-user"></i> Full Name</label><div class="input-wrapper"><i class="fas fa-user input-icon"></i><input type="text" id="editName" value="${escapeHtml(admin.name)}"></div></div>
                 <div class="form-group"><label><i class="fas fa-envelope"></i> Email</label><div class="input-wrapper"><i class="fas fa-envelope input-icon"></i><input type="email" id="editEmail" value="${escapeHtml(admin.email)}"></div></div>
@@ -584,12 +607,15 @@
         if (!name || !email || !password) { showToast('All fields required', true); return false; }
         if (password.length < 6) { showToast('Password must be at least 6 characters', true); return false; }
         const hashedPassword = btoa(password + 'noor_salt_2024');
-        const newAdmin = { name, email: email.toLowerCase(), password: hashedPassword, role, createdAt: new Date(), updatedAt: new Date() };
+        const { getFirestore, collection, addDoc } = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js');
+        const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js');
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
         try {
-            const { addDoc, collection } = await import('./auth.js');
-            const { getFirestore } = await import('./auth.js');
-            const db = getFirestore();
-            await addDoc(collection(db, "admins"), newAdmin);
+            await addDoc(collection(db, "admins"), {
+                name, email: email.toLowerCase(), password: hashedPassword, role,
+                createdAt: new Date(), updatedAt: new Date()
+            });
             await logActivity(currentAdmin.id, currentAdmin.name, 'CREATE', `Added new admin: ${name} (${email})`);
             showToast('Admin added successfully');
             await loadAdmins();
@@ -603,7 +629,11 @@
             const success = await deleteAdmin(id, currentAdmin.id, currentAdmin.name);
             if (success) {
                 showToast('Admin deleted successfully');
-                if (selectedAdminId === id) { selectedAdminId = null; document.getElementById('selectedAdminBadge').innerHTML = 'Select an admin'; document.getElementById('adminDetailsPanel').innerHTML = '<div class="empty-state" style="padding:60px 20px;"><i class="fas fa-user-circle fa-3x"></i><p>Select an admin to view details</p></div>'; }
+                if (selectedAdminId === id) { 
+                    selectedAdminId = null; 
+                    document.getElementById('selectedAdminBadge').innerHTML = 'Select an admin'; 
+                    adminDetailsPanel.innerHTML = '<div class="empty-state"><i class="fas fa-user-circle fa-3x"></i><p>Select an admin to view details</p></div>';
+                }
                 await loadAdmins();
                 await loadAllActivities();
             }
@@ -614,31 +644,31 @@
         try {
             allActivities = await getAllActivities(100);
             const stats = await getActivityStats();
-            document.getElementById('totalActions').textContent = stats.total || 0;
+            totalActionsSpan.textContent = stats.total || 0;
             const today = new Date().toDateString();
             const todayCount = allActivities.filter(a => {
                 const d = a.timestamp?.toDate?.() || new Date(a.timestamp);
                 return d.toDateString() === today;
             }).length;
-            document.getElementById('todayActions').textContent = todayCount;
+            todayActionsSpan.textContent = todayCount;
             renderActivityLog(allActivities);
         } catch (error) { console.error(error); }
     }
     
     async function loadAdminActivities(adminId) {
         try {
+            const { getAdminActivities } = await import('./auth.js');
             const activities = await getAdminActivities(adminId, 50);
             renderActivityLog(activities);
         } catch (error) { console.error(error); }
     }
     
     function renderActivityLog(activities) {
-        const container = document.getElementById('activityList');
-        const filter = document.getElementById('activityFilter').value;
+        const filter = activityFilter.value;
         let filtered = activities;
         if (filter !== 'all') filtered = activities.filter(a => a.action === filter);
-        if (filtered.length === 0) { container.innerHTML = '<div class="empty-state">No activities found</div>'; return; }
-        container.innerHTML = filtered.map(act => {
+        if (filtered.length === 0) { activityList.innerHTML = '<div class="empty-state">No activities found</div>'; return; }
+        activityList.innerHTML = filtered.map(act => {
             const timestamp = act.timestamp?.toDate?.() || new Date(act.timestamp);
             let icon = 'fa-bell';
             if (act.action === 'LOGIN') icon = 'fa-sign-in-alt';
@@ -661,7 +691,6 @@
         }).join('');
     }
     
-    // Modal Functions
     function openAddAdminModal() {
         document.getElementById('modalTitle').innerHTML = '<i class="fas fa-user-plus"></i> Add New Admin';
         document.getElementById('modalName').value = '';
@@ -670,10 +699,15 @@
         document.getElementById('modalRole').value = 'admin';
         document.getElementById('adminModal').classList.add('active');
     }
+    
     window.closeAdminModal = () => document.getElementById('adminModal').classList.remove('active');
-    function closeDeleteModal() { document.getElementById('deleteModal').classList.remove('active'); pendingDeleteId = null; }
-    window.closeDeleteModal = closeDeleteModal;
-    function showDeleteConfirm(id, name) { pendingDeleteId = id; document.getElementById('deleteAdminName').innerHTML = `Are you sure you want to delete "<strong>${escapeHtml(name)}</strong>"?`; document.getElementById('deleteModal').classList.add('active'); }
+    window.closeDeleteModal = () => document.getElementById('deleteModal').classList.remove('active');
+    
+    function showDeleteConfirm(id, name) { 
+        pendingDeleteId = id; 
+        document.getElementById('deleteAdminName').innerHTML = `Are you sure you want to delete "<strong>${escapeHtml(name)}</strong>"?`; 
+        document.getElementById('deleteModal').classList.add('active'); 
+    }
     
     document.getElementById('adminForm').addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -693,12 +727,20 @@
         }
     };
     
-    document.getElementById('addAdminBtn').onclick = openAddAdminModal;
-    document.getElementById('refreshActivityBtn').onclick = () => { if (selectedAdminId) loadAdminActivities(selectedAdminId); else loadAllActivities(); };
-    document.getElementById('activityFilter').addEventListener('change', () => { if (selectedAdminId) loadAdminActivities(selectedAdminId); else renderActivityLog(allActivities); });
-    document.getElementById('logoutBtn').addEventListener('click', async () => { await logout(); window.location.href = 'admin-login.html'; });
+    addAdminBtn.onclick = openAddAdminModal;
+    refreshActivityBtn.onclick = () => { if (selectedAdminId) loadAdminActivities(selectedAdminId); else loadAllActivities(); };
+    activityFilter.addEventListener('change', () => { if (selectedAdminId) loadAdminActivities(selectedAdminId); else renderActivityLog(allActivities); });
+    logoutBtn.addEventListener('click', async () => { await logout(); window.location.href = 'admin-login.html'; });
     
-    // Initial loads
+    const firebaseConfig = {
+        apiKey: "AIzaSyAR_g5y04YAGCrTvZCowrE7hw8h7k1du08",
+        authDomain: "jujm-qirat.firebaseapp.com",
+        projectId: "jujm-qirat",
+        storageBucket: "jujm-qirat.firebasestorage.app",
+        messagingSenderId: "253413984903",
+        appId: "1:253413984903:web:c1577e0fdef1711f960622"
+    };
+    
     await loadAdmins();
     await loadAllActivities();
 </script>
