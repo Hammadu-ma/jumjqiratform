@@ -40,20 +40,13 @@
         }
 
         .register-container {
-            max-width: 1400px;
+            max-width: 600px;
             width: 100%;
             margin: 0 auto;
         }
 
-        /* Two Column Layout */
-        .two-columns {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 32px;
-        }
-
-        /* Glass Card */
-        .register-card, .admin-list-card {
+        /* Single Column Layout - Responsive */
+        .register-card {
             background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(10px);
             border-radius: 48px;
@@ -61,7 +54,6 @@
             box-shadow: var(--shadow-xl);
             border: 1px solid rgba(16, 185, 129, 0.2);
             transition: all 0.3s ease;
-            height: fit-content;
         }
 
         .logo {
@@ -79,6 +71,7 @@
             align-items: center;
             justify-content: center;
             gap: 12px;
+            flex-wrap: wrap;
         }
 
         .logo i {
@@ -267,117 +260,6 @@
             transform: none;
         }
 
-        /* Admin List Styles */
-        .admin-list-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        .admin-list-header h3 {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        .refresh-btn {
-            background: var(--primary-light);
-            border: none;
-            padding: 8px 20px;
-            border-radius: 40px;
-            cursor: pointer;
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: var(--primary-dark);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.2s;
-        }
-
-        .refresh-btn:hover {
-            background: var(--primary);
-            color: white;
-        }
-
-        .admin-list {
-            max-height: 500px;
-            overflow-y: auto;
-        }
-
-        .admin-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px;
-            border-bottom: 1px solid var(--border);
-            transition: background 0.2s;
-        }
-
-        .admin-item:hover {
-            background: var(--primary-light);
-        }
-
-        .admin-info {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .admin-name {
-            font-weight: 700;
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .admin-name i {
-            color: var(--primary);
-        }
-
-        .admin-email {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-
-        .admin-date {
-            font-size: 0.65rem;
-            color: var(--text-muted);
-        }
-
-        .admin-role {
-            background: var(--primary-light);
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.65rem;
-            font-weight: 600;
-            color: var(--primary-dark);
-        }
-
-        .delete-admin {
-            background: none;
-            border: none;
-            color: var(--danger);
-            cursor: pointer;
-            padding: 8px 12px;
-            border-radius: 30px;
-            transition: all 0.2s;
-        }
-
-        .delete-admin:hover {
-            background: #fee2e2;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 60px;
-            color: var(--text-muted);
-        }
-
         /* Messages */
         .message {
             padding: 12px 16px;
@@ -446,121 +328,205 @@
             text-decoration: underline;
         }
 
-        /* Responsive */
-        @media (max-width: 1024px) {
-            .two-columns {
-                grid-template-columns: 1fr;
-                gap: 24px;
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body { 
+                padding: 16px; 
+            }
+            .register-card { 
+                padding: 24px 20px;
+                border-radius: 32px;
+            }
+            .logo h1 { 
+                font-size: 1.4rem; 
+            }
+            .logo i {
+                font-size: 1.6rem;
+            }
+            .input-wrapper input, .input-wrapper select {
+                padding: 12px 45px 12px 42px;
+                font-size: 0.9rem;
+            }
+            .btn-register {
+                padding: 12px 24px;
+                font-size: 0.9rem;
+            }
+            .password-requirements {
+                gap: 8px;
+                font-size: 0.6rem;
+            }
+            .req-item {
+                font-size: 0.6rem;
             }
         }
 
-        @media (max-width: 768px) {
-            body { padding: 16px; }
-            .register-card, .admin-list-card { padding: 24px 20px; }
-            .logo h1 { font-size: 1.4rem; }
+        @media (max-width: 480px) {
+            body { 
+                padding: 12px; 
+            }
+            .register-card { 
+                padding: 20px 16px;
+                border-radius: 28px;
+            }
+            .logo h1 { 
+                font-size: 1.2rem; 
+            }
+            .logo i {
+                font-size: 1.4rem;
+            }
+            .logo p {
+                font-size: 0.75rem;
+            }
+            .form-group {
+                margin-bottom: 16px;
+            }
+            .form-group label {
+                font-size: 0.75rem;
+            }
+            .input-wrapper input, .input-wrapper select {
+                padding: 10px 40px 10px 38px;
+                font-size: 0.85rem;
+            }
+            .input-wrapper i.input-icon {
+                left: 12px;
+                font-size: 0.85rem;
+            }
+            .toggle-visibility {
+                right: 12px;
+                padding: 6px;
+            }
+            .btn-register {
+                padding: 10px 20px;
+                font-size: 0.85rem;
+            }
+            .password-requirements {
+                gap: 6px;
+            }
+            .req-item {
+                font-size: 0.55rem;
+            }
+            .message {
+                padding: 10px 12px;
+                font-size: 0.75rem;
+                margin-bottom: 20px;
+            }
+            .login-link {
+                margin-top: 20px;
+                padding-top: 20px;
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .register-card {
+                padding: 16px 12px;
+                border-radius: 24px;
+            }
+            .logo h1 {
+                font-size: 1.1rem;
+            }
+            .password-requirements {
+                flex-direction: column;
+                gap: 4px;
+            }
         }
     </style>
 </head>
 <body>
 
 <div class="register-container">
-    <div class="two-columns">
-        <!-- Registration Form Column -->
-        <div class="register-card">
-            <div class="logo">
-                <h1><i class="fas fa-user-shield"></i> Admin Registration</h1>
-                <p>Create a new administrator account</p>
-            </div>
-
-            <div id="messageContainer"></div>
-
-            <form id="registerForm">
-                <div class="form-group">
-                    <label><i class="fas fa-user"></i> Full Name <span class="required">*</span></label>
-                    <div class="input-wrapper">
-                        <i class="fas fa-user-circle input-icon"></i>
-                        <input type="text" id="adminName" placeholder="Enter full name" autocomplete="off">
-                    </div>
-                    <span class="error-message" id="nameError"></span>
-                </div>
-
-                <div class="form-group">
-                    <label><i class="fas fa-envelope"></i> Email Address <span class="required">*</span></label>
-                    <div class="input-wrapper">
-                        <i class="fas fa-envelope input-icon"></i>
-                        <input type="email" id="adminEmail" placeholder="admin@example.com" autocomplete="off">
-                    </div>
-                    <span class="error-message" id="emailError"></span>
-                </div>
-
-                <div class="form-group">
-                    <label><i class="fas fa-lock"></i> Password <span class="required">*</span></label>
-                    <div class="input-wrapper">
-                        <i class="fas fa-lock input-icon"></i>
-                        <input type="password" id="password" placeholder="Create a strong password" autocomplete="new-password">
-                        <button type="button" class="toggle-visibility" data-target="password">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    </div>
-                    <div class="password-strength">
-                        <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
-                        <span class="strength-text" id="strengthText">Not set</span>
-                    </div>
-                    <div class="password-requirements" id="passwordReqs">
-                        <span class="req-item" id="reqLength"><i class="fas fa-circle"></i> 8+ characters</span>
-                        <span class="req-item" id="reqUpper"><i class="fas fa-circle"></i> Uppercase</span>
-                        <span class="req-item" id="reqLower"><i class="fas fa-circle"></i> Lowercase</span>
-                        <span class="req-item" id="reqNumber"><i class="fas fa-circle"></i> Number</span>
-                        <span class="req-item" id="reqSpecial"><i class="fas fa-circle"></i> Special character</span>
-                    </div>
-                    <span class="error-message" id="passwordError"></span>
-                </div>
-
-                <div class="form-group">
-                    <label><i class="fas fa-check-circle"></i> Confirm Password <span class="required">*</span></label>
-                    <div class="input-wrapper">
-                        <i class="fas fa-check-circle input-icon"></i>
-                        <input type="password" id="confirmPassword" placeholder="Confirm your password" autocomplete="off">
-                        <button type="button" class="toggle-visibility" data-target="confirmPassword">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    </div>
-                    <span class="error-message" id="confirmError"></span>
-                </div>
-
-                <div class="form-group">
-                    <label><i class="fas fa-key"></i> Secret Key <span class="required">*</span></label>
-                    <div class="input-wrapper">
-                        <i class="fas fa-key input-icon"></i>
-                        <input type="password" id="secretKey" placeholder="Enter your secret key" autocomplete="off">
-                        <button type="button" class="toggle-visibility" data-target="secretKey">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    </div>
-                    <span class="error-message" id="keyError"></span>
-                    <div style="font-size:0.65rem; color:var(--text-muted); margin-top:6px;">
-                        <i class="fas fa-info-circle"></i> Contact the system administrator to get a valid secret key
-                    </div>
-                </div>
-
-                <button type="submit" class="btn-register" id="registerBtn">
-                    <i class="fas fa-user-plus"></i>
-                    <span>Register as Admin</span>
-                </button>
-            </form>
-
-            <div class="login-link">
-                Already have an account? <a href="admin-login.html">Login here</a>
-            </div>
+    <div class="register-card">
+        <div class="logo">
+            <h1><i class="fas fa-user-shield"></i> Admin Registration</h1>
+            <p>Create a new administrator account</p>
         </div>
 
-        
+        <div id="messageContainer"></div>
+
+        <form id="registerForm">
+            <div class="form-group">
+                <label><i class="fas fa-user"></i> Full Name <span class="required">*</span></label>
+                <div class="input-wrapper">
+                    <i class="fas fa-user-circle input-icon"></i>
+                    <input type="text" id="adminName" placeholder="Enter full name" autocomplete="off">
+                </div>
+                <span class="error-message" id="nameError"></span>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-envelope"></i> Email Address <span class="required">*</span></label>
+                <div class="input-wrapper">
+                    <i class="fas fa-envelope input-icon"></i>
+                    <input type="email" id="adminEmail" placeholder="admin@example.com" autocomplete="off">
+                </div>
+                <span class="error-message" id="emailError"></span>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-lock"></i> Password <span class="required">*</span></label>
+                <div class="input-wrapper">
+                    <i class="fas fa-lock input-icon"></i>
+                    <input type="password" id="password" placeholder="Create a strong password" autocomplete="new-password">
+                    <button type="button" class="toggle-visibility" data-target="password">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+                <div class="password-strength">
+                    <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+                    <span class="strength-text" id="strengthText">Not set</span>
+                </div>
+                <div class="password-requirements" id="passwordReqs">
+                    <span class="req-item" id="reqLength"><i class="fas fa-circle"></i> 8+ characters</span>
+                    <span class="req-item" id="reqUpper"><i class="fas fa-circle"></i> Uppercase</span>
+                    <span class="req-item" id="reqLower"><i class="fas fa-circle"></i> Lowercase</span>
+                    <span class="req-item" id="reqNumber"><i class="fas fa-circle"></i> Number</span>
+                    <span class="req-item" id="reqSpecial"><i class="fas fa-circle"></i> Special character</span>
+                </div>
+                <span class="error-message" id="passwordError"></span>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-check-circle"></i> Confirm Password <span class="required">*</span></label>
+                <div class="input-wrapper">
+                    <i class="fas fa-check-circle input-icon"></i>
+                    <input type="password" id="confirmPassword" placeholder="Confirm your password" autocomplete="off">
+                    <button type="button" class="toggle-visibility" data-target="confirmPassword">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+                <span class="error-message" id="confirmError"></span>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-key"></i> Secret Key <span class="required">*</span></label>
+                <div class="input-wrapper">
+                    <i class="fas fa-key input-icon"></i>
+                    <input type="password" id="secretKey" placeholder="Enter your secret key" autocomplete="off">
+                    <button type="button" class="toggle-visibility" data-target="secretKey">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+                <span class="error-message" id="keyError"></span>
+                <div style="font-size:0.65rem; color:var(--text-muted); margin-top:6px;">
+                    <i class="fas fa-info-circle"></i> Contact the system administrator to get a valid secret key
+                </div>
+            </div>
+
+            <button type="submit" class="btn-register" id="registerBtn">
+                <i class="fas fa-user-plus"></i>
+                <span>Register as Admin</span>
+            </button>
+        </form>
+
+        <div class="login-link">
+            Already have an account? <a href="admin-login.html">Login here</a>
+        </div>
     </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, query, orderBy, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, addDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     
     const firebaseConfig = {
         apiKey: "AIzaSyAR_g5y04YAGCrTvZCowrE7hw8h7k1du08",
@@ -585,8 +551,6 @@
     const registerBtn = document.getElementById('registerBtn');
     const registerForm = document.getElementById('registerForm');
     const messageContainer = document.getElementById('messageContainer');
-    const adminList = document.getElementById('adminList');
-    const refreshBtn = document.getElementById('refreshAdminsBtn');
     
     // Password strength elements
     const strengthFill = document.getElementById('strengthFill');
@@ -779,73 +743,17 @@
             showMessage('✅ Admin registered successfully!', 'success');
             adminName.value = ''; adminEmail.value = ''; passwordInput.value = ''; confirmPasswordInput.value = ''; secretKeyInput.value = '';
             checkPasswordStrength('');
-            await loadAdmins();
             setTimeout(() => { window.location.href = 'admin-login.html'; }, 2000);
         } catch (error) { showMessage('Registration failed: ' + error.message, 'error'); }
         finally { registerBtn.disabled = false; registerBtn.innerHTML = '<i class="fas fa-user-plus"></i> Register as Admin'; }
     }
     
-    async function loadAdmins() {
-        try {
-            const q = query(adminsCollection, orderBy('createdAt', 'desc'));
-            const querySnapshot = await getDocs(q);
-            const admins = [];
-            querySnapshot.forEach((docSnap) => {
-                const data = docSnap.data();
-                admins.push({
-                    id: docSnap.id, name: data.name, email: data.email, role: data.role || 'admin',
-                    createdAt: data.createdAt?.toDate?.() || new Date(data.createdAt) || new Date()
-                });
-            });
-            renderAdminList(admins);
-        } catch (error) { adminList.innerHTML = '<div class="empty-state">Failed to load admins</div>'; }
-    }
-    
-    async function deleteAdmin(id, name) {
-        if (confirm(`Are you sure you want to remove "${name}" from admin list?`)) {
-            try {
-                await deleteDoc(doc(db, "admins", id));
-                showMessage(`Admin "${name}" removed successfully`, 'success');
-                await loadAdmins();
-            } catch (error) { showMessage('Failed to remove admin: ' + error.message, 'error'); }
-        }
-    }
-    
-    function renderAdminList(admins) {
-        if (admins.length === 0) { adminList.innerHTML = '<div class="empty-state">No admins registered yet</div>'; return; }
-        adminList.innerHTML = admins.map(admin => `
-            <div class="admin-item">
-                <div class="admin-info">
-                    <div class="admin-name"><i class="fas fa-user-shield"></i> ${escapeHtml(admin.name)} <span class="admin-role">${escapeHtml(admin.role)}</span></div>
-                    <div class="admin-email"><i class="fas fa-envelope"></i> ${escapeHtml(admin.email)}</div>
-                    <div class="admin-date"><i class="fas fa-calendar-alt"></i> Registered: ${formatDate(admin.createdAt)}</div>
-                </div>
-                <button class="delete-admin" onclick="window.deleteAdmin('${admin.id}', '${escapeHtml(admin.name)}')" title="Remove Admin"><i class="fas fa-trash-alt"></i></button>
-            </div>
-        `).join('');
-    }
-    
-    function formatDate(date) {
-        if (!date) return 'Unknown';
-        return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-    }
-    
-    function escapeHtml(str) {
-        if (!str) return '';
-        return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m]));
-    }
-    
-    window.deleteAdmin = deleteAdmin;
-    
     registerForm.addEventListener('submit', registerAdmin);
-    refreshBtn.addEventListener('click', loadAdmins);
     passwordInput.addEventListener('input', () => checkPasswordStrength(passwordInput.value));
     confirmPasswordInput.addEventListener('input', () => {
         if (confirmPasswordInput.value && passwordInput.value !== confirmPasswordInput.value) showFieldError('confirm', 'Passwords do not match');
         else { document.getElementById('confirmError').textContent = ''; confirmPasswordInput.classList.remove('error'); }
     });
-    
-    loadAdmins();
 </script>
 </body>
 </html>
