@@ -656,12 +656,19 @@
 
 <div id="toast" class="toast"></div>
 <script type="module">
-    import { protectPage, initAuthUI, setupAutoLogout } from './auth.js';
+     import { protectPage, initAuthUI, setupAutoLogout, getCurrentAdminSync } from './auth.js';
     import { initNavigation } from './nav.js';
     
-    if (!protectPage('admin-login.html')) throw new Error('Redirecting');
-    initAuthUI();
+    // SYNC check - no await needed
+    if (!protectPage('admin-login.html')) {
+        throw new Error('Redirecting to login');
+    }
+    
+    // SYNC init - no await needed
+    const admin = initAuthUI();
     setupAutoLogout(60);
+    
+    console.log('Logged in as:', admin?.name, admin?.email);
     
     console.log('Logged in as:', admin?.name, admin?.email);
     
