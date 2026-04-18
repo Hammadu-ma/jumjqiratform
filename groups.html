@@ -457,16 +457,6 @@
     
 
 <script type="module">
-    import { protectPage, initAuthUI, setupAutoLogout } from './auth.js';
-
-if (!protectPage('admin-login.html')) {
-    throw new Error('Redirecting to login');
-}
-
-const admin = await initAuthUI();
-setupAutoLogout(60);
-
-
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     
