@@ -10,8 +10,7 @@ import {
     onAuthStateChanged,
     sendPasswordResetEmail,
     updatePassword,
-    updateEmail,
-    deleteUser
+    updateEmail
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { 
     getFirestore, 
@@ -73,16 +72,7 @@ export function getCurrentSession() {
 }
 
 /**
- * Check if admin is currently logged in (synchronous)
- * @returns {boolean} True if logged in
- */
-export function isLoggedIn() {
-    const session = getCurrentSession();
-    return session !== null;
-}
-
-/**
- * Get current admin info (synchronous from session only)
+ * Get current admin from session (SYNC - fast)
  * @returns {Object|null} Admin info or null
  */
 export function getCurrentAdminSync() {
@@ -98,21 +88,48 @@ export function getCurrentAdminSync() {
 }
 
 /**
- * Get current admin info with Firebase verification (async)
+ * Get current admin data from Firestore (ASYNC - for verification)
+ * @returns {Promise<Object|null>} Admin data or null
+ */
+export async function getCurrentAdminData() {
+    const user = auth.currentUser;
+    if (!user) return null;
+    
+    try {
+        const adminDoc = await getDoc(doc(db, "admins", user.uid));
+        if (adminDoc.exists()) {
+            return { id: adminDoc.id, ...adminDoc.data() };
+        }
+        return null;
+    } catch (error) {
+        console.error("Error getting admin data:", error);
+        return null;
+    }
+}
+
+/**
+ * Get current admin info (async - from Firestore)
  * @returns {Promise<Object|null>} Admin info or null
  */
 export async function getCurrentAdmin() {
     const session = getCurrentSession();
     if (!session) return null;
     
-    // Return session data directly without Firebase check for speed
-    // The session already contains the admin info
     return {
         id: session.adminId,
         name: session.name,
         email: session.email,
         role: session.role
     };
+}
+
+/**
+ * Check if admin is currently logged in (SYNC)
+ * @returns {boolean} True if logged in
+ */
+export function isLoggedIn() {
+    const session = getCurrentSession();
+    return session !== null;
 }
 
 /**
@@ -345,6 +362,27 @@ export async function getAllAdmins() {
 }
 
 /**
+ * Get activities for a specific admin
+ * @param {string} adminId - Admin ID
+ * @param {number} limit - Max number of activities
+ * @returns {Promise<Array>} List of activities
+ */
+export async function getAdminActivities(adminId, limit = 50) {
+    try {
+        const q = query(collection(db, "adminActivities"), where('adminId', '==', adminId), orderBy('timestamp', 'desc'));
+        const snapshot = await getDocs(q);
+        const activities = [];
+        snapshot.forEach((doc) => {
+            activities.push({ id: doc.id, ...doc.data() });
+        });
+        return activities.slice(0, limit);
+    } catch (error) {
+        console.error("Error getting admin activities:", error);
+        return [];
+    }
+}
+
+/**
  * Log activity to Firestore
  * @param {string} adminId - Admin ID
  * @param {string} adminName - Admin name
@@ -381,27 +419,6 @@ export async function getAllActivities(limit = 100) {
         return activities.slice(0, limit);
     } catch (error) {
         console.error("Error getting activities:", error);
-        return [];
-    }
-}
-
-/**
- * Get activities for a specific admin
- * @param {string} adminId - Admin ID
- * @param {number} limit - Max number of activities
- * @returns {Promise<Array>} List of activities
- */
-export async function getAdminActivities(adminId, limit = 50) {
-    try {
-        const q = query(collection(db, "adminActivities"), where('adminId', '==', adminId), orderBy('timestamp', 'desc'));
-        const snapshot = await getDocs(q);
-        const activities = [];
-        snapshot.forEach((doc) => {
-            activities.push({ id: doc.id, ...doc.data() });
-        });
-        return activities.slice(0, limit);
-    } catch (error) {
-        console.error("Error getting admin activities:", error);
         return [];
     }
 }
@@ -540,21 +557,20 @@ export function setupAutoLogout(timeoutMinutes = 60) {
 
 // Export all functions
 export default {
-    getCurrentFirebaseUser: () => auth.currentUser,
-    getCurrentAdminData,
     getCurrentSession,
-    isLoggedIn,
     getCurrentAdminSync,
+    getCurrentAdminData,
     getCurrentAdmin,
+    isLoggedIn,
     logout,
     loginAdmin,
     registerAdmin,
     updateAdmin,
     deleteAdmin,
     getAllAdmins,
+    getAdminActivities,
     logActivity,
     getAllActivities,
-    getAdminActivities,
     getActivityStats,
     validateSecretKey,
     protectPage,
