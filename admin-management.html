@@ -517,7 +517,7 @@
 <div id="toast" class="toast"></div>
 
 <script type="module">
-    import { protectPageWithRole, initAuthUI, setupAutoLogout, logout, getAllAdmins, getAllActivities, getActivityStats, updateAdmin, deleteAdmin, logActivity, getAdminActivities } from './auth.js';
+    import { protectPageWithRole, initAuthUI, setupAutoLogout, logout, getCurrentAdminSync, getAllAdmins, getAllActivities, getActivityStats, updateAdmin, deleteAdmin, logActivity, getAdminActivities } from './auth.js';
     import { initNavigation, refreshNavigation } from './nav.js';
     
     // ========== SUPER ADMIN ONLY CHECK ==========
@@ -528,7 +528,46 @@
     // ========== INITIALIZE AUTH ==========
     const admin = initAuthUI();
     setupAutoLogout(60);
-    console.log('Super Admin logged in:', admin?.name);
+    
+    // Also get admin from sync function to ensure we have data
+    const currentAdmin = getCurrentAdminSync();
+    console.log('Super Admin logged in:', currentAdmin?.name, currentAdmin?.email);
+    
+    // ========== UPDATE PROFILE DISPLAY ==========
+    function updateProfileDisplay() {
+        const adminData = getCurrentAdminSync();
+        if (adminData) {
+            const nameElement = document.getElementById('currentAdminName');
+            const avatarElement = document.getElementById('currentAdminAvatar');
+            if (nameElement) nameElement.textContent = adminData.name;
+            if (avatarElement) avatarElement.textContent = adminData.name.charAt(0).toUpperCase();
+            console.log('Profile updated:', adminData.name);
+        } else {
+            console.log('No admin data found in session');
+        }
+    }
+    
+    // Call immediately
+    updateProfileDisplay();
+    
+    // Also try to load from Firestore if needed
+    async function loadProfileFromFirestore() {
+        try {
+            const { getCurrentAdminData } = await import('./auth.js');
+            const adminData = await getCurrentAdminData();
+            if (adminData) {
+                const nameElement = document.getElementById('currentAdminName');
+                const avatarElement = document.getElementById('currentAdminAvatar');
+                if (nameElement && adminData.name) nameElement.textContent = adminData.name;
+                if (avatarElement && adminData.name) avatarElement.textContent = adminData.name.charAt(0).toUpperCase();
+            }
+        } catch (error) {
+            console.error('Error loading profile from Firestore:', error);
+        }
+    }
+    
+    // Try Firestore as backup
+    loadProfileFromFirestore();
     
     // ========== DOM ELEMENTS ==========
     const toast = document.getElementById('toast');
@@ -631,9 +670,14 @@
         const updateData = { name, email: email.toLowerCase(), role, updatedAt: new Date() };
         if (newPassword && newPassword.length >= 6) updateData.password = btoa(newPassword + 'noor_salt_2024');
         try {
-            const success = await updateAdmin(id, updateData, admin.id, admin.name);
+            const currentAdminData = getCurrentAdminSync();
+            const success = await updateAdmin(id, updateData, currentAdminData?.id || id, currentAdminData?.name || 'Admin');
             if (success) {
                 showToast('Admin updated successfully');
+                // If we updated the current admin, refresh profile display
+                if (id === currentAdminData?.id) {
+                    updateProfileDisplay();
+                }
                 await loadAdmins();
                 await loadAllActivities();
                 if (selectedAdminId === id) loadAdminDetails(id);
@@ -661,11 +705,12 @@
         const hashedPassword = btoa(password + 'noor_salt_2024');
         
         try {
+            const currentAdminData = getCurrentAdminSync();
             await addDoc(collection(db, "admins"), {
                 name, email: email.toLowerCase(), password: hashedPassword, role,
                 createdAt: new Date(), updatedAt: new Date()
             });
-            await logActivity(admin.id, admin.name, 'CREATE', `Added new admin: ${name} (${email})`);
+            await logActivity(currentAdminData?.id || 'unknown', currentAdminData?.name || 'Admin', 'CREATE', `Added new admin: ${name} (${email})`);
             showToast('Admin added successfully');
             await loadAdmins();
             await loadAllActivities();
@@ -676,7 +721,8 @@
     // ========== DELETE ADMIN ==========
     async function deleteAdminHandler(id, name) {
         try {
-            const success = await deleteAdmin(id, admin.id, admin.name);
+            const currentAdminData = getCurrentAdminSync();
+            const success = await deleteAdmin(id, currentAdminData?.id || id, currentAdminData?.name || 'Admin');
             if (success) {
                 showToast('Admin deleted successfully');
                 if (selectedAdminId === id) { 
