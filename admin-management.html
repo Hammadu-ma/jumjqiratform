@@ -517,19 +517,20 @@
 <div id="toast" class="toast"></div>
 
 <script type="module">
-    import { protectPageWithRole, initAuthUI, setupAutoLogout } from './auth.js';
-
-// Super Admin only check - ADD THIS RIGHT AFTER YOUR IMPORTS
-if (!protectPageWithRole(['super-admin'], 'admin-login.html')) {
-    throw new Error('Redirecting to login');
-}
-
-// Initialize auth - ADD THIS AFTER THE CHECK
-const admin = initAuthUI();
-setupAutoLogout(60);
-    import { protectPageWithRole, initAuthUI, setupAutoLogout, logout, getCurrentAdmin, logActivity, getAllAdmins, getAllActivities, getActivityStats, updateAdmin, deleteAdmin } from './auth.js';
+    import { protectPageWithRole, initAuthUI, setupAutoLogout, logout, getAllAdmins, getAllActivities, getActivityStats, updateAdmin, deleteAdmin, logActivity, getAdminActivities } from './auth.js';
+    import { initNavigation, refreshNavigation } from './nav.js';
     
-    // DOM Elements
+    // ========== SUPER ADMIN ONLY CHECK ==========
+    if (!protectPageWithRole(['super-admin'], 'admin-login.html')) {
+        throw new Error('Redirecting to login');
+    }
+    
+    // ========== INITIALIZE AUTH ==========
+    const admin = initAuthUI();
+    setupAutoLogout(60);
+    console.log('Super Admin logged in:', admin?.name);
+    
+    // ========== DOM ELEMENTS ==========
     const toast = document.getElementById('toast');
     const adminListDiv = document.getElementById('adminList');
     const adminDetailsPanel = document.getElementById('adminDetailsPanel');
@@ -545,9 +546,8 @@ setupAutoLogout(60);
     let selectedAdminId = null;
     let pendingDeleteId = null;
     let allActivities = [];
-    let currentAdminUser = null;
-    let isSuperAdmin = false;
     
+    // ========== HELPER FUNCTIONS ==========
     function showToast(msg, isErr = false) { 
         toast.textContent = msg; 
         toast.style.background = isErr ? '#ef4444' : '#10b981'; 
@@ -565,35 +565,7 @@ setupAutoLogout(60);
         return new Date(date).toLocaleString(); 
     }
     
-    // Protect page - only super-admin can access full features, admin can view only
-    if (!protectPageWithRole(['super-admin', 'admin'], 'admin-login.html')) {
-        throw new Error('Redirecting');
-    }
-    
-    currentAdminUser = initAuthUI();
-    setupAutoLogout(60);
-    isSuperAdmin = currentAdminUser?.role === 'super-admin';
-    
-    // Update header
-    if (currentAdminUser) {
-        document.getElementById('currentAdminName').textContent = currentAdminUser.name;
-        document.getElementById('currentAdminAvatar').textContent = currentAdminUser.name.charAt(0).toUpperCase();
-    }
-    
-    // Role-based UI restrictions
-    if (!isSuperAdmin) {
-        if (addAdminBtn) addAdminBtn.style.display = 'none';
-        
-        const viewOnlyMessage = document.createElement('div');
-        viewOnlyMessage.className = 'view-only-message';
-        viewOnlyMessage.innerHTML = '<i class="fas fa-info-circle"></i> You are in view-only mode. Contact a Super Admin to add, edit, or delete admins.';
-        const container = document.querySelector('.container');
-        if (container && !document.querySelector('.view-only-message')) {
-            container.insertBefore(viewOnlyMessage, container.firstChild);
-        }
-    }
-    
-    // Load all admins
+    // ========== LOAD ADMINS ==========
     async function loadAdmins() {
         try {
             allAdmins = await getAllAdmins();
@@ -627,22 +599,11 @@ setupAutoLogout(60);
         await loadAdminActivities(id);
     };
     
+    // ========== LOAD ADMIN DETAILS ==========
     async function loadAdminDetails(id) {
         const admin = allAdmins.find(a => a.id === id);
         if (!admin) return;
         document.getElementById('selectedAdminBadge').innerHTML = `<i class="fas fa-check-circle"></i> ${escapeHtml(admin.name)}`;
-        
-        if (!isSuperAdmin) {
-            adminDetailsPanel.innerHTML = `
-                <div style="padding: 20px;">
-                    <div class="form-group"><label><i class="fas fa-user"></i> Full Name</label><div><strong>${escapeHtml(admin.name)}</strong></div></div>
-                    <div class="form-group"><label><i class="fas fa-envelope"></i> Email</label><div><strong>${escapeHtml(admin.email)}</strong></div></div>
-                    <div class="form-group"><label><i class="fas fa-tag"></i> Role</label><div><span class="admin-role-badge">${escapeHtml(admin.role)}</span></div></div>
-                    <div class="form-group"><label><i class="fas fa-calendar"></i> Registered</label><div>${formatDate(admin.createdAt)}</div></div>
-                </div>
-            `;
-            return;
-        }
         
         adminDetailsPanel.innerHTML = `
             <form id="editAdminForm">
@@ -660,6 +621,7 @@ setupAutoLogout(60);
         document.getElementById('deleteAdminBtn').addEventListener('click', () => showDeleteConfirm(id, admin.name));
     }
     
+    // ========== UPDATE ADMIN ==========
     async function updateAdminHandler(id) {
         const name = document.getElementById('editName').value.trim();
         const email = document.getElementById('editEmail').value.trim();
@@ -669,7 +631,7 @@ setupAutoLogout(60);
         const updateData = { name, email: email.toLowerCase(), role, updatedAt: new Date() };
         if (newPassword && newPassword.length >= 6) updateData.password = btoa(newPassword + 'noor_salt_2024');
         try {
-            const success = await updateAdmin(id, updateData, currentAdminUser.id, currentAdminUser.name);
+            const success = await updateAdmin(id, updateData, admin.id, admin.name);
             if (success) {
                 showToast('Admin updated successfully');
                 await loadAdmins();
@@ -679,6 +641,7 @@ setupAutoLogout(60);
         } catch (error) { showToast('Update failed: ' + error.message, true); }
     }
     
+    // ========== ADD ADMIN ==========
     async function addAdminHandler(name, email, password, role) {
         if (!name || !email || !password) { showToast('All fields required', true); return false; }
         if (password.length < 6) { showToast('Password must be at least 6 characters', true); return false; }
@@ -702,7 +665,7 @@ setupAutoLogout(60);
                 name, email: email.toLowerCase(), password: hashedPassword, role,
                 createdAt: new Date(), updatedAt: new Date()
             });
-            await logActivity(currentAdminUser.id, currentAdminUser.name, 'CREATE', `Added new admin: ${name} (${email})`);
+            await logActivity(admin.id, admin.name, 'CREATE', `Added new admin: ${name} (${email})`);
             showToast('Admin added successfully');
             await loadAdmins();
             await loadAllActivities();
@@ -710,9 +673,10 @@ setupAutoLogout(60);
         } catch (error) { showToast('Add failed: ' + error.message, true); return false; }
     }
     
+    // ========== DELETE ADMIN ==========
     async function deleteAdminHandler(id, name) {
         try {
-            const success = await deleteAdmin(id, currentAdminUser.id, currentAdminUser.name);
+            const success = await deleteAdmin(id, admin.id, admin.name);
             if (success) {
                 showToast('Admin deleted successfully');
                 if (selectedAdminId === id) { 
@@ -726,6 +690,7 @@ setupAutoLogout(60);
         } catch (error) { showToast('Delete failed: ' + error.message, true); }
     }
     
+    // ========== LOAD ACTIVITIES ==========
     async function loadAllActivities() {
         try {
             allActivities = await getAllActivities(100);
@@ -737,7 +702,6 @@ setupAutoLogout(60);
     
     async function loadAdminActivities(adminId) {
         try {
-            const { getAdminActivities } = await import('./auth.js');
             const activities = await getAdminActivities(adminId, 50);
             renderActivityLog(activities);
         } catch (error) { console.error(error); }
@@ -771,8 +735,8 @@ setupAutoLogout(60);
         }).join('');
     }
     
+    // ========== MODAL FUNCTIONS ==========
     function openAddAdminModal() {
-        if (!isSuperAdmin) { showToast('Only Super Admins can add new admins', true); return; }
         document.getElementById('modalTitle').innerHTML = '<i class="fas fa-user-plus"></i> Add New Admin';
         document.getElementById('modalName').value = '';
         document.getElementById('modalEmail').value = '';
@@ -785,12 +749,12 @@ setupAutoLogout(60);
     window.closeDeleteModal = () => document.getElementById('deleteModal').classList.remove('active');
     
     function showDeleteConfirm(id, name) { 
-        if (!isSuperAdmin) { showToast('Only Super Admins can delete admins', true); return; }
         pendingDeleteId = id; 
         document.getElementById('deleteAdminName').innerHTML = `Are you sure you want to delete "<strong>${escapeHtml(name)}</strong>"?`; 
         document.getElementById('deleteModal').classList.add('active'); 
     }
     
+    // ========== EVENT LISTENERS ==========
     document.getElementById('adminForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const name = document.getElementById('modalName').value.trim();
@@ -803,8 +767,8 @@ setupAutoLogout(60);
     
     document.getElementById('confirmDeleteBtn').onclick = async () => {
         if (pendingDeleteId) {
-            const admin = allAdmins.find(a => a.id === pendingDeleteId);
-            await deleteAdminHandler(pendingDeleteId, admin?.name || 'Unknown');
+            const adminUser = allAdmins.find(a => a.id === pendingDeleteId);
+            await deleteAdminHandler(pendingDeleteId, adminUser?.name || 'Unknown');
             closeDeleteModal();
         }
     };
@@ -814,9 +778,13 @@ setupAutoLogout(60);
     activityFilter.addEventListener('change', () => { if (selectedAdminId) loadAdminActivities(selectedAdminId); else renderActivityLog(allActivities); });
     logoutBtn.addEventListener('click', async () => { await logout(); window.location.href = 'admin-login.html'; });
     
-    // Initial loads
+    // ========== INITIALIZE PAGE ==========
     await loadAdmins();
     await loadAllActivities();
+    
+    // ========== NAVIGATION (LAST) ==========
+    initNavigation();
+    refreshNavigation();
 </script>
 </body>
 </html>
