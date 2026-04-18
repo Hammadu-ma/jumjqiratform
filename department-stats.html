@@ -118,6 +118,46 @@
         .stat-value { font-size: 2rem; font-weight: 800; color: var(--primary); }
         .stat-label { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
 
+        /* Advanced Export Section */
+        .advanced-export-section {
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            border-radius: 28px;
+            padding: 24px;
+            margin-bottom: 32px;
+            border: 1px solid var(--primary-light);
+        }
+        .advanced-export-title {
+            font-size: 1.1rem;
+            font-weight: 800;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--primary-dark);
+        }
+        .qirat-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+        .qirat-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: white;
+            padding: 6px 14px;
+            border-radius: 40px;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .qirat-checkbox:hover { background: var(--primary-light); border-color: var(--primary); }
+        .qirat-checkbox.selected { background: var(--primary); color: white; border-color: var(--primary); }
+        .qirat-checkbox input { margin-right: 6px; cursor: pointer; }
+        .select-all-btn { background: var(--primary); color: white; border: none; padding: 8px 20px; border-radius: 40px; font-weight: 600; cursor: pointer; }
+
         /* Department Grid */
         .dept-grid {
             display: grid;
@@ -291,6 +331,26 @@
     <!-- Stats Overview -->
     <div class="stats-grid" id="statsGrid"></div>
 
+    <!-- Advanced Export Section -->
+    <div class="advanced-export-section">
+        <div class="advanced-export-title"><i class="fas fa-rocket"></i> Advanced Multi-Department Export</div>
+        <div class="qirat-selector" id="qiratSelector">
+            <span style="font-weight:600;">Select Qirats to Export:</span>
+            <button class="select-all-btn" id="selectAllQirats">Select All</button>
+            <button class="select-all-btn" id="deselectAllQirats" style="background:#64748b;">Deselect All</button>
+        </div>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px;">
+            <button class="export-btn export-excel" id="advancedExportExcel"><i class="fas fa-file-excel"></i> Export Selected Qirats (Excel)</button>
+            <button class="export-btn export-pdf" id="advancedExportPDF"><i class="fas fa-file-pdf"></i> Export Selected Qirats (PDF - Multi-Table)</button>
+            <button class="export-btn export-word" id="advancedExportWord"><i class="fas fa-file-word"></i> Export Selected Qirats (Word - Multi-Table)</button>
+            <button class="export-btn export-csv" id="advancedExportCSV"><i class="fas fa-file-csv"></i> Export Selected Qirats (CSV)</button>
+        </div>
+        <div class="filter-group" style="margin-top: 16px; max-width: 300px;">
+            <label><i class="fas fa-filter"></i> Filter by Department (Optional)</label>
+            <select id="advancedDeptFilter"><option value="">All Departments</option></select>
+        </div>
+    </div>
+
     <!-- Departments Grid -->
     <div class="section-title"><i class="fas fa-building"></i> Departments Overview <span style="font-size:0.8rem;">(Click any department to analyze)</span></div>
     <div class="dept-grid" id="deptGrid"></div>
@@ -326,9 +386,7 @@
     <div class="section-title" id="tableTitle" style="display:none;"><i class="fas fa-users"></i> Students List <span id="tableDeptName"></span></div>
     <div class="table-container" id="tableContainer" style="display:none;">
         <table class="data-table" id="studentTable">
-            <thead>
-                <tr><th>Name</th><th>Gender</th><th>Phone</th><th>Department</th><th>Batch</th><th>Qirats</th><th>Registration Date</th>
-            </thead>
+            <thead><tr><th>Name</th><th>Gender</th><th>Phone</th><th>Department</th><th>Batch</th><th>Qirats</th><th>Registration Date</th></tr></thead>
             <tbody id="studentTableBody"></tbody>
         </table>
     </div>
@@ -373,6 +431,8 @@
     let departments = [];
     let selectedDept = null;
     let currentFilteredStudents = [];
+    let allQiratsList = [];
+    let selectedQirats = new Set();
     
     const toast = document.getElementById('toast');
     
@@ -401,7 +461,29 @@
             });
             calculateDepartmentStats();
             renderDepartments();
+            buildQiratSelector();
         } catch (error) { showToast("Error: " + error.message, true); }
+    }
+    
+    function buildQiratSelector() {
+        const allQiratsSet = new Set();
+        allStudents.forEach(s => getQiratNames(s).forEach(q => allQiratsSet.add(q)));
+        allQiratsList = Array.from(allQiratsSet).sort();
+        
+        const container = document.getElementById('qiratSelector');
+        const existingElements = container.querySelectorAll('.qirat-checkbox');
+        existingElements.forEach(el => el.remove());
+        
+        allQiratsList.forEach(q => {
+            const label = document.createElement('label');
+            label.className = 'qirat-checkbox';
+            label.innerHTML = `<input type="checkbox" value="${escapeHtml(q)}"> ${escapeHtml(q)}`;
+            container.appendChild(label);
+        });
+        
+        // Populate advanced department filter
+        const deptFilter = document.getElementById('advancedDeptFilter');
+        deptFilter.innerHTML = '<option value="">All Departments</option>' + departments.map(d => `<option value="${escapeHtml(d.name)}">${escapeHtml(d.name)} (${d.total})</option>`).join('');
     }
     
     function calculateDepartmentStats() {
@@ -464,12 +546,10 @@
         document.getElementById('tableContainer').style.display = 'block';
         document.getElementById('selectedDeptInfo').innerHTML = `<div class="stat-card" style="background:linear-gradient(135deg, #10b981, #059669); color:white;"><div class="stat-value" style="color:white;">📊 ${escapeHtml(selectedDept.name)}</div><div class="stat-label" style="color:rgba(255,255,255,0.9);">${selectedDept.total} students | ♂ ${selectedDept.male} | ♀ ${selectedDept.female} | ${selectedDept.qiratCount} Qirats | ${selectedDept.batchCount} Batches</div></div>`;
         
-        // Populate batch filter
         const batches = [...new Set(selectedDept.students.map(s => s.batch))];
         const batchSelect = document.getElementById('studentBatch');
         batchSelect.innerHTML = '<option value="">All Batches</option>' + batches.map(b => `<option value="${escapeHtml(b)}">${escapeHtml(b)}</option>`).join('');
         
-        // Populate Qirat filter
         const allQirats = [...new Set(selectedDept.students.flatMap(s => getQiratNames(s)))];
         const qiratSelect = document.getElementById('studentQirat');
         qiratSelect.innerHTML = '<option value="">All Qirats</option>' + allQirats.map(q => `<option value="${escapeHtml(q)}">${escapeHtml(q)}</option>`).join('');
@@ -498,7 +578,7 @@
     
     function renderStudentTable() {
         const tbody = document.getElementById('studentTableBody');
-        if (currentFilteredStudents.length === 0) { tbody.innerHTML = `<td><td colspan="7" class="empty-state">No students found</td></tr>`; return; }
+        if (currentFilteredStudents.length === 0) { tbody.innerHTML = `<tr><td colspan="7" class="empty-state">No students found</td></tr>`; return; }
         tbody.innerHTML = currentFilteredStudents.map(s => `
             <tr>
                 <td><strong>${escapeHtml(s.full_name)}</strong></td>
@@ -557,7 +637,7 @@
                     <div style="overflow-x:auto;">
                         <table class="data-table" style="width:100%;border-collapse:collapse;">
                             <thead><tr><th>Name</th><th>Gender</th><th>Phone</th><th>Department</th><th>Batch</th><th>Qirats</th><th>Date</th></tr></thead>
-                            <tbody>${students.map(s => `<tr><td><strong>${escapeHtml(s.Name)}</strong></td><td>${escapeHtml(s.Gender)}</td><td>${escapeHtml(s.Phone)}</td><td>${escapeHtml(s.Department)}</td><td>${escapeHtml(s.Batch)}</td><td>${escapeHtml(s.Qirats)}</td><td>${escapeHtml(s.Date)}</td></tr>`).join('')}</tbody>
+                            <tbody>${students.map(s => `<tr><td><strong>${escapeHtml(s.Name)}</strong></td><td>${escapeHtml(s.Gender)}</td><td>${escapeHtml(s.Phone)}</td><td>${escapeHtml(s.Department)}</td><td>${escapeHtml(s.Batch)}</td><td>${escapeHtml(s.Qirats)}</td><td>${escapeHtml(s.Date)}</td>`).join('')}</tbody>
                         </table>
                     </div>
                 </div>
@@ -568,9 +648,242 @@
     
     window.exportInsightToCSV = (title, data) => { exportDataToCSV(data, `${title}_students`); showToast('CSV exported'); };
     window.exportInsightToExcel = (title, data) => { exportDataToExcel(data, `${title}_students`); showToast('Excel exported'); };
-    window.exportInsightToPDF = async (title, data) => { await exportDataToPDF(data, `${title} Students in ${selectedDept.name}`); showToast('PDF exported'); };
-    window.exportInsightToWord = (title, data) => { exportDataToWord(data, `${title} Students in ${selectedDept.name}`); showToast('Word exported'); };
+    window.exportInsightToPDF = async (title, data) => { await exportDataToPDF(data, `${title} Students`); showToast('PDF exported'); };
+    window.exportInsightToWord = (title, data) => { exportDataToWord(data, `${title} Students`); showToast('Word exported'); };
     
+    // ==================== ADVANCED MULTI-DEPARTMENT EXPORT ====================
+    
+    document.getElementById('selectAllQirats').addEventListener('click', () => {
+        document.querySelectorAll('.qirat-checkbox input').forEach(cb => { cb.checked = true; cb.closest('.qirat-checkbox').classList.add('selected'); });
+    });
+    document.getElementById('deselectAllQirats').addEventListener('click', () => {
+        document.querySelectorAll('.qirat-checkbox input').forEach(cb => { cb.checked = false; cb.closest('.qirat-checkbox').classList.remove('selected'); });
+    });
+    document.querySelectorAll('.qirat-checkbox').forEach(el => {
+        el.addEventListener('click', (e) => { if (e.target.tagName !== 'INPUT') { const cb = el.querySelector('input'); cb.checked = !cb.checked; if (cb.checked) el.classList.add('selected'); else el.classList.remove('selected'); } });
+        const cb = el.querySelector('input');
+        cb.addEventListener('change', () => { if (cb.checked) el.classList.add('selected'); else el.classList.remove('selected'); });
+    });
+    
+    function getSelectedQirats() {
+        const selected = [];
+        document.querySelectorAll('.qirat-checkbox input:checked').forEach(cb => selected.push(cb.value));
+        return selected;
+    }
+    
+    function getDepartmentFilter() { return document.getElementById('advancedDeptFilter').value; }
+    
+    function getDataForExport() {
+        const selectedQirats = getSelectedQirats();
+        const deptFilter = getDepartmentFilter();
+        if (selectedQirats.length === 0) { showToast('Please select at least one Qirat', true); return null; }
+        
+        const result = {};
+        selectedQirats.forEach(qirat => { result[qirat] = {}; });
+        
+        const targetDepartments = deptFilter ? departments.filter(d => d.name === deptFilter) : departments;
+        
+        targetDepartments.forEach(dept => {
+            const deptStudents = dept.students;
+            selectedQirats.forEach(qirat => {
+                const studentsInQirat = deptStudents.filter(s => getQiratNames(s).includes(qirat));
+                if (studentsInQirat.length > 0) {
+                    result[qirat][dept.name] = studentsInQirat.map(s => ({
+                        Name: s.full_name,
+                        Gender: s.gender,
+                        Phone: s.phone,
+                        Department: s.department,
+                        Batch: s.batch,
+                        Qirats: getQiratNames(s).join(', '),
+                        RegistrationDate: s.timestamp.toLocaleDateString()
+                    }));
+                }
+            });
+        });
+        
+        return result;
+    }
+    
+    function formatWordWithTables(data, title, selectedQirats) {
+        let html = `<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>${title}</title>
+            <style>
+                body { font-family: 'Arial', sans-serif; margin: 40px; }
+                h1 { color: #10b981; border-bottom: 3px solid #10b981; padding-bottom: 10px; }
+                h2 { color: #059669; margin-top: 30px; border-left: 4px solid #10b981; padding-left: 15px; }
+                h3 { color: #0f172a; margin-top: 25px; background: #f1f5f9; padding: 8px 15px; border-radius: 8px; }
+                .header-info { background: #f0fdf4; padding: 15px; border-radius: 12px; margin: 20px 0; }
+                table { border-collapse: collapse; width: 100%; margin: 20px 0; page-break-inside: avoid; }
+                th { background: #10b981; color: white; padding: 10px; text-align: left; font-weight: bold; }
+                td { border: 1px solid #ddd; padding: 8px; }
+                tr:nth-child(even) { background: #f9fafb; }
+                .dept-header { background: #e2e8f0; font-weight: bold; margin-top: 20px; }
+                .footer { margin-top: 40px; text-align: center; font-size: 10px; color: #64748b; border-top: 1px solid #ddd; padding-top: 20px; }
+            </style>
+        </head>
+        <body>
+            <h1>📊 JUMJ Irshad - Multi-Department Qirat Report</h1>
+            <div class="header-info">
+                <p><strong>Generated:</strong> ${new Date().toLocaleString()}</p>
+                <p><strong>Selected Qirats:</strong> ${selectedQirats.join(', ')}</p>
+                <p><strong>Departments Included:</strong> ${Object.keys(data[selectedQirats[0]] || {}).join(', ')}</p>
+            </div>
+        `;
+        
+        for (const qirat of selectedQirats) {
+            const deptData = data[qirat];
+            const deptNames = Object.keys(deptData);
+            if (deptNames.length === 0) continue;
+            
+            let totalForQirat = 0;
+            deptNames.forEach(d => { totalForQirat += deptData[d].length; });
+            
+            html += `<h2>📖 ${escapeHtml(qirat)}</h2>`;
+            html += `<p style="margin-bottom: 15px;"><strong>Total Students:</strong> ${totalForQirat}</p>`;
+            
+            for (const deptName of deptNames) {
+                const students = deptData[deptName];
+                html += `<h3>🏛️ ${escapeHtml(deptName)} (${students.length} students)</h3>`;
+                html += `<table><thead><tr><th>#</th><th>Name</th><th>Gender</th><th>Phone</th><th>Batch</th><th>Registration Date</th></tr></thead><tbody>`;
+                students.forEach((s, idx) => {
+                    html += `<tr><td>${idx + 1}</td><td>${escapeHtml(s.Name)}</td><td>${escapeHtml(s.Gender)}</td><td>${escapeHtml(s.Phone)}</td><td>${escapeHtml(s.Batch)}</td><td>${escapeHtml(s.RegistrationDate)}</td></tr>`;
+                });
+                html += `</tbody></table>`;
+            }
+        }
+        
+        html += `<div class="footer"><p>JUMJ Irshad Qirat Management System | Report Generated on ${new Date().toLocaleString()}</p></div></body></html>`;
+        return html;
+    }
+    
+    async function formatPDFWithTables(data, title, selectedQirats) {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+        
+        doc.setFontSize(20);
+        doc.setTextColor(16, 185, 129);
+        doc.text("JUMJ Irshad - Multi-Department Qirat Report", 14, 20);
+        
+        doc.setFontSize(10);
+        doc.setTextColor(100, 100, 100);
+        doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 30);
+        doc.text(`Selected Qirats: ${selectedQirats.join(', ')}`, 14, 37);
+        
+        let yPos = 50;
+        
+        for (const qirat of selectedQirats) {
+            const deptData = data[qirat];
+            const deptNames = Object.keys(deptData);
+            if (deptNames.length === 0) continue;
+            
+            let totalForQirat = 0;
+            deptNames.forEach(d => { totalForQirat += deptData[d].length; });
+            
+            if (yPos > 250) { doc.addPage(); yPos = 20; }
+            
+            doc.setFontSize(14);
+            doc.setTextColor(5, 150, 105);
+            doc.text(`📖 ${qirat} (Total: ${totalForQirat} students)`, 14, yPos);
+            yPos += 8;
+            
+            for (const deptName of deptNames) {
+                const students = deptData[deptName];
+                if (students.length === 0) continue;
+                
+                if (yPos > 250) { doc.addPage(); yPos = 20; }
+                
+                doc.setFontSize(11);
+                doc.setTextColor(0, 0, 0);
+                doc.text(`🏛️ ${deptName} (${students.length} students)`, 14, yPos);
+                yPos += 5;
+                
+                const tableData = students.map((s, idx) => [idx + 1, s.Name, s.Gender, s.Phone, s.Batch, s.RegistrationDate]);
+                const result = doc.autoTable({
+                    head: [['#', 'Name', 'Gender', 'Phone', 'Batch', 'Reg Date']],
+                    body: tableData,
+                    startY: yPos,
+                    theme: 'striped',
+                    headStyles: { fillColor: [16, 185, 129], textColor: [255, 255, 255] },
+                    styles: { fontSize: 8, cellPadding: 2 },
+                    margin: { left: 14, right: 14 }
+                });
+                yPos = result.lastAutoTable.finalY + 8;
+            }
+            yPos += 5;
+        }
+        
+        return doc;
+    }
+    
+    document.getElementById('advancedExportExcel').addEventListener('click', () => {
+        const selectedQirats = getSelectedQirats();
+        if (selectedQirats.length === 0) { showToast('Please select at least one Qirat', true); return; }
+        const exportData = getDataForExport();
+        if (!exportData) return;
+        
+        const wb = XLSX.utils.book_new();
+        for (const qirat of selectedQirats) {
+            const deptData = exportData[qirat];
+            const allStudents = [];
+            for (const deptName of Object.keys(deptData)) {
+                deptData[deptName].forEach(s => allStudents.push({ ...s, Department: deptName }));
+            }
+            if (allStudents.length > 0) {
+                const ws = XLSX.utils.json_to_sheet(allStudents);
+                XLSX.utils.book_append_sheet(wb, ws, qirat.slice(0, 31));
+            }
+        }
+        XLSX.writeFile(wb, `Multi_Qirat_Export_${new Date().toISOString().slice(0, 19)}.xlsx`);
+        showToast('Excel export completed');
+    });
+    
+    document.getElementById('advancedExportCSV').addEventListener('click', () => {
+        const selectedQirats = getSelectedQirats();
+        if (selectedQirats.length === 0) { showToast('Please select at least one Qirat', true); return; }
+        const exportData = getDataForExport();
+        if (!exportData) return;
+        
+        let allRows = [];
+        for (const qirat of selectedQirats) {
+            const deptData = exportData[qirat];
+            for (const deptName of Object.keys(deptData)) {
+                deptData[deptName].forEach(s => {
+                    allRows.push({ Qirat: qirat, ...s });
+                });
+            }
+        }
+        const ws = XLSX.utils.json_to_sheet(allRows);
+        const csv = XLSX.utils.sheet_to_csv(ws);
+        const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv' });
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `Multi_Qirat_Export.csv`; a.click(); URL.revokeObjectURL(a.href);
+        showToast('CSV export completed');
+    });
+    
+    document.getElementById('advancedExportPDF').addEventListener('click', async () => {
+        const selectedQirats = getSelectedQirats();
+        if (selectedQirats.length === 0) { showToast('Please select at least one Qirat', true); return; }
+        const exportData = getDataForExport();
+        if (!exportData) return;
+        const doc = await formatPDFWithTables(exportData, 'Multi-Qirat Report', selectedQirats);
+        doc.save(`Multi_Qirat_Report_${new Date().toISOString().slice(0, 19)}.pdf`);
+        showToast('PDF export completed');
+    });
+    
+    document.getElementById('advancedExportWord').addEventListener('click', () => {
+        const selectedQirats = getSelectedQirats();
+        if (selectedQirats.length === 0) { showToast('Please select at least one Qirat', true); return; }
+        const exportData = getDataForExport();
+        if (!exportData) return;
+        const html = formatWordWithTables(exportData, 'Multi-Qirat Report', selectedQirats);
+        const blob = new Blob([html], { type: 'application/msword' });
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `Multi_Qirat_Report.doc`; a.click(); URL.revokeObjectURL(a.href);
+        showToast('Word export completed');
+    });
+    
+    // Basic Export Functions
     function exportDataToCSV(data, filename) {
         const headers = ['Name', 'Gender', 'Phone', 'Department', 'Batch', 'Qirats', 'Date'];
         const rows = data.map(r => headers.map(h => `"${String(r[h] || '').replace(/"/g, '""')}"`).join(','));
@@ -594,11 +907,11 @@
     }
     
     function exportDataToWord(data, title) {
-        let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial;} table{border-collapse:collapse;width:100%;} th,td{border:1px solid #ddd;padding:8px;} th{background:#10b981;color:white;}</style></head><body><h1>JUMJ Irshad Report</h1><h2>${title}</h2><p>Generated: ${new Date().toLocaleString()} | Total: ${data.length}</p>${data.map(r => `</table><thead><tr><th>Name</th><th>Gender</th><th>Phone</th><th>Department</th><th>Batch</th><th>Qirats</th><th>Date</th></tr></thead><tbody>${data.map(r => `<tr><td>${escapeHtml(r.Name)}</td><td>${escapeHtml(r.Gender)}</td><td>${escapeHtml(r.Phone)}</td><td>${escapeHtml(r.Department)}</td><td>${escapeHtml(r.Batch)}</td><td>${escapeHtml(r.Qirats)}</td><td>${escapeHtml(r.Date)}</td></tr>`).join('')}</tbody></table>`).join('')}</body></html>`;
+        let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial;} table{border-collapse:collapse;width:100%;} th,td{border:1px solid #ddd;padding:8px;} th{background:#10b981;color:white;}</style></head><body><h1>JUMJ Irshad Report</h1><h2>${title}</h2><p>Generated: ${new Date().toLocaleString()} | Total: ${data.length}</p><table><thead><tr><th>Name</th><th>Gender</th><th>Phone</th><th>Department</th><th>Batch</th><th>Qirats</th><th>Date</th></tr></thead><tbody>${data.map(r => `<tr><td>${escapeHtml(r.Name)}</td><td>${escapeHtml(r.Gender)}</td><td>${escapeHtml(r.Phone)}</td><td>${escapeHtml(r.Department)}</td><td>${escapeHtml(r.Batch)}</td><td>${escapeHtml(r.Qirats)}</td><td>${escapeHtml(r.Date)}</td></tr>`).join('')}</tbody></table></body></html>`;
         const blob = new Blob([html], { type: 'application/msword' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${title.replace(/[^a-z0-9]/gi, '_')}.doc`; a.click(); URL.revokeObjectURL(a.href);
     }
     
-    // Main Export Functions
+    // Event Listeners for Basic Exports
     document.getElementById('exportCSVBtn').addEventListener('click', () => { exportDataToCSV(currentFilteredStudents.map(s => ({ Name: s.full_name, Gender: s.gender, Phone: s.phone, Department: s.department, Batch: s.batch, Qirats: getQiratNames(s).join(', '), Date: s.timestamp.toLocaleDateString() })), `${selectedDept?.name}_students`); showToast('CSV exported'); });
     document.getElementById('exportExcelBtn').addEventListener('click', () => { exportDataToExcel(currentFilteredStudents.map(s => ({ Name: s.full_name, Gender: s.gender, Phone: s.phone, Department: s.department, Batch: s.batch, Qirats: getQiratNames(s).join(', '), Date: s.timestamp.toLocaleDateString() })), `${selectedDept?.name}_students`); showToast('Excel exported'); });
     document.getElementById('exportPDFBtn').addEventListener('click', async () => { await exportDataToPDF(currentFilteredStudents.map(s => ({ Name: s.full_name, Gender: s.gender, Phone: s.phone, Department: s.department, Batch: s.batch, Qirats: getQiratNames(s).join(', '), Date: s.timestamp.toLocaleDateString() })), `${selectedDept?.name} Department Students`); showToast('PDF exported'); });
