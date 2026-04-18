@@ -409,14 +409,20 @@
 <div id="toast" class="toast"></div>
 
 <script type="module">
-    import { protectPage, initAuthUI, setupAutoLogout } from './auth.js';
-
-if (!protectPage('admin-login.html')) {
-    throw new Error('Redirecting to login');
-}
-
-const admin = await initAuthUI();
-setupAutoLogout(60);
+    import { protectPage, initAuthUI, setupAutoLogout, getCurrentAdminSync } from './auth.js';
+    import { initNavigation } from './nav.js';
+    
+    // SYNC check - no await needed
+    if (!protectPage('admin-login.html')) {
+        throw new Error('Redirecting to login');
+    }
+    
+    // SYNC init - no await needed
+    const admin = initAuthUI();
+    setupAutoLogout(60);
+    
+    console.log('Logged in as:', admin?.name, admin?.email);
+    
 
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
