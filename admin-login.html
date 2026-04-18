@@ -321,7 +321,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     
     const firebaseConfig = {
@@ -405,34 +405,46 @@
         return { valid: true, message: '' };
     }
     
-    // Create session after successful login
-    async function createSession(user) {
-        try {
-            // Get admin data from Firestore
-            const adminDoc = await getDoc(doc(db, "admins", user.uid));
-            
-            if (!adminDoc.exists()) {
-                throw new Error('Admin account not found in database');
+    // Create session after successful login (SYNC - just store in localStorage)
+    function createSession(user, adminData) {
+        const sessionData = {
+            adminId: user.uid,
+            name: adminData.name,
+            email: adminData.email,
+            role: adminData.role || 'admin',
+            loginTime: new Date().toISOString()
+        };
+        
+        localStorage.setItem('adminSession', JSON.stringify(sessionData));
+        sessionStorage.setItem('adminLoggedIn', 'true');
+        
+        return sessionData;
+    }
+    
+    // Check if already logged in (SYNC - just check localStorage)
+    function checkExistingSession() {
+        const session = localStorage.getItem('adminSession');
+        if (session) {
+            try {
+                const sessionData = JSON.parse(session);
+                const loginTime = new Date(sessionData.loginTime);
+                const now = new Date();
+                const hoursDiff = (now - loginTime) / (1000 * 60 * 60);
+                
+                // Session expires after 24 hours
+                if (hoursDiff < 24) {
+                    // Redirect immediately - no Firebase check
+                    window.location.href = 'index.html';
+                    return true;
+                } else {
+                    localStorage.removeItem('adminSession');
+                    sessionStorage.removeItem('adminLoggedIn');
+                }
+            } catch (e) {
+                localStorage.removeItem('adminSession');
             }
-            
-            const adminData = adminDoc.data();
-            
-            const sessionData = {
-                adminId: user.uid,
-                name: adminData.name,
-                email: adminData.email,
-                role: adminData.role || 'admin',
-                loginTime: new Date().toISOString()
-            };
-            
-            localStorage.setItem('adminSession', JSON.stringify(sessionData));
-            sessionStorage.setItem('adminLoggedIn', 'true');
-            
-            return sessionData;
-        } catch (error) {
-            console.error("Error creating session:", error);
-            throw error;
         }
+        return false;
     }
     
     async function loginAdmin(event) {
@@ -469,8 +481,21 @@
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
             
-            // Create session
-            await createSession(user);
+            // Get admin data from Firestore
+            const adminDoc = await getDoc(doc(db, "admins", user.uid));
+            
+            if (!adminDoc.exists()) {
+                await signOut(auth);
+                showMessage('❌ Admin account not found. Please contact support.', 'error');
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = originalBtnText;
+                return;
+            }
+            
+            const adminData = adminDoc.data();
+            
+            // Create session (sync)
+            createSession(user, adminData);
             
             showMessage('✅ Login successful! Redirecting to dashboard...', 'success');
             
@@ -496,37 +521,6 @@
             showMessage('❌ ' + errorMessage, 'error');
             loginBtn.disabled = false;
             loginBtn.innerHTML = originalBtnText;
-        }
-    }
-    
-    // Check if already logged in
-    async function checkExistingSession() {
-        const session = localStorage.getItem('adminSession');
-        if (session) {
-            try {
-                const sessionData = JSON.parse(session);
-                const loginTime = new Date(sessionData.loginTime);
-                const now = new Date();
-                const hoursDiff = (now - loginTime) / (1000 * 60 * 60);
-                
-                // Session expires after 24 hours
-                if (hoursDiff < 24) {
-                    // Verify with Firebase Auth that user still exists
-                    onAuthStateChanged(auth, (user) => {
-                        if (user && user.uid === sessionData.adminId) {
-                            window.location.href = 'index.html';
-                        } else {
-                            localStorage.removeItem('adminSession');
-                            sessionStorage.removeItem('adminLoggedIn');
-                        }
-                    });
-                } else {
-                    localStorage.removeItem('adminSession');
-                    sessionStorage.removeItem('adminLoggedIn');
-                }
-            } catch (e) {
-                localStorage.removeItem('adminSession');
-            }
         }
     }
     
@@ -565,7 +559,7 @@
     
     loginForm.addEventListener('submit', loginAdmin);
     
-    // Check for existing session on page load
+    // Check for existing session on page load (SYNC - redirects immediately if logged in)
     checkExistingSession();
 </script>
 </body>
