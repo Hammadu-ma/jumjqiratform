@@ -900,11 +900,23 @@
     loadData();
     setInterval(loadData, 30000);
 </script>
-        <!-- Navigation Script - Add this at the end of body -->
+     <!-- Navigation Script - Add this at the end of body -->
 <script type="module">
-    import { initNavigation } from './nav.js';
-    // Initialize navigation when DOM is ready
+    import { initNavigation, refreshNavigation } from './nav.js';
+    import { getCurrentAdminSync } from './auth.js';
+    
+    // Initialize navigation
     initNavigation();
+    
+    // For Super Admin: refresh navigation to show Keys and Admins
+    // This ensures role-based items appear correctly
+    const admin = getCurrentAdminSync();
+    if (admin?.role === 'super-admin') {
+        // Small delay to ensure DOM is ready, then refresh
+        setTimeout(() => {
+            refreshNavigation();
+        }, 100);
+    }
 </script>
 </body>
 </html>
