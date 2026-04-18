@@ -1,16 +1,17 @@
-// auth.js - Complete Authentication System with Firebase Auth
-// For Noor Academy Admin Dashboard
+// auth.js - Complete Authentication with Firebase Auth + Session Management
+// For JUMJ Irshad Admin Dashboard
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { 
     getAuth, 
+    createUserWithEmailAndPassword, 
     signInWithEmailAndPassword, 
     signOut, 
     onAuthStateChanged,
     sendPasswordResetEmail,
     updatePassword,
     updateEmail,
-    createUserWithEmailAndPassword
+    deleteUser
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { 
     getFirestore, 
@@ -24,8 +25,7 @@ import {
     query, 
     where, 
     orderBy,
-    setDoc,
-    writeBatch
+    setDoc
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 // Firebase Configuration
@@ -43,34 +43,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// ==================== SESSION MANAGEMENT ====================
-
-/**
- * Get current admin session from localStorage
- * @returns {Object|null} Session data or null if not logged in
- */
-export function getCurrentSession() {
-    try {
-        const session = localStorage.getItem('adminSession');
-        if (!session) return null;
-        
-        const sessionData = JSON.parse(session);
-        const loginTime = new Date(sessionData.loginTime);
-        const now = new Date();
-        const hoursDiff = (now - loginTime) / (1000 * 60 * 60);
-        
-        // Session expires after 24 hours
-        if (hoursDiff > 24) {
-            logout();
-            return null;
-        }
-        
-        return sessionData;
-    } catch (error) {
-        console.error("Error getting session:", error);
-        return null;
-    }
-}
+// ==================== HELPER FUNCTIONS ====================
 
 /**
  * Get current Firebase Auth user
@@ -81,7 +54,7 @@ export function getCurrentFirebaseUser() {
 }
 
 /**
- * Get current admin data from Firestore
+ * Get custom admin data from Firestore
  * @returns {Promise<Object|null>} Admin data or null
  */
 export async function getCurrentAdminData() {
@@ -101,19 +74,47 @@ export async function getCurrentAdminData() {
 }
 
 /**
+ * Get current admin session from localStorage
+ * @returns {Object|null} Session data or null
+ */
+export function getCurrentSession() {
+    try {
+        const session = localStorage.getItem('adminSession');
+        if (!session) return null;
+        
+        const sessionData = JSON.parse(session);
+        const loginTime = new Date(sessionData.loginTime);
+        const now = new Date();
+        const hoursDiff = (now - loginTime) / (1000 * 60 * 60);
+        
+        if (hoursDiff > 24) {
+            logout();
+            return null;
+        }
+        
+        return sessionData;
+    } catch (error) {
+        console.error("Error getting session:", error);
+        return null;
+    }
+}
+
+/**
+ * Check if admin is currently logged in
+ * @returns {boolean} True if logged in
+ */
+export function isLoggedIn() {
+    const session = getCurrentSession();
+    return session !== null && auth.currentUser !== null;
+}
+
+/**
  * Get current admin info (combines session + Firestore)
  * @returns {Promise<Object|null>} Admin info or null
  */
 export async function getCurrentAdmin() {
     const session = getCurrentSession();
     if (!session) return null;
-    
-    // Verify with Firebase Auth that user still exists
-    const user = auth.currentUser;
-    if (!user || user.uid !== session.adminId) {
-        await logout();
-        return null;
-    }
     
     const adminData = await getCurrentAdminData();
     if (!adminData) return null;
@@ -127,15 +128,6 @@ export async function getCurrentAdmin() {
 }
 
 /**
- * Check if admin is currently logged in
- * @returns {boolean} True if logged in
- */
-export function isLoggedIn() {
-    const session = getCurrentSession();
-    return session !== null && auth.currentUser !== null;
-}
-
-/**
  * Logout current admin
  */
 export async function logout() {
@@ -146,9 +138,6 @@ export async function logout() {
         }
         localStorage.removeItem('adminSession');
         sessionStorage.removeItem('adminLoggedIn');
-        sessionStorage.removeItem('redirectAfterLogin');
-        
-        // Dispatch logout event
         window.dispatchEvent(new CustomEvent('admin-logout'));
     } catch (error) {
         console.error("Logout error:", error);
@@ -156,20 +145,27 @@ export async function logout() {
 }
 
 /**
- * Create admin session after successful login
- * @param {Object} user - Firebase user object
- * @returns {Promise<Object>} Session data
+ * Login admin with email and password
+ * @param {string} email - Admin email
+ * @param {string} password - Admin password
+ * @returns {Promise<Object>} Result object
  */
-async function createSession(user) {
+export async function loginAdmin(email, password) {
     try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        
+        // Get admin data from Firestore
         const adminDoc = await getDoc(doc(db, "admins", user.uid));
         
         if (!adminDoc.exists()) {
-            throw new Error('Admin account not found in database');
+            await signOut(auth);
+            return { success: false, message: 'Admin account not found in database' };
         }
         
         const adminData = adminDoc.data();
         
+        // Create session
         const sessionData = {
             adminId: user.uid,
             name: adminData.name,
@@ -184,45 +180,14 @@ async function createSession(user) {
         // Log activity
         await logActivity(user.uid, adminData.name, 'LOGIN', 'Admin logged in successfully');
         
-        return sessionData;
-    } catch (error) {
-        console.error("Error creating session:", error);
-        throw error;
-    }
-}
-
-// ==================== AUTHENTICATION ====================
-
-/**
- * Login admin with email and password
- * @param {string} email - Admin email
- * @param {string} password - Admin password
- * @returns {Promise<Object>} Result object
- */
-export async function loginAdmin(email, password) {
-    try {
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
-        
-        // Create session
-        await createSession(user);
-        
-        return { success: true, message: 'Login successful' };
+        return { success: true, message: 'Login successful', adminData, adminId: user.uid };
         
     } catch (error) {
         console.error("Login error:", error);
-        
         let message = 'Login failed';
-        if (error.code === 'auth/user-not-found') {
-            message = 'No account found with this email';
-        } else if (error.code === 'auth/wrong-password') {
-            message = 'Incorrect password';
-        } else if (error.code === 'auth/invalid-email') {
-            message = 'Invalid email format';
-        } else if (error.code === 'auth/too-many-requests') {
-            message = 'Too many failed attempts. Try again later';
-        }
-        
+        if (error.code === 'auth/user-not-found') message = 'Email not found';
+        else if (error.code === 'auth/wrong-password') message = 'Invalid password';
+        else if (error.code === 'auth/invalid-email') message = 'Invalid email format';
         return { success: false, message: message };
     }
 }
@@ -278,44 +243,10 @@ export async function registerAdmin(adminData, registrarId = null, registrarName
         
     } catch (error) {
         console.error("Registration error:", error);
-        
         let message = 'Registration failed';
-        if (error.code === 'auth/email-already-in-use') {
-            message = 'Email already in use';
-        } else if (error.code === 'auth/weak-password') {
-            message = 'Password too weak (minimum 6 characters)';
-        } else if (error.code === 'auth/invalid-email') {
-            message = 'Invalid email format';
-        }
-        
+        if (error.code === 'auth/email-already-in-use') message = 'Email already in use';
+        else if (error.code === 'auth/weak-password') message = 'Password too weak';
         return { success: false, message: message };
-    }
-}
-
-// ==================== ADMIN MANAGEMENT ====================
-
-/**
- * Get all admins from Firestore
- * @returns {Promise<Array>} List of admins
- */
-export async function getAllAdmins() {
-    try {
-        const snapshot = await getDocs(collection(db, "admins"));
-        const admins = [];
-        snapshot.forEach((doc) => {
-            const data = doc.data();
-            admins.push({
-                id: doc.id,
-                name: data.name,
-                email: data.email,
-                role: data.role || 'admin',
-                createdAt: data.createdAt?.toDate?.() || new Date(data.createdAt)
-            });
-        });
-        return admins;
-    } catch (error) {
-        console.error("Error getting admins:", error);
-        return [];
     }
 }
 
@@ -337,6 +268,18 @@ export async function updateAdmin(adminId, updateData, updaterId, updaterName) {
             ...updateData,
             updatedAt: new Date()
         });
+        
+        // Update Firebase Auth email if changed
+        if (updateData.email) {
+            // Note: This requires re-authentication in production
+            // For simplicity, we're only updating Firestore
+        }
+        
+        // Update Firebase Auth password if changed
+        if (updateData.password) {
+            // This would require the user to be logged in
+            // For admin updates, handle separately
+        }
         
         const changes = [];
         if (updateData.name && updateData.name !== oldData.name) changes.push(`name: ${oldData.name} → ${updateData.name}`);
@@ -364,7 +307,11 @@ export async function deleteAdmin(adminId, deleterId, deleterName) {
         const admin = await getDoc(adminRef);
         const adminData = admin.data();
         
+        // Delete from Firestore
         await deleteDoc(adminRef);
+        
+        // Note: Deleting from Firebase Auth requires admin SDK or user to be logged in
+        // For now, we only delete from Firestore
         
         await logActivity(deleterId, deleterName, 'DELETE', `Deleted admin ${adminData?.name || adminId}`);
         return true;
@@ -375,7 +322,30 @@ export async function deleteAdmin(adminId, deleterId, deleterName) {
     }
 }
 
-// ==================== ACTIVITY LOGGING ====================
+/**
+ * Get all admins from Firestore
+ * @returns {Promise<Array>} List of admins
+ */
+export async function getAllAdmins() {
+    try {
+        const snapshot = await getDocs(collection(db, "admins"));
+        const admins = [];
+        snapshot.forEach((doc) => {
+            const data = doc.data();
+            admins.push({
+                id: doc.id,
+                name: data.name,
+                email: data.email,
+                role: data.role || 'admin',
+                createdAt: data.createdAt?.toDate?.() || new Date(data.createdAt)
+            });
+        });
+        return admins;
+    } catch (error) {
+        console.error("Error getting admins:", error);
+        return [];
+    }
+}
 
 /**
  * Log activity to Firestore
@@ -419,27 +389,6 @@ export async function getAllActivities(limit = 100) {
 }
 
 /**
- * Get activities for a specific admin
- * @param {string} adminId - Admin ID
- * @param {number} limit - Max number of activities
- * @returns {Promise<Array>} List of activities
- */
-export async function getAdminActivities(adminId, limit = 50) {
-    try {
-        const q = query(collection(db, "adminActivities"), where('adminId', '==', adminId), orderBy('timestamp', 'desc'));
-        const snapshot = await getDocs(q);
-        const activities = [];
-        snapshot.forEach((doc) => {
-            activities.push({ id: doc.id, ...doc.data() });
-        });
-        return activities.slice(0, limit);
-    } catch (error) {
-        console.error("Error getting admin activities:", error);
-        return [];
-    }
-}
-
-/**
  * Get activity statistics
  * @returns {Promise<Object>} Statistics
  */
@@ -456,8 +405,6 @@ export async function getActivityStats() {
         return { total: 0, byAction: {} };
     }
 }
-
-// ==================== SECRET KEY MANAGEMENT ====================
 
 /**
  * Validate secret key
@@ -484,8 +431,6 @@ export async function validateSecretKey(secretKey) {
     }
 }
 
-// ==================== PAGE PROTECTION ====================
-
 /**
  * Protect a page - redirect if not logged in
  * @param {string} redirectUrl - URL to redirect to
@@ -507,14 +452,12 @@ export function protectPage(redirectUrl = 'admin-login.html') {
  * @returns {boolean} True if authorized
  */
 export async function protectPageWithRole(allowedRoles, redirectUrl = 'admin-login.html') {
-    // First check if logged in
     if (!isLoggedIn()) {
         sessionStorage.setItem('redirectAfterLogin', window.location.pathname);
         window.location.href = redirectUrl;
         return false;
     }
     
-    // Get current admin and check role
     const admin = await getCurrentAdmin();
     const roles = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];
     
@@ -526,50 +469,25 @@ export async function protectPageWithRole(allowedRoles, redirectUrl = 'admin-log
     return true;
 }
 
-// ==================== UI INITIALIZATION ====================
-
 /**
- * Initialize Auth UI components
+ * Initialize Auth UI
  * @returns {Promise<Object|null>} Current admin
  */
 export async function initAuthUI() {
     const admin = await getCurrentAdmin();
     
     if (admin) {
-        // Update admin name display
         const nameElement = document.getElementById('adminNameDisplay');
         if (nameElement) nameElement.textContent = admin.name;
         
-        // Update admin email display
         const emailElement = document.getElementById('adminEmailDisplay');
         if (emailElement) emailElement.textContent = admin.email;
         
-        // Update admin role display
         const roleElement = document.getElementById('adminRoleDisplay');
         if (roleElement) roleElement.textContent = admin.role;
-        
-        // Update avatar
-        const avatarElement = document.getElementById('adminAvatar');
-        if (avatarElement) avatarElement.textContent = admin.name.charAt(0).toUpperCase();
-        
-        // Setup logout buttons
-        const logoutButtons = document.querySelectorAll('.logout-btn, #logoutBtn');
-        logoutButtons.forEach(btn => {
-            btn.removeEventListener('click', logoutHandler);
-            btn.addEventListener('click', logoutHandler);
-        });
     }
     
     return admin;
-}
-
-/**
- * Logout handler for buttons
- */
-async function logoutHandler(e) {
-    e.preventDefault();
-    await logout();
-    window.location.href = 'admin-login.html';
 }
 
 /**
@@ -590,47 +508,33 @@ export function setupAutoLogout(timeoutMinutes = 60) {
         }, timeoutMinutes * 60 * 1000);
     }
     
-    const events = ['mousedown', 'keypress', 'scroll', 'touchstart', 'click'];
+    const events = ['mousedown', 'keypress', 'scroll', 'touchstart'];
     events.forEach(event => {
-        document.removeEventListener(event, resetTimer);
         document.addEventListener(event, resetTimer);
     });
     
     resetTimer();
 }
 
-// ==================== EXPORTS ====================
-
+// Export all functions
 export default {
-    // Session Management
-    getCurrentSession,
     getCurrentFirebaseUser,
     getCurrentAdminData,
-    getCurrentAdmin,
+    getCurrentSession,
     isLoggedIn,
+    getCurrentAdmin,
     logout,
     loginAdmin,
-    
-    // Admin Management
     registerAdmin,
-    getAllAdmins,
     updateAdmin,
     deleteAdmin,
-    
-    // Activity Logging
+    getAllAdmins,
     logActivity,
     getAllActivities,
-    getAdminActivities,
     getActivityStats,
-    
-    // Secret Keys
     validateSecretKey,
-    
-    // Page Protection
     protectPage,
     protectPageWithRole,
-    
-    // UI
     initAuthUI,
     setupAutoLogout
 };

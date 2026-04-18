@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>Noor Academy | Admin Management Center</title>
+    <title>JUMJ Irshad | Admin Management Center</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -517,6 +517,15 @@
 <div id="toast" class="toast"></div>
 
 <script type="module">
+    import { protectPageWithRole, initAuthUI, setupAutoLogout } from './auth.js';
+
+if (!protectPageWithRole(['super-admin'], 'admin-login.html')) {
+    throw new Error('Redirecting to login');
+}
+
+const admin = await initAuthUI();
+setupAutoLogout(60);
+
     import { protectPageWithRole, initAuthUI, setupAutoLogout, logout, getCurrentAdmin, logActivity, getAllAdmins, getAllActivities, getActivityStats, updateAdmin, deleteAdmin } from './auth.js';
     
     // DOM Elements

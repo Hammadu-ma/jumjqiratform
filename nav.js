@@ -1,4 +1,4 @@
-// nav.js - Universal Navigation System for Noor Academy Admin Dashboard
+// nav.js - Universal Navigation System for JUMJ Irshad Admin Dashboard
 // Handles desktop header navigation and mobile bottom navigation with role-based access
 
 import { getCurrentAdmin } from './auth.js';

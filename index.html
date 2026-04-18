@@ -657,25 +657,15 @@
 <div id="toast" class="toast"></div>
 
 <script type="module">
-    import { protectPage, initAuthUI, setupAutoLogout, getCurrentAdmin } from './auth.js';
+    import { protectPage, initAuthUI, setupAutoLogout } from './auth.js';
 
-// Protect this page - redirects to login if not authenticated
-(async () => {
-    const isAuthenticated = await protectPage('admin-login.html');
-    if (!isAuthenticated) {
-        throw new Error('Redirecting to login');
-    }
-    
-    // Initialize UI components (shows admin name, sets up logout buttons)
-    const admin = await initAuthUI();
-    
-    // Setup auto-logout after 60 minutes of inactivity
-    setupAutoLogout(60);
-    
-    // Display admin info in console for debugging
-    console.log('Logged in as:', admin?.name, admin?.email);
-    console.log('Page loaded successfully with admin access');
-})();
+if (!protectPage('admin-login.html')) {
+    throw new Error('Redirecting to login');
+}
+
+const admin = await initAuthUI();
+setupAutoLogout(60);
+
 
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
