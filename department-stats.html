@@ -145,18 +145,28 @@
         .qirat-checkbox {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             background: white;
-            padding: 6px 14px;
+            padding: 8px 16px;
             border-radius: 40px;
             border: 1px solid var(--border);
             cursor: pointer;
             transition: all 0.2s;
+            font-size: 0.85rem;
+            font-weight: 500;
         }
-        .qirat-checkbox:hover { background: var(--primary-light); border-color: var(--primary); }
+        .qirat-checkbox:hover { background: var(--primary-light); border-color: var(--primary); transform: translateY(-1px); }
         .qirat-checkbox.selected { background: var(--primary); color: white; border-color: var(--primary); }
-        .qirat-checkbox input { margin-right: 6px; cursor: pointer; }
-        .select-all-btn { background: var(--primary); color: white; border: none; padding: 8px 20px; border-radius: 40px; font-weight: 600; cursor: pointer; }
+        .qirat-checkbox.selected input { accent-color: white; }
+        .qirat-checkbox input { margin-right: 6px; cursor: pointer; width: 16px; height: 16px; }
+        .select-all-btn { background: var(--primary); color: white; border: none; padding: 8px 20px; border-radius: 40px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .select-all-btn:hover { transform: translateY(-1px); box-shadow: 0 2px 8px rgba(16,185,129,0.3); }
+        .select-all-btn.deselect { background: #64748b; }
+        .export-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
+        .export-format-btn { padding: 10px 24px; border: none; border-radius: 40px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; }
+        .export-format-btn:hover { transform: translateY(-2px); filter: brightness(1.05); }
+        .filter-row { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 16px; align-items: flex-end; }
+        .filter-row .filter-group { flex: 1; min-width: 200px; margin-bottom: 0; }
 
         /* Department Grid */
         .dept-grid {
@@ -196,7 +206,8 @@
         .filter-group { flex: 1; min-width: 140px; }
         .filter-group label { font-size: 0.7rem; font-weight: 700; color: var(--primary); display: block; margin-bottom: 6px; }
         .filter-group input, .filter-group select { width: 100%; padding: 10px 14px; border: 2px solid var(--border); border-radius: 16px; font-family: inherit; background: white; }
-        .btn-clear { background: #64748b; color: white; border: none; padding: 10px 24px; border-radius: 16px; font-weight: 600; cursor: pointer; }
+        .btn-clear { background: #64748b; color: white; border: none; padding: 10px 24px; border-radius: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .btn-clear:hover { background: #475569; transform: translateY(-1px); }
 
         /* Export Bar */
         .export-bar {
@@ -212,7 +223,7 @@
             border: 1px solid var(--border);
         }
         .export-buttons { display: flex; gap: 12px; flex-wrap: wrap; }
-        .export-btn { padding: 8px 20px; border: none; border-radius: 40px; font-weight: 600; font-size: 0.8rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+        .export-btn { padding: 8px 20px; border: none; border-radius: 40px; font-weight: 600; font-size: 0.8rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; }
         .export-csv { background: #10b981; color: white; }
         .export-excel { background: #059669; color: white; }
         .export-pdf { background: #ef4444; color: white; }
@@ -238,7 +249,8 @@
         .insight-title { font-weight: 800; font-size: 0.9rem; color: var(--primary-dark); }
         .insight-value { font-size: 1.5rem; font-weight: 800; color: var(--primary); }
         .insight-stats { font-size: 0.7rem; color: var(--text-muted); margin: 8px 0; }
-        .insight-btn { background: var(--border); border: none; padding: 6px 12px; border-radius: 30px; font-size: 0.7rem; font-weight: 600; cursor: pointer; margin-top: 8px; width: 100%; }
+        .insight-btn { background: var(--border); border: none; padding: 6px 12px; border-radius: 30px; font-size: 0.7rem; font-weight: 600; cursor: pointer; margin-top: 8px; width: 100%; transition: all 0.2s; }
+        .insight-btn:hover { background: var(--primary); color: white; }
 
         /* Student Table */
         .table-container {
@@ -307,7 +319,7 @@
         .nav-item.active { color: var(--primary); background: var(--primary-light); }
 
         @media (min-width: 768px) { body { padding-bottom: 0; } .bottom-nav { display: none; } }
-        @media (max-width: 768px) { .desktop-nav { display: none; } .bottom-nav { display: flex; } .main-container { padding: 16px; padding-bottom: 80px; } .filters-bar { flex-direction: column; } }
+        @media (max-width: 768px) { .desktop-nav { display: none; } .bottom-nav { display: flex; } .main-container { padding: 16px; padding-bottom: 80px; } .filters-bar { flex-direction: column; } .qirat-selector { max-height: 200px; overflow-y: auto; } }
     </style>
 </head>
 <body>
@@ -335,19 +347,32 @@
     <div class="advanced-export-section">
         <div class="advanced-export-title"><i class="fas fa-rocket"></i> Advanced Multi-Department Export</div>
         <div class="qirat-selector" id="qiratSelector">
-            <span style="font-weight:600;">Select Qirats to Export:</span>
+            <span style="font-weight:600; margin-right:10px;">Select Qirats:</span>
             <button class="select-all-btn" id="selectAllQirats">Select All</button>
-            <button class="select-all-btn" id="deselectAllQirats" style="background:#64748b;">Deselect All</button>
+            <button class="select-all-btn deselect" id="deselectAllQirats">Deselect All</button>
         </div>
-        <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px;">
-            <button class="export-btn export-excel" id="advancedExportExcel"><i class="fas fa-file-excel"></i> Export Selected Qirats (Excel)</button>
-            <button class="export-btn export-pdf" id="advancedExportPDF"><i class="fas fa-file-pdf"></i> Export Selected Qirats (PDF - Multi-Table)</button>
-            <button class="export-btn export-word" id="advancedExportWord"><i class="fas fa-file-word"></i> Export Selected Qirats (Word - Multi-Table)</button>
-            <button class="export-btn export-csv" id="advancedExportCSV"><i class="fas fa-file-csv"></i> Export Selected Qirats (CSV)</button>
+        <div class="filter-row">
+            <div class="filter-group">
+                <label><i class="fas fa-building"></i> Filter by Department (Optional)</label>
+                <select id="advancedDeptFilter"><option value="">All Departments</option></select>
+            </div>
+            <div class="filter-group">
+                <label><i class="fas fa-calendar"></i> Filter by Batch (Optional)</label>
+                <select id="advancedBatchFilter"><option value="">All Batches</option></select>
+            </div>
+            <div class="filter-group">
+                <label><i class="fas fa-venus-mars"></i> Filter by Gender (Optional)</label>
+                <select id="advancedGenderFilter"><option value="">All Genders</option><option value="Male">Male</option><option value="Female">Female</option></select>
+            </div>
         </div>
-        <div class="filter-group" style="margin-top: 16px; max-width: 300px;">
-            <label><i class="fas fa-filter"></i> Filter by Department (Optional)</label>
-            <select id="advancedDeptFilter"><option value="">All Departments</option></select>
+        <div class="export-actions">
+            <button class="export-format-btn export-excel" id="advancedExportExcel"><i class="fas fa-file-excel"></i> Export to Excel (Multi-Sheet)</button>
+            <button class="export-format-btn export-pdf" id="advancedExportPDF"><i class="fas fa-file-pdf"></i> Export to PDF (Multi-Table)</button>
+            <button class="export-format-btn export-word" id="advancedExportWord"><i class="fas fa-file-word"></i> Export to Word (Multi-Table)</button>
+            <button class="export-format-btn export-csv" id="advancedExportCSV"><i class="fas fa-file-csv"></i> Export to CSV (Combined)</button>
+        </div>
+        <div style="margin-top: 12px; font-size: 0.7rem; color: var(--text-muted);">
+            <i class="fas fa-info-circle"></i> For each selected Qirat, creates separate tables for each department. PDF and Word exports include beautifully formatted tables per department.
         </div>
     </div>
 
@@ -432,7 +457,6 @@
     let selectedDept = null;
     let currentFilteredStudents = [];
     let allQiratsList = [];
-    let selectedQirats = new Set();
     
     const toast = document.getElementById('toast');
     
@@ -462,7 +486,14 @@
             calculateDepartmentStats();
             renderDepartments();
             buildQiratSelector();
+            populateBatchFilter();
         } catch (error) { showToast("Error: " + error.message, true); }
+    }
+    
+    function populateBatchFilter() {
+        const batches = [...new Set(allStudents.map(s => s.batch))];
+        const batchSelect = document.getElementById('advancedBatchFilter');
+        batchSelect.innerHTML = '<option value="">All Batches</option>' + batches.map(b => `<option value="${escapeHtml(b)}">${escapeHtml(b)}</option>`).join('');
     }
     
     function buildQiratSelector() {
@@ -471,14 +502,20 @@
         allQiratsList = Array.from(allQiratsSet).sort();
         
         const container = document.getElementById('qiratSelector');
-        const existingElements = container.querySelectorAll('.qirat-checkbox');
-        existingElements.forEach(el => el.remove());
+        const existingCheckboxes = container.querySelectorAll('.qirat-checkbox');
+        existingCheckboxes.forEach(el => el.remove());
         
         allQiratsList.forEach(q => {
             const label = document.createElement('label');
             label.className = 'qirat-checkbox';
             label.innerHTML = `<input type="checkbox" value="${escapeHtml(q)}"> ${escapeHtml(q)}`;
             container.appendChild(label);
+        });
+        
+        // Add click handlers for checkboxes
+        document.querySelectorAll('.qirat-checkbox').forEach(el => {
+            const cb = el.querySelector('input');
+            cb.addEventListener('change', () => { if (cb.checked) el.classList.add('selected'); else el.classList.remove('selected'); });
         });
         
         // Populate advanced department filter
@@ -637,7 +674,7 @@
                     <div style="overflow-x:auto;">
                         <table class="data-table" style="width:100%;border-collapse:collapse;">
                             <thead><tr><th>Name</th><th>Gender</th><th>Phone</th><th>Department</th><th>Batch</th><th>Qirats</th><th>Date</th></tr></thead>
-                            <tbody>${students.map(s => `<tr><td><strong>${escapeHtml(s.Name)}</strong></td><td>${escapeHtml(s.Gender)}</td><td>${escapeHtml(s.Phone)}</td><td>${escapeHtml(s.Department)}</td><td>${escapeHtml(s.Batch)}</td><td>${escapeHtml(s.Qirats)}</td><td>${escapeHtml(s.Date)}</td>`).join('')}</tbody>
+                            <tbody>${students.map(s => `<tr>}<strong>${escapeHtml(s.Name)}</strong></td>}<td>${escapeHtml(s.Gender)}</td><td>${escapeHtml(s.Phone)}</td><td>${escapeHtml(s.Department)}</td><td>${escapeHtml(s.Batch)}</td><td>${escapeHtml(s.Qirats)}</td><td>${escapeHtml(s.Date)}</td></tr>`).join('')}</tbody>
                         </table>
                     </div>
                 </div>
@@ -659,11 +696,6 @@
     document.getElementById('deselectAllQirats').addEventListener('click', () => {
         document.querySelectorAll('.qirat-checkbox input').forEach(cb => { cb.checked = false; cb.closest('.qirat-checkbox').classList.remove('selected'); });
     });
-    document.querySelectorAll('.qirat-checkbox').forEach(el => {
-        el.addEventListener('click', (e) => { if (e.target.tagName !== 'INPUT') { const cb = el.querySelector('input'); cb.checked = !cb.checked; if (cb.checked) el.classList.add('selected'); else el.classList.remove('selected'); } });
-        const cb = el.querySelector('input');
-        cb.addEventListener('change', () => { if (cb.checked) el.classList.add('selected'); else el.classList.remove('selected'); });
-    });
     
     function getSelectedQirats() {
         const selected = [];
@@ -671,20 +703,39 @@
         return selected;
     }
     
-    function getDepartmentFilter() { return document.getElementById('advancedDeptFilter').value; }
+    function getAdvancedFilters() {
+        return {
+            dept: document.getElementById('advancedDeptFilter').value,
+            batch: document.getElementById('advancedBatchFilter').value,
+            gender: document.getElementById('advancedGenderFilter').value
+        };
+    }
+    
+    function filterStudentsByAdvancedFilters(students) {
+        const filters = getAdvancedFilters();
+        return students.filter(s => {
+            const matchDept = !filters.dept || s.department === filters.dept;
+            const matchBatch = !filters.batch || s.batch === filters.batch;
+            const matchGender = !filters.gender || s.gender === filters.gender;
+            return matchDept && matchBatch && matchGender;
+        });
+    }
     
     function getDataForExport() {
         const selectedQirats = getSelectedQirats();
-        const deptFilter = getDepartmentFilter();
         if (selectedQirats.length === 0) { showToast('Please select at least one Qirat', true); return null; }
         
         const result = {};
         selectedQirats.forEach(qirat => { result[qirat] = {}; });
         
+        // Get departments to include (either selected or all)
+        const deptFilter = document.getElementById('advancedDeptFilter').value;
         const targetDepartments = deptFilter ? departments.filter(d => d.name === deptFilter) : departments;
         
         targetDepartments.forEach(dept => {
-            const deptStudents = dept.students;
+            // Apply batch and gender filters to department students
+            let deptStudents = filterStudentsByAdvancedFilters(dept.students);
+            
             selectedQirats.forEach(qirat => {
                 const studentsInQirat = deptStudents.filter(s => getQiratNames(s).includes(qirat));
                 if (studentsInQirat.length > 0) {
@@ -720,7 +771,6 @@
                 th { background: #10b981; color: white; padding: 10px; text-align: left; font-weight: bold; }
                 td { border: 1px solid #ddd; padding: 8px; }
                 tr:nth-child(even) { background: #f9fafb; }
-                .dept-header { background: #e2e8f0; font-weight: bold; margin-top: 20px; }
                 .footer { margin-top: 40px; text-align: center; font-size: 10px; color: #64748b; border-top: 1px solid #ddd; padding-top: 20px; }
             </style>
         </head>
@@ -729,7 +779,7 @@
             <div class="header-info">
                 <p><strong>Generated:</strong> ${new Date().toLocaleString()}</p>
                 <p><strong>Selected Qirats:</strong> ${selectedQirats.join(', ')}</p>
-                <p><strong>Departments Included:</strong> ${Object.keys(data[selectedQirats[0]] || {}).join(', ')}</p>
+                <p><strong>Filters Applied:</strong> ${getAdvancedFilters().dept || 'All Depts'} | ${getAdvancedFilters().batch || 'All Batches'} | ${getAdvancedFilters().gender || 'All Genders'}</p>
             </div>
         `;
         
@@ -747,7 +797,7 @@
             for (const deptName of deptNames) {
                 const students = deptData[deptName];
                 html += `<h3>🏛️ ${escapeHtml(deptName)} (${students.length} students)</h3>`;
-                html += `<table><thead><tr><th>#</th><th>Name</th><th>Gender</th><th>Phone</th><th>Batch</th><th>Registration Date</th></tr></thead><tbody>`;
+                html += `</table><thead><tr><th>#</th><th>Name</th><th>Gender</th><th>Phone</th><th>Batch</th><th>Registration Date</th></tr></thead><tbody>`;
                 students.forEach((s, idx) => {
                     html += `<tr><td>${idx + 1}</td><td>${escapeHtml(s.Name)}</td><td>${escapeHtml(s.Gender)}</td><td>${escapeHtml(s.Phone)}</td><td>${escapeHtml(s.Batch)}</td><td>${escapeHtml(s.RegistrationDate)}</td></tr>`;
                 });
@@ -772,7 +822,11 @@
         doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 30);
         doc.text(`Selected Qirats: ${selectedQirats.join(', ')}`, 14, 37);
         
-        let yPos = 50;
+        const filters = getAdvancedFilters();
+        let filterText = `Filters: ${filters.dept || 'All Depts'} | ${filters.batch || 'All Batches'} | ${filters.gender || 'All Genders'}`;
+        doc.text(filterText, 14, 44);
+        
+        let yPos = 55;
         
         for (const qirat of selectedQirats) {
             const deptData = data[qirat];
@@ -829,7 +883,7 @@
             const deptData = exportData[qirat];
             const allStudents = [];
             for (const deptName of Object.keys(deptData)) {
-                deptData[deptName].forEach(s => allStudents.push({ ...s, Department: deptName }));
+                deptData[deptName].forEach(s => allStudents.push({ Qirat: qirat, Department: deptName, ...s }));
             }
             if (allStudents.length > 0) {
                 const ws = XLSX.utils.json_to_sheet(allStudents);
@@ -851,7 +905,7 @@
             const deptData = exportData[qirat];
             for (const deptName of Object.keys(deptData)) {
                 deptData[deptName].forEach(s => {
-                    allRows.push({ Qirat: qirat, ...s });
+                    allRows.push({ Qirat: qirat, Department: deptName, ...s });
                 });
             }
         }
