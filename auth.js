@@ -43,35 +43,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// ==================== HELPER FUNCTIONS ====================
-
-/**
- * Get current Firebase Auth user
- * @returns {Object|null} Firebase user or null
- */
-export function getCurrentFirebaseUser() {
-    return auth.currentUser;
-}
-
-/**
- * Get custom admin data from Firestore
- * @returns {Promise<Object|null>} Admin data or null
- */
-export async function getCurrentAdminData() {
-    const user = auth.currentUser;
-    if (!user) return null;
-    
-    try {
-        const adminDoc = await getDoc(doc(db, "admins", user.uid));
-        if (adminDoc.exists()) {
-            return { id: adminDoc.id, ...adminDoc.data() };
-        }
-        return null;
-    } catch (error) {
-        console.error("Error getting admin data:", error);
-        return null;
-    }
-}
+// ==================== SESSION MANAGEMENT ====================
 
 /**
  * Get current admin session from localStorage
@@ -87,8 +59,9 @@ export function getCurrentSession() {
         const now = new Date();
         const hoursDiff = (now - loginTime) / (1000 * 60 * 60);
         
+        // Session expires after 24 hours
         if (hoursDiff > 24) {
-            logout();
+            localStorage.removeItem('adminSession');
             return null;
         }
         
@@ -100,30 +73,45 @@ export function getCurrentSession() {
 }
 
 /**
- * Check if admin is currently logged in
+ * Check if admin is currently logged in (synchronous)
  * @returns {boolean} True if logged in
  */
 export function isLoggedIn() {
     const session = getCurrentSession();
-    return session !== null && auth.currentUser !== null;
+    return session !== null;
 }
 
 /**
- * Get current admin info (combines session + Firestore)
+ * Get current admin info (synchronous from session only)
+ * @returns {Object|null} Admin info or null
+ */
+export function getCurrentAdminSync() {
+    const session = getCurrentSession();
+    if (!session) return null;
+    
+    return {
+        id: session.adminId,
+        name: session.name,
+        email: session.email,
+        role: session.role
+    };
+}
+
+/**
+ * Get current admin info with Firebase verification (async)
  * @returns {Promise<Object|null>} Admin info or null
  */
 export async function getCurrentAdmin() {
     const session = getCurrentSession();
     if (!session) return null;
     
-    const adminData = await getCurrentAdminData();
-    if (!adminData) return null;
-    
+    // Return session data directly without Firebase check for speed
+    // The session already contains the admin info
     return {
         id: session.adminId,
-        name: adminData.name,
-        email: adminData.email,
-        role: adminData.role
+        name: session.name,
+        email: session.email,
+        role: session.role
     };
 }
 
@@ -132,15 +120,26 @@ export async function getCurrentAdmin() {
  */
 export async function logout() {
     try {
+        // Clear localStorage first
+        localStorage.removeItem('adminSession');
+        sessionStorage.removeItem('adminLoggedIn');
+        sessionStorage.removeItem('redirectAfterLogin');
+        
+        // Then sign out from Firebase if user exists
         const user = auth.currentUser;
         if (user) {
             await signOut(auth);
         }
-        localStorage.removeItem('adminSession');
-        sessionStorage.removeItem('adminLoggedIn');
+        
+        // Dispatch logout event
         window.dispatchEvent(new CustomEvent('admin-logout'));
+        
+        // Force redirect to login
+        window.location.href = 'admin-login.html';
     } catch (error) {
         console.error("Logout error:", error);
+        // Still redirect even if Firebase signout fails
+        window.location.href = 'admin-login.html';
     }
 }
 
@@ -177,10 +176,10 @@ export async function loginAdmin(email, password) {
         localStorage.setItem('adminSession', JSON.stringify(sessionData));
         sessionStorage.setItem('adminLoggedIn', 'true');
         
-        // Log activity
-        await logActivity(user.uid, adminData.name, 'LOGIN', 'Admin logged in successfully');
+        // Log activity (don't await to avoid blocking)
+        logActivity(user.uid, adminData.name, 'LOGIN', 'Admin logged in successfully').catch(console.error);
         
-        return { success: true, message: 'Login successful', adminData, adminId: user.uid };
+        return { success: true, message: 'Login successful' };
         
     } catch (error) {
         console.error("Login error:", error);
@@ -188,6 +187,7 @@ export async function loginAdmin(email, password) {
         if (error.code === 'auth/user-not-found') message = 'Email not found';
         else if (error.code === 'auth/wrong-password') message = 'Invalid password';
         else if (error.code === 'auth/invalid-email') message = 'Invalid email format';
+        else if (error.code === 'auth/too-many-requests') message = 'Too many attempts. Try again later';
         return { success: false, message: message };
     }
 }
@@ -245,7 +245,8 @@ export async function registerAdmin(adminData, registrarId = null, registrarName
         console.error("Registration error:", error);
         let message = 'Registration failed';
         if (error.code === 'auth/email-already-in-use') message = 'Email already in use';
-        else if (error.code === 'auth/weak-password') message = 'Password too weak';
+        else if (error.code === 'auth/weak-password') message = 'Password too weak (minimum 6 characters)';
+        else if (error.code === 'auth/invalid-email') message = 'Invalid email format';
         return { success: false, message: message };
     }
 }
@@ -269,16 +270,16 @@ export async function updateAdmin(adminId, updateData, updaterId, updaterName) {
             updatedAt: new Date()
         });
         
-        // Update Firebase Auth email if changed
-        if (updateData.email) {
-            // Note: This requires re-authentication in production
-            // For simplicity, we're only updating Firestore
-        }
-        
-        // Update Firebase Auth password if changed
-        if (updateData.password) {
-            // This would require the user to be logged in
-            // For admin updates, handle separately
+        // Also update session if this is the current admin
+        const currentSession = getCurrentSession();
+        if (currentSession && currentSession.adminId === adminId) {
+            const sessionData = {
+                ...currentSession,
+                name: updateData.name || currentSession.name,
+                email: updateData.email || currentSession.email,
+                role: updateData.role || currentSession.role
+            };
+            localStorage.setItem('adminSession', JSON.stringify(sessionData));
         }
         
         const changes = [];
@@ -307,11 +308,7 @@ export async function deleteAdmin(adminId, deleterId, deleterName) {
         const admin = await getDoc(adminRef);
         const adminData = admin.data();
         
-        // Delete from Firestore
         await deleteDoc(adminRef);
-        
-        // Note: Deleting from Firebase Auth requires admin SDK or user to be logged in
-        // For now, we only delete from Firestore
         
         await logActivity(deleterId, deleterName, 'DELETE', `Deleted admin ${adminData?.name || adminId}`);
         return true;
@@ -389,6 +386,27 @@ export async function getAllActivities(limit = 100) {
 }
 
 /**
+ * Get activities for a specific admin
+ * @param {string} adminId - Admin ID
+ * @param {number} limit - Max number of activities
+ * @returns {Promise<Array>} List of activities
+ */
+export async function getAdminActivities(adminId, limit = 50) {
+    try {
+        const q = query(collection(db, "adminActivities"), where('adminId', '==', adminId), orderBy('timestamp', 'desc'));
+        const snapshot = await getDocs(q);
+        const activities = [];
+        snapshot.forEach((doc) => {
+            activities.push({ id: doc.id, ...doc.data() });
+        });
+        return activities.slice(0, limit);
+    } catch (error) {
+        console.error("Error getting admin activities:", error);
+        return [];
+    }
+}
+
+/**
  * Get activity statistics
  * @returns {Promise<Object>} Statistics
  */
@@ -432,7 +450,7 @@ export async function validateSecretKey(secretKey) {
 }
 
 /**
- * Protect a page - redirect if not logged in
+ * Protect a page - redirect if not logged in (SYNCHRONOUS)
  * @param {string} redirectUrl - URL to redirect to
  * @returns {boolean} True if authenticated
  */
@@ -446,19 +464,21 @@ export function protectPage(redirectUrl = 'admin-login.html') {
 }
 
 /**
- * Protect page with role check
+ * Protect page with role check (SYNCHRONOUS using session)
  * @param {string|string[]} allowedRoles - Allowed roles
  * @param {string} redirectUrl - Redirect URL
  * @returns {boolean} True if authorized
  */
-export async function protectPageWithRole(allowedRoles, redirectUrl = 'admin-login.html') {
+export function protectPageWithRole(allowedRoles, redirectUrl = 'admin-login.html') {
+    // First check if logged in
     if (!isLoggedIn()) {
         sessionStorage.setItem('redirectAfterLogin', window.location.pathname);
         window.location.href = redirectUrl;
         return false;
     }
     
-    const admin = await getCurrentAdmin();
+    // Get admin from session synchronously
+    const admin = getCurrentAdminSync();
     const roles = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];
     
     if (!admin || !roles.includes(admin.role)) {
@@ -470,11 +490,11 @@ export async function protectPageWithRole(allowedRoles, redirectUrl = 'admin-log
 }
 
 /**
- * Initialize Auth UI
- * @returns {Promise<Object|null>} Current admin
+ * Initialize Auth UI (synchronous using session)
+ * @returns {Object|null} Current admin or null
  */
-export async function initAuthUI() {
-    const admin = await getCurrentAdmin();
+export function initAuthUI() {
+    const admin = getCurrentAdminSync();
     
     if (admin) {
         const nameElement = document.getElementById('adminNameDisplay');
@@ -485,6 +505,9 @@ export async function initAuthUI() {
         
         const roleElement = document.getElementById('adminRoleDisplay');
         if (roleElement) roleElement.textContent = admin.role;
+        
+        const avatarElement = document.getElementById('adminAvatar');
+        if (avatarElement) avatarElement.textContent = admin.name.charAt(0).toUpperCase();
     }
     
     return admin;
@@ -499,17 +522,16 @@ export function setupAutoLogout(timeoutMinutes = 60) {
     
     function resetTimer() {
         if (logoutTimer) clearTimeout(logoutTimer);
-        logoutTimer = setTimeout(async () => {
+        logoutTimer = setTimeout(() => {
             if (isLoggedIn()) {
-                await logout();
-                alert('Your session has expired. Please login again.');
-                window.location.href = 'admin-login.html';
+                logout();
             }
         }, timeoutMinutes * 60 * 1000);
     }
     
-    const events = ['mousedown', 'keypress', 'scroll', 'touchstart'];
+    const events = ['mousedown', 'keypress', 'scroll', 'touchstart', 'click'];
     events.forEach(event => {
+        document.removeEventListener(event, resetTimer);
         document.addEventListener(event, resetTimer);
     });
     
@@ -518,10 +540,11 @@ export function setupAutoLogout(timeoutMinutes = 60) {
 
 // Export all functions
 export default {
-    getCurrentFirebaseUser,
+    getCurrentFirebaseUser: () => auth.currentUser,
     getCurrentAdminData,
     getCurrentSession,
     isLoggedIn,
+    getCurrentAdminSync,
     getCurrentAdmin,
     logout,
     loginAdmin,
@@ -531,6 +554,7 @@ export default {
     getAllAdmins,
     logActivity,
     getAllActivities,
+    getAdminActivities,
     getActivityStats,
     validateSecretKey,
     protectPage,
