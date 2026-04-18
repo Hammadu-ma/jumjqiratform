@@ -657,25 +657,45 @@
 <div id="toast" class="toast"></div>
 
 <script type="module">
-    // 1. IMPORT AUTHENTICATION
+    // ========== 1. IMPORT AUTHENTICATION FIRST ==========
     import { protectPage, initAuthUI, setupAutoLogout } from './auth.js';
     import { initNavigation } from './nav.js';
     
-    // 2. PROTECT PAGE (SYNCHRONOUS CHECK)
+    // ========== 2. PROTECT PAGE - REDIRECT IF NOT LOGGED IN ==========
     if (!protectPage('admin-login.html')) {
         throw new Error('Redirecting to login');
     }
     
-    // 3. INITIALIZE AUTH (AWAIT)
+    // ========== 3. INITIALIZE AUTHENTICATION ==========
     const admin = await initAuthUI();
     setupAutoLogout(60);
+    console.log('Logged in as:', admin?.name, admin?.email);
     
-    // 4. IMPORT FIREBASE AND OTHER MODULES
-    import { initializeApp } from "firebase/app";
-    import { getFirestore } from "firebase/firestore";
+    // ========== 4. IMPORT FIREBASE MODULES ==========
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     
-    // 5. YOUR PAGE CODE
-        function showToast(msg, isErr = false) {
+    // ========== 5. FIREBASE CONFIGURATION ==========
+    const firebaseConfig = {
+        apiKey: "AIzaSyAR_g5y04YAGCrTvZCowrE7hw8h7k1du08",
+        authDomain: "jujm-qirat.firebaseapp.com",
+        projectId: "jujm-qirat",
+        storageBucket: "jujm-qirat.firebasestorage.app",
+        messagingSenderId: "253413984903",
+        appId: "1:253413984903:web:c1577e0fdef1711f960622"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    
+    // ========== 6. PAGE VARIABLES ==========
+    let registrations = [];
+    let trendChart, genderChart;
+    let currentlyEditing = null;
+    
+    const toast = document.getElementById('toast');
+    
+    function showToast(msg, isErr = false) {
         toast.textContent = msg;
         toast.style.background = isErr ? '#ef4444' : '#10b981';
         toast.style.display = 'block';
@@ -692,6 +712,7 @@
         return (student.schedules || []).map(s => s.qirat_name).filter(Boolean);
     }
     
+    // ========== 7. LOAD DATA FROM FIREBASE ==========
     async function loadData() {
         try {
             const querySnapshot = await getDocs(collection(db, "registrations"));
@@ -772,7 +793,7 @@
             .slice(0, 10);
     }
     
-    // Inline Edit Functions
+    // ========== 8. INLINE EDIT FUNCTIONS ==========
     function startEdit(id) {
         if (currentlyEditing) {
             saveEdit(currentlyEditing);
@@ -827,6 +848,12 @@
         if (row) row.classList.remove('editing');
         currentlyEditing = null;
     }
+    
+    // Make functions available globally for onclick handlers
+    window.startEdit = startEdit;
+    window.saveEdit = saveEdit;
+    window.deleteStudent = deleteStudent;
+    window.cancelEdit = cancelEdit;
     
     function renderEditableRecentTable() {
         const recent = getRecentRegistrations();
@@ -896,11 +923,7 @@
         });
     }
     
-    window.startEdit = startEdit;
-    window.saveEdit = saveEdit;
-    window.deleteStudent = deleteStudent;
-    window.cancelEdit = cancelEdit;
-    
+    // ========== 9. RENDER DASHBOARD ==========
     function renderDashboard() {
         const total = registrations.length;
         const maleCount = registrations.filter(r => r.gender === 'Male').length;
@@ -925,25 +948,53 @@
             totalTrendElem.className = `trend-badge trend-${growth.direction === 'up' ? 'up' : 'down'}`;
         }
         
-        // Charts
+        // Render Trend Chart
         const trend = getDailyTrend();
         const trendCtx = document.getElementById('trendChart').getContext('2d');
         if (trendChart) trendChart.destroy();
         trendChart = new Chart(trendCtx, {
             type: 'line',
-            data: { labels: trend.labels, datasets: [{ label: 'Registrations', data: trend.counts, borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.1)', fill: true, tension: 0.3 }] },
-            options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'top' } } }
+            data: {
+                labels: trend.labels,
+                datasets: [{
+                    label: 'Registrations',
+                    data: trend.counts,
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16,185,129,0.1)',
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 3,
+                    pointBackgroundColor: '#059669'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: { legend: { position: 'top' } }
+            }
         });
         
+        // Render Gender Chart
         const genderCtx = document.getElementById('genderChart').getContext('2d');
         if (genderChart) genderChart.destroy();
         genderChart = new Chart(genderCtx, {
             type: 'doughnut',
-            data: { labels: ['Male', 'Female'], datasets: [{ data: [maleCount, femaleCount], backgroundColor: ['#3b82f6', '#ec489a'], borderWidth: 0 }] },
-            options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom' } } }
+            data: {
+                labels: ['Male', 'Female'],
+                datasets: [{
+                    data: [maleCount, femaleCount],
+                    backgroundColor: ['#3b82f6', '#ec489a'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: { legend: { position: 'bottom' } }
+            }
         });
         
-        // Top Qirats
+        // Render Top Qirats
         const topQirats = getTopQirats();
         const topContainer = document.getElementById('topQiratsList');
         if (topQirats.length === 0) {
@@ -960,7 +1011,7 @@
             `).join('');
         }
         
-        // Editable Recent Table
+        // Render Editable Recent Table
         renderEditableRecentTable();
     }
     
@@ -969,16 +1020,11 @@
         return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m]));
     }
     
+    // ========== 10. INITIALIZE PAGE ==========
     loadData();
     setInterval(loadData, 30000);
-    // In your page-specific JavaScript
-    import { initNavigation } from './nav.js';
     
-    document.addEventListener('DOMContentLoaded', () => {
-        initNavigation();
-    });
-    
-    // 6. NAVIGATION (LAST)
+    // ========== 11. INITIALIZE NAVIGATION (LAST) ==========
     document.addEventListener('DOMContentLoaded', () => {
         initNavigation();
     });
