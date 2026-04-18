@@ -657,14 +657,19 @@
 <div id="toast" class="toast"></div>
 
 <script type="module">
+        // ========== 1. IMPORT AUTHENTICATION FIRST ==========
     import { protectPage, initAuthUI, setupAutoLogout } from './auth.js';
-
-if (!protectPage('admin-login.html')) {
-    throw new Error('Redirecting to login');
-}
-
-const admin = await initAuthUI();
-setupAutoLogout(60);
+    import { initNavigation } from './nav.js';
+    
+    // ========== 2. PROTECT PAGE - THIS MUST BE FIRST ==========
+    if (!protectPage('admin-login.html')) {
+        throw new Error('Redirecting to login');
+    }
+    
+    // ========== 3. INITIALIZE AUTHENTICATION ==========
+    const admin = await initAuthUI();
+    setupAutoLogout(60);
+    console.log('Logged in as:', admin?.name, admin?.email);
 
 
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
