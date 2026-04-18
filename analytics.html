@@ -337,13 +337,6 @@
 <div class="glass-header">
     <div class="header-content">
         <div class="logo"><h1><i class="fas fa-chart-line"></i> Analytics Studio</h1></div>
-        <div class="desktop-nav">
-            <a href="index.html" class="nav-link">Home</a>
-            <a href="groups.html" class="nav-link">Groups</a>
-            <a href="tables.html" class="nav-link">Tables</a>
-            <a href="analytics.html" class="nav-link active">Analytics</a>
-            <a href="import.html" class="nav-link">Import</a>
-        </div>
         <button class="back-btn" onclick="window.location.href='index.html'"><i class="fas fa-arrow-left"></i> Back</button>
     </div>
 </div>
@@ -382,13 +375,7 @@
 </div>
 
 <!-- Bottom Navigation -->
-<div class="bottom-nav">
-    <button class="nav-item" onclick="window.location.href='index.html'"><i class="fas fa-home"></i><span>Home</span></button>
-    <button class="nav-item" onclick="window.location.href='groups.html'"><i class="fas fa-layer-group"></i><span>Groups</span></button>
-    <button class="nav-item" onclick="window.location.href='tables.html'"><i class="fas fa-table"></i><span>Tables</span></button>
-    <button class="nav-item active" onclick="window.location.href='analytics.html'"><i class="fas fa-chart-line"></i><span>Analytics</span></button>
-    <button class="nav-item" onclick="window.location.href='import.html'"><i class="fas fa-upload"></i><span>Import</span></button>
-</div>
+
 
 <!-- Drill Modal -->
 <div id="drillModal" class="modal">
@@ -422,6 +409,23 @@
 <div id="toast" class="toast"></div>
 
 <script type="module">
+    import { protectPage, initAuthUI, setupAutoLogout, getCurrentAdmin } from './auth.js';
+
+// Protect this page - redirects to login if not authenticated
+if (!protectPage('admin-login.html')) {
+    throw new Error('Redirecting to login');
+}
+
+// Initialize UI components (shows admin name, sets up logout buttons)
+const admin = await initAuthUI();
+
+// Setup auto-logout after 60 minutes of inactivity
+setupAutoLogout(60);
+
+// Display admin info in console for debugging
+console.log('Logged in as:', admin?.name, admin?.email);
+console.log('Page loaded successfully with admin access');
+
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     
@@ -707,6 +711,13 @@
     
     loadData();
     setInterval(loadData, 30000);
+    // ========== NAVIGATION INITIALIZATION ==========
+import { initNavigation } from './nav.js';
+
+// Initialize navigation when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    initNavigation();
+});
 </script>
 </body>
 </html>
