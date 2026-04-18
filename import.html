@@ -9,6 +9,19 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mammoth@1.4.2/mammoth.browser.min.js"></script>
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#3b82f6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="ALIF Med">
+    
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" href="/icons/icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-192x192.png">
+
+  
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -135,9 +148,14 @@
             position: relative;
         }
         .upload-zone:hover { border-color: var(--primary); background: var(--primary-light); transform: translateY(-2px); }
+        .upload-zone.loading {
+            pointer-events: none;
+            opacity: 0.7;
+        }
         .upload-zone i { font-size: 3rem; color: var(--primary); margin-bottom: 16px; }
         .upload-zone h3 { margin-bottom: 8px; }
 
+        /* Loading Overlay */
         .loading-overlay {
             position: fixed;
             top: 0;
@@ -162,7 +180,11 @@
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
-        .loading-text { color: white; font-size: 1.1rem; font-weight: 600; }
+        .loading-text {
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
         .loading-progress {
             width: 300px;
             height: 8px;
@@ -177,7 +199,9 @@
             border-radius: 10px;
             transition: width 0.3s;
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
 
         .file-types {
             display: flex;
@@ -285,7 +309,10 @@
             align-items: center;
             gap: 8px;
         }
-        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
         .btn-secondary {
             background: #e2e8f0;
             color: #334155;
@@ -361,22 +388,15 @@
 <div class="glass-header">
     <div class="header-content">
         <div class="logo"><h1><i class="fas fa-cloud-upload-alt"></i> Smart Import Center</h1></div>
-        <div class="desktop-nav">
-            <a href="index.html" class="nav-link">Home</a>
-            <a href="groups.html" class="nav-link">Groups</a>
-            <a href="tables.html" class="nav-link">Tables</a>
-            <a href="analytics.html" class="nav-link">Analytics</a>
-            <a href="qirat-analytics.html" class="nav-link">Qirat Analytics</a>
-            <a href="import.html" class="nav-link active">Import</a>
-        </div>
+
         <button class="back-btn" onclick="window.location.href='index.html'"><i class="fas fa-arrow-left"></i> Back</button>
     </div>
 </div>
 
 <div class="main-container">
     <div class="hero-import">
-        <h2><i class="fas fa-database"></i> Intelligent Bulk Import</h2>
-        <p>Smart duplicate detection • Auto-merge Qirats • Update existing records</p>
+        <h2><i class="fas fa-database"></i> Bulk Import</h2>
+        <p> Auto-merge Qirats • </p>
         <div class="file-types" id="fileTypeButtons">
             <button class="type-btn" data-type="csv"><i class="fas fa-file-csv"></i> CSV</button>
             <button class="type-btn" data-type="excel"><i class="fas fa-file-excel"></i> Excel</button>
@@ -425,17 +445,11 @@
     </div>
 </div>
 
-<div class="bottom-nav">
-    <button class="nav-item" onclick="window.location.href='index.html'"><i class="fas fa-home"></i><span>Home</span></button>
-    <button class="nav-item" onclick="window.location.href='groups.html'"><i class="fas fa-layer-group"></i><span>Groups</span></button>
-    <button class="nav-item" onclick="window.location.href='tables.html'"><i class="fas fa-table"></i><span>Tables</span></button>
-    <button class="nav-item" onclick="window.location.href='analytics.html'"><i class="fas fa-chart-line"></i><span>Analytics</span></button>
-    <button class="nav-item" onclick="window.location.href='qirat-analytics.html'"><i class="fas fa-project-diagram"></i><span>Qirat</span></button>
-    <button class="nav-item active" onclick="window.location.href='import.html'"><i class="fas fa-upload"></i><span>Import</span></button>
-</div>
+
 
 <div id="toast" class="toast"></div>
 
+<!-- Loading Overlay -->
 <div id="loadingOverlay" class="loading-overlay">
     <div class="loading-spinner"></div>
     <div class="loading-text" id="loadingText">Processing file...</div>
@@ -443,24 +457,25 @@
 </div>
 
 <script type="module">
-    // ==================== AUTHENTICATION IMPORTS (FIRST) ====================
-    import { protectPage, initAuthUI, setupAutoLogout, getCurrentAdminSync } from './auth.js';
-    import { initNavigation, refreshNavigation } from './nav.js';
+
+      import { protectPage, initAuthUI, setupAutoLogout, getCurrentAdminSync } from './auth.js';
+    import { initNavigation } from './nav.js';
     
-    // ==================== AUTHENTICATION CHECK ====================
+    // SYNC check - no await needed
     if (!protectPage('admin-login.html')) {
         throw new Error('Redirecting to login');
     }
     
+    // SYNC init - no await needed
     const admin = initAuthUI();
     setupAutoLogout(60);
+    
     console.log('Logged in as:', admin?.name, admin?.email);
     
-    // ==================== FIREBASE IMPORTS ====================
+
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, doc, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, doc, updateDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     
-    // ==================== FIREBASE CONFIG ====================
     const firebaseConfig = {
         apiKey: "AIzaSyAR_g5y04YAGCrTvZCowrE7hw8h7k1du08",
         authDomain: "jujm-qirat.firebaseapp.com",
@@ -473,7 +488,6 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     
-    // ==================== GLOBAL VARIABLES ====================
     let parsedData = [];
     let headers = [];
     let currentFileType = 'excel';
@@ -501,7 +515,6 @@
     const loadingText = document.getElementById('loadingText');
     const loadingProgressBar = document.getElementById('loadingProgressBar');
     
-    // ==================== UI HELPERS ====================
     function showLoading(message, progress = null) {
         loadingOverlay.classList.add('active');
         loadingText.textContent = message;
@@ -527,20 +540,12 @@
         setTimeout(() => toast.style.display = 'none', 3000);
     }
     
-    function escapeHtml(str) {
-        if (!str) return '';
-        return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m]));
-    }
-    
-    // ==================== EFFICIENT DATA LOADING (SINGLE READ) ====================
     async function loadExistingStudents() {
         try {
             showLoading("Loading existing student data...", 10);
             const querySnapshot = await getDocs(collection(db, "registrations"));
             existingStudentsMap.clear();
             let count = 0;
-            
-            // Single pass - O(n) operation
             querySnapshot.forEach((docSnap) => {
                 const data = docSnap.data();
                 const name = (data.full_name || '').trim().toLowerCase();
@@ -558,7 +563,6 @@
                     count++;
                 }
             });
-            
             updateLoadingProgress(30, `Loaded ${count} existing records`);
             await new Promise(r => setTimeout(r, 300));
             hideLoading();
@@ -569,7 +573,7 @@
         }
     }
     
-    // ==================== FILE TYPE HANDLERS ====================
+    // File type selection
     document.querySelectorAll('.type-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
@@ -593,7 +597,6 @@
     });
     fileInput.addEventListener('change', async (e) => { if (e.target.files[0]) await processFile(e.target.files[0]); });
     
-    // ==================== FILE PARSERS ====================
     async function processFile(file) {
         showLoading(`Loading ${file.name}...`, 20);
         await loadExistingStudents();
@@ -697,7 +700,6 @@
         renderPreview();
     }
     
-    // ==================== MAPPING & PREVIEW ====================
     function getMappedValue(row, fieldKey) {
         const selectedColumn = currentMappingSelections[fieldKey];
         if (!selectedColumn) {
@@ -876,7 +878,11 @@
         updateMappingAndAnalyze();
     }
     
-    // ==================== EFFICIENT BATCH IMPORT ====================
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m]));
+    }
+    
     cancelBtn.addEventListener('click', () => {
         parsedData = [];
         previewContainer.style.display = 'none';
@@ -894,22 +900,15 @@
         }
         
         showLoading("Starting import...", 0);
-        
         let added = 0;
         let updated = 0;
         let merged = 0;
         const total = parsedData.length;
         
-        // Use batch writes for better performance (max 500 operations per batch)
-        // Firebase free plan allows 20k writes/day, so we batch efficiently
-        let batch = writeBatch(db);
-        let batchCount = 0;
-        let operations = [];
-        
         for (let i = 0; i < parsedData.length; i++) {
             const row = parsedData[i];
             const progress = Math.round((i / total) * 100);
-            updateLoadingProgress(progress, `Processing ${i+1}/${total} records...`);
+            updateLoadingProgress(progress, `Importing ${i+1}/${total} records...`);
             
             try {
                 const full_name = getMappedValue(row, 'full_name');
@@ -922,25 +921,20 @@
                 const phone = getMappedValue(row, 'phone') || '';
                 const telegram = getMappedValue(row, 'telegram') || '';
                 const department = getMappedValue(row, 'department') || 'Other';
-                const batchField = getMappedValue(row, 'batch') || 'General';
+                const batch = getMappedValue(row, 'batch') || 'General';
                 const qiratsRaw = getMappedValue(row, 'qirats');
                 
                 const newQirats = qiratsRaw ? qiratsRaw.split(',').map(q => q.trim()).filter(q => q) : [];
                 const schedules = newQirats.map(q => ({ qirat_name: q, days: ["Flexible"], time_preference: "Evening" }));
                 
                 if (!existing) {
-                    // New student - add to batch
-                    const newDocRef = doc(collection(db, "registrations"));
-                    batch.set(newDocRef, {
+                    await addDoc(collection(db, "registrations"), {
                         full_name: full_name.trim(),
-                        gender, phone, telegram, department, batch: batchField,
+                        gender, phone, telegram, department, batch,
                         schedules, timestamp: new Date()
                     });
-                    operations.push({ type: 'add', name: full_name });
                     added++;
-                    batchCount++;
                 } else {
-                    // Existing student - check for changes
                     const existingQirats = (existing.schedules || []).map(s => s.qirat_name);
                     const mergedQirats = [...new Set([...existingQirats, ...newQirats])];
                     const mergedSchedules = mergedQirats.map(q => ({ qirat_name: q, days: ["Flexible"], time_preference: "Evening" }));
@@ -950,42 +944,24 @@
                         existing.phone !== phone ||
                         existing.telegram !== telegram ||
                         existing.department !== department ||
-                        existing.batch !== batchField ||
+                        existing.batch !== batch ||
                         mergedQirats.length !== existingQirats.length
                     );
                     
                     if (hasChanges) {
                         const studentRef = doc(db, "registrations", existing.id);
-                        batch.update(studentRef, {
-                            gender, phone, telegram, department, batch: batchField,
+                        await updateDoc(studentRef, {
+                            gender, phone, telegram, department, batch,
                             schedules: mergedSchedules,
                             timestamp: new Date()
                         });
-                        operations.push({ type: 'update', name: full_name });
                         updated++;
                         if (mergedQirats.length > existingQirats.length) merged++;
-                        batchCount++;
                     }
                 }
-                
-                // Commit batch every 450 operations (safe limit for Firebase)
-                if (batchCount >= 450) {
-                    await batch.commit();
-                    batch = writeBatch(db);
-                    batchCount = 0;
-                    
-                    // Small delay to avoid rate limiting
-                    await new Promise(r => setTimeout(r, 100));
-                }
-                
             } catch (err) {
-                console.error("Import error for row:", row, err);
+                console.error("Import error:", err);
             }
-        }
-        
-        // Commit remaining operations
-        if (batchCount > 0) {
-            await batch.commit();
         }
         
         updateLoadingProgress(100, "Finalizing...");
@@ -994,19 +970,15 @@
         
         showToast(`✅ Import complete: ${added} new, ${updated} updated, ${merged} Qirats merged`);
         
-        // Clear UI and reload data
         parsedData = [];
         previewContainer.style.display = 'none';
         mappingSection.style.display = 'none';
         actionButtons.style.display = 'none';
         statsGrid.style.display = 'none';
         fileInput.value = '';
-        
-        // Reload existing students cache
         await loadExistingStudents();
     });
     
-    // ==================== TEMPLATE DOWNLOAD ====================
     function downloadTemplate() {
         const template = [
             { 'Full Name': 'Ahmed Hassan', 'Gender': 'Male', 'Phone': '+1234567890', 'Telegram': 'ahmed_h', 'Department': 'Medicine', 'Batch': '1st Year', 'Qirats': 'Hafs, Warsh' },
@@ -1028,15 +1000,25 @@
     templateBtn.onclick = downloadTemplate;
     headerContent.appendChild(templateBtn);
     
-    // ==================== NAVIGATION INITIALIZATION ====================
+    loadExistingStudents();
+
+</script>
+    <!-- Navigation Script - Add this at the end of body -->
+<script type="module">
+    import { initNavigation, refreshNavigation } from './nav.js';
+    import { getCurrentAdminSync } from './auth.js';
+    
+    // Initialize base navigation
     initNavigation();
-    const adminUser = getCurrentAdminSync();
-    if (adminUser?.role === 'super-admin') {
+    
+    // Check if Super Admin and refresh to show hidden items
+    const admin = getCurrentAdminSync();
+    if (admin?.role === 'super-admin') {
+        // Refresh navigation to show Keys and Admins
         refreshNavigation();
     }
     
-    // ==================== INITIAL LOAD ====================
-    loadExistingStudents();
+    console.log('Navigation loaded for role:', admin?.role || 'guest');
 </script>
 </body>
 </html>
