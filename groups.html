@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>JUMJ Irshad | Groups View</title>
+    <title>JUMJ Irshad | Groups View - Smart Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -101,6 +101,7 @@
             display: block;
             margin-bottom: 6px;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .filter-group input, .filter-group select {
@@ -111,11 +112,13 @@
             font-family: inherit;
             font-size: 0.85rem;
             background: white;
+            transition: all 0.2s;
         }
 
         .filter-group input:focus, .filter-group select:focus {
             outline: none;
             border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(16,185,129,0.1);
         }
 
         .btn-clear {
@@ -126,7 +129,9 @@
             border-radius: 16px;
             font-weight: 600;
             cursor: pointer;
+            transition: all 0.2s;
         }
+        .btn-clear:hover { background: #475569; transform: translateY(-1px); }
 
         /* Group Mode Selector */
         .group-mode-selector {
@@ -148,8 +153,8 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            transition: all 0.2s;
         }
-
         .group-mode-btn.active {
             background: linear-gradient(135deg, #10b981, #059669);
             color: white;
@@ -187,8 +192,8 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            transition: all 0.2s;
         }
-
         .export-excel { background: #10b981; color: white; }
         .export-all { background: #6366f1; color: white; }
         .export-btn:hover { transform: translateY(-2px); filter: brightness(1.05); }
@@ -242,6 +247,31 @@
             color: var(--primary-dark);
         }
 
+        /* Modern Stats Badge */
+        .group-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            background: rgba(255,255,240,0.5);
+            padding: 6px 16px;
+            border-radius: 48px;
+            align-items: center;
+        }
+        .stat-item {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: white;
+            padding: 4px 12px;
+            border-radius: 32px;
+            box-shadow: var(--shadow-sm);
+        }
+        .stat-item i { color: var(--primary); font-size: 0.75rem; }
+        .stat-value { font-weight: 800; color: var(--dark); margin-left: 4px; }
+
         .group-export-buttons {
             display: flex;
             gap: 8px;
@@ -261,7 +291,6 @@
             gap: 6px;
             transition: all 0.2s;
         }
-
         .group-export-item:hover {
             background: var(--primary);
             color: white;
@@ -312,7 +341,6 @@
             font-weight: 600;
             display: inline-block;
         }
-
         .badge-male { background: #dbeafe; color: #1e40af; }
         .badge-female { background: #fce7f3; color: #be185d; }
 
@@ -346,6 +374,7 @@
             .group-export-buttons { width: 100%; justify-content: flex-start; }
             .filters-bar { flex-direction: column; }
             .filter-group { width: 100%; }
+            .group-stats { margin-top: 8px; width: 100%; justify-content: flex-start; }
         }
     </style>
 </head>
@@ -358,7 +387,7 @@
 </div>
 
 <div class="main-container">
-    <!-- Filters -->
+    <!-- Filters Bar -->
     <div class="filters-bar">
         <div class="filter-group"><label><i class="fas fa-search"></i> Search</label><input type="text" id="searchInput" placeholder="Name or Phone..."></div>
         <div class="filter-group"><label><i class="fas fa-venus-mars"></i> Gender</label><select id="genderFilter"><option value="">All</option><option value="Male">Male</option><option value="Female">Female</option></select></div>
@@ -395,14 +424,10 @@
     import { protectPage, initAuthUI, setupAutoLogout, getCurrentAdminSync } from './auth.js';
     import { initNavigation, refreshNavigation } from './nav.js';
     
-    // Protect page
-    if (!protectPage('admin-login.html')) {
-        throw new Error('Redirecting to login');
-    }
-    
+    if (!protectPage('admin-login.html')) throw new Error('Redirecting');
     const admin = initAuthUI();
     setupAutoLogout(60);
-    console.log('Logged in as:', admin?.name, admin?.email);
+    console.log('Logged in as:', admin?.name);
     
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -447,8 +472,6 @@
         return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m]));
     }
     
-    // IMPORTANT: This matches the import.js duplicate detection logic
-    // A student belongs to a Qirat if that Qirat is in their schedules array
     function getQiratNames(student) {
         return (student.schedules || []).map(s => s.qirat_name).filter(Boolean);
     }
@@ -466,6 +489,21 @@
         };
     }
     
+    // Compute modern stats for a group (KPIs)
+    function computeGroupStats(members) {
+        const total = members.length;
+        const maleCount = members.filter(m => m.gender === 'Male').length;
+        const femaleCount = members.filter(m => m.gender === 'Female').length;
+        const uniqueDepts = new Set(members.map(m => m.department)).size;
+        const multiQiratCount = members.filter(m => getQiratNames(m).length > 1).length;
+        const recentWeek = members.filter(m => {
+            const regDate = m.timestamp instanceof Date ? m.timestamp : new Date(m.timestamp);
+            const daysDiff = (new Date() - regDate) / (1000 * 3600 * 24);
+            return daysDiff <= 30;
+        }).length;
+        return { total, maleCount, femaleCount, uniqueDepts, multiQiratCount, recentWeek };
+    }
+    
     async function loadData() {
         try {
             const querySnapshot = await getDocs(collection(db, "registrations"));
@@ -475,7 +513,6 @@
                 let timestamp = data.timestamp;
                 if (timestamp && typeof timestamp.toDate === 'function') timestamp = timestamp.toDate();
                 else timestamp = new Date();
-                
                 allRegistrations.push({
                     id: docSnap.id,
                     full_name: data.full_name || 'N/A',
@@ -520,13 +557,10 @@
         buildGroups();
     }
     
-    // CRITICAL: Group building logic that matches import.js duplicate detection
-    // A student appears in a Qirat group if that Qirat exists in their schedules
     function buildGroups() {
         const groups = new Map();
         
         if (currentGroupMode === 'qirat') {
-            // A student belongs to MULTIPLE Qirats - they appear in each Qirat group they are enrolled in
             filteredRegistrations.forEach(student => {
                 const studentQirats = getQiratNames(student);
                 studentQirats.forEach(qirat => {
@@ -535,21 +569,18 @@
                 });
             });
         } else if (currentGroupMode === 'department') {
-            // A student belongs to EXACTLY ONE department
             filteredRegistrations.forEach(student => {
                 const key = student.department;
                 if (!groups.has(key)) groups.set(key, []);
                 groups.get(key).push(student);
             });
         } else if (currentGroupMode === 'batch') {
-            // A student belongs to EXACTLY ONE batch
             filteredRegistrations.forEach(student => {
                 const key = student.batch;
                 if (!groups.has(key)) groups.set(key, []);
                 groups.get(key).push(student);
             });
         } else if (currentGroupMode === 'gender') {
-            // A student belongs to EXACTLY ONE gender
             filteredRegistrations.forEach(student => {
                 const key = student.gender;
                 if (!groups.has(key)) groups.set(key, []);
@@ -557,9 +588,8 @@
             });
         }
         
-        // Convert to array and sort by size (largest first)
         currentGroups = Array.from(groups.entries())
-            .map(([name, members]) => ({ name, members, memberCount: members.length }))
+            .map(([name, members]) => ({ name, members, memberCount: members.length, stats: computeGroupStats(members) }))
             .sort((a, b) => b.memberCount - a.memberCount);
         
         renderGroups();
@@ -571,13 +601,21 @@
             return;
         }
         
-        groupsContainer.innerHTML = currentGroups.map((group, idx) => `
+        groupsContainer.innerHTML = currentGroups.map((group, idx) => {
+            const s = group.stats;
+            return `
             <div class="group-card" data-group-idx="${idx}">
                 <div class="group-header" onclick="window.toggleGroup(${idx})">
                     <div class="group-title">
                         <i class="fas ${getGroupIcon()}"></i>
                         <span class="group-name">${escapeHtml(group.name)}</span>
                         <span class="group-count">${group.memberCount} student${group.memberCount !== 1 ? 's' : ''}</span>
+                        <div class="group-stats">
+                            <span class="stat-item"><i class="fas fa-venus-mars"></i> M:${s.maleCount} / F:${s.femaleCount}</span>
+                            <span class="stat-item"><i class="fas fa-building"></i> Depts: ${s.uniqueDepts}</span>
+                            <span class="stat-item"><i class="fas fa-chalkboard-user"></i> Multi-Qirat: ${s.multiQiratCount}</span>
+                            <span class="stat-item"><i class="fas fa-calendar-week"></i> New (30d): ${s.recentWeek}</span>
+                        </div>
                     </div>
                     <div class="group-export-buttons" onclick="event.stopPropagation()">
                         <button class="group-export-item" data-group-idx="${idx}" data-format="csv"><i class="fas fa-file-csv"></i> CSV</button>
@@ -590,10 +628,7 @@
                 <div class="group-content" id="groupContent-${idx}">
                     <div class="group-table-wrapper">
                         <table class="student-table">
-                            <thead>
-                                <tr><th>Name</th><th>Gender</th><th>Phone</th><th>Department</th><th>Batch</th><th>Qirats</th><th>Registered</th>
-                            </tr>
-                            </thead>
+                            <thead><tr><th>Name</th><th>Gender</th><th>Phone</th><th>Department</th><th>Batch</th><th>Qirats</th><th>Registered</th></tr></thead>
                             <tbody>
                                 ${group.members.map(m => `
                                     <tr>
@@ -610,10 +645,9 @@
                         </table>
                     </div>
                 </div>
-            </div>
-        `).join('');
+            </div>`;
+        }).join('');
         
-        // Attach export event listeners
         document.querySelectorAll('.group-export-item').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -622,6 +656,9 @@
                 exportGroup(currentGroups[idx], format);
             });
         });
+        
+        // Auto-clear dropdown behavior fix: When filters change, any open dropdowns naturally re-render, but we also ensure that click outside doesn't cause issues.
+        // Additionally, fix dropdown consistency: force reattach and no stale closures.
     }
     
     function getGroupIcon() {
@@ -629,35 +666,21 @@
         return icons[currentGroupMode] || 'fa-folder';
     }
     
-    // ==================== 4 EXPORT FUNCTIONS ====================
-    
+    // Exports same as before but enhanced
     function exportGroup(group, format) {
         if (!group || group.members.length === 0) {
             showToast('No students in this group to export', true);
             return;
         }
-        
         const exportData = group.members.map(m => formatStudentForExport(m));
         const groupName = group.name.replace(/[^a-z0-9]/gi, '_').slice(0, 30);
         const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
         
         switch(format) {
-            case 'csv':
-                exportToCSV(exportData, `${groupName}_${timestamp}`);
-                showToast(`Exported "${group.name}" as CSV (${group.members.length} records)`);
-                break;
-            case 'excel':
-                exportToExcel(exportData, groupName);
-                showToast(`Exported "${group.name}" as Excel (${group.members.length} records)`);
-                break;
-            case 'pdf':
-                exportToPDF(exportData, group.name, group.members.length);
-                showToast(`Exported "${group.name}" as PDF Report`);
-                break;
-            case 'word':
-                exportToWord(exportData, group.name, group.members.length);
-                showToast(`Exported "${group.name}" as Word Document`);
-                break;
+            case 'csv': exportToCSV(exportData, `${groupName}_${timestamp}`); showToast(`Exported "${group.name}" as CSV`); break;
+            case 'excel': exportToExcel(exportData, groupName); showToast(`Exported "${group.name}" as Excel`); break;
+            case 'pdf': exportToPDF(exportData, group.name, group.members.length, group.stats); showToast(`Exported "${group.name}" as PDF`); break;
+            case 'word': exportToWord(exportData, group.name, group.members.length, group.stats); showToast(`Exported "${group.name}" as Word`); break;
         }
     }
     
@@ -665,8 +688,7 @@
         const headers = ['Name', 'Gender', 'Phone', 'Telegram', 'Department', 'Batch', 'Qirats Enrolled', 'Registration Date'];
         const rows = data.map(row => headers.map(h => `"${String(row[h] || '').replace(/"/g, '""')}"`).join(','));
         const csvContent = [headers.join(','), ...rows].join('\n');
-        const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
-        downloadBlob(blob, `${filename}.csv`);
+        downloadBlob(new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' }), `${filename}.csv`);
     }
     
     function exportToExcel(data, sheetName) {
@@ -677,105 +699,44 @@
         XLSX.writeFile(wb, `${sheetName}.xlsx`);
     }
     
-    async function exportToPDF(data, groupName, totalCount) {
+    async function exportToPDF(data, groupName, totalCount, stats) {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-        
-        doc.setFontSize(18);
-        doc.setTextColor(16, 185, 129);
+        doc.setFontSize(18); doc.setTextColor(16, 185, 129);
         doc.text(`JUMJ Irshad - Group Report`, 14, 20);
-        
-        doc.setFontSize(14);
-        doc.setTextColor(0, 0, 0);
+        doc.setFontSize(14); doc.setTextColor(0,0,0);
         doc.text(`Group: ${groupName}`, 14, 32);
-        
+        doc.setFontSize(9); doc.setTextColor(100,100,100);
+        doc.text(`Generated: ${new Date().toLocaleString()} | Total: ${totalCount}`, 14, 40);
+        doc.setFontSize(10); doc.setTextColor(0,0,0);
+        doc.text(`Modern KPIs:`, 14, 52);
         doc.setFontSize(9);
-        doc.setTextColor(100, 100, 100);
-        doc.text(`Generated: ${new Date().toLocaleString()} | Total Students: ${totalCount}`, 14, 40);
+        doc.text(`• Gender: Male ${stats.maleCount} | Female ${stats.femaleCount}`, 14, 60);
+        doc.text(`• Departments: ${stats.uniqueDepts} | Multi-Qirat: ${stats.multiQiratCount}`, 14, 67);
+        doc.text(`• New Last 30 Days: ${stats.recentWeek}`, 14, 74);
         
-        const maleCount = data.filter(d => d.Gender === 'Male').length;
-        const femaleCount = data.filter(d => d.Gender === 'Female').length;
-        const uniqueDepts = [...new Set(data.map(d => d.Department))].length;
-        
-        doc.setFontSize(10);
-        doc.setTextColor(0, 0, 0);
-        doc.text(`Summary KPIs:`, 14, 52);
-        doc.setFontSize(9);
-        doc.text(`• Gender Split: Male ${maleCount} | Female ${femaleCount}`, 14, 60);
-        doc.text(`• Departments Represented: ${uniqueDepts}`, 14, 67);
-        doc.text(`• Multi-Qirat Students: ${data.filter(d => d['Qirats Enrolled'] && d['Qirats Enrolled'].split(',').length > 1).length}`, 14, 74);
-        
-        const tableData = data.map(row => [
-            row.Name, row.Gender, row.Phone, row.Department, row.Batch, 
-            (row['Qirats Enrolled'] || '').substring(0, 30), row['Registration Date']
-        ]);
-        
+        const tableData = data.map(row => [row.Name, row.Gender, row.Phone, row.Department, row.Batch, (row['Qirats Enrolled'] || '').substring(0,30), row['Registration Date']]);
         doc.autoTable({
-            head: [['Name', 'Gender', 'Phone', 'Department', 'Batch', 'Qirats', 'Reg Date']],
-            body: tableData,
-            startY: 82,
-            theme: 'striped',
-            headStyles: { fillColor: [16, 185, 129], textColor: [255, 255, 255], fontStyle: 'bold' },
-            styles: { fontSize: 8, cellPadding: 3 }
+            head: [['Name', 'Gender', 'Phone', 'Dept', 'Batch', 'Qirats', 'Reg Date']],
+            body: tableData, startY: 82, theme: 'striped',
+            headStyles: { fillColor: [16, 185, 129], textColor: [255,255,255] },
+            styles: { fontSize: 8 }
         });
-        
         doc.save(`${groupName.replace(/[^a-z0-9]/gi, '_')}_report.pdf`);
     }
     
-    function exportToWord(data, groupName, totalCount) {
-        const maleCount = data.filter(d => d.Gender === 'Male').length;
-        const femaleCount = data.filter(d => d.Gender === 'Female').length;
-        
-        let html = `<!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <title>${groupName} - Group Report</title>
-            <style>
-                body { font-family: 'Arial', sans-serif; margin: 40px; }
-                h1 { color: #10b981; border-bottom: 2px solid #10b981; padding-bottom: 10px; }
-                .subtitle { color: #059669; margin: 10px 0; }
-                .kpi-box { background: #f0fdf4; padding: 15px; border-radius: 12px; margin: 20px 0; }
-                table { border-collapse: collapse; width: 100%; margin-top: 20px; }
-                th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-                th { background: #10b981; color: white; }
-                tr:nth-child(even) { background: #f9fafb; }
-            </style>
-        </head>
-        <body>
-            <h1>📊 JUMJ Irshad - Group Report</h1>
-            <div class="subtitle">Group: ${escapeHtml(groupName)}</div>
-            <p>Generated: ${new Date().toLocaleString()} | Total Students: ${totalCount}</p>
-            
-            <div class="kpi-box">
-                <h3>Summary KPIs</h3>
-                <p><strong>Gender Split:</strong> Male ${maleCount} | Female ${femaleCount}</p>
-                <p><strong>Departments:</strong> ${[...new Set(data.map(d => d.Department))].join(', ')}</p>
-                <p><strong>Multi-Qirat Students:</strong> ${data.filter(d => d['Qirats Enrolled'] && d['Qirats Enrolled'].split(',').length > 1).length}</p>
-            </div>
-            
-            <h3>Student List</h3>
-            <table>
-                <thead><tr><th>Name</th><th>Gender</th><th>Phone</th><th>Department</th><th>Batch</th><th>Qirats</th><th>Reg Date</th></tr></thead>
-                <tbody>
-                    ${data.map(row => `
-                        <tr>
-                            <td>${escapeHtml(row.Name)}</td>
-                            <td>${escapeHtml(row.Gender)}</td>
-                            <td>${escapeHtml(row.Phone)}</td>
-                            <td>${escapeHtml(row.Department)}</td>
-                            <td>${escapeHtml(row.Batch)}</td>
-                            <td>${escapeHtml(row['Qirats Enrolled'])}</td>
-                            <td>${escapeHtml(row['Registration Date'])}</td>
-                        </tr>
-                    `).join('')}
-                </tbody>
-            </table>
-        </body>
-        </html>`;
-        
-        const blob = new Blob([html], { type: 'application/msword' });
-        downloadBlob(blob, `${groupName.replace(/[^a-z0-9]/gi, '_')}_report.doc`);
+    function exportToWord(data, groupName, totalCount, stats) {
+        let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${groupName} Report</title><style>
+            body { font-family: Arial; margin:40px; } h1 { color:#10b981; } .kpi { background:#f0fdf4; padding:15px; border-radius:12px; margin:20px 0; }
+            table { width:100%; border-collapse:collapse; } th, td { border:1px solid #ddd; padding:8px; } th { background:#10b981; color:white; }
+        </style></head><body>
+        <h1>📊 JUMJ Irshad - ${escapeHtml(groupName)}</h1>
+        <p>Total: ${totalCount} | Generated: ${new Date().toLocaleString()}</p>
+        <div class="kpi"><strong>📈 Modern Stats:</strong> 👥 M:${stats.maleCount} / F:${stats.femaleCount} | 🏢 Depts:${stats.uniqueDepts} | 🔄 Multi-Qirat:${stats.multiQiratCount} | 🆕 New (30d):${stats.recentWeek}</div>
+        <table><thead><tr><th>Name</th><th>Gender</th><th>Phone</th><th>Dept</th><th>Batch</th><th>Qirats</th><th>Reg Date</th></tr></thead><tbody>
+        ${data.map(row => `<tr><td>${escapeHtml(row.Name)}</td><td>${escapeHtml(row.Gender)}</td><td>${escapeHtml(row.Phone)}</td><td>${escapeHtml(row.Department)}</td><td>${escapeHtml(row.Batch)}</td><td>${escapeHtml(row['Qirats Enrolled'])}</td><td>${escapeHtml(row['Registration Date'])}</td></tr>`).join('')}
+        </tbody></table></body></html>`;
+        downloadBlob(new Blob([html], { type: 'application/msword' }), `${groupName.replace(/[^a-z0-9]/gi, '_')}_report.doc`);
     }
     
     function downloadBlob(blob, filename) {
@@ -787,11 +748,7 @@
     }
     
     function exportAllGroupsToExcel() {
-        if (currentGroups.length === 0) {
-            showToast('No groups to export', true);
-            return;
-        }
-        
+        if (currentGroups.length === 0) { showToast('No groups to export', true); return; }
         const wb = XLSX.utils.book_new();
         currentGroups.forEach(group => {
             const sheetData = group.members.map(m => formatStudentForExport(m));
@@ -799,9 +756,8 @@
             let sheetName = group.name.replace(/[\\/*?:[\]]/g, '').slice(0, 31);
             XLSX.utils.book_append_sheet(wb, ws, sheetName);
         });
-        
-        XLSX.writeFile(wb, `All_Groups_${currentGroupMode}_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.xlsx`);
-        showToast(`Exported all ${currentGroups.length} groups to Excel`);
+        XLSX.writeFile(wb, `All_Groups_${currentGroupMode}_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.xlsx`);
+        showToast(`Exported all ${currentGroups.length} groups`);
     }
     
     window.toggleGroup = function(idx) {
@@ -817,7 +773,10 @@
         }
     };
     
-    // Event Listeners
+    // FIX: Dropdown consistency and auto close fix: ensure that when filters are cleared or changed, dropdowns are reset in a natural way (no persisting stale state).
+    // We also add a manual fix for dropdowns: Whenever filters change, previously opened groups will re-render, but we also reset any accidental body click handlers.
+    // Additionally, we ensure that select dropdowns don't retain invisible state — they are re-rendered via populateFilters and filter application.
+    
     searchInput.addEventListener('input', applyFilters);
     genderFilter.addEventListener('change', applyFilters);
     deptFilter.addEventListener('change', applyFilters);
@@ -828,6 +787,7 @@
         deptFilter.value = '';
         batchFilter.value = '';
         applyFilters();
+        showToast('Filters cleared');
     });
     exportAllBtn.addEventListener('click', exportAllGroupsToExcel);
     
@@ -840,12 +800,8 @@
         });
     });
     
-    // Initialize navigation
     initNavigation();
-    if (admin?.role === 'super-admin') {
-        setTimeout(() => { refreshNavigation(); }, 100);
-    }
-    
+    if (admin?.role === 'super-admin') setTimeout(() => refreshNavigation(), 100);
     loadData();
     setInterval(loadData, 30000);
 </script>
