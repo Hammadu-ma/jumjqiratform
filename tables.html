@@ -330,7 +330,7 @@
 <div class="glass-header">
     <div class="header-content">
         <div class="logo"><h1><i class="fas fa-table"></i> Advanced Tables</h1></div>
-        <button class="back-btn" onclick="window.location.href='index.html'"><i class="fas fa-arrow-left"></i> Back</button>
+        <button class="back-btn" onclick="window.location.href='home.html'"><i class="fas fa-arrow-left"></i> Back</button>
     </div>
 </div>
 
@@ -391,32 +391,17 @@
 </div>
 
 <!-- Bottom Navigation -->
-
+<div class="bottom-nav">
+    <button class="nav-item" onclick="window.location.href='home.html'"><i class="fas fa-home"></i><span>Home</span></button>
+    <button class="nav-item" onclick="window.location.href='groups.html'"><i class="fas fa-layer-group"></i><span>Groups</span></button>
+    <button class="nav-item active" onclick="window.location.href='tables.html'"><i class="fas fa-table"></i><span>Tables</span></button>
+    <button class="nav-item" onclick="window.location.href='analytics.html'"><i class="fas fa-chart-line"></i><span>Analytics</span></button>
+</div>
 
 <div id="studentModal" class="modal"><div class="modal-content"><h3 id="modalTitle">Add Student</h3><form id="studentForm"><div class="form-group"><label>Full Name *</label><input type="text" id="full_name" required></div><div class="form-group"><label>Gender</label><select id="gender"><option>Male</option><option>Female</option></select></div><div class="form-group"><label>Phone</label><input type="text" id="phone"></div><div class="form-group"><label>Telegram</label><input type="text" id="telegram"></div><div class="form-group"><label>Department</label><select id="department"><option>Medicine</option><option>Pharmacy</option><option>Nursing</option><option>Other</option></select></div><div class="form-group"><label>Batch</label><input type="text" id="batch" placeholder="e.g., 1st Year"></div><div class="form-group"><label>Qirats (comma)</label><input type="text" id="qirats" placeholder="Hafs, Warsh"></div><div style="display:flex; gap:12px; justify-content:flex-end;"><button type="button" class="btn-clear" id="cancelModalBtn">Cancel</button><button type="submit" class="btn-primary">Save</button></div></form><button id="modalClose" style="position:absolute; top:20px; right:24px; background:none; border:none; font-size:24px;">&times;</button></div></div>
 
 <div id="toast" class="toast"></div>
-<script type="module">
-    import { protectPage, initAuthUI, setupAutoLogout, getCurrentAdmin } from './auth.js';
-    
-    // Protect this page - redirects to login if not authenticated
-    if (!protectPage('admin-login.html')) {
-        // The redirect will happen automatically
-        throw new Error('Redirecting to login');
-    }
-    
-    // Initialize UI components (shows admin name, sets up logout buttons)
-    const admin = initAuthUI();
-    
-    // Setup auto-logout after 60 minutes of inactivity
-    setupAutoLogout(60);
-    
-    // Optional: Display admin info in console for debugging
-    console.log('Logged in as:', admin?.name, admin?.email);
-    
-    // Your page-specific code continues here...
-    console.log('Page loaded successfully with admin access');
-</script>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, getDocs, deleteDoc, doc, addDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -715,14 +700,6 @@
     
     loadData();
     setInterval(loadData, 30000);
-    // In your page-specific JavaScript
-import { initNavigation, updateActiveNav } from './nav.js';
-
-// Initialize
-initNavigation();
-
-// Update active state when needed
-updateActiveNav();
 </script>
 </body>
 </html>

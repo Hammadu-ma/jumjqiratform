@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Noor Academy | Super Admin Registration</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #10b981;
+            --primary-dark: #059669;
+            --primary-light: #d1fae5;
+            --secondary: #6366f1;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --dark: #0f172a;
+            --card-bg: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e6f7f0 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .register-container {
+            max-width: 520px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* Glass Card */
+        .register-card {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            border-radius: 48px;
+            padding: 40px 32px;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, #f59e0b, #d97706, #b45309);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .logo i {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-size: 2rem;
+        }
+
+        .logo p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 8px;
+        }
+
+        .badge-super {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 8px;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .form-group label i {
+            color: var(--primary);
+            margin-right: 8px;
+        }
+
+        .form-group label .required {
+            color: var(--danger);
+            margin-left: 4px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrapper i.input-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 1rem;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 14px 50px 14px 48px;
+            border: 2px solid var(--border);
+            border-radius: 28px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .input-wrapper input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        .input-wrapper input.error {
+            border-color: var(--danger);
+        }
+
+        .toggle-visibility {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-size: 1rem;
+            z-index: 1;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s;
+        }
+
+        .toggle-visibility:hover {
+            color: var(--primary);
+        }
+
+        .error-message {
+            color: var(--danger);
+            font-size: 0.7rem;
+            margin-top: 6px;
+            display: block;
+        }
+
+        /* Password Strength */
+        .password-strength {
+            margin-top: 8px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .strength-bar {
+            flex: 1;
+            height: 4px;
+            background: var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .strength-fill {
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s, background 0.3s;
+        }
+
+        .strength-text {
+            font-size: 0.65rem;
+            font-weight: 600;
+        }
+
+        .strength-weak { background: #ef4444; }
+        .strength-fair { background: #f59e0b; }
+        .strength-good { background: #10b981; }
+        .strength-strong { background: #059669; }
+
+        .password-requirements {
+            margin-top: 8px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            font-size: 0.65rem;
+        }
+
+        .req-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-muted);
+        }
+
+        .req-item.valid {
+            color: var(--primary);
+        }
+
+        /* Button */
+        .btn-register {
+            width: 100%;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3);
+        }
+
+        .btn-register:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Messages */
+        .message {
+            padding: 12px 16px;
+            border-radius: 20px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85rem;
+            animation: slideIn 0.3s ease;
+        }
+
+        .message.success {
+            background: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid #10b981;
+        }
+
+        .message.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border-left: 4px solid #ef4444;
+        }
+
+        .message.info {
+            background: #fef3c7;
+            color: #92400e;
+            border-left: 4px solid #f59e0b;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Login Link */
+        .login-link {
+            text-align: center;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+        }
+
+        .login-link a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        /* Spinner */
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body { padding: 16px; }
+            .register-card { padding: 28px 20px; }
+            .logo h1 { font-size: 1.4rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="register-container">
+    <div class="register-card">
+        <div class="logo">
+            <h1><i class="fas fa-crown"></i> Super Admin Registration</h1>
+            <p>Create the first Super Administrator account</p>
+            <span class="badge-super"><i class="fas fa-star"></i> Full System Access</span>
+        </div>
+
+        <div id="messageContainer"></div>
+
+        <form id="registerForm">
+            <div class="form-group">
+                <label><i class="fas fa-user"></i> Full Name <span class="required">*</span></label>
+                <div class="input-wrapper">
+                    <i class="fas fa-user-circle input-icon"></i>
+                    <input type="text" id="adminName" placeholder="Enter your full name" autocomplete="off">
+                </div>
+                <span class="error-message" id="nameError"></span>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-envelope"></i> Email Address <span class="required">*</span></label>
+                <div class="input-wrapper">
+                    <i class="fas fa-envelope input-icon"></i>
+                    <input type="email" id="adminEmail" placeholder="superadmin@example.com" autocomplete="off">
+                </div>
+                <span class="error-message" id="emailError"></span>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-lock"></i> Password <span class="required">*</span></label>
+                <div class="input-wrapper">
+                    <i class="fas fa-lock input-icon"></i>
+                    <input type="password" id="password" placeholder="Create a strong password" autocomplete="new-password">
+                    <button type="button" class="toggle-visibility" data-target="password">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+                <div class="password-strength">
+                    <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+                    <span class="strength-text" id="strengthText">Not set</span>
+                </div>
+                <div class="password-requirements" id="passwordReqs">
+                    <span class="req-item" id="reqLength"><i class="fas fa-circle"></i> 8+ characters</span>
+                    <span class="req-item" id="reqUpper"><i class="fas fa-circle"></i> Uppercase</span>
+                    <span class="req-item" id="reqLower"><i class="fas fa-circle"></i> Lowercase</span>
+                    <span class="req-item" id="reqNumber"><i class="fas fa-circle"></i> Number</span>
+                    <span class="req-item" id="reqSpecial"><i class="fas fa-circle"></i> Special character</span>
+                </div>
+                <span class="error-message" id="passwordError"></span>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-check-circle"></i> Confirm Password <span class="required">*</span></label>
+                <div class="input-wrapper">
+                    <i class="fas fa-check-circle input-icon"></i>
+                    <input type="password" id="confirmPassword" placeholder="Confirm your password" autocomplete="off">
+                    <button type="button" class="toggle-visibility" data-target="confirmPassword">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+                <span class="error-message" id="confirmError"></span>
+            </div>
+
+            <button type="submit" class="btn-register" id="registerBtn">
+                <i class="fas fa-crown"></i>
+                <span>Register as Super Admin</span>
+            </button>
+        </form>
+
+        <div class="login-link">
+            Already have an account? <a href="admin-login.html">Login here</a>
+        </div>
+    </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, addDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    
+    const firebaseConfig = {
+        apiKey: "AIzaSyAR_g5y04YAGCrTvZCowrE7hw8h7k1du08",
+        authDomain: "jujm-qirat.firebaseapp.com",
+        projectId: "jujm-qirat",
+        storageBucket: "jujm-qirat.firebasestorage.app",
+        messagingSenderId: "253413984903",
+        appId: "1:253413984903:web:c1577e0fdef1711f960622"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const adminsCollection = collection(db, "admins");
+    
+    // DOM Elements
+    const adminName = document.getElementById('adminName');
+    const adminEmail = document.getElementById('adminEmail');
+    const passwordInput = document.getElementById('password');
+    const confirmPasswordInput = document.getElementById('confirmPassword');
+    const registerBtn = document.getElementById('registerBtn');
+    const registerForm = document.getElementById('registerForm');
+    const messageContainer = document.getElementById('messageContainer');
+    
+    // Password strength elements
+    const strengthFill = document.getElementById('strengthFill');
+    const strengthText = document.getElementById('strengthText');
+    const reqLength = document.getElementById('reqLength');
+    const reqUpper = document.getElementById('reqUpper');
+    const reqLower = document.getElementById('reqLower');
+    const reqNumber = document.getElementById('reqNumber');
+    const reqSpecial = document.getElementById('reqSpecial');
+    
+    // Toggle password visibility
+    document.querySelectorAll('.toggle-visibility').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = btn.getAttribute('data-target');
+            const targetInput = document.getElementById(targetId);
+            if (targetInput) {
+                const type = targetInput.type === 'password' ? 'text' : 'password';
+                targetInput.type = type;
+                btn.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+            }
+        });
+    });
+    
+    // Password strength checker
+    function checkPasswordStrength(password) {
+        let strength = 0;
+        const checks = {
+            length: password.length >= 8,
+            upper: /[A-Z]/.test(password),
+            lower: /[a-z]/.test(password),
+            number: /[0-9]/.test(password),
+            special: /[^A-Za-z0-9]/.test(password)
+        };
+        
+        reqLength.className = `req-item ${checks.length ? 'valid' : 'invalid'}`;
+        reqLength.innerHTML = checks.length ? '<i class="fas fa-check-circle"></i> 8+ characters' : '<i class="fas fa-circle"></i> 8+ characters';
+        reqUpper.className = `req-item ${checks.upper ? 'valid' : 'invalid'}`;
+        reqUpper.innerHTML = checks.upper ? '<i class="fas fa-check-circle"></i> Uppercase' : '<i class="fas fa-circle"></i> Uppercase';
+        reqLower.className = `req-item ${checks.lower ? 'valid' : 'invalid'}`;
+        reqLower.innerHTML = checks.lower ? '<i class="fas fa-check-circle"></i> Lowercase' : '<i class="fas fa-circle"></i> Lowercase';
+        reqNumber.className = `req-item ${checks.number ? 'valid' : 'invalid'}`;
+        reqNumber.innerHTML = checks.number ? '<i class="fas fa-check-circle"></i> Number' : '<i class="fas fa-circle"></i> Number';
+        reqSpecial.className = `req-item ${checks.special ? 'valid' : 'invalid'}`;
+        reqSpecial.innerHTML = checks.special ? '<i class="fas fa-check-circle"></i> Special character' : '<i class="fas fa-circle"></i> Special character';
+        
+        if (checks.length) strength++;
+        if (checks.upper) strength++;
+        if (checks.lower) strength++;
+        if (checks.number) strength++;
+        if (checks.special) strength++;
+        
+        let percentage = (strength / 5) * 100;
+        let strengthLabel = '';
+        let strengthClass = '';
+        
+        if (strength <= 2) { strengthLabel = 'Weak'; strengthClass = 'strength-weak'; }
+        else if (strength === 3) { strengthLabel = 'Fair'; strengthClass = 'strength-fair'; }
+        else if (strength === 4) { strengthLabel = 'Good'; strengthClass = 'strength-good'; }
+        else { strengthLabel = 'Strong'; strengthClass = 'strength-strong'; }
+        
+        strengthFill.style.width = `${percentage}%`;
+        strengthFill.className = `strength-fill ${strengthClass}`;
+        strengthText.textContent = strengthLabel;
+        
+        return { valid: strength >= 3, strength };
+    }
+    
+    function validatePassword(password) {
+        if (!password) return { valid: false, message: 'Password is required' };
+        if (password.length < 8) return { valid: false, message: 'Password must be at least 8 characters' };
+        if (!/[A-Z]/.test(password)) return { valid: false, message: 'Password must contain an uppercase letter' };
+        if (!/[a-z]/.test(password)) return { valid: false, message: 'Password must contain a lowercase letter' };
+        if (!/[0-9]/.test(password)) return { valid: false, message: 'Password must contain a number' };
+        if (!/[^A-Za-z0-9]/.test(password)) return { valid: false, message: 'Password must contain a special character' };
+        return { valid: true, message: '' };
+    }
+    
+    function showMessage(message, type = 'info') {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${type}`;
+        let icon = type === 'success' ? '<i class="fas fa-check-circle"></i>' : (type === 'error' ? '<i class="fas fa-exclamation-circle"></i>' : '<i class="fas fa-info-circle"></i>');
+        messageDiv.innerHTML = `${icon} ${message}`;
+        messageContainer.innerHTML = '';
+        messageContainer.appendChild(messageDiv);
+        setTimeout(() => {
+            if (messageDiv.parentNode === messageContainer) {
+                messageDiv.style.opacity = '0';
+                setTimeout(() => { if (messageDiv.parentNode === messageContainer) messageContainer.innerHTML = ''; }, 300);
+            }
+        }, 5000);
+    }
+    
+    function clearErrors() {
+        ['nameError', 'emailError', 'passwordError', 'confirmError'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = '';
+        });
+        [adminName, adminEmail, passwordInput, confirmPasswordInput].forEach(el => {
+            if (el) el.classList.remove('error');
+        });
+    }
+    
+    function showFieldError(field, message) {
+        const errorSpan = document.getElementById(`${field}Error`);
+        const inputMap = { name: adminName, email: adminEmail, password: passwordInput, confirm: confirmPasswordInput };
+        if (errorSpan) errorSpan.textContent = message;
+        if (inputMap[field]) inputMap[field].classList.add('error');
+    }
+    
+    async function isEmailExists(email) {
+        try {
+            const q = query(adminsCollection, where('email', '==', email.toLowerCase()));
+            const querySnapshot = await getDocs(q);
+            return !querySnapshot.empty;
+        } catch (error) { return false; }
+    }
+    
+    async function registerSuperAdmin(event) {
+        event.preventDefault();
+        clearErrors();
+        
+        const name = adminName.value;
+        const email = adminEmail.value;
+        const password = passwordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
+        
+        const nameValidation = { valid: name && name.trim().length >= 3, message: 'Name must be at least 3 characters' };
+        const emailValidation = { valid: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email), message: 'Valid email required' };
+        const passwordValidation = validatePassword(password);
+        const confirmValidation = { valid: password === confirmPassword, message: 'Passwords do not match' };
+        
+        let isValid = true;
+        if (!nameValidation.valid) { showFieldError('name', nameValidation.message); isValid = false; }
+        if (!emailValidation.valid) { showFieldError('email', emailValidation.message); isValid = false; }
+        if (!passwordValidation.valid) { showFieldError('password', passwordValidation.message); isValid = false; }
+        if (!confirmValidation.valid) { showFieldError('confirm', confirmValidation.message); isValid = false; }
+        if (!isValid) return;
+        
+        const emailExists = await isEmailExists(email);
+        if (emailExists) { 
+            showFieldError('email', 'Email already registered'); 
+            showMessage('This email is already registered. Please use a different email or login.', 'error'); 
+            return; 
+        }
+        
+        registerBtn.disabled = true;
+        registerBtn.innerHTML = '<span class="spinner"></span> Creating Super Admin account...';
+        
+        try {
+            const hashedPassword = btoa(password + 'noor_salt_2024');
+            const adminData = {
+                name: name.trim(),
+                email: email.trim().toLowerCase(),
+                password: hashedPassword,
+                role: 'super-admin',
+                createdAt: new Date(),
+                updatedAt: new Date()
+            };
+            
+            await addDoc(adminsCollection, adminData);
+            showMessage('✅ Super Admin registered successfully! You can now login.', 'success');
+            
+            // Clear form
+            adminName.value = '';
+            adminEmail.value = '';
+            passwordInput.value = '';
+            confirmPasswordInput.value = '';
+            checkPasswordStrength('');
+            
+            // Redirect to login after 2 seconds
+            setTimeout(() => {
+                window.location.href = 'admin-login.html';
+            }, 2000);
+            
+        } catch (error) {
+            showMessage('Registration failed: ' + error.message, 'error');
+        } finally {
+            registerBtn.disabled = false;
+            registerBtn.innerHTML = '<i class="fas fa-crown"></i> Register as Super Admin';
+        }
+    }
+    
+    registerForm.addEventListener('submit', registerSuperAdmin);
+    passwordInput.addEventListener('input', () => checkPasswordStrength(passwordInput.value));
+    confirmPasswordInput.addEventListener('input', () => {
+        if (confirmPasswordInput.value && passwordInput.value !== confirmPasswordInput.value) {
+            showFieldError('confirm', 'Passwords do not match');
+        } else {
+            document.getElementById('confirmError').textContent = '';
+            confirmPasswordInput.classList.remove('error');
+        }
+    });
+    
+    adminName.addEventListener('input', () => {
+        if (adminName.value.trim().length >= 3) {
+            document.getElementById('nameError').textContent = '';
+            adminName.classList.remove('error');
+        }
+    });
+    
+    adminEmail.addEventListener('input', () => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (emailRegex.test(adminEmail.value)) {
+            document.getElementById('emailError').textContent = '';
+            adminEmail.classList.remove('error');
+        }
+    });
+</script>
+
+</body>
+</html>

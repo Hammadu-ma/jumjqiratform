@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LearnConnect - Student Onboarding</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <style>
+        /* CSS Variables - Consistent with Signup Page */
+        :root {
+            --primary-color: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary-color: #7209b7;
+            --accent-color: #f72585;
+            --success-color: #4cc9f0;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --gray-color: #6c757d;
+            --light-gray: #e9ecef;
+            --border-radius: 12px;
+            --box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            --box-shadow-hover: 0 15px 40px rgba(0, 0, 0, 0.12);
+            --transition: all 0.3s ease;
+            --step-active: #4361ee;
+            --step-inactive: #e9ecef;
+            --step-completed: #4cc9f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #f5f7ff 0%, #f0f4ff 100%);
+            color: var(--dark-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding-bottom: 80px; /* Space for fixed button */
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .logo-icon {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 16px;
+            color: var(--gray-color);
+            margin-bottom: 25px;
+        }
+
+        /* Progress Indicator */
+        .progress-container {
+            margin-bottom: 40px;
+        }
+
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 2;
+            flex: 1;
+        }
+
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+            margin-bottom: 8px;
+            transition: var(--transition);
+        }
+
+        .step.active .step-circle {
+            background-color: var(--step-active);
+            color: white;
+            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+        }
+
+        .step.completed .step-circle {
+            background-color: var(--step-completed);
+            color: white;
+        }
+
+        .step.inactive .step-circle {
+            background-color: var(--step-inactive);
+            color: var(--gray-color);
+        }
+
+        .step-label {
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+            color: var(--dark-color);
+        }
+
+        .step.inactive .step-label {
+            color: var(--gray-color);
+        }
+
+        .progress-bar {
+            height: 4px;
+            background-color: var(--step-inactive);
+            position: absolute;
+            top: 20px;
+            left: 10%;
+            right: 10%;
+            z-index: 1;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, var(--step-completed), var(--step-active));
+            width: 0%;
+            transition: var(--transition);
+            border-radius: 2px;
+        }
+
+        /* Onboarding Card */
+        .onboarding-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 35px 30px;
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+            margin-bottom: 20px;
+        }
+
+        .onboarding-card:hover {
+            box-shadow: var(--box-shadow-hover);
+        }
+
+        .section-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-icon {
+            color: var(--primary-color);
+            font-size: 24px;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 30px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--dark-color);
+        }
+
+        .form-label .required {
+            color: var(--accent-color);
+            margin-left: 4px;
+        }
+
+        .form-hint {
+            font-size: 14px;
+            color: var(--gray-color);
+            margin-top: 6px;
+            margin-bottom: 15px;
+        }
+
+        /* Custom Select Dropdown */
+        .custom-select {
+            position: relative;
+            width: 100%;
+        }
+
+        .select-btn {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid var(--light-gray);
+            border-radius: var(--border-radius);
+            background-color: white;
+            font-size: 16px;
+            font-family: inherit;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: var(--transition);
+        }
+
+        .select-btn:hover {
+            border-color: var(--primary-color);
+        }
+
+        .select-btn:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+
+        .select-dropdown {
+            position: absolute;
+            top: calc(100% + 5px);
+            left: 0;
+            width: 100%;
+            background-color: white;
+            border-radius: var(--border-radius);
+            border: 2px solid var(--light-gray);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            z-index: 100;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .select-dropdown.active {
+            display: block;
+        }
+
+        .select-option {
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .select-option:last-child {
+            border-bottom: none;
+        }
+
+        .select-option:hover {
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+
+        .select-option.selected {
+            background-color: rgba(67, 97, 238, 0.1);
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        /* Multi-select Cards */
+        .multi-select-container {
+            margin-top: 15px;
+        }
+
+        .multi-select-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .selected-count {
+            font-size: 14px;
+            color: var(--primary-color);
+            font-weight: 600;
+            background-color: rgba(67, 97, 238, 0.1);
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        .multi-select-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .subject-card {
+            background-color: white;
+            border: 2px solid var(--light-gray);
+            border-radius: var(--border-radius);
+            padding: 18px 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .subject-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--primary-color);
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.1);
+        }
+
+        .subject-card.selected {
+            border-color: var(--primary-color);
+            background-color: rgba(67, 97, 238, 0.05);
+            color: var(--primary-color);
+        }
+
+        .subject-card.selected::before {
+            content: '✓';
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 22px;
+            height: 22px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .subject-icon {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .subject-card.selected .subject-icon {
+            color: var(--primary-color);
+        }
+
+        .subject-name {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        /* Future Department Input */
+        .department-search {
+            position: relative;
+        }
+
+        .department-input {
+            width: 100%;
+            padding: 16px 20px 16px 50px;
+            border: 2px solid var(--light-gray);
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            font-family: inherit;
+            transition: var(--transition);
+            background-color: white;
+        }
+
+        .department-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+
+        .department-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-color);
+            font-size: 18px;
+        }
+
+        .suggestions-dropdown {
+            position: absolute;
+            top: calc(100% + 5px);
+            left: 0;
+            width: 100%;
+            background-color: white;
+            border-radius: var(--border-radius);
+            border: 2px solid var(--light-gray);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            z-index: 100;
+            max-height: 250px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .suggestions-dropdown.active {
+            display: block;
+        }
+
+        .suggestion-item {
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .suggestion-item:hover {
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+
+        /* Fixed Next Button */
+        .next-button-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .next-btn {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: block;
+        }
+
+        .next-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(67, 97, 238, 0.3);
+        }
+
+        .next-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .next-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background-color: white;
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 450px;
+            padding: 35px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            transform: translateY(20px);
+            transition: var(--transition);
+            text-align: center;
+        }
+
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+        }
+
+        .modal-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, var(--success-color), var(--primary-color));
+            color: white;
+        }
+
+        .modal-title {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 15px;
+        }
+
+        .modal-message {
+            font-size: 16px;
+            color: var(--gray-color);
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .modal-btn {
+            padding: 14px 30px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            min-width: 120px;
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(67, 97, 238, 0.3);
+        }
+
+        .modal-btn-secondary {
+            background: transparent;
+            color: var(--gray-color);
+            border: 2px solid var(--light-gray);
+            margin-left: 10px;
+        }
+
+        .modal-btn-secondary:hover {
+            background-color: var(--light-gray);
+            box-shadow: none;
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding-bottom: 90px;
+            }
+            
+            .onboarding-card {
+                padding: 25px 20px;
+            }
+            
+            .multi-select-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                gap: 12px;
+            }
+            
+            .subject-card {
+                padding: 15px 10px;
+            }
+            
+            .subject-icon {
+                font-size: 24px;
+            }
+            
+            .next-button-container {
+                padding: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
+            }
+            
+            .page-title {
+                font-size: 24px;
+            }
+            
+            .section-title {
+                font-size: 20px;
+            }
+            
+            .multi-select-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .progress-steps {
+                margin-bottom: 20px;
+            }
+            
+            .step-label {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <div class="logo-text">LearnConnect</div>
+            </div>
+            <h1 class="page-title">Complete Your Profile</h1>
+            <p class="page-subtitle">Tell us about yourself to get personalized recommendations</p>
+        </div>
+
+        <!-- Progress Indicator -->
+        <div class="progress-container">
+            <div class="progress-steps">
+                <div class="step active" id="step1">
+                    <div class="step-circle">1</div>
+                    <div class="step-label">Basic Info</div>
+                </div>
+                <div class="step inactive" id="step2">
+                    <div class="step-circle">2</div>
+                    <div class="step-label">Subjects</div>
+                </div>
+                <div class="step inactive" id="step3">
+                    <div class="step-circle">3</div>
+                    <div class="step-label">Future Goals</div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Onboarding Form -->
+        <div class="onboarding-card">
+            <!-- Step 1: Grade/Year Selection -->
+            <div class="onboarding-step active" id="step1Content">
+                <h2 class="section-title">
+                    <i class="fas fa-user-graduate section-icon"></i>
+                    Select Your Grade/Year
+                </h2>
+                
+                <div class="form-group">
+                    <label class="form-label">Current Educational Level <span class="required">*</span></label>
+                    <p class="form-hint">This helps us match you with appropriate mentors and resources.</p>
+                    
+                    <div class="custom-select">
+                        <button class="select-btn" id="gradeSelectBtn">
+                            <span id="gradeSelectText">Select your grade/year</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="select-dropdown" id="gradeDropdown">
+                            <!-- Grades will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Subjects Selection -->
+            <div class="onboarding-step" id="step2Content" style="display: none;">
+                <h2 class="section-title">
+                    <i class="fas fa-book-open section-icon"></i>
+                    Select Subjects You Need Help With
+                </h2>
+                
+                <div class="form-group">
+                    <label class="form-label">Subjects <span class="required">*</span></label>
+                    <p class="form-hint">Select all subjects where you'd like support. You can always update this later.</p>
+                    
+                    <div class="multi-select-container">
+                        <div class="multi-select-header">
+                            <span>Select at least one subject</span>
+                            <span class="selected-count" id="selectedCount">0 selected</span>
+                        </div>
+                        
+                        <div class="multi-select-grid" id="subjectsGrid">
+                            <!-- Subjects will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Future Department -->
+            <div class="onboarding-step" id="step3Content" style="display: none;">
+                <h2 class="section-title">
+                    <i class="fas fa-bullseye section-icon"></i>
+                    Future Career & Department
+                </h2>
+                
+                <div class="form-group">
+                    <label class="form-label">Target Department/Field <span class="required">*</span></label>
+                    <p class="form-hint">Tell us about your future career interests. We'll match you with relevant mentors and resources.</p>
+                    
+                    <div class="department-search">
+                        <i class="fas fa-search department-icon"></i>
+                        <input type="text" class="department-input" id="departmentInput" 
+                               placeholder="e.g., Computer Science, Medicine, Engineering, Business">
+                        <div class="suggestions-dropdown" id="suggestionsDropdown">
+                            <!-- Suggestions will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Exam Goals (Optional)</label>
+                    <p class="form-hint">Are you preparing for any specific exams? (e.g., SAT, A-Levels, University Entrance)</p>
+                    
+                    <div class="multi-select-grid" id="examsGrid">
+                        <!-- Exam options will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fixed Next Button -->
+    <div class="next-button-container">
+        <button class="next-btn" id="nextBtn" disabled>
+            <span id="nextBtnText">Select Grade to Continue</span>
+        </button>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal-overlay" id="successModal">
+        <div class="modal">
+            <div class="modal-icon">
+                <i class="fas fa-check"></i>
+            </div>
+            <h2 class="modal-title">Profile Complete!</h2>
+            <p class="modal-message" id="modalMessage">
+                Your student profile has been successfully created. You'll now be redirected to your personalized dashboard.
+            </p>
+            <button class="modal-btn" id="modalContinueBtn">Continue to Dashboard</button>
+        </div>
+    </div>
+
+    <script>
+        // Firebase Configuration (Same as signup page)
+        const firebaseConfig = {
+    apiKey: "AIzaSyCWquYbzfwt1oEqvXEuQOMUyhIoSS-V4FE",
+    authDomain: "schoolhub-ada40.firebaseapp.com",
+    projectId: "schoolhub-ada40",
+    storageBucket: "schoolhub-ada40.firebasestorage.app",
+    messagingSenderId: "1004768478486",
+    appId: "1:1004768478486:web:910f3d3ed06885d68dfc37"
+  };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // DOM Elements
+        const step1 = document.getElementById('step1');
+        const step2 = document.getElementById('step2');
+        const step3 = document.getElementById('step3');
+        const progressFill = document.getElementById('progressFill');
+        
+        const step1Content = document.getElementById('step1Content');
+        const step2Content = document.getElementById('step2Content');
+        const step3Content = document.getElementById('step3Content');
+        
+        const gradeSelectBtn = document.getElementById('gradeSelectBtn');
+        const gradeSelectText = document.getElementById('gradeSelectText');
+        const gradeDropdown = document.getElementById('gradeDropdown');
+        
+        const subjectsGrid = document.getElementById('subjectsGrid');
+        const selectedCount = document.getElementById('selectedCount');
+        
+        const departmentInput = document.getElementById('departmentInput');
+        const suggestionsDropdown = document.getElementById('suggestionsDropdown');
+        
+        const examsGrid = document.getElementById('examsGrid');
+        
+        const nextBtn = document.getElementById('nextBtn');
+        const nextBtnText = document.getElementById('nextBtnText');
+        
+        const successModal = document.getElementById('successModal');
+        const modalMessage = document.getElementById('modalMessage');
+        const modalContinueBtn = document.getElementById('modalContinueBtn');
+
+        // Application State
+        let currentStep = 1;
+        let selectedGrade = null;
+        let selectedSubjects = [];
+        let selectedDepartment = '';
+        let selectedExams = [];
+        let userId = null;
+        let isSubmitting = false;
+
+        // Data Sets
+        const grades = [
+            { value: 'grade1-5', label: 'Grades 1-5 (Elementary)' },
+            { value: 'grade6-8', label: 'Grades 6-8 (Middle School)' },
+            { value: 'grade9-10', label: 'Grades 9-10 (Secondary)' },
+            { value: 'grade11-12', label: 'Grades 11-12 (High School)' },
+            { value: 'freshman', label: 'University - Freshman' },
+            { value: 'sophomore', label: 'University - Sophomore' },
+            { value: 'junior', label: 'University - Junior' },
+            { value: 'senior', label: 'University - Senior' }
+        ];
+
+        const subjects = [
+            { id: 'math', name: 'Mathematics', icon: 'fas fa-calculator' },
+            { id: 'physics', name: 'Physics', icon: 'fas fa-atom' },
+            { id: 'chemistry', name: 'Chemistry', icon: 'fas fa-flask' },
+            { id: 'biology', name: 'Biology', icon: 'fas fa-dna' },
+            { id: 'english', name: 'English', icon: 'fas fa-language' },
+            { id: 'history', name: 'History', icon: 'fas fa-landmark' },
+            { id: 'geography', name: 'Geography', icon: 'fas fa-globe-americas' },
+            { id: 'computer-science', name: 'Computer Science', icon: 'fas fa-laptop-code' },
+            { id: 'economics', name: 'Economics', icon: 'fas fa-chart-line' },
+            { id: 'business', name: 'Business', icon: 'fas fa-briefcase' },
+            { id: 'art', name: 'Art', icon: 'fas fa-palette' },
+            { id: 'music', name: 'Music', icon: 'fas fa-music' }
+        ];
+
+        const departments = [
+            'Medicine',
+            'Engineering',
+            'Computer Science',
+            'Business Administration',
+            'Law',
+            'Architecture',
+            'Psychology',
+            'Economics',
+            'Biology',
+            'Chemistry',
+            'Physics',
+            'Mathematics',
+            'Literature',
+            'History',
+            'Political Science',
+            'Fine Arts',
+            'Music',
+            'Education',
+            'Nursing',
+            'Pharmacy'
+        ];
+
+        const exams = [
+            { id: 'sat', name: 'SAT' },
+            { id: 'act', name: 'ACT' },
+            { id: 'alevel', name: 'A-Levels' },
+            { id: 'ib', name: 'IB Diploma' },
+            { id: 'ap', name: 'AP Exams' },
+            { id: 'gre', name: 'GRE' },
+            { id: 'gmat', name: 'GMAT' },
+            { id: 'toefl', name: 'TOEFL' },
+            { id: 'ielts', name: 'IELTS' },
+            { id: 'national', name: 'National Exams' },
+            { id: 'university-entrance', name: 'University Entrance' }
+        ];
+
+        // Initialize Application
+        async function initApp() {
+            // Check authentication
+            auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    userId = user.uid;
+                    
+                    // Check if user already completed onboarding
+                    const studentDoc = await db.collection('students').doc(userId).get();
+                    if (studentDoc.exists && studentDoc.data().profileCompleted) {
+                        // Redirect to dashboard if already completed
+                        window.location.href = 'student-dashboard.html';
+                    }
+                } else {
+                    // Redirect to login if not authenticated
+                    window.location.href = 'login.html';
+                }
+            });
+
+            // Initialize UI Components
+            populateGradeDropdown();
+            populateSubjectsGrid();
+            populateExamsGrid();
+            setupEventListeners();
+            updateProgressBar();
+        }
+
+        // Populate Grade Dropdown
+        function populateGradeDropdown() {
+            gradeDropdown.innerHTML = '';
+            grades.forEach(grade => {
+                const option = document.createElement('div');
+                option.className = 'select-option';
+                option.textContent = grade.label;
+                option.dataset.value = grade.value;
+                
+                option.addEventListener('click', () => {
+                    selectGrade(grade.value, grade.label);
+                    gradeDropdown.classList.remove('active');
+                });
+                
+                gradeDropdown.appendChild(option);
+            });
+        }
+
+        // Populate Subjects Grid
+        function populateSubjectsGrid() {
+            subjectsGrid.innerHTML = '';
+            subjects.forEach(subject => {
+                const card = document.createElement('div');
+                card.className = 'subject-card';
+                card.dataset.id = subject.id;
+                
+                card.innerHTML = `
+                    <i class="${subject.icon} subject-icon"></i>
+                    <div class="subject-name">${subject.name}</div>
+                `;
+                
+                card.addEventListener('click', () => toggleSubject(subject.id));
+                subjectsGrid.appendChild(card);
+            });
+        }
+
+        // Populate Exams Grid
+        function populateExamsGrid() {
+            examsGrid.innerHTML = '';
+            exams.forEach(exam => {
+                const card = document.createElement('div');
+                card.className = 'subject-card';
+                card.dataset.id = exam.id;
+                
+                card.innerHTML = `
+                    <div class="subject-name">${exam.name}</div>
+                `;
+                
+                card.addEventListener('click', () => toggleExam(exam.id));
+                examsGrid.appendChild(card);
+            });
+        }
+
+        // Setup Event Listeners
+        function setupEventListeners() {
+            // Grade Select Button
+            gradeSelectBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                gradeDropdown.classList.toggle('active');
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', () => {
+                gradeDropdown.classList.remove('active');
+                suggestionsDropdown.classList.remove('active');
+            });
+
+            // Department Input
+            departmentInput.addEventListener('input', () => {
+                const query = departmentInput.value.trim().toLowerCase();
+                selectedDepartment = departmentInput.value.trim();
+                updateNextButtonState();
+                
+                if (query.length > 1) {
+                    showDepartmentSuggestions(query);
+                } else {
+                    suggestionsDropdown.classList.remove('active');
+                }
+            });
+
+            departmentInput.addEventListener('focus', () => {
+                if (departmentInput.value.trim().length > 1) {
+                    showDepartmentSuggestions(departmentInput.value.trim().toLowerCase());
+                }
+            });
+
+            // Next Button
+            nextBtn.addEventListener('click', goToNextStep);
+
+            // Modal Continue Button
+            modalContinueBtn.addEventListener('click', () => {
+                window.location.href = 'student-dashboard.html';
+            });
+        }
+
+        // Select Grade
+        function selectGrade(value, label) {
+            selectedGrade = value;
+            gradeSelectText.textContent = label;
+            gradeSelectBtn.querySelector('i').className = 'fas fa-check';
+            updateNextButtonState();
+        }
+
+        // Toggle Subject Selection
+        function toggleSubject(subjectId) {
+            const index = selectedSubjects.indexOf(subjectId);
+            const card = document.querySelector(`.subject-card[data-id="${subjectId}"]`);
+            
+            if (index === -1) {
+                selectedSubjects.push(subjectId);
+                card.classList.add('selected');
+            } else {
+                selectedSubjects.splice(index, 1);
+                card.classList.remove('selected');
+            }
+            
+            updateSelectedCount();
+            updateNextButtonState();
+        }
+
+        // Toggle Exam Selection
+        function toggleExam(examId) {
+            const index = selectedExams.indexOf(examId);
+            const card = document.querySelector(`#examsGrid .subject-card[data-id="${examId}"]`);
+            
+            if (index === -1) {
+                selectedExams.push(examId);
+                card.classList.add('selected');
+            } else {
+                selectedExams.splice(index, 1);
+                card.classList.remove('selected');
+            }
+        }
+
+        // Update Selected Count Display
+        function updateSelectedCount() {
+            const count = selectedSubjects.length;
+            selectedCount.textContent = `${count} selected`;
+            selectedCount.style.display = count > 0 ? 'inline-block' : 'none';
+        }
+
+        // Show Department Suggestions
+        function showDepartmentSuggestions(query) {
+            suggestionsDropdown.innerHTML = '';
+            const filtered = departments.filter(dept => 
+                dept.toLowerCase().includes(query)
+            ).slice(0, 8);
+            
+            if (filtered.length > 0) {
+                filtered.forEach(dept => {
+                    const item = document.createElement('div');
+                    item.className = 'suggestion-item';
+                    item.textContent = dept;
+                    
+                    item.addEventListener('click', () => {
+                        departmentInput.value = dept;
+                        selectedDepartment = dept;
+                        suggestionsDropdown.classList.remove('active');
+                        updateNextButtonState();
+                    });
+                    
+                    suggestionsDropdown.appendChild(item);
+                });
+                
+                suggestionsDropdown.classList.add('active');
+            } else {
+                suggestionsDropdown.classList.remove('active');
+            }
+        }
+
+        // Update Progress Bar
+        function updateProgressBar() {
+            const progressPercentage = ((currentStep - 1) / 2) * 100;
+            progressFill.style.width = `${progressPercentage}%`;
+            
+            // Update step indicators
+            [step1, step2, step3].forEach((step, index) => {
+                const stepNum = index + 1;
+                step.className = 'step';
+                
+                if (stepNum === currentStep) {
+                    step.classList.add('active');
+                } else if (stepNum < currentStep) {
+                    step.classList.add('completed');
+                } else {
+                    step.classList.add('inactive');
+                }
+            });
+        }
+
+        // Update Next Button State
+        function updateNextButtonState() {
+            let isValid = false;
+            let buttonText = '';
+            
+            switch (currentStep) {
+                case 1:
+                    isValid = selectedGrade !== null;
+                    buttonText = isValid ? 'Continue to Subjects' : 'Select Grade to Continue';
+                    break;
+                case 2:
+                    isValid = selectedSubjects.length > 0;
+                    buttonText = isValid ? 'Continue to Goals' : 'Select at Least One Subject';
+                    break;
+                case 3:
+                    isValid = selectedDepartment.trim().length > 0;
+                    buttonText = isValid ? 'Complete Profile' : 'Enter Future Department';
+                    break;
+            }
+            
+            nextBtn.disabled = !isValid;
+            nextBtnText.textContent = buttonText;
+        }
+
+        // Navigate to Next Step
+        function goToNextStep() {
+            if (isSubmitting) return;
+            
+            // Validate current step
+            if (!validateCurrentStep()) return;
+            
+            if (currentStep < 3) {
+                // Move to next step
+                currentStep++;
+                showStep(currentStep);
+                updateProgressBar();
+                updateNextButtonState();
+                
+                // Scroll to top of card
+                document.querySelector('.onboarding-card').scrollIntoView({ behavior: 'smooth' });
+            } else {
+                // Submit form
+                submitOnboardingData();
+            }
+        }
+
+        // Validate Current Step
+        function validateCurrentStep() {
+            switch (currentStep) {
+                case 1:
+                    if (!selectedGrade) {
+                        showError('Please select your grade/year');
+                        return false;
+                    }
+                    return true;
+                case 2:
+                    if (selectedSubjects.length === 0) {
+                        showError('Please select at least one subject');
+                        return false;
+                    }
+                    return true;
+                case 3:
+                    if (!selectedDepartment.trim()) {
+                        showError('Please enter your target department/field');
+                        return false;
+                    }
+                    return true;
+                default:
+                    return true;
+            }
+        }
+
+        // Show Step Content
+        function showStep(step) {
+            // Hide all steps
+            [step1Content, step2Content, step3Content].forEach(content => {
+                content.style.display = 'none';
+                content.classList.remove('active');
+            });
+            
+            // Show current step
+            const currentContent = document.getElementById(`step${step}Content`);
+            currentContent.style.display = 'block';
+            setTimeout(() => {
+                currentContent.classList.add('active');
+            }, 10);
+        }
+
+        // Show Error Message
+        function showError(message) {
+            // Create temporary error message
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.style.cssText = `
+                background-color: #fee;
+                color: #c00;
+                padding: 12px;
+                border-radius: 8px;
+                margin: 15px 0;
+                border-left: 4px solid #c00;
+                font-weight: 500;
+            `;
+            errorDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
+            
+            // Insert at top of card
+            const card = document.querySelector('.onboarding-card');
+            card.insertBefore(errorDiv, card.firstChild);
+            
+            // Remove after 5 seconds
+            setTimeout(() => {
+                errorDiv.remove();
+            }, 5000);
+        }
+
+        // Submit Onboarding Data to Firebase
+        async function submitOnboardingData() {
+            if (isSubmitting || !userId) return;
+            
+            isSubmitting = true;
+            nextBtn.disabled = true;
+            nextBtnText.innerHTML = '<span class="loading"></span> Saving Profile...';
+            
+            try {
+                // Prepare data
+                const onboardingData = {
+                    grade: selectedGrade,
+                    subjects: selectedSubjects,
+                    targetDepartment: selectedDepartment.trim(),
+                    examGoals: selectedExams,
+                    profileCompleted: true,
+                    onboardingCompletedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                
+                // Update student document in Firestore
+                await db.collection('students').doc(userId).update(onboardingData);
+                
+                // Update user document to mark profile as complete
+                await db.collection('users').doc(userId).update({
+                    profileCompleted: true,
+                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                // Show success modal
+                setTimeout(() => {
+                    modalMessage.innerHTML = `
+                        Your student profile has been successfully created!<br><br>
+                        <strong>Grade:</strong> ${grades.find(g => g.value === selectedGrade)?.label}<br>
+                        <strong>Subjects:</strong> ${selectedSubjects.length} selected<br>
+                        <strong>Target Field:</strong> ${selectedDepartment}<br><br>
+                        You'll now be redirected to your personalized dashboard.
+                    `;
+                    successModal.classList.add('active');
+                }, 500);
+                
+            } catch (error) {
+                console.error('Error saving onboarding data:', error);
+                showError('Failed to save profile. Please try again.');
+                
+                // Reset button state
+                isSubmitting = false;
+                nextBtn.disabled = false;
+                nextBtnText.textContent = 'Complete Profile';
+            }
+        }
+
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>

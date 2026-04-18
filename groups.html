@@ -414,7 +414,7 @@
 <div class="glass-header">
     <div class="header-content">
         <div class="logo"><h1><i class="fas fa-layer-group"></i> Groups View</h1></div>
-        <button class="back-btn" onclick="window.location.href='index.html'"><i class="fas fa-arrow-left"></i> Back</button>
+        <button class="back-btn" onclick="window.location.href='home.html'"><i class="fas fa-arrow-left"></i> Back</button>
     </div>
 </div>
 
@@ -452,36 +452,14 @@
 
 <!-- Bottom Navigation -->
 <div class="bottom-nav">
-    <button class="nav-item" onclick="window.location.href='index.html'"><i class="fas fa-home"></i><span>Home</span></button>
+    <button class="nav-item" onclick="window.location.href='home.html'"><i class="fas fa-home"></i><span>Home</span></button>
     <button class="nav-item active" onclick="window.location.href='groups.html'"><i class="fas fa-layer-group"></i><span>Groups</span></button>
     <button class="nav-item" onclick="window.location.href='tables.html'"><i class="fas fa-table"></i><span>Tables</span></button>
     <button class="nav-item" onclick="window.location.href='analytics.html'"><i class="fas fa-chart-line"></i><span>Analytics</span></button>
 </div>
 
 <div id="toast" class="toast"></div>
-    
-<!-- Add this at the beginning of your protected pages, before any other scripts -->
-<script type="module">
-    import { protectPage, initAuthUI, setupAutoLogout, getCurrentAdmin } from './auth.js';
-    
-    // Protect this page - redirects to login if not authenticated
-    if (!protectPage('admin-login.html')) {
-        // The redirect will happen automatically
-        throw new Error('Redirecting to login');
-    }
-    
-    // Initialize UI components (shows admin name, sets up logout buttons)
-    const admin = initAuthUI();
-    
-    // Setup auto-logout after 60 minutes of inactivity
-    setupAutoLogout(60);
-    
-    // Optional: Display admin info in console for debugging
-    console.log('Logged in as:', admin?.name, admin?.email);
-    
-    // Your page-specific code continues here...
-    console.log('Page loaded successfully with admin access');
-</script>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -911,14 +889,6 @@
     
     loadData();
     setInterval(loadData, 30000);
-    // In your page-specific JavaScript
-import { initNavigation, updateActiveNav } from './nav.js';
-
-// Initialize
-initNavigation();
-
-// Update active state when needed
-updateActiveNav();
 </script>
 </body>
 </html>
