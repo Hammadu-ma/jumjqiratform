@@ -471,16 +471,17 @@
         return (student.schedules || []).map(s => s.qirat_name).filter(Boolean);
     }
     
-    function formatStudentForExport(student) {
+    // Format for export - NO registration date, with sequential number
+    function formatStudentForExport(student, index) {
         return {
+            'No.': index,
             'Name': student.full_name,
             'Gender': student.gender,
             'Phone': student.phone,
             'Telegram': student.telegram,
             'Department': student.department,
             'Batch': student.batch,
-            'Qirats Enrolled': getQiratNames(student).join(', ') || '-',
-            'Registration Date': student.timestamp instanceof Date ? student.timestamp.toLocaleDateString() : new Date(student.timestamp).toLocaleDateString()
+            'Qirats Enrolled': getQiratNames(student).join(', ') || '-'
         };
     }
     
@@ -659,7 +660,7 @@
     
     function exportSingleGroup(group, format) {
         if (!group || group.members.length === 0) { showToast('No students', true); return; }
-        const exportData = group.members.map(m => formatStudentForExport(m));
+        const exportData = group.members.map((m, idx) => formatStudentForExport(m, idx + 1));
         const groupName = group.name.replace(/[^a-z0-9]/gi, '_').slice(0, 30);
         const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
         if (format === 'csv') downloadCSV(exportData, `${groupName}_${timestamp}`);
@@ -669,7 +670,7 @@
         showToast(`Exported "${group.name}" as ${format.toUpperCase()}`);
     }
     
-    // ========== MASTER EXPORT: ALL GROUPS IN ONE FILE (WORD & PDF) ==========
+    // ========== MASTER EXPORT: ALL GROUPS IN ONE FILE ==========
     function exportAllGroupsToWord() {
         if (currentGroups.length === 0) { showToast('No groups to export', true); return; }
         let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>JUMJ_All_Groups_${currentGroupMode}</title>
@@ -696,9 +697,9 @@
                 <span class="kpi-badge">🔄 Multi-Qirat: ${s.multiQiratCount}</span>
                 <span class="kpi-badge">🆕 New (30d): ${s.recentWeek}</span>
             </div>
-            <table><thead><tr><th>Name</th><th>Gender</th><th>Phone</th><th>Dept</th><th>Batch</th><th>Qirats</th><th>Reg Date</th></tr></thead><tbody>`;
-            group.members.forEach(m => {
-                html += `<tr><td>${escapeHtml(m.full_name)}</td><td>${escapeHtml(m.gender)}</td><td>${escapeHtml(m.phone)}</td><td>${escapeHtml(m.department)}</td><td>${escapeHtml(m.batch)}</td><td>${escapeHtml(getQiratNames(m).join(', ') || '-')}</td><td>${m.timestamp.toLocaleDateString()}</td></tr>`;
+            <table><thead><tr><th>No.</th><th>Name</th><th>Gender</th><th>Phone</th><th>Dept</th><th>Batch</th><th>Qirats</th></tr></thead><tbody>`;
+            group.members.forEach((m, idx) => {
+                html += `<tr><td>${idx + 1}</td><td>${escapeHtml(m.full_name)}</td><td>${escapeHtml(m.gender)}</td><td>${escapeHtml(m.phone)}</td><td>${escapeHtml(m.department)}</td><td>${escapeHtml(m.batch)}</td><td>${escapeHtml(getQiratNames(m).join(', ') || '-')}</td></tr>`;
             });
             html += `</tbody></table>`;
         });
@@ -726,9 +727,9 @@
             const s = group.stats;
             doc.text(`Stats: Male ${s.maleCount} | Female ${s.femaleCount} | Depts ${s.uniqueDepts} | Multi-Qirat ${s.multiQiratCount} | New30d ${s.recentWeek}`, 14, yPos); yPos += 7;
             
-            const tableData = group.members.map(m => [m.full_name, m.gender, m.phone, m.department, m.batch, getQiratNames(m).join(', ').substring(0,25), m.timestamp.toLocaleDateString()]);
+            const tableData = group.members.map((m, idx) => [idx + 1, m.full_name, m.gender, m.phone, m.department, m.batch, getQiratNames(m).join(', ').substring(0, 25)]);
             const result = doc.autoTable({
-                head: [['Name', 'Gender', 'Phone', 'Dept', 'Batch', 'Qirats', 'Reg Date']],
+                head: [['No.', 'Name', 'Gender', 'Phone', 'Dept', 'Batch', 'Qirats']],
                 body: tableData,
                 startY: yPos,
                 theme: 'striped',
@@ -747,7 +748,7 @@
         if (currentGroups.length === 0) { showToast('No groups', true); return; }
         const wb = XLSX.utils.book_new();
         currentGroups.forEach(group => {
-            const sheetData = group.members.map(m => formatStudentForExport(m));
+            const sheetData = group.members.map((m, idx) => formatStudentForExport(m, idx + 1));
             const ws = XLSX.utils.json_to_sheet(sheetData);
             let sheetName = group.name.replace(/[\\/*?:[\]]/g, '').slice(0, 31);
             XLSX.utils.book_append_sheet(wb, ws, sheetName);
@@ -756,35 +757,39 @@
         showToast(`Exported all ${currentGroups.length} groups to Excel`);
     }
     
-    // Helper exports for single group (maintain existing)
+    // Single group exports with No. column and no registration date
     function downloadCSV(data, filename) {
-        const headers = ['Name', 'Gender', 'Phone', 'Telegram', 'Department', 'Batch', 'Qirats Enrolled', 'Registration Date'];
+        const headers = ['No.', 'Name', 'Gender', 'Phone', 'Telegram', 'Department', 'Batch', 'Qirats Enrolled'];
         const rows = data.map(row => headers.map(h => `"${String(row[h] || '').replace(/"/g, '""')}"`).join(','));
         const csvContent = [headers.join(','), ...rows].join('\n');
         downloadBlob(new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' }), `${filename}.csv`);
     }
+    
     function exportSingleExcel(data, sheetName) {
         const ws = XLSX.utils.json_to_sheet(data);
-        ws['!cols'] = [{wch:25},{wch:10},{wch:15},{wch:18},{wch:20},{wch:15},{wch:35},{wch:15}];
+        ws['!cols'] = [{wch:6},{wch:25},{wch:10},{wch:15},{wch:18},{wch:20},{wch:15},{wch:35}];
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, sheetName.slice(0,31));
         XLSX.writeFile(wb, `${sheetName}.xlsx`);
     }
+    
     async function exportSinglePDF(data, groupName, totalCount, stats) {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
         doc.setFontSize(18); doc.setTextColor(16,185,129); doc.text(`JUMJ - ${groupName}`, 14,20);
         doc.setFontSize(10); doc.text(`Total: ${totalCount} | M:${stats.maleCount} F:${stats.femaleCount} | Multi-Q:${stats.multiQiratCount}`, 14,30);
-        const tableData = data.map(row => [row.Name, row.Gender, row.Phone, row.Department, row.Batch, (row['Qirats Enrolled']||'').substring(0,30), row['Registration Date']]);
-        doc.autoTable({ head: [['Name','Gender','Phone','Dept','Batch','Qirats','Reg Date']], body: tableData, startY: 38, theme: 'striped', headStyles: { fillColor: [16,185,129] }, styles: { fontSize: 8 } });
+        const tableData = data.map(row => [row['No.'], row.Name, row.Gender, row.Phone, row.Department, row.Batch, row['Qirats Enrolled']]);
+        doc.autoTable({ head: [['No.', 'Name', 'Gender', 'Phone', 'Dept', 'Batch', 'Qirats']], body: tableData, startY: 38, theme: 'striped', headStyles: { fillColor: [16,185,129] }, styles: { fontSize: 8 } });
         doc.save(`${groupName.replace(/[^a-z0-9]/gi, '_')}_report.pdf`);
     }
+    
     function exportSingleWord(data, groupName, totalCount, stats) {
         let html = `<html><head><meta charset="UTF-8"><title>${groupName}</title><style>table{border-collapse:collapse;width:100%}th,td{border:1px solid #ccc;padding:6px}th{background:#10b981;color:white}</style></head><body>
         <h2>${escapeHtml(groupName)} (${totalCount})</h2><p>Stats: M:${stats.maleCount} F:${stats.femaleCount} | Multi-Q:${stats.multiQiratCount} | New30d:${stats.recentWeek}</p>
-        <table><thead><tr><th>Name</th><th>Gender</th><th>Phone</th><th>Dept</th><th>Batch</th><th>Qirats</th><th>Reg Date</th></tr></thead><tbody>${data.map(r => `<tr><td>${escapeHtml(r.Name)}</td><td>${escapeHtml(r.Gender)}</td><td>${escapeHtml(r.Phone)}</td><td>${escapeHtml(r.Department)}</td><td>${escapeHtml(r.Batch)}</td><td>${escapeHtml(r['Qirats Enrolled'])}</td><td>${escapeHtml(r['Registration Date'])}</td></tr>`).join('')}</tbody></table></body></html>`;
+        <table><thead><tr><th>No.</th><th>Name</th><th>Gender</th><th>Phone</th><th>Dept</th><th>Batch</th><th>Qirats</th></tr></thead><tbody>${data.map(r => `<tr><td>${r['No.']}</td><td>${escapeHtml(r.Name)}</td><td>${escapeHtml(r.Gender)}</td><td>${escapeHtml(r.Phone)}</td><td>${escapeHtml(r.Department)}</td><td>${escapeHtml(r.Batch)}</td><td>${escapeHtml(r['Qirats Enrolled'])}</td></tr>`).join('')}</tbody></table></body></html>`;
         downloadBlob(new Blob([html], { type: 'application/msword' }), `${groupName.replace(/[^a-z0-9]/gi, '_')}_report.doc`);
     }
+    
     function downloadBlob(blob, filename) { const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = filename; link.click(); URL.revokeObjectURL(link.href); }
     
     window.toggleGroup = function(idx) {
