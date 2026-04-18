@@ -6,18 +6,6 @@
     <title>JUMJ Irshad | Admin Registration</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <!-- PWA Meta Tags -->
-    <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#3b82f6">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="ALIF Med">
-    
-    <!-- Apple Touch Icons -->
-    <link rel="apple-touch-icon" href="/icons/icon-152x152.png">
-    <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-192x192.png">
-
     <style>
         * {
             margin: 0;
@@ -602,20 +590,36 @@
         } catch (error) { return false; }
     }
     
+    // FIXED: Better secret key validation with debugging
     async function validateSecretKeyAgainstDB(secretKey) {
         try {
+            console.log("Validating secret key:", secretKey);
+            
             const querySnapshot = await getDocs(secretKeysCollection);
+            console.log("Total secret keys found:", querySnapshot.size);
+            
             let isValid = false;
             let validKey = null;
+            
             querySnapshot.forEach((docSnap) => {
                 const data = docSnap.data();
+                console.log("Checking key:", data.name, "Key value:", data.secretKey);
+                console.log("Secret key stored:", data.secretKey);
+                console.log("Secret key entered:", secretKey);
+                console.log("Are they equal?", data.secretKey === secretKey);
+                
                 if (data.secretKey === secretKey && data.isActive !== false) {
                     isValid = true;
                     validKey = { id: docSnap.id, name: data.name };
+                    console.log("✅ MATCH FOUND!", data.name);
                 }
             });
+            
+            console.log("Validation result:", isValid);
             return { valid: isValid, keyInfo: validKey };
+            
         } catch (error) {
+            console.error("Error validating secret key:", error);
             return { valid: false, keyInfo: null };
         }
     }
@@ -651,11 +655,12 @@
         registerBtn.innerHTML = '<span class="spinner"></span> Verifying secret key...';
         
         const keyValidationResult = await validateSecretKeyAgainstDB(secretKey);
+        
         if (!keyValidationResult.valid) {
             registerBtn.disabled = false;
             registerBtn.innerHTML = '<i class="fas fa-user-plus"></i> Register as Admin';
             showFieldError('key', 'Invalid secret key');
-            showMessage('❌ Invalid secret key', 'error');
+            showMessage('❌ Invalid secret key. Please check and try again.', 'error');
             return;
         }
         
@@ -700,6 +705,8 @@
                 errorMessage = 'Password is too weak. Please use a stronger password.';
             } else if (error.code === 'auth/invalid-email') {
                 errorMessage = 'Invalid email format.';
+            } else if (error.code === 'auth/network-request-failed') {
+                errorMessage = 'Network error. Please check your internet connection.';
             }
             showMessage('❌ ' + errorMessage, 'error');
         } finally {
@@ -718,7 +725,29 @@
             confirmPasswordInput.classList.remove('error');
         }
     });
+    
+    // Auto-validation on input
+    adminName.addEventListener('input', () => {
+        if (adminName.value.trim().length >= 3) {
+            document.getElementById('nameError').textContent = '';
+            adminName.classList.remove('error');
+        }
+    });
+    
+    adminEmail.addEventListener('input', () => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (emailRegex.test(adminEmail.value)) {
+            document.getElementById('emailError').textContent = '';
+            adminEmail.classList.remove('error');
+        }
+    });
+    
+    secretKeyInput.addEventListener('input', () => {
+        if (secretKeyInput.value.trim() !== '') {
+            document.getElementById('keyError').textContent = '';
+            secretKeyInput.classList.remove('error');
+        }
+    });
 </script>
-
 </body>
 </html>
