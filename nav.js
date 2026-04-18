@@ -1,7 +1,7 @@
 // nav.js - Universal Navigation System for JUMJ Irshad Admin Dashboard
 // Handles desktop header navigation and mobile bottom navigation with role-based access
 
-import { getCurrentAdmin } from './auth.js';
+import { getCurrentAdminSync } from './auth.js';
 
 /**
  * Navigation Configuration
@@ -27,7 +27,7 @@ const MOBILE_ONLY_ITEMS = [];
  */
 function getCurrentAdminRole() {
     try {
-        const admin = getCurrentAdmin();
+        const admin = getCurrentAdminSync();
         return admin?.role || null;
     } catch (error) {
         console.error("Error getting admin role:", error);
