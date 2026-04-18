@@ -517,20 +517,16 @@
 <div id="toast" class="toast"></div>
 
 <script type="module">
-    import { protectPageWithRole, initAuthUI, setupAutoLogout, getCurrentAdminSync } from './auth.js';
-import { initNavigation } from './nav.js';
+    import { protectPageWithRole, initAuthUI, setupAutoLogout } from './auth.js';
 
-// SYNC check - Super Admin only
+// Super Admin only check - ADD THIS RIGHT AFTER YOUR IMPORTS
 if (!protectPageWithRole(['super-admin'], 'admin-login.html')) {
     throw new Error('Redirecting to login');
 }
 
-// SYNC init - no await needed
+// Initialize auth - ADD THIS AFTER THE CHECK
 const admin = initAuthUI();
 setupAutoLogout(60);
-
-console.log('Logged in as Super Admin:', admin?.name, admin?.email);
-console.log('Role:', admin?.role);
     import { protectPageWithRole, initAuthUI, setupAutoLogout, logout, getCurrentAdmin, logActivity, getAllAdmins, getAllActivities, getActivityStats, updateAdmin, deleteAdmin } from './auth.js';
     
     // DOM Elements
