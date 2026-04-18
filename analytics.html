@@ -709,13 +709,23 @@
     
     loadData();
     setInterval(loadData, 30000);
-    // ========== NAVIGATION INITIALIZATION ==========
-import { initNavigation } from './nav.js';
-
-// Initialize navigation when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
+</script>
+    <!-- Navigation Script - Add this at the end of body -->
+<script type="module">
+    import { initNavigation, refreshNavigation } from './nav.js';
+    import { getCurrentAdminSync } from './auth.js';
+    
+    // Initialize base navigation
     initNavigation();
-});
+    
+    // Check if Super Admin and refresh to show hidden items
+    const admin = getCurrentAdminSync();
+    if (admin?.role === 'super-admin') {
+        // Refresh navigation to show Keys and Admins
+        refreshNavigation();
+    }
+    
+    console.log('Navigation loaded for role:', admin?.role || 'guest');
 </script>
 </body>
 </html>
