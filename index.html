@@ -987,6 +987,12 @@
     
     loadData();
     setInterval(loadData, 30000);
+    // In your page-specific JavaScript
+    import { initNavigation } from './nav.js';
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        initNavigation();
+    });
 </script>
 </body>
 </html>
