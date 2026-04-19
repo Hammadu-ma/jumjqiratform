@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>JUMJ Irshad | Exam Analytics Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary: #10b981;
+            --primary-dark: #059669;
+            --primary-light: #d1fae5;
+            --secondary: #6366f1;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --dark: #0f172a;
+            --card-bg: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e6f7f0 100%);
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        .glass-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(16, 185, 129, 0.2);
+            padding: 16px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .header-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, #10b981, #059669);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .desktop-nav {
+            display: flex;
+            gap: 8px;
+            background: var(--card-bg);
+            padding: 6px;
+            border-radius: 60px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+        }
+
+        .nav-link {
+            padding: 10px 24px;
+            border-radius: 40px;
+            text-decoration: none;
+            font-weight: 600;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-link:hover { background: var(--primary-light); color: var(--primary-dark); }
+        .nav-link.active { background: linear-gradient(135deg, #10b981, #059669); color: white; }
+
+        .main-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 28px;
+            padding: 20px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border);
+            text-align: center;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+        .stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+        .stat-value { font-size: 2rem; font-weight: 800; color: var(--primary); }
+        .stat-label { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
+        .top-performer {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+        }
+        .top-performer .stat-value { color: #92400e; }
+
+        /* Group Mode Switcher */
+        .mode-switcher {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+            background: var(--card-bg);
+            padding: 8px;
+            border-radius: 60px;
+            box-shadow: var(--shadow-md);
+            width: fit-content;
+        }
+        .mode-btn {
+            padding: 12px 32px;
+            border: none;
+            background: transparent;
+            border-radius: 50px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .mode-btn.active {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+        }
+
+        /* Search Bar */
+        .search-bar {
+            background: var(--card-bg);
+            border-radius: 60px;
+            padding: 8px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border);
+        }
+        .search-bar i { color: var(--text-muted); }
+        .search-bar input {
+            flex: 1;
+            border: none;
+            padding: 12px 0;
+            font-family: inherit;
+            font-size: 0.9rem;
+            background: transparent;
+            outline: none;
+        }
+
+        /* Qirat Grid */
+        .qirat-grid, .department-grid, .global-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 20px;
+        }
+        .student-card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .student-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary);
+        }
+        .student-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .student-name {
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+        }
+        .rank-badge {
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+        .rank-1 { background: #fbbf24; color: #78350f; }
+        .rank-2 { background: #e5e7eb; color: #374151; }
+        .rank-3 { background: #fdba74; color: #7c2d12; }
+        .score-value { font-size: 1.5rem; font-weight: 800; color: var(--primary); }
+        .progress-bar { height: 6px; background: var(--border); border-radius: 10px; overflow: hidden; margin: 12px 0; }
+        .progress-fill { height: 100%; background: var(--primary); border-radius: 10px; transition: width 0.5s; }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: white;
+            border-radius: 32px;
+            padding: 28px;
+            max-width: 1200px;
+            width: 95%;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 16px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--primary-light);
+        }
+        .exam-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+        .exam-table th, .exam-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        .exam-table th { background: #f8fafc; font-weight: 700; }
+        .mini-chart { width: 80px; height: 30px; }
+
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            right: 24px;
+            background: #1f2937;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            display: none;
+            z-index: 1100;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 12px 20px 20px;
+            border-top: 1px solid var(--border);
+            z-index: 200;
+            display: none;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 40px;
+            color: var(--text-muted);
+        }
+        .nav-item i { font-size: 1.4rem; }
+        .nav-item span { font-size: 0.7rem; font-weight: 500; }
+        .nav-item.active { color: var(--primary); background: var(--primary-light); }
+
+        @media (min-width: 768px) { body { padding-bottom: 0; } .bottom-nav { display: none; } }
+        @media (max-width: 768px) { .desktop-nav { display: none; } .bottom-nav { display: flex; } .main-container { padding: 16px; padding-bottom: 80px; } .mode-switcher { width: 100%; justify-content: center; } .mode-btn { padding: 8px 20px; font-size: 0.8rem; } }
+    </style>
+</head>
+<body>
+
+<div class="glass-header">
+    <div class="header-content">
+        <div class="logo"><h1><i class="fas fa-chart-line"></i> Exam Analytics Dashboard</h1></div>
+        <div class="desktop-nav">
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="groups.html" class="nav-link">Groups</a>
+            <a href="tables.html" class="nav-link">Tables</a>
+            <a href="analytics.html" class="nav-link">Analytics</a>
+            <a href="exam.html" class="nav-link active">Exam</a>
+            <a href="import.html" class="nav-link">Import</a>
+        </div>
+    </div>
+</div>
+
+<div class="main-container">
+    <div class="stats-grid" id="statsGrid"></div>
+
+    <div class="mode-switcher">
+        <button class="mode-btn active" data-mode="qirat"><i class="fas fa-book-quran"></i> By Qirat</button>
+        <button class="mode-btn" data-mode="department"><i class="fas fa-building"></i> By Department</button>
+        <button class="mode-btn" data-mode="global"><i class="fas fa-globe"></i> Global Ranking</button>
+    </div>
+
+    <div class="search-bar">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Search by name, department, or qirat...">
+    </div>
+
+    <div id="contentContainer"></div>
+</div>
+
+<div id="examModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div class="modal-title" id="modalTitle">Exam Details</div>
+            <button class="close-modal" onclick="closeModal()">&times;</button>
+        </div>
+        <div id="modalBody"></div>
+    </div>
+</div>
+
+<div class="bottom-nav">
+    <button class="nav-item" onclick="window.location.href='index.html'"><i class="fas fa-home"></i><span>Home</span></button>
+    <button class="nav-item" onclick="window.location.href='groups.html'"><i class="fas fa-layer-group"></i><span>Groups</span></button>
+    <button class="nav-item" onclick="window.location.href='tables.html'"><i class="fas fa-table"></i><span>Tables</span></button>
+    <button class="nav-item" onclick="window.location.href='analytics.html'"><i class="fas fa-chart-line"></i><span>Analytics</span></button>
+    <button class="nav-item active" onclick="window.location.href='exam.html'"><i class="fas fa-graduation-cap"></i><span>Exam</span></button>
+    <button class="nav-item" onclick="window.location.href='import.html'"><i class="fas fa-upload"></i><span>Import</span></button>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script type="module">
+    import { protectPage, initAuthUI, setupAutoLogout, getCurrentAdminSync } from './auth.js';
+    import { initNavigation, refreshNavigation } from './nav.js';
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    
+    if (!protectPage('admin-login.html')) throw new Error('Redirecting');
+    const admin = initAuthUI();
+    setupAutoLogout(60);
+    
+    const firebaseConfig = {
+        apiKey: "AIzaSyAR_g5y04YAGCrTvZCowrE7hw8h7k1du08",
+        authDomain: "jujm-qirat.firebaseapp.com",
+        projectId: "jujm-qirat",
+        storageBucket: "jujm-qirat.firebasestorage.app",
+        messagingSenderId: "253413984903",
+        appId: "1:253413984903:web:c1577e0fdef1711f960622"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    
+    let allStudents = [];
+    let examScores = new Map();
+    let currentMode = 'qirat';
+    let searchQuery = '';
+    let charts = {};
+    
+    const toast = document.getElementById('toast');
+    function showToast(msg) { toast.textContent = msg; toast.style.display = 'block'; setTimeout(() => toast.style.display = 'none', 3000); }
+    function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
+    function getQiratNames(student) { return (student.schedules || []).map(s => s.qirat_name).filter(Boolean); }
+    
+    function getStudentExamScores(studentId, qiratName) {
+        const studentScores = examScores.get(studentId) || {};
+        return studentScores[qiratName] || { exam1: null, exam2: null, exam3: null };
+    }
+    
+    function calculateAverage(scores) {
+        const values = Object.values(scores).filter(v => v !== null && !isNaN(v));
+        if (values.length === 0) return null;
+        const sum = values.reduce((a, b) => a + parseFloat(b), 0);
+        return Math.round((sum / values.length) * 10) / 10;
+    }
+    
+    function calculateTotalPoints(scores) {
+        const values = Object.values(scores).filter(v => v !== null && !isNaN(v));
+        if (values.length === 0) return null;
+        return values.reduce((a, b) => a + parseFloat(b), 0);
+    }
+    
+    async function loadData() {
+        try {
+            const studentsSnap = await getDocs(collection(db, "registrations"));
+            allStudents = [];
+            studentsSnap.forEach(docSnap => {
+                const data = docSnap.data();
+                allStudents.push({
+                    id: docSnap.id,
+                    full_name: data.full_name || 'N/A',
+                    gender: data.gender || 'Not Specified',
+                    department: data.department || 'Other',
+                    batch: data.batch || 'General',
+                    schedules: data.schedules || []
+                });
+            });
+            const examSnap = await getDocs(collection(db, "examScores"));
+            examScores.clear();
+            examSnap.forEach(docSnap => {
+                const data = docSnap.data();
+                if (data.scores) {
+                    Object.entries(data.scores).forEach(([studentId, studentData]) => {
+                        examScores.set(studentId, studentData);
+                    });
+                }
+            });
+            renderStats();
+            renderCurrentView();
+        } catch (error) { showToast("Error: " + error.message); }
+    }
+    
+    function renderStats() {
+        const totalStudents = allStudents.length;
+        let totalAvg = 0;
+        let count = 0;
+        let highestScorer = { name: '', score: 0 };
+        allStudents.forEach(s => {
+            const overall = calculateStudentOverallAvg(s.id);
+            if (overall !== null) {
+                totalAvg += overall;
+                count++;
+                if (overall > highestScorer.score) {
+                    highestScorer = { name: s.full_name, score: overall };
+                }
+            }
+        });
+        const topPerformer = highestScorer.name ? highestScorer.name : 'N/A';
+        document.getElementById('statsGrid').innerHTML = `
+            <div class="stat-card"><div class="stat-value">${totalStudents}</div><div class="stat-label">Total Students</div></div>
+            <div class="stat-card"><div class="stat-value">${count ? Math.round(totalAvg / count) : 0}%</div><div class="stat-label">Class Average</div></div>
+            <div class="stat-card top-performer"><div class="stat-value">🏆</div><div class="stat-label">Top Performer<br>${escapeHtml(topPerformer)}</div></div>
+            <div class="stat-card"><div class="stat-value">${examScores.size}</div><div class="stat-label">Students with Exams</div></div>
+        `;
+    }
+    
+    function calculateStudentOverallAvg(studentId) {
+        const student = allStudents.find(s => s.id === studentId);
+        if (!student) return null;
+        const qirats = getQiratNames(student);
+        let total = 0, cnt = 0;
+        qirats.forEach(q => {
+            const scores = getStudentExamScores(studentId, q);
+            const avg = calculateAverage(scores);
+            if (avg !== null) { total += avg; cnt++; }
+        });
+        return cnt > 0 ? Math.round(total / cnt) : null;
+    }
+    
+    function getStudentQiratAvg(studentId, qiratName) {
+        const scores = getStudentExamScores(studentId, qiratName);
+        return calculateAverage(scores);
+    }
+    
+    function renderCurrentView() {
+        if (currentMode === 'qirat') renderQiratView();
+        else if (currentMode === 'department') renderDepartmentView();
+        else renderGlobalView();
+    }
+    
+    function renderQiratView() {
+        const allQirats = new Set();
+        allStudents.forEach(s => getQiratNames(s).forEach(q => allQirats.add(q)));
+        const qiratList = Array.from(allQirats);
+        const qiratData = qiratList.map(qirat => {
+            const studentsInQirat = allStudents.filter(s => getQiratNames(s).includes(qirat));
+            const studentScores = studentsInQirat.map(s => ({
+                student: s,
+                avg: getStudentQiratAvg(s.id, qirat)
+            })).filter(item => item.avg !== null).sort((a,b) => b.avg - a.avg);
+            return { qirat, studentsInQirat, rankings: studentScores };
+        });
+        
+        const filteredQirats = qiratData.filter(q => 
+            q.qirat.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+        
+        const container = document.getElementById('contentContainer');
+        container.innerHTML = `<div class="qirat-grid">${filteredQirats.map(q => `
+            <div class="student-card" onclick="openQiratModal('${escapeHtml(q.qirat)}', ${JSON.stringify(q.rankings).replace(/"/g, '&quot;')})">
+                <div class="student-header">
+                    <span class="student-name">📖 ${escapeHtml(q.qirat)}</span>
+                    <span class="rank-badge rank-1">${q.rankings.length} students</span>
+                </div>
+                <div class="progress-bar"><div class="progress-fill" style="width: ${Math.min(100, (q.rankings.length / (allStudents.length || 1)) * 100)}%;"></div></div>
+                <div style="margin-top: 12px; font-size:0.75rem; color:var(--text-muted);">Click to view rankings and exam details</div>
+            </div>
+        `).join('')}</div>`;
+        if (filteredQirats.length === 0) container.innerHTML = '<div class="empty-state" style="text-align:center;padding:60px;">No Qirats found</div>';
+    }
+    
+    window.openQiratModal = (qiratName, rankings) => {
+        const assessmentCols = ['exam1', 'exam2', 'exam3'];
+        const colNames = ['Exam 1', 'Exam 2', 'Exam 3'];
+        
+        let rows = '';
+        rankings.forEach((item, idx) => {
+            const student = item.student;
+            const scores = getStudentExamScores(student.id, qiratName);
+            const avg = item.avg;
+            const totalPoints = calculateTotalPoints(scores);
+            const percentage = avg !== null ? avg : 0;
+            const rankClass = idx === 0 ? 'rank-1' : idx === 1 ? 'rank-2' : idx === 2 ? 'rank-3' : '';
+            rows += `
+                <tr>
+                    <td><span class="rank-badge ${rankClass}">${idx + 1}</span></td>
+                    <td><strong>${escapeHtml(student.full_name)}</strong></td>
+                    <td>${escapeHtml(student.department)}</td>
+                    ${assessmentCols.map(col => `<td>${scores[col] !== null ? scores[col] : '-'}</td>`).join('')}
+                    <td>${avg !== null ? avg : '-'}</td>
+                    <td>${totalPoints !== null ? totalPoints : '-'}</td>
+                    <td>${percentage}%</td>
+                </tr>
+            `;
+        });
+        
+        document.getElementById('modalTitle').innerHTML = `📖 ${escapeHtml(qiratName)} - Rankings & Exam Scores`;
+        document.getElementById('modalBody').innerHTML = `
+            <div style="overflow-x:auto;">
+                <table class="exam-table">
+                    <thead><tr><th>Rank</th><th>Student</th><th>Department</th>${colNames.map(n => `<th>${n}</th>`).join('')}<th>Avg</th><th>Total</th><th>%</th></tr></thead>
+                    <tbody>${rows}</tbody>
+                </table>
+            </div>
+        `;
+        document.getElementById('examModal').classList.add('active');
+    };
+    
+    function renderDepartmentView() {
+        const deptMap = new Map();
+        allStudents.forEach(s => {
+            const dept = s.department;
+            if (!deptMap.has(dept)) deptMap.set(dept, []);
+            deptMap.get(dept).push(s);
+        });
+        const deptList = Array.from(deptMap.entries()).map(([dept, students]) => ({ dept, students }));
+        const filteredDepts = deptList.filter(d => d.dept.toLowerCase().includes(searchQuery.toLowerCase()));
+        
+        const container = document.getElementById('contentContainer');
+        container.innerHTML = `<div class="department-grid">${filteredDepts.map(dept => `
+            <div class="student-card" onclick="openDepartmentModal('${escapeHtml(dept.dept)}', ${JSON.stringify(dept.students.map(s => ({ id: s.id, name: s.full_name, department: s.department, batch: s.batch, qirats: getQiratNames(s) }))).replace(/"/g, '&quot;')})">
+                <div class="student-header">
+                    <span class="student-name">🏛️ ${escapeHtml(dept.dept)}</span>
+                    <span class="rank-badge rank-1">${dept.students.length} students</span>
+                </div>
+                <div class="progress-bar"><div class="progress-fill" style="width: ${(dept.students.length / allStudents.length) * 100}%;"></div></div>
+                <div style="margin-top: 12px; font-size:0.75rem; color:var(--text-muted);">Click to view Qirat performance</div>
+            </div>
+        `).join('')}</div>`;
+    }
+    
+    window.openDepartmentModal = (deptName, studentsData) => {
+        const students = studentsData.map(sd => allStudents.find(s => s.id === sd.id)).filter(Boolean);
+        const allQirats = new Set();
+        students.forEach(s => getQiratNames(s).forEach(q => allQirats.add(q)));
+        const qiratList = Array.from(allQirats);
+        
+        let qiratHtml = '<div class="qirat-selector" style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:20px;">';
+        qiratList.forEach(q => {
+            const avgScore = students.filter(s => getQiratNames(s).includes(q)).map(s => getStudentQiratAvg(s.id, q)).filter(a => a !== null).reduce((a,b) => a+b, 0) / (students.filter(s => getQiratNames(s).includes(q)).length || 1);
+            qiratHtml += `<button class="mode-btn" style="background:var(--border);" onclick="showDepartmentQirat('${deptName}', '${escapeHtml(q)}', ${JSON.stringify(students.map(s => ({ id: s.id, name: s.full_name, department: s.department, batch: s.batch }))).replace(/"/g, '&quot;')})">📖 ${escapeHtml(q)} (Avg: ${Math.round(avgScore)}%)</button>`;
+        });
+        qiratHtml += '</div><div id="deptQiratContent"></div>';
+        
+        document.getElementById('modalTitle').innerHTML = `🏛️ ${escapeHtml(deptName)} - Select Qirat`;
+        document.getElementById('modalBody').innerHTML = qiratHtml;
+        document.getElementById('examModal').classList.add('active');
+    };
+    
+    window.showDepartmentQirat = (deptName, qiratName, students) => {
+        const assessmentCols = ['exam1', 'exam2', 'exam3'];
+        const colNames = ['Exam 1', 'Exam 2', 'Exam 3'];
+        const qiratStudents = students.filter(s => getQiratNames(allStudents.find(st => st.id === s.id)).includes(qiratName));
+        const studentScores = qiratStudents.map(s => ({
+            student: s,
+            avg: getStudentQiratAvg(s.id, qiratName)
+        })).filter(item => item.avg !== null).sort((a,b) => b.avg - a.avg);
+        
+        let rows = '';
+        studentScores.forEach((item, idx) => {
+            const scores = getStudentExamScores(item.student.id, qiratName);
+            const avg = item.avg;
+            const totalPoints = calculateTotalPoints(scores);
+            rows += `<tr><td>${idx + 1}</td><td><strong>${escapeHtml(item.student.name)}</strong></td>${assessmentCols.map(col => `<td>${scores[col] !== null ? scores[col] : '-'}</td>`).join('')}<td>${avg !== null ? avg : '-'}</td><td>${totalPoints !== null ? totalPoints : '-'}</td><td>${avg !== null ? avg : 0}%</td></tr>`;
+        });
+        
+        const bestQirat = studentScores.length ? studentScores.reduce((a,b) => (a.avg || 0) > (b.avg || 0) ? a : b) : null;
+        const worstQirat = studentScores.length ? studentScores.reduce((a,b) => (a.avg || 0) < (b.avg || 0) ? a : b) : null;
+        const avgAll = studentScores.length ? Math.round(studentScores.reduce((a,b) => a + (b.avg || 0), 0) / studentScores.length) : 0;
+        
+        document.getElementById('deptQiratContent').innerHTML = `
+            <div style="margin-bottom:20px;padding:16px;background:#f0fdf4;border-radius:20px;">
+                <div style="display:flex;gap:20px;flex-wrap:wrap;">
+                    <div><strong>🏆 Best Qirat:</strong> ${bestQirat ? escapeHtml(bestQirat.student.name) : 'N/A'} (${bestQirat?.avg || 0}%)</div>
+                    <div><strong>⚠️ Weakest Qirat:</strong> ${worstQirat ? escapeHtml(worstQirat.student.name) : 'N/A'} (${worstQirat?.avg || 0}%)</div>
+                    <div><strong>📊 Department Average:</strong> ${avgAll}%</div>
+                </div>
+            </div>
+            <div style="overflow-x:auto;">
+                <table class="exam-table">
+                    <thead><tr><th>Rank</th><th>Student</th>${colNames.map(n => `<th>${n}</th>`).join('')}<th>Avg</th><th>Total</th><th>%</th></tr></thead>
+                    <tbody>${rows}</tbody>
+                </table>
+            </div>
+        `;
+    };
+    
+    function renderGlobalView() {
+        const studentAverages = allStudents.map(s => ({
+            student: s,
+            avg: calculateStudentOverallAvg(s.id),
+            totalPoints: getStudentTotalPoints(s.id)
+        })).filter(item => item.avg !== null).sort((a,b) => {
+            if (b.avg !== a.avg) return b.avg - a.avg;
+            return (b.totalPoints || 0) - (a.totalPoints || 0);
+        });
+        
+        const filtered = studentAverages.filter(item => 
+            item.student.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            item.student.department.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+        
+        const container = document.getElementById('contentContainer');
+        container.innerHTML = `<div class="global-grid">${filtered.map((item, idx) => {
+            const rankClass = idx === 0 ? 'rank-1' : idx === 1 ? 'rank-2' : idx === 2 ? 'rank-3' : '';
+            return `
+                <div class="student-card" onclick="openGlobalStudentModal('${item.student.id}', '${escapeHtml(item.student.full_name)}')">
+                    <div class="student-header">
+                        <span class="student-name">${escapeHtml(item.student.full_name)}</span>
+                        <span class="rank-badge ${rankClass}">#${idx + 1}</span>
+                    </div>
+                    <div class="score-value">${item.avg}%</div>
+                    <div class="progress-bar"><div class="progress-fill" style="width: ${item.avg}%;"></div></div>
+                    <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:0.7rem;">
+                        <span>${escapeHtml(item.student.department)}</span>
+                        <span>${item.totalPoints || 0} pts</span>
+                    </div>
+                </div>
+            `;
+        }).join('')}</div>`;
+        if (filtered.length === 0) container.innerHTML = '<div class="empty-state" style="text-align:center;padding:60px;">No students found</div>';
+    }
+    
+    function getStudentTotalPoints(studentId) {
+        const student = allStudents.find(s => s.id === studentId);
+        if (!student) return 0;
+        const qirats = getQiratNames(student);
+        let total = 0;
+        qirats.forEach(q => {
+            const scores = getStudentExamScores(studentId, q);
+            const points = calculateTotalPoints(scores);
+            if (points !== null) total += points;
+        });
+        return total;
+    }
+    
+    window.openGlobalStudentModal = (studentId, studentName) => {
+        const student = allStudents.find(s => s.id === studentId);
+        const qirats = getQiratNames(student);
+        const assessmentCols = ['exam1', 'exam2', 'exam3'];
+        const colNames = ['Exam 1', 'Exam 2', 'Exam 3'];
+        
+        let qiratRows = '';
+        let bestQirat = { name: '', avg: 0 };
+        let worstQirat = { name: '', avg: 100 };
+        qirats.forEach(q => {
+            const scores = getStudentExamScores(studentId, q);
+            const avg = calculateAverage(scores);
+            if (avg !== null) {
+                if (avg > bestQirat.avg) bestQirat = { name: q, avg };
+                if (avg < worstQirat.avg) worstQirat = { name: q, avg };
+            }
+            qiratRows += `
+                <tr>
+                    <td><strong>📖 ${escapeHtml(q)}</strong></td>
+                    ${assessmentCols.map(col => `<td>${scores[col] !== null ? scores[col] : '-'}</td>`).join('')}
+                    <td>${avg !== null ? avg : '-'}</td>
+                    <td>${calculateTotalPoints(scores) !== null ? calculateTotalPoints(scores) : '-'}</td>
+                    <td>${avg !== null ? avg : 0}%</td>
+                </tr>
+            `;
+        });
+        
+        const overallAvg = calculateStudentOverallAvg(studentId);
+        
+        document.getElementById('modalTitle').innerHTML = `👤 ${escapeHtml(studentName)} - Performance Analysis`;
+        document.getElementById('modalBody').innerHTML = `
+            <div style="margin-bottom:20px;padding:16px;background:linear-gradient(135deg,#f0fdf4,#dcfce7);border-radius:20px;">
+                <div style="display:flex;gap:20px;flex-wrap:wrap;justify-content:space-between;">
+                    <div><strong>📊 Overall Average:</strong> <span style="font-size:1.5rem;font-weight:800;color:var(--primary);">${overallAvg !== null ? overallAvg : 0}%</span></div>
+                    <div><strong>🏆 Best Qirat:</strong> ${escapeHtml(bestQirat.name)} (${bestQirat.avg}%)</div>
+                    <div><strong>⚠️ Weakest Qirat:</strong> ${escapeHtml(worstQirat.name)} (${worstQirat.avg}%)</div>
+                </div>
+            </div>
+            <div style="overflow-x:auto;">
+                <table class="exam-table">
+                    <thead><tr><th>Qirat</th>${colNames.map(n => `<th>${n}</th>`).join('')}<th>Average</th><th>Total Points</th><th>%</th></tr></thead>
+                    <tbody>${qiratRows}</tbody>
+                </table>
+            </div>
+            <canvas id="trendCanvas" style="margin-top:24px;max-height:200px;"></canvas>
+        `;
+        document.getElementById('examModal').classList.add('active');
+        
+        setTimeout(() => {
+            const ctx = document.getElementById('trendCanvas')?.getContext('2d');
+            if (ctx && qirats.length) {
+                const avgs = qirats.map(q => getStudentQiratAvg(studentId, q)).filter(a => a !== null);
+                if (avgs.length) {
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: { labels: qirats.map(q => q), datasets: [{ label: 'Performance by Qirat', data: avgs, borderColor: '#10b981', tension: 0.3, fill: false }] },
+                        options: { responsive: true, maintainAspectRatio: true }
+                    });
+                }
+            }
+        }, 100);
+    };
+    
+    window.closeModal = () => document.getElementById('examModal').classList.remove('active');
+    
+    document.querySelectorAll('.mode-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentMode = btn.dataset.mode;
+            renderCurrentView();
+        });
+    });
+    
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+        searchQuery = e.target.value;
+        renderCurrentView();
+    });
+    
+    initNavigation();
+    const adminUser = getCurrentAdminSync();
+    if (adminUser?.role === 'super-admin') setTimeout(() => refreshNavigation(), 100);
+    
+    loadData();
+</script>
+</body>
+</html>
