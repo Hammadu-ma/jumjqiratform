@@ -3,10 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>JUMJ Irshad | Exam Marks Management</title>
+    <title>JUMJ Irshad | Exam Marks Management System</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -98,7 +101,6 @@
             padding: 24px;
         }
 
-        /* Stats Cards */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -118,7 +120,6 @@
         .stat-value { font-size: 2rem; font-weight: 800; color: var(--primary); }
         .stat-label { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
 
-        /* Group Mode Selector */
         .group-mode-selector {
             display: flex;
             gap: 12px;
@@ -146,7 +147,6 @@
             box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
         }
 
-        /* Groups Grid */
         .groups-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -160,7 +160,6 @@
             border: 1px solid var(--border);
             transition: all 0.3s;
             cursor: pointer;
-            position: relative;
         }
         .group-card:hover {
             transform: translateY(-4px);
@@ -175,33 +174,11 @@
             flex-wrap: wrap;
             gap: 8px;
         }
-        .group-name {
-            font-size: 1.2rem;
-            font-weight: 800;
-            color: var(--primary-dark);
-        }
-        .group-stats {
-            font-size: 0.7rem;
-            color: var(--text-muted);
-            display: flex;
-            gap: 12px;
-            margin-top: 12px;
-        }
-        .progress-bar {
-            height: 6px;
-            background: var(--border);
-            border-radius: 10px;
-            overflow: hidden;
-            margin: 12px 0;
-        }
-        .progress-fill {
-            height: 100%;
-            background: var(--primary);
-            border-radius: 10px;
-            transition: width 0.5s;
-        }
+        .group-name { font-size: 1.2rem; font-weight: 800; color: var(--primary-dark); }
+        .progress-bar { height: 6px; background: var(--border); border-radius: 10px; overflow: hidden; margin: 12px 0; }
+        .progress-fill { height: 100%; background: var(--primary); border-radius: 10px; transition: width 0.5s; }
+        .group-stats { font-size: 0.7rem; color: var(--text-muted); display: flex; gap: 12px; margin-top: 12px; }
 
-        /* Modal Styles */
         .modal {
             display: none;
             position: fixed;
@@ -220,7 +197,7 @@
             background: white;
             border-radius: 32px;
             padding: 28px;
-            max-width: 1300px;
+            max-width: 1400px;
             width: 95%;
             max-height: 85vh;
             overflow-y: auto;
@@ -229,91 +206,50 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             flex-wrap: wrap;
             gap: 16px;
             padding-bottom: 16px;
             border-bottom: 2px solid var(--primary-light);
         }
-        .modal-title {
-            font-size: 1.4rem;
-            font-weight: 800;
-            color: var(--primary-dark);
-        }
-        .close-modal {
-            background: none;
-            border: none;
-            font-size: 28px;
-            cursor: pointer;
-            color: var(--text-muted);
-        }
-        .exam-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.8rem;
-        }
-        .exam-table th, .exam-table td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid var(--border);
-        }
-        .exam-table th {
+        .modal-title { font-size: 1.4rem; font-weight: 800; color: var(--primary-dark); }
+        .close-modal { background: none; border: none; font-size: 28px; cursor: pointer; color: var(--text-muted); }
+
+        .modal-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding: 16px;
             background: #f8fafc;
-            font-weight: 700;
-            position: sticky;
-            top: 0;
-        }
-        .score-input {
-            width: 70px;
-            padding: 6px 8px;
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            text-align: center;
-            font-family: inherit;
-        }
-        .score-input:focus { outline: none; border-color: var(--primary); }
-        .save-score-btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 4px 10px;
             border-radius: 20px;
-            font-size: 0.7rem;
-            cursor: pointer;
+            align-items: flex-end;
         }
-        .rank-badge {
-            background: #fef3c7;
-            color: #92400e;
-            padding: 4px 10px;
-            border-radius: 30px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            display: inline-block;
-        }
+        .filter-group { display: flex; flex-direction: column; gap: 4px; }
+        .filter-group label { font-size: 0.7rem; font-weight: 700; color: var(--primary); }
+        .filter-group input, .filter-group select { padding: 6px 12px; border-radius: 20px; border: 1px solid var(--border); font-family: inherit; }
+        .btn-clear { background: #64748b; color: white; border: none; padding: 6px 16px; border-radius: 20px; cursor: pointer; }
+
+        .export-buttons { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+        .export-btn { background: #e2e8f0; border: none; padding: 8px 18px; border-radius: 30px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+        .export-btn:hover { background: var(--primary); color: white; }
+
+        .exam-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+        .exam-table th, .exam-table td { padding: 10px; text-align: left; border-bottom: 1px solid var(--border); vertical-align: middle; }
+        .exam-table th { background: #f8fafc; position: sticky; top: 0; font-weight: 700; }
+        .score-input { width: 80px; padding: 6px 8px; border: 2px solid var(--border); border-radius: 12px; text-align: center; font-family: inherit; }
+        .score-input:focus { outline: none; border-color: var(--primary); }
+        .score-input.editable { background: white; }
+        .score-input.readonly { background: #f1f5f9; color: #64748b; cursor: not-allowed; }
+        .outof-input { width: 60px; padding: 4px 6px; border: 1px solid var(--border); border-radius: 10px; text-align: center; font-size: 0.7rem; }
+
+        .rank-badge { background: #fef3c7; color: #92400e; padding: 4px 10px; border-radius: 30px; font-size: 0.7rem; font-weight: 600; display: inline-block; }
         .rank-badge.top1 { background: #fbbf24; color: #78350f; }
         .rank-badge.top2 { background: #e5e7eb; color: #374151; }
         .rank-badge.top3 { background: #fdba74; color: #7c2d12; }
 
-        /* Qirat Selector Modal */
-        .qirat-selector {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-        .qirat-btn {
-            background: var(--border);
-            border: none;
-            padding: 10px 20px;
-            border-radius: 40px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .qirat-btn.active {
-            background: var(--primary);
-            color: white;
-        }
+        .edit-toggle-btn { background: var(--secondary); color: white; border: none; padding: 8px 20px; border-radius: 30px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+        .settings-btn { background: #f59e0b; color: white; border: none; padding: 8px 20px; border-radius: 30px; font-weight: 600; cursor: pointer; }
 
         .toast {
             position: fixed;
@@ -363,7 +299,7 @@
         .nav-item.active { color: var(--primary); background: var(--primary-light); }
 
         @media (min-width: 768px) { body { padding-bottom: 0; } .bottom-nav { display: none; } }
-        @media (max-width: 768px) { .desktop-nav { display: none; } .bottom-nav { display: flex; } .main-container { padding: 16px; padding-bottom: 80px; } .groups-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) { .desktop-nav { display: none; } .bottom-nav { display: flex; } .main-container { padding: 16px; padding-bottom: 80px; } .groups-grid { grid-template-columns: 1fr; } .modal-filters { flex-direction: column; } }
     </style>
 </head>
 <body>
@@ -384,35 +320,16 @@
 
 <div class="main-container">
     <div class="stats-grid" id="statsGrid"></div>
-
     <div class="group-mode-selector">
         <button class="mode-btn active" data-mode="qirat"><i class="fas fa-book-quran"></i> By Qirat</button>
         <button class="mode-btn" data-mode="department"><i class="fas fa-building"></i> By Department</button>
         <button class="mode-btn" data-mode="overall"><i class="fas fa-chart-line"></i> Overall Ranking</button>
     </div>
-
     <div class="groups-grid" id="groupsGrid"></div>
 </div>
 
-<div id="examModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <div class="modal-title" id="modalTitle">Exam Scores</div>
-            <button class="close-modal" onclick="closeExamModal()">&times;</button>
-        </div>
-        <div id="modalBody"></div>
-    </div>
-</div>
-
-<div id="qiratSelectorModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <div class="modal-title" id="qiratModalTitle">Select Qirat</div>
-            <button class="close-modal" onclick="closeQiratSelectorModal()">&times;</button>
-        </div>
-        <div id="qiratSelectorBody"></div>
-    </div>
-</div>
+<div id="examModal" class="modal"><div class="modal-content"><div class="modal-header"><div class="modal-title" id="modalTitle">Exam Scores</div><button class="close-modal" onclick="closeExamModal()">&times;</button></div><div id="modalBody"></div></div></div>
+<div id="settingsModal" class="modal"><div class="modal-content"><div class="modal-header"><div class="modal-title">Assessment Settings</div><button class="close-modal" onclick="closeSettingsModal()">&times;</button></div><div id="settingsBody"></div></div></div>
 
 <div class="bottom-nav">
     <button class="nav-item" onclick="window.location.href='index.html'"><i class="fas fa-home"></i><span>Home</span></button>
@@ -447,40 +364,40 @@
     const db = getFirestore(app);
     
     let allStudents = [];
-    let examScores = new Map(); // studentId -> { qiratName: { assessment1, assessment2, ... } }
+    let examScores = new Map();
+    let assessmentConfig = { names: ['Quiz 1', 'Mid Exam', 'Assignment', 'Final Exam', 'Project'], outOf: [30, 50, 20, 100, 40] };
     let currentGroupMode = 'qirat';
     let groups = [];
-    let currentDepartmentData = null;
-    let currentStudentQirats = [];
+    let isEditMode = false;
+    let currentModalData = null;
+    let currentModalFilters = { search: '', gender: '', department: '', batch: '' };
     
     const toast = document.getElementById('toast');
+    function showToast(msg, isErr = false) { toast.textContent = msg; toast.style.background = isErr ? '#ef4444' : '#10b981'; toast.style.display = 'block'; setTimeout(() => toast.style.display = 'none', 3000); }
+    function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
+    function getQiratNames(student) { return (student.schedules || []).map(s => s.qirat_name).filter(Boolean); }
     
-    function showToast(msg, isErr = false) {
-        toast.textContent = msg;
-        toast.style.background = isErr ? '#ef4444' : '#10b981';
-        toast.style.display = 'block';
-        setTimeout(() => toast.style.display = 'none', 3000);
+    async function loadAssessmentConfig() {
+        try { const configDoc = await getDocs(collection(db, "settings")); configDoc.forEach(doc => { if (doc.id === 'assessmentConfig') assessmentConfig = doc.data(); }); } catch(e) {}
     }
-    
-    function escapeHtml(str) {
-        if (!str) return '';
-        return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m]));
-    }
-    
-    function getQiratNames(student) {
-        return (student.schedules || []).map(s => s.qirat_name).filter(Boolean);
-    }
+    async function saveAssessmentConfig() { await setDoc(doc(db, "settings", "assessmentConfig"), assessmentConfig); showToast('Settings saved'); }
     
     function getStudentExamScores(studentId, qiratName) {
         const studentScores = examScores.get(studentId) || {};
-        return studentScores[qiratName] || { assessment1: null, assessment2: null, assessment3: null, assessment4: null, assessment5: null };
+        return studentScores[qiratName] || {};
     }
     
+    function calculatePercentage(score, outOf) { if (score === null || score === '' || !outOf) return null; return Math.round((parseFloat(score) / outOf) * 100); }
     function calculateAverage(scores) {
-        const values = Object.values(scores).filter(v => v !== null && v !== '' && !isNaN(v));
-        if (values.length === 0) return null;
-        const sum = values.reduce((a, b) => a + parseFloat(b), 0);
-        return Math.round((sum / values.length) * 10) / 10;
+        let totalPercent = 0; let count = 0;
+        for (let i = 0; i < assessmentConfig.names.length; i++) {
+            const score = scores[`assessment${i+1}`];
+            if (score !== null && score !== '' && !isNaN(score)) {
+                const percent = calculatePercentage(parseFloat(score), assessmentConfig.outOf[i]);
+                if (percent !== null) { totalPercent += percent; count++; }
+            }
+        }
+        return count > 0 ? Math.round(totalPercent / count) : null;
     }
     
     async function saveExamScore(studentId, qiratName, assessmentKey, value) {
@@ -489,168 +406,81 @@
         qiratScores[assessmentKey] = value ? parseFloat(value) : null;
         currentScores[qiratName] = qiratScores;
         examScores.set(studentId, currentScores);
-        
-        // Save to Firestore
         const examRef = doc(db, "examScores", studentId);
         await setDoc(examRef, { scores: Object.fromEntries(examScores) }, { merge: true });
-        showToast('Score saved');
     }
     
     async function loadExamScores() {
-        try {
-            const snapshot = await getDocs(collection(db, "examScores"));
+        try { const snapshot = await getDocs(collection(db, "examScores"));
             examScores.clear();
-            snapshot.forEach(docSnap => {
-                const data = docSnap.data();
-                if (data.scores) {
-                    const scoresMap = new Map();
-                    Object.entries(data.scores).forEach(([studentId, studentData]) => {
-                        scoresMap.set(studentId, studentData);
-                    });
-                    scoresMap.forEach((v, k) => examScores.set(k, v));
-                }
+            snapshot.forEach(docSnap => { const data = docSnap.data();
+                if (data.scores) { Object.entries(data.scores).forEach(([studentId, studentData]) => examScores.set(studentId, studentData)); }
             });
-        } catch (error) { console.error("Error loading exam scores:", error); }
+        } catch(e) {}
     }
     
     async function loadData() {
         try {
             const querySnapshot = await getDocs(collection(db, "registrations"));
             allStudents = [];
-            querySnapshot.forEach((docSnap) => {
+            querySnapshot.forEach(docSnap => {
                 const data = docSnap.data();
                 let timestamp = data.timestamp?.toDate?.() || new Date(data.timestamp) || new Date();
                 allStudents.push({
-                    id: docSnap.id,
-                    full_name: data.full_name || 'N/A',
-                    gender: data.gender || 'Not Specified',
-                    phone: data.phone || '',
-                    department: data.department || 'Other',
-                    batch: data.batch || 'General',
-                    schedules: data.schedules || [],
-                    timestamp: timestamp
+                    id: docSnap.id, full_name: data.full_name || 'N/A', gender: data.gender || 'Not Specified',
+                    phone: data.phone || '', department: data.department || 'Other', batch: data.batch || 'General',
+                    schedules: data.schedules || [], timestamp: timestamp
                 });
             });
+            await loadAssessmentConfig();
             await loadExamScores();
             buildGroups();
             renderStats();
-        } catch (error) { showToast("Error: " + error.message, true); }
+        } catch(e) { showToast("Error: " + e.message, true); }
     }
     
     function renderStats() {
         const totalStudents = allStudents.length;
-        const allQirats = new Set();
-        allStudents.forEach(s => getQiratNames(s).forEach(q => allQirats.add(q)));
-        const totalQirats = allQirats.size;
-        let totalExams = 0;
-        examScores.forEach(studentScores => {
-            Object.values(studentScores).forEach(qiratScores => {
-                if (Object.values(qiratScores).some(v => v !== null)) totalExams++;
-            });
-        });
+        const allQirats = new Set(); allStudents.forEach(s => getQiratNames(s).forEach(q => allQirats.add(q)));
+        let totalExamRecords = 0;
+        examScores.forEach(studentScores => { Object.values(studentScores).forEach(qScores => { if (Object.values(qScores).some(v => v !== null)) totalExamRecords++; }); });
         document.getElementById('statsGrid').innerHTML = `
             <div class="stat-card"><div class="stat-value">${totalStudents}</div><div class="stat-label">Students</div></div>
-            <div class="stat-card"><div class="stat-value">${totalQirats}</div><div class="stat-label">Active Qirats</div></div>
-            <div class="stat-card"><div class="stat-value">${totalExams}</div><div class="stat-label">Exam Records</div></div>
-            <div class="stat-card"><div class="stat-value">${Math.round((totalExams / (totalStudents * totalQirats || 1)) * 100)}%</div><div class="stat-label">Completion Rate</div></div>
+            <div class="stat-card"><div class="stat-value">${allQirats.size}</div><div class="stat-label">Active Qirats</div></div>
+            <div class="stat-card"><div class="stat-value">${totalExamRecords}</div><div class="stat-label">Exam Records</div></div>
+            <div class="stat-card"><div class="stat-value">${assessmentConfig.names.length}</div><div class="stat-label">Assessments</div></div>
         `;
     }
     
     function buildGroups() {
         if (currentGroupMode === 'qirat') {
             const qiratMap = new Map();
-            allStudents.forEach(student => {
-                getQiratNames(student).forEach(qirat => {
-                    if (!qiratMap.has(qirat)) qiratMap.set(qirat, []);
-                    qiratMap.get(qirat).push(student);
-                });
-            });
-            groups = Array.from(qiratMap.entries()).map(([name, students]) => ({
-                name, students, count: students.length,
-                avgScore: calculateGroupAverageScore(name, students)
-            })).sort((a, b) => b.count - a.count);
+            allStudents.forEach(s => { getQiratNames(s).forEach(q => { if (!qiratMap.has(q)) qiratMap.set(q, []); qiratMap.get(q).push(s); }); });
+            groups = Array.from(qiratMap.entries()).map(([name, students]) => ({ name, students, count: students.length, avgScore: calculateGroupAverageScore(name, students) })).sort((a,b) => b.count - a.count);
         } else if (currentGroupMode === 'department') {
             const deptMap = new Map();
-            allStudents.forEach(student => {
-                const dept = student.department;
-                if (!deptMap.has(dept)) deptMap.set(dept, []);
-                deptMap.get(dept).push(student);
-            });
-            groups = Array.from(deptMap.entries()).map(([name, students]) => ({
-                name, students, count: students.length,
-                avgScore: calculateDepartmentAverageScore(students)
-            })).sort((a, b) => b.count - a.count);
+            allStudents.forEach(s => { const dept = s.department; if (!deptMap.has(dept)) deptMap.set(dept, []); deptMap.get(dept).push(s); });
+            groups = Array.from(deptMap.entries()).map(([name, students]) => ({ name, students, count: students.length, avgScore: calculateDepartmentAverageScore(students) })).sort((a,b) => b.count - a.count);
         } else {
-            // Overall ranking - all students
-            const studentScores = allStudents.map(student => ({
-                student,
-                avgScore: calculateStudentOverallAverage(student.id)
-            })).sort((a, b) => (b.avgScore || 0) - (a.avgScore || 0));
+            const studentScores = allStudents.map(s => ({ student: s, avgScore: calculateStudentOverallAverage(s.id) })).sort((a,b) => (b.avgScore || 0) - (a.avgScore || 0));
             groups = [{ name: "All Students", students: allStudents, rankings: studentScores, count: allStudents.length }];
         }
         renderGroups();
     }
     
-    function calculateGroupAverageScore(qiratName, students) {
-        let total = 0;
-        let count = 0;
-        students.forEach(student => {
-            const scores = getStudentExamScores(student.id, qiratName);
-            const avg = calculateAverage(scores);
-            if (avg !== null) { total += avg; count++; }
-        });
-        return count > 0 ? Math.round(total / count) : 0;
-    }
-    
-    function calculateDepartmentAverageScore(students) {
-        let total = 0;
-        let count = 0;
-        students.forEach(student => {
-            const qirats = getQiratNames(student);
-            let studentTotal = 0;
-            let studentCount = 0;
-            qirats.forEach(qirat => {
-                const scores = getStudentExamScores(student.id, qirat);
-                const avg = calculateAverage(scores);
-                if (avg !== null) { studentTotal += avg; studentCount++; }
-            });
-            if (studentCount > 0) { total += (studentTotal / studentCount); count++; }
-        });
-        return count > 0 ? Math.round(total / count) : 0;
-    }
-    
-    function calculateStudentOverallAverage(studentId) {
-        let total = 0;
-        let count = 0;
-        const student = allStudents.find(s => s.id === studentId);
-        if (student) {
-            const qirats = getQiratNames(student);
-            qirats.forEach(qirat => {
-                const scores = getStudentExamScores(studentId, qirat);
-                const avg = calculateAverage(scores);
-                if (avg !== null) { total += avg; count++; }
-            });
-        }
-        return count > 0 ? Math.round(total / count) : null;
-    }
+    function calculateGroupAverageScore(qiratName, students) { let total = 0, count = 0; students.forEach(s => { const scores = getStudentExamScores(s.id, qiratName); const avg = calculateAverage(scores); if (avg !== null) { total += avg; count++; } }); return count > 0 ? Math.round(total / count) : 0; }
+    function calculateDepartmentAverageScore(students) { let total = 0, count = 0; students.forEach(s => { const qirats = getQiratNames(s); let studentTotal = 0, studentCount = 0; qirats.forEach(q => { const scores = getStudentExamScores(s.id, q); const avg = calculateAverage(scores); if (avg !== null) { studentTotal += avg; studentCount++; } }); if (studentCount > 0) { total += (studentTotal / studentCount); count++; } }); return count > 0 ? Math.round(total / count) : 0; }
+    function calculateStudentOverallAverage(studentId) { let total = 0, count = 0; const student = allStudents.find(s => s.id === studentId); if (student) { getQiratNames(student).forEach(q => { const scores = getStudentExamScores(studentId, q); const avg = calculateAverage(scores); if (avg !== null) { total += avg; count++; } }); } return count > 0 ? Math.round(total / count) : null; }
     
     function renderGroups() {
         const container = document.getElementById('groupsGrid');
         if (groups.length === 0) { container.innerHTML = '<div class="empty-state">No data available</div>'; return; }
-        
         const maxCount = Math.max(...groups.map(g => g.count), 1);
         container.innerHTML = groups.map((group, idx) => `
             <div class="group-card" onclick="openGroupModal('${escapeHtml(group.name)}', ${idx})">
-                <div class="group-header">
-                    <span class="group-name"><i class="fas ${currentGroupMode === 'qirat' ? 'fa-book-quran' : (currentGroupMode === 'department' ? 'fa-building' : 'fa-trophy')}"></i> ${escapeHtml(group.name)}</span>
-                    <span class="rank-badge ${idx === 0 ? 'top1' : idx === 1 ? 'top2' : idx === 2 ? 'top3' : ''}">${group.avgScore || 0}% Avg</span>
-                </div>
+                <div class="group-header"><span class="group-name"><i class="fas ${currentGroupMode === 'qirat' ? 'fa-book-quran' : (currentGroupMode === 'department' ? 'fa-building' : 'fa-trophy')}"></i> ${escapeHtml(group.name)}</span><span class="rank-badge ${idx === 0 ? 'top1' : idx === 1 ? 'top2' : idx === 2 ? 'top3' : ''}">Avg: ${group.avgScore || 0}%</span></div>
                 <div class="progress-bar"><div class="progress-fill" style="width: ${(group.count / maxCount) * 100}%;"></div></div>
-                <div class="group-stats">
-                    <span><i class="fas fa-users"></i> ${group.count} students</span>
-                    <span><i class="fas fa-chart-line"></i> Avg: ${group.avgScore || 0}%</span>
-                </div>
-                <div style="margin-top: 12px; font-size:0.7rem; color:var(--text-muted);">Click to manage exam scores</div>
+                <div class="group-stats"><span><i class="fas fa-users"></i> ${group.count} students</span><span><i class="fas fa-chart-line"></i> ${group.avgScore || 0}% Average</span></div>
             </div>
         `).join('');
     }
@@ -658,333 +488,181 @@
     window.openGroupModal = async (groupName, idx) => {
         const group = groups[idx];
         if (!group) return;
-        
-        if (currentGroupMode === 'qirat') {
-            await openQiratModal(group.name, group.students);
-        } else if (currentGroupMode === 'department') {
-            currentDepartmentData = { name: group.name, students: group.students };
-            await openDepartmentModal(group.name, group.students);
-        } else {
-            await openOverallModal(group.rankings);
-        }
+        currentModalData = group;
+        isEditMode = false;
+        if (currentGroupMode === 'qirat') await openQiratModal(group.name, group.students);
+        else if (currentGroupMode === 'department') await openDepartmentModal(group.name, group.students);
+        else await openOverallModal(group.rankings);
     };
     
     async function openQiratModal(qiratName, students) {
-        const assessmentColumns = ['assessment1', 'assessment2', 'assessment3', 'assessment4', 'assessment5'];
-        const columnNames = ['Exam 1', 'Exam 2', 'Exam 3', 'Exam 4', 'Exam 5'];
+        currentModalData = { type: 'qirat', name: qiratName, students };
+        const filteredStudents = applyFilters(students);
+        const rankedStudents = filteredStudents.map(s => ({ student: s, avg: calculateAverage(getStudentExamScores(s.id, qiratName)) })).sort((a,b) => (b.avg || 0) - (a.avg || 0));
         
-        let studentRows = '';
-        for (const student of students) {
-            const scores = getStudentExamScores(student.id, qiratName);
-            const avg = calculateAverage(scores);
-            studentRows += `
-                <tr data-student="${student.id}" data-qirat="${qiratName}">
-                    <td><strong>${escapeHtml(student.full_name)}</strong></td>
-                    <td>${escapeHtml(student.department)}</td>
-                    <td>${escapeHtml(student.batch)}</td>
-                    ${assessmentColumns.map((col, idx) => `
-                        <td><input type="number" class="score-input" data-assessment="${col}" value="${scores[col] !== null ? scores[col] : ''}" step="0.5" min="0" max="100" style="width:70px;"></td>
-                    `).join('')}
-                    <td id="avg-${student.id}-${qiratName.replace(/[^a-z0-9]/gi, '_')}">${avg !== null ? avg : '-'}</td>
-                </tr>
-            `;
-        }
+        let tableRows = rankedStudents.map((item, rank) => {
+            const s = item.student;
+            const scores = getStudentExamScores(s.id, qiratName);
+            return `<tr>${isEditMode ? `<td><input type="checkbox" class="row-select" data-id="${s.id}">` : `<td>${rank + 1}</td>`}<td><strong>${escapeHtml(s.full_name)}</strong></td><td>${escapeHtml(s.gender)}</td><td>${escapeHtml(s.department)}</td><td>${escapeHtml(s.batch)}</td>${assessmentConfig.names.map((name, i) => {
+                const score = scores[`assessment${i+1}`];
+                const outOf = assessmentConfig.outOf[i];
+                const percent = calculatePercentage(score, outOf);
+                return `<td>${isEditMode ? `<input type="number" class="score-input editable" data-student="${s.id}" data-qirat="${qiratName}" data-assessment="${i+1}" value="${score !== null ? score : ''}" step="0.5" min="0" max="${outOf}" style="width:70px;"><span class="outof-text">/${outOf}</span>` : `<span>${score !== null ? score : '-'} / ${outOf}<br><small>${percent !== null ? percent+'%' : '-'}</small></span>`}</td>`;
+            }).join('')}<td class="avg-cell">${item.avg !== null ? item.avg+'%' : '-'}</td><td><span class="rank-badge ${rank === 0 ? 'top1' : rank === 1 ? 'top2' : rank === 2 ? 'top3' : ''}">#${rank+1}</span></td></tr>`;
+        }).join('');
         
-        const html = `
-            <div style="margin-bottom: 16px; padding: 12px; background: #f0fdf4; border-radius: 16px;">
-                <strong>📊 Group Statistics:</strong> Total Students: ${students.length} | Average Score: ${calculateGroupAverageScore(qiratName, students)}%
-            </div>
-            <div style="overflow-x: auto;">
-                <table class="exam-table">
-                    <thead>
-                        <tr><th>Student</th><th>Department</th><th>Batch</th>${columnNames.map(n => `<th>${n}</th>`).join('')}<th>Average</th>
-                    </thead>
-                    <tbody>${studentRows}</tbody>
-                </table>
-            </div>
-            <div style="margin-top: 20px; display: flex; justify-content: flex-end;">
-                <button class="save-score-btn" onclick="saveAllScoresInModal('${qiratName}')" style="padding: 10px 24px;">Save All Changes</button>
-            </div>
+        document.getElementById('modalTitle').innerHTML = `📖 ${escapeHtml(qiratName)} - Exam Scores ${isEditMode ? '(Edit Mode)' : '(View Mode)'}`;
+        document.getElementById('modalBody').innerHTML = `
+            <div class="modal-filters"><div class="filter-group"><label>Search</label><input type="text" id="modalSearch" placeholder="Name"></div>
+            <div class="filter-group"><label>Gender</label><select id="modalGender"><option value="">All</option><option value="Male">Male</option><option value="Female">Female</option></select></div>
+            <div class="filter-group"><label>Department</label><select id="modalDept"><option value="">All</option>${[...new Set(students.map(s=>s.department))].map(d=>`<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join('')}</select></div>
+            <div class="filter-group"><label>Batch</label><select id="modalBatch"><option value="">All</option>${[...new Set(students.map(s=>s.batch))].map(b=>`<option value="${escapeHtml(b)}">${escapeHtml(b)}</option>`).join('')}</select></div>
+            <button class="btn-clear" onclick="clearModalFilters()">Clear</button></div>
+            <div class="export-buttons"><button class="export-btn" onclick="exportModalToCSV()"><i class="fas fa-file-csv"></i> CSV</button><button class="export-btn" onclick="exportModalToExcel()"><i class="fas fa-file-excel"></i> Excel</button><button class="export-btn" onclick="exportModalToPDF()"><i class="fas fa-file-pdf"></i> PDF</button></div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;"><button class="edit-toggle-btn" onclick="toggleEditMode()"><i class="fas ${isEditMode ? 'fa-eye' : 'fa-edit'}"></i> ${isEditMode ? 'View Mode' : 'Edit Mode'}</button>
+            <button class="settings-btn" onclick="openSettingsModal()"><i class="fas fa-cog"></i> Assessment Settings</button></div>
+            ${isEditMode ? `<div style="margin-bottom: 16px;"><button class="save-score-btn" onclick="saveAllScoresInModal()" style="background:#10b981;color:white;padding:8px 20px;border-radius:30px;border:none;"><i class="fas fa-save"></i> Save All Changes</button></div>` : ''}
+            <div style="overflow-x: auto;"><table class="exam-table"><thead><tr><th>${isEditMode ? 'Select' : 'Rank'}</th><th>Student</th><th>Gender</th><th>Dept</th><th>Batch</th>${assessmentConfig.names.map((n,i)=>`<th>${escapeHtml(n)}<br><small>/${assessmentConfig.outOf[i]}</small></th>`).join('')}<th>Avg %</th><th>Rank</th></tr></thead><tbody>${tableRows}</tbody></table></div>
         `;
-        
-        document.getElementById('modalTitle').innerHTML = `📖 ${escapeHtml(qiratName)} - Exam Scores`;
-        document.getElementById('modalBody').innerHTML = html;
         document.getElementById('examModal').classList.add('active');
-        
-        // Attach auto-save to individual inputs
-        document.querySelectorAll('.score-input').forEach(input => {
-            input.addEventListener('change', (e) => {
-                const row = input.closest('tr');
-                const studentId = row.dataset.student;
-                const qirat = row.dataset.qirat;
-                const assessment = input.dataset.assessment;
-                const value = input.value;
-                saveExamScore(studentId, qirat, assessment, value);
-                updateAverageDisplay(studentId, qirat);
-            });
-        });
-    }
-    
-    window.saveAllScoresInModal = async (qiratName) => {
-        const inputs = document.querySelectorAll('.score-input');
-        for (const input of inputs) {
-            const row = input.closest('tr');
-            const studentId = row.dataset.student;
-            const qirat = row.dataset.qirat;
-            const assessment = input.dataset.assessment;
-            const value = input.value;
-            await saveExamScore(studentId, qirat, assessment, value);
-        }
-        showToast('All scores saved');
-        await loadExamScores();
-        buildGroups();
-        renderStats();
-        // Refresh modal
-        const group = groups.find(g => g.name === qiratName);
-        if (group) await openQiratModal(qiratName, group.students);
-    };
-    
-    function updateAverageDisplay(studentId, qiratName) {
-        const scores = getStudentExamScores(studentId, qiratName);
-        const avg = calculateAverage(scores);
-        const avgId = `avg-${studentId}-${qiratName.replace(/[^a-z0-9]/gi, '_')}`;
-        const avgCell = document.getElementById(avgId);
-        if (avgCell) avgCell.textContent = avg !== null ? avg : '-';
+        if (isEditMode) attachScoreInputEvents();
+        attachFilterEvents();
     }
     
     async function openDepartmentModal(deptName, students) {
-        // Get all unique Qirats across department
-        const allQirats = new Set();
-        students.forEach(s => getQiratNames(s).forEach(q => allQirats.add(q)));
-        const qiratList = Array.from(allQirats).sort();
-        
-        const html = `
-            <div style="margin-bottom: 20px;">
-                <div class="qirat-selector" id="deptQiratSelector">
-                    ${qiratList.map(q => `<button class="qirat-btn" data-qirat="${escapeHtml(q)}">📖 ${escapeHtml(q)}</button>`).join('')}
-                </div>
-                <div id="deptExamTable"></div>
-            </div>
-        `;
-        document.getElementById('qiratModalTitle').innerHTML = `🏛️ ${escapeHtml(deptName)} - Select Qirat`;
-        document.getElementById('qiratSelectorBody').innerHTML = html;
-        document.getElementById('qiratSelectorModal').classList.add('active');
-        
-        document.querySelectorAll('#deptQiratSelector .qirat-btn').forEach(btn => {
-            btn.addEventListener('click', async () => {
-                document.querySelectorAll('#deptQiratSelector .qirat-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                const selectedQirat = btn.dataset.qirat;
-                await renderDepartmentQiratTable(students, selectedQirat, deptName);
-            });
-        });
-        if (qiratList[0]) await renderDepartmentQiratTable(students, qiratList[0], deptName);
-    }
-    
-    async function renderDepartmentQiratTable(students, qiratName, deptName) {
-        const assessmentColumns = ['assessment1', 'assessment2', 'assessment3', 'assessment4', 'assessment5'];
-        const columnNames = ['Exam 1', 'Exam 2', 'Exam 3', 'Exam 4', 'Exam 5'];
-        
-        // Filter students who take this Qirat
-        const qiratStudents = students.filter(s => getQiratNames(s).includes(qiratName));
-        
-        let studentRows = '';
-        for (const student of qiratStudents) {
-            const scores = getStudentExamScores(student.id, qiratName);
-            const avg = calculateAverage(scores);
-            studentRows += `
-                <tr data-student="${student.id}" data-qirat="${qiratName}">
-                    <td><strong>${escapeHtml(student.full_name)}</strong></td>
-                    <td>${escapeHtml(student.department)}</td>
-                    <td>${escapeHtml(student.batch)}</td>
-                    ${assessmentColumns.map((col, idx) => `
-                        <td><input type="number" class="score-input-dept" data-assessment="${col}" value="${scores[col] !== null ? scores[col] : ''}" step="0.5" min="0" max="100" style="width:70px;"></td>
-                    `).join('')}
-                    <td id="dept-avg-${student.id}-${qiratName.replace(/[^a-z0-9]/gi, '_')}">${avg !== null ? avg : '-'}</td>
-                </tr>
-            `;
-        }
-        
-        const container = document.getElementById('deptExamTable');
-        container.innerHTML = `
-            <div style="margin-bottom: 16px; padding: 12px; background: #f0fdf4; border-radius: 16px;">
-                <strong>📊 ${escapeHtml(qiratName)} Statistics:</strong> Students: ${qiratStudents.length} | Average: ${calculateGroupAverageScore(qiratName, qiratStudents)}%
-            </div>
-            <div style="overflow-x: auto;">
-                <table class="exam-table">
-                    <thead><tr><th>Student</th><th>Department</th><th>Batch</th>${columnNames.map(n => `<th>${n}</th>`).join('')}<th>Average</th></tr></thead>
-                    <tbody>${studentRows}</tbody>
-                </table>
-            </div>
-            <div style="margin-top: 20px; display: flex; justify-content: flex-end;">
-                <button class="save-score-btn" onclick="saveAllDeptScores('${qiratName}')" style="padding: 10px 24px;">Save All Changes</button>
-            </div>
-        `;
-        
-        document.querySelectorAll('.score-input-dept').forEach(input => {
-            input.addEventListener('change', async (e) => {
-                const row = input.closest('tr');
-                const studentId = row.dataset.student;
-                const qirat = row.dataset.qirat;
-                const assessment = input.dataset.assessment;
-                const value = input.value;
-                await saveExamScore(studentId, qirat, assessment, value);
-                updateDeptAverageDisplay(studentId, qirat);
-            });
-        });
-    }
-    
-    window.saveAllDeptScores = async (qiratName) => {
-        const inputs = document.querySelectorAll('.score-input-dept');
-        for (const input of inputs) {
-            const row = input.closest('tr');
-            const studentId = row.dataset.student;
-            const qirat = row.dataset.qirat;
-            const assessment = input.dataset.assessment;
-            const value = input.value;
-            await saveExamScore(studentId, qirat, assessment, value);
-        }
-        showToast('All scores saved');
-        await loadExamScores();
-        buildGroups();
-    };
-    
-    function updateDeptAverageDisplay(studentId, qiratName) {
-        const scores = getStudentExamScores(studentId, qiratName);
-        const avg = calculateAverage(scores);
-        const avgId = `dept-avg-${studentId}-${qiratName.replace(/[^a-z0-9]/gi, '_')}`;
-        const avgCell = document.getElementById(avgId);
-        if (avgCell) avgCell.textContent = avg !== null ? avg : '-';
-    }
-    
-    async function openOverallModal(rankings) {
-        const assessmentColumns = ['assessment1', 'assessment2', 'assessment3', 'assessment4', 'assessment5'];
-        const columnNames = ['Exam 1', 'Exam 2', 'Exam 3', 'Exam 4', 'Exam 5'];
-        
-        let studentRows = '';
-        rankings.forEach((item, idx) => {
-            const student = item.student;
-            const overallAvg = item.avgScore;
-            studentRows += `
-                <tr>
-                    <td><span class="rank-badge ${idx === 0 ? 'top1' : idx === 1 ? 'top2' : idx === 2 ? 'top3' : ''}">${idx + 1}</span></td>
-                    <td><strong>${escapeHtml(student.full_name)}</strong></td>
-                    <td>${escapeHtml(student.department)}</td>
-                    <td>${escapeHtml(student.batch)}</span></td>
-                    <td><span class="rank-badge">${overallAvg !== null ? overallAvg + '%' : '-'}</span></td>
-                    <td><button class="save-score-btn" onclick="viewStudentQirats('${student.id}', '${escapeHtml(student.full_name)}')">View Qirats <i class="fas fa-external-link-alt"></i></button></td>
-                </tr>
-            `;
-        });
-        
-        const html = `
-            <div style="overflow-x: auto;">
-                <table class="exam-table">
-                    <thead>
-                        <tr><th>Rank</th><th>Student</th><th>Department</th><th>Batch</th><th>Overall Avg</th><th>Actions</th>
-                    </thead>
-                    <tbody>${studentRows}</tbody>
-                </table>
-            </div>
-        `;
-        document.getElementById('modalTitle').innerHTML = `🏆 Overall Student Rankings`;
-        document.getElementById('modalBody').innerHTML = html;
+        currentModalData = { type: 'department', name: deptName, students };
+        const allQirats = [...new Set(students.flatMap(s => getQiratNames(s)))];
+        let selectedQirat = allQirats[0];
+        const renderTable = async (qirat) => {
+            const qiratStudents = students.filter(s => getQiratNames(s).includes(qirat));
+            const filtered = applyFilters(qiratStudents);
+            const ranked = filtered.map(s => ({ student: s, avg: calculateAverage(getStudentExamScores(s.id, qirat)) })).sort((a,b) => (b.avg || 0) - (a.avg || 0));
+            let rows = ranked.map((item, rank) => {
+                const s = item.student;
+                const scores = getStudentExamScores(s.id, qirat);
+                return `<tr><td>${rank+1}</td>}<strong>${escapeHtml(s.full_name)}</strong></td>}<span class="badge ${s.gender==='Male'?'badge-male':'badge-female'}">${escapeHtml(s.gender)}</span></td>}<span class="badge badge-dept">${escapeHtml(s.department)}</span></td>}${escapeHtml(s.batch)}</span>${assessmentConfig.names.map((name,i)=>{
+                    const score = scores[`assessment${i+1}`];
+                    const percent = calculatePercentage(score, assessmentConfig.outOf[i]);
+                    return `<td>${isEditMode ? `<input type="number" class="score-input-editable" data-student="${s.id}" data-qirat="${qirat}" data-assessment="${i+1}" value="${score !== null ? score : ''}" step="0.5" min="0" max="${assessmentConfig.outOf[i]}" style="width:70px;"><span class="outof-text">/${assessmentConfig.outOf[i]}</span>` : `<span>${score !== null ? score : '-'} / ${assessmentConfig.outOf[i]}<br><small>${percent !== null ? percent+'%' : '-'}</small></span>`}`;
+                }).join('')}<td class="avg-cell">${item.avg !== null ? item.avg+'%' : '-'}</td><td class="rank-badge ${rank===0?'top1':rank===1?'top2':rank===2?'top3':''}">#${rank+1}</span></td></tr>`;
+            }).join('');
+            document.getElementById('modalBody').innerHTML = `<div class="qirat-selector" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;">${allQirats.map(q=>`<button class="qirat-btn ${q===selectedQirat?'active':''}" onclick="switchDepartmentQirat('${escapeHtml(q)}')">📖 ${escapeHtml(q)}</button>`).join('')}</div>
+            <div class="modal-filters"><div class="filter-group"><label>Search</label><input type="text" id="modalSearch" placeholder="Name"></div><div class="filter-group"><label>Gender</label><select id="modalGender"><option value="">All</option><option value="Male">Male</option><option value="Female">Female</option></select></div><div class="filter-group"><label>Batch</label><select id="modalBatch"><option value="">All</option>${[...new Set(students.map(s=>s.batch))].map(b=>`<option value="${escapeHtml(b)}">${escapeHtml(b)}</option>`).join('')}</select></div><button class="btn-clear" onclick="clearModalFilters()">Clear</button></div>
+            <div class="export-buttons"><button class="export-btn" onclick="exportModalToCSV()">CSV</button><button class="export-btn" onclick="exportModalToExcel()">Excel</button><button class="export-btn" onclick="exportModalToPDF()">PDF</button></div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:16px;"><button class="edit-toggle-btn" onclick="toggleEditMode()"><i class="fas ${isEditMode?'fa-eye':'fa-edit'}"></i> ${isEditMode?'View Mode':'Edit Mode'}</button><button class="settings-btn" onclick="openSettingsModal()"><i class="fas fa-cog"></i> Settings</button></div>
+            ${isEditMode?`<div style="margin-bottom:16px;"><button class="save-score-btn" onclick="saveAllScoresInModal()" style="background:#10b981;color:white;padding:8px 20px;border-radius:30px;"><i class="fas fa-save"></i> Save All</button></div>`:''}
+            <div style="overflow-x:auto;"><table class="exam-table"><thead><tr><th>Rank</th><th>Name</th><th>Gender</th><th>Dept</th><th>Batch</th>${assessmentConfig.names.map((n,i)=>`<th>${escapeHtml(n)}<br><small>/${assessmentConfig.outOf[i]}</small></th>`).join('')}<th>Avg %</th><th>Rank</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+            if(isEditMode) attachEditableEvents();
+            attachFilterEvents();
+        };
+        await renderTable(selectedQirat);
+        window.switchDepartmentQirat = async (q) => { selectedQirat = q; await renderTable(q); };
+        document.getElementById('modalTitle').innerHTML = `🏛️ ${escapeHtml(deptName)} - Exam Scores`;
         document.getElementById('examModal').classList.add('active');
     }
     
-    window.viewStudentQirats = async (studentId, studentName) => {
+    async function openOverallModal(rankings) {
+        currentModalData = { type: 'overall', rankings };
+        const filtered = applyFiltersToRankings(rankings);
+        let rows = filtered.map((item, idx) => `<tr><td class="rank-badge ${idx===0?'top1':idx===1?'top2':idx===2?'top3':''}">${idx+1}</span></td>}<strong>${escapeHtml(item.student.full_name)}</strong></td>}<span class="badge ${item.student.gender==='Male'?'badge-male':'badge-female'}">${escapeHtml(item.student.gender)}</span></td>}<span class="badge badge-dept">${escapeHtml(item.student.department)}</span></td>}${escapeHtml(item.student.batch)}</span></td>}<span class="rank-badge">${item.avgScore !== null ? item.avgScore+'%' : '-'}</span></td>}<button class="save-score-btn" onclick="viewStudentDetails('${item.student.id}')">View Details</button></td></tr>`).join('');
+        document.getElementById('modalBody').innerHTML = `
+            <div class="modal-filters"><div class="filter-group"><label>Search</label><input type="text" id="modalSearch" placeholder="Name"></div><div class="filter-group"><label>Gender</label><select id="modalGender"><option value="">All</option><option value="Male">Male</option><option value="Female">Female</option></select></div><div class="filter-group"><label>Department</label><select id="modalDept"><option value="">All</option>${[...new Set(rankings.map(r=>r.student.department))].map(d=>`<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join('')}</select></div><div class="filter-group"><label>Batch</label><select id="modalBatch"><option value="">All</option>${[...new Set(rankings.map(r=>r.student.batch))].map(b=>`<option value="${escapeHtml(b)}">${escapeHtml(b)}</option>`).join('')}</select></div><button class="btn-clear" onclick="clearModalFilters()">Clear</button></div>
+            <div class="export-buttons"><button class="export-btn" onclick="exportModalToCSV()">CSV</button><button class="export-btn" onclick="exportModalToExcel()">Excel</button><button class="export-btn" onclick="exportModalToPDF()">PDF</button></div>
+            <div style="overflow-x:auto;"><table class="exam-table"><thead><td><th>Rank</th><th>Student</th><th>Gender</th><th>Department</th><th>Batch</th><th>Overall Avg</th><th>Actions</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+        document.getElementById('modalTitle').innerHTML = `🏆 Overall Student Rankings`;
+        document.getElementById('examModal').classList.add('active');
+        attachFilterEvents();
+    }
+    
+    window.viewStudentDetails = async (studentId) => {
         const student = allStudents.find(s => s.id === studentId);
         if (!student) return;
         const qirats = getQiratNames(student);
-        
-        const assessmentColumns = ['assessment1', 'assessment2', 'assessment3', 'assessment4', 'assessment5'];
-        const columnNames = ['Exam 1', 'Exam 2', 'Exam 3', 'Exam 4', 'Exam 5'];
-        
-        let qiratRows = '';
-        for (const qirat of qirats) {
-            const scores = getStudentExamScores(studentId, qirat);
+        let rows = qirats.map(q => {
+            const scores = getStudentExamScores(studentId, q);
             const avg = calculateAverage(scores);
-            qiratRows += `
-                <tr data-student="${studentId}" data-qirat="${qirat}">
-                    <td><strong>📖 ${escapeHtml(qirat)}</strong></td>
-                    ${assessmentColumns.map((col, idx) => `
-                        <td><input type="number" class="score-input-student" data-assessment="${col}" data-qirat="${qirat}" value="${scores[col] !== null ? scores[col] : ''}" step="0.5" min="0" max="100" style="width:70px;"></td>
-                    `).join('')}
-                    <td id="student-avg-${studentId}-${qirat.replace(/[^a-z0-9]/gi, '_')}">${avg !== null ? avg : '-'}</td>
-                </tr>
-            `;
-        }
-        
-        const html = `
-            <div style="margin-bottom: 16px;">
-                <h4>${escapeHtml(studentName)}</h4>
-                <p>Department: ${escapeHtml(student.department)} | Batch: ${escapeHtml(student.batch)}</p>
-            </div>
-            <div style="overflow-x: auto;">
-                <table class="exam-table">
-                    <thead>
-                        <td><th>Qirat</th>${columnNames.map(n => `<th>${n}</th>`).join('')}<th>Average</th>
-                    </thead>
-                    <tbody>${qiratRows}</tbody>
-                </table>
-            </div>
-            <div style="margin-top: 20px; display: flex; justify-content: flex-end;">
-                <button class="save-score-btn" onclick="saveAllStudentScores('${studentId}')" style="padding: 10px 24px;">Save All Changes</button>
-            </div>
-        `;
-        
-        document.getElementById('modalTitle').innerHTML = `👤 ${escapeHtml(studentName)} - Qirat Exams`;
-        document.getElementById('modalBody').innerHTML = html;
-        
-        document.querySelectorAll('.score-input-student').forEach(input => {
-            input.addEventListener('change', async (e) => {
-                const qirat = input.dataset.qirat;
-                const assessment = input.dataset.assessment;
-                const value = input.value;
-                await saveExamScore(studentId, qirat, assessment, value);
-                updateStudentAverageDisplay(studentId, qirat);
-            });
+            return `<tr>}<strong>📖 ${escapeHtml(q)}</strong>${assessmentConfig.names.map((name,i)=>{
+                const score = scores[`assessment${i+1}`];
+                const percent = calculatePercentage(score, assessmentConfig.outOf[i]);
+                return `<td>${isEditMode ? `<input type="number" class="score-input-student" data-student="${studentId}" data-qirat="${q}" data-assessment="${i+1}" value="${score !== null ? score : ''}" step="0.5" min="0" max="${assessmentConfig.outOf[i]}" style="width:70px;"><span class="outof-text">/${assessmentConfig.outOf[i]}</span>` : `<span>${score !== null ? score : '-'} / ${assessmentConfig.outOf[i]}<br><small>${percent !== null ? percent+'%' : '-'}</small></span>`}`;
+            }).join('')}<td class="avg-cell">${avg !== null ? avg+'%' : '-'}</td></tr>`;
+        }).join('');
+        document.getElementById('modalBody').innerHTML = `<div class="modal-header"><div class="modal-title">👤 ${escapeHtml(student.full_name)} - Qirat Details</div><button class="close-modal" onclick="closeExamModal()">&times;</button></div>
+            <div><p><strong>Department:</strong> ${escapeHtml(student.department)} | <strong>Batch:</strong> ${escapeHtml(student.batch)}</p></div>
+            <div style="display:flex;justify-content:flex-end;margin-bottom:16px;"><button class="edit-toggle-btn" onclick="toggleEditMode()"><i class="fas ${isEditMode?'fa-eye':'fa-edit'}"></i> ${isEditMode?'View Mode':'Edit Mode'}</button></div>
+            <div style="overflow-x:auto;"><table class="exam-table"><thead><tr><th>Qirat</th>${assessmentConfig.names.map((n,i)=>`<th>${escapeHtml(n)}<br><small>/${assessmentConfig.outOf[i]}</small></th>`).join('')}<th>Avg %</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+        if(isEditMode) attachStudentInputEvents(studentId);
+    };
+    
+    function applyFilters(students) {
+        const search = document.getElementById('modalSearch')?.value.toLowerCase() || '';
+        const gender = document.getElementById('modalGender')?.value || '';
+        const dept = document.getElementById('modalDept')?.value || '';
+        const batch = document.getElementById('modalBatch')?.value || '';
+        return students.filter(s => {
+            const matchSearch = s.full_name.toLowerCase().includes(search);
+            const matchGender = !gender || s.gender === gender;
+            const matchDept = !dept || s.department === dept;
+            const matchBatch = !batch || s.batch === batch;
+            return matchSearch && matchGender && matchDept && matchBatch;
         });
-    };
-    
-    window.saveAllStudentScores = async (studentId) => {
-        const inputs = document.querySelectorAll('.score-input-student');
-        for (const input of inputs) {
-            const qirat = input.dataset.qirat;
-            const assessment = input.dataset.assessment;
-            const value = input.value;
-            await saveExamScore(studentId, qirat, assessment, value);
-        }
-        showToast('All scores saved');
-        await loadExamScores();
-        buildGroups();
-    };
-    
-    function updateStudentAverageDisplay(studentId, qiratName) {
-        const scores = getStudentExamScores(studentId, qiratName);
-        const avg = calculateAverage(scores);
-        const avgId = `student-avg-${studentId}-${qiratName.replace(/[^a-z0-9]/gi, '_')}`;
-        const avgCell = document.getElementById(avgId);
-        if (avgCell) avgCell.textContent = avg !== null ? avg : '-';
     }
+    function applyFiltersToRankings(rankings) { const search = document.getElementById('modalSearch')?.value.toLowerCase() || ''; const gender = document.getElementById('modalGender')?.value || ''; const dept = document.getElementById('modalDept')?.value || ''; const batch = document.getElementById('modalBatch')?.value || ''; return rankings.filter(r => { const s = r.student; const matchSearch = s.full_name.toLowerCase().includes(search); const matchGender = !gender || s.gender === gender; const matchDept = !dept || s.department === dept; const matchBatch = !batch || s.batch === batch; return matchSearch && matchGender && matchDept && matchBatch; }); }
+    window.clearModalFilters = () => { if(document.getElementById('modalSearch')) document.getElementById('modalSearch').value = ''; if(document.getElementById('modalGender')) document.getElementById('modalGender').value = ''; if(document.getElementById('modalDept')) document.getElementById('modalDept').value = ''; if(document.getElementById('modalBatch')) document.getElementById('modalBatch').value = ''; applyModalFilters(); };
+    function attachFilterEvents() { const filters = ['modalSearch','modalGender','modalDept','modalBatch']; filters.forEach(id => { const el = document.getElementById(id); if(el) el.addEventListener('input', () => applyModalFilters()); }); }
+    function applyModalFilters() { if(currentModalData?.type === 'qirat') openQiratModal(currentModalData.name, currentModalData.students); else if(currentModalData?.type === 'department') openDepartmentModal(currentModalData.name, currentModalData.students); else if(currentModalData?.type === 'overall') openOverallModal(currentModalData.rankings); }
     
+    window.toggleEditMode = () => { isEditMode = !isEditMode; applyModalFilters(); };
+    async function saveAllScoresInModal() {
+        const inputs = document.querySelectorAll('.score-input, .score-input-editable, .score-input-student');
+        for(const input of inputs) {
+            const studentId = input.dataset.student; const qirat = input.dataset.qirat; const assessment = `assessment${input.dataset.assessment}`; const value = input.value;
+            if(studentId && qirat) await saveExamScore(studentId, qirat, assessment, value);
+        }
+        showToast('All scores saved'); await loadExamScores(); applyModalFilters();
+    }
+    function attachScoreInputEvents() { document.querySelectorAll('.score-input').forEach(inp => inp.addEventListener('change', () => updateAvgDisplay(inp))); }
+    function attachEditableEvents() { document.querySelectorAll('.score-input-editable').forEach(inp => inp.addEventListener('change', () => updateAvgDisplay(inp))); }
+    function attachStudentInputEvents(studentId) { document.querySelectorAll('.score-input-student').forEach(inp => inp.addEventListener('change', () => updateAvgDisplay(inp))); }
+    function updateAvgDisplay(input) { const row = input.closest('tr'); const avgCell = row?.querySelector('.avg-cell'); if(avgCell) avgCell.textContent = '...'; setTimeout(() => applyModalFilters(), 500); }
+    
+    function getCurrentExportData() {
+        const rows = []; const table = document.querySelector('.exam-table');
+        if(!table) return [];
+        const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.innerText.trim());
+        table.querySelectorAll('tbody tr').forEach(row => { const rowData = {}; Array.from(row.querySelectorAll('td')).forEach((td, idx) => { rowData[headers[idx] || `col${idx}`] = td.innerText.trim(); }); rows.push(rowData); });
+        return rows;
+    }
+    window.exportModalToCSV = () => { const data = getCurrentExportData(); if(!data.length) return; const ws = XLSX.utils.json_to_sheet(data); const csv = XLSX.utils.sheet_to_csv(ws); const blob = new Blob(["\uFEFF" + csv], {type:'text/csv'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `exam_export.csv`; a.click(); showToast('CSV exported'); };
+    window.exportModalToExcel = () => { const data = getCurrentExportData(); if(!data.length) return; const ws = XLSX.utils.json_to_sheet(data); XLSX.writeFile(XLSX.utils.book_new(), XLSX.utils.book_append_sheet(XLSX.utils.book_new(), ws, 'ExamData'), 'exam_export.xlsx'); showToast('Excel exported'); };
+    window.exportModalToPDF = async () => { const data = getCurrentExportData(); if(!data.length) return; const { jsPDF } = window.jspdf; const doc = new jsPDF({ orientation: 'landscape' }); doc.setFontSize(16); doc.text("Exam Results", 14, 20); doc.autoTable({ html: '.exam-table', startY: 30 }); doc.save('exam_report.pdf'); showToast('PDF exported'); };
+    
+    window.openSettingsModal = () => {
+        document.getElementById('settingsBody').innerHTML = `
+            <div style="margin-bottom:20px;"><h4>Assessment Names & Max Scores</h4><p style="font-size:0.75rem;color:gray;">Customize assessment names and their maximum points</p></div>
+            ${assessmentConfig.names.map((name, idx) => `<div style="display:flex;gap:12px;margin-bottom:12px;align-items:center;"><input type="text" class="assessment-name" data-idx="${idx}" value="${escapeHtml(name)}" style="flex:1;padding:8px;border-radius:12px;border:1px solid var(--border);"><input type="number" class="assessment-outof" data-idx="${idx}" value="${assessmentConfig.outOf[idx]}" style="width:80px;padding:8px;border-radius:12px;border:1px solid var(--border);" min="1" max="500"><button class="btn-clear" onclick="removeAssessment(${idx})" style="background:#ef4444;">Remove</button></div>`).join('')}
+            <button class="btn-primary" onclick="addAssessment()" style="margin:12px 0;background:#10b981;color:white;padding:8px 20px;border-radius:30px;border:none;"><i class="fas fa-plus"></i> Add Assessment</button>
+            <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:20px;"><button class="btn-clear" onclick="closeSettingsModal()">Cancel</button><button class="btn-primary" onclick="saveSettings()" style="background:#10b981;">Save Settings</button></div>
+        `;
+        document.getElementById('settingsModal').classList.add('active');
+    };
+    window.addAssessment = () => { assessmentConfig.names.push(`Assessment ${assessmentConfig.names.length+1}`); assessmentConfig.outOf.push(100); openSettingsModal(); };
+    window.removeAssessment = (idx) => { assessmentConfig.names.splice(idx,1); assessmentConfig.outOf.splice(idx,1); openSettingsModal(); };
+    window.saveSettings = async () => {
+        const names = Array.from(document.querySelectorAll('.assessment-name')).map(inp => inp.value);
+        const outOf = Array.from(document.querySelectorAll('.assessment-outof')).map(inp => parseInt(inp.value));
+        assessmentConfig = { names, outOf };
+        await saveAssessmentConfig();
+        closeSettingsModal();
+        showToast('Settings saved');
+        await loadData();
+    };
     window.closeExamModal = () => document.getElementById('examModal').classList.remove('active');
-    window.closeQiratSelectorModal = () => document.getElementById('qiratSelectorModal').classList.remove('active');
+    window.closeSettingsModal = () => document.getElementById('settingsModal').classList.remove('active');
     
-    document.querySelectorAll('.mode-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            currentGroupMode = btn.dataset.mode;
-            buildGroups();
-            renderStats();
-        });
-    });
+    document.querySelectorAll('.mode-btn').forEach(btn => btn.addEventListener('click', () => { document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); currentGroupMode = btn.dataset.mode; buildGroups(); renderStats(); }));
     
-    initNavigation();
-    const adminUser = getCurrentAdminSync();
-    if (adminUser?.role === 'super-admin') setTimeout(() => refreshNavigation(), 100);
-    
+    initNavigation(); const adminUser = getCurrentAdminSync(); if(adminUser?.role === 'super-admin') setTimeout(() => refreshNavigation(), 100);
     loadData();
 </script>
 </body>
