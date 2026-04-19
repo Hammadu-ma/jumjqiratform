@@ -630,7 +630,7 @@
         const pageData = filteredStudents.slice(start, end);
         
         if (pageData.length === 0) {
-            tableBody.innerHTML = `<tr><td colspan="10" class="empty-state">No students found</td></tr>`;
+            tableBody.innerHTML = `<td><td colspan="10" class="empty-state">No students found</span></td>`;
             return;
         }
         
@@ -829,7 +829,7 @@
         } catch (error) { showToast("Error: " + error.message, true); }
     });
     
-    // ========== EXPORT FUNCTIONS (WITHOUT REGISTRATION DATE) ==========
+    // ========== BEAUTIFUL EXPORT FUNCTIONS ==========
     function getExportData() { 
         return filteredStudents.map(s => ({ 
             'Name': s.full_name, 
@@ -856,7 +856,9 @@
         const data = getExportData();
         if (!data.length) { showToast('No data to export', true); return; }
         const ws = XLSX.utils.json_to_sheet(data);
-        const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Students');
+        ws['!cols'] = [{wch:25},{wch:10},{wch:15},{wch:18},{wch:20},{wch:15},{wch:35}];
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Students');
         XLSX.writeFile(wb, `students_${new Date().toISOString().slice(0,19)}.xlsx`);
         showToast('Excel exported');
     });
@@ -864,16 +866,27 @@
     exportPDF.addEventListener('click', async () => {
         const data = getExportData();
         if (!data.length) { showToast('No data to export', true); return; }
-        const { jsPDF } = window.jspdf; const doc = new jsPDF({ orientation: 'landscape' });
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
         const kpi = { total: filteredStudents.length, male: filteredStudents.filter(s=>s.gender==='Male').length, female: filteredStudents.filter(s=>s.gender==='Female').length };
-        doc.setFontSize(18); doc.setTextColor(16,185,129); doc.text("JUMJ Irshad - Student Report", 14, 20);
-        doc.setFontSize(10); doc.text(`Generated: ${new Date().toLocaleString()} | Total: ${kpi.total} | Male: ${kpi.male} | Female: ${kpi.female}`, 14, 30);
-        doc.autoTable({ 
-            head: [['Name','Gender','Phone','Department','Batch','Qirats']], 
-            body: data.map(r => [r.Name, r.Gender, r.Phone, r.Department, r.Batch, r.Qirats]), 
-            startY: 40, 
-            headStyles: { fillColor: [16,185,129] } 
+        
+        doc.setFontSize(18);
+        doc.setTextColor(16, 185, 129);
+        doc.text("JUMJ Irshad - Student Report", 14, 20);
+        
+        doc.setFontSize(10);
+        doc.setTextColor(100, 100, 100);
+        doc.text(`Generated: ${new Date().toLocaleString()} | Total Students: ${kpi.total} | Male: ${kpi.male} | Female: ${kpi.female}`, 14, 30);
+        
+        doc.autoTable({
+            head: [['Name', 'Gender', 'Phone', 'Department', 'Batch', 'Qirats']],
+            body: data.map(r => [r.Name, r.Gender, r.Phone, r.Department, r.Batch, r.Qirats]),
+            startY: 45,
+            theme: 'striped',
+            headStyles: { fillColor: [16, 185, 129], textColor: [255, 255, 255], fontStyle: 'bold' },
+            styles: { fontSize: 9, cellPadding: 3 }
         });
+        
         doc.save(`students_report.pdf`);
         showToast('PDF exported');
     });
@@ -881,7 +894,42 @@
     exportWord.addEventListener('click', () => {
         const data = getExportData();
         if (!data.length) { showToast('No data to export', true); return; }
-        let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Students Report</title><style>body{font-family:Arial;} table{border-collapse:collapse;width:100%;} th,td{border:1px solid #ddd;padding:8px;} th{background:#10b981;color:white;}</style></head><body><h1>Student Report</h1><p>Generated: ${new Date().toLocaleString()} | Total: ${data.length}</p><table><thead><tr><th>Name</th><th>Gender</th><th>Phone</th><th>Department</th><th>Batch</th><th>Qirats</th></tr></thead><tbody>${data.map(r => `<tr>}<strong>${escapeHtml(r.Name)}</strong></td>}</span>${escapeHtml(r.Gender)}</span></td>}</span>${escapeHtml(r.Phone)}</span></td>}</span>${escapeHtml(r.Department)}</span></td>}</span>${escapeHtml(r.Batch)}</span></td>}</span>${escapeHtml(r.Qirats)}</span></td></tr>`).join('')}</tbody></table></body></html>`;
+        let html = `<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Students Report</title>
+            <style>
+                body { font-family: 'Arial', sans-serif; margin: 40px; }
+                h1 { color: #10b981; border-bottom: 2px solid #10b981; padding-bottom: 10px; }
+                table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+                th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+                th { background: #10b981; color: white; }
+                tr:nth-child(even) { background: #f9fafb; }
+            </style>
+        </head>
+        <body>
+            <h1>📊 JUMJ Irshad - Student Report</h1>
+            <p>Generated: ${new Date().toLocaleString()} | Total Students: ${data.length}</p>
+            <table>
+                <thead>
+                    <tr><th>Name</th><th>Gender</th><th>Phone</th><th>Department</th><th>Batch</th><th>Qirats</th></tr>
+                </thead>
+                <tbody>
+                    ${data.map(r => `
+                        <tr>
+                            <td>${escapeHtml(r.Name)}</strong></td>
+                            <td>${escapeHtml(r.Gender)}</span></td>
+                            <td>${escapeHtml(r.Phone)}</span></td>
+                            <td>${escapeHtml(r.Department)}</span></td>
+                            <td>${escapeHtml(r.Batch)}</span></td>
+                            <td>${escapeHtml(r.Qirats)}</span></td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        </body>
+        </html>`;
         const blob = new Blob([html], { type: 'application/msword' });
         const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `students_report.doc`; a.click(); URL.revokeObjectURL(a.href);
         showToast('Word exported');
