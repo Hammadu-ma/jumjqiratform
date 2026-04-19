@@ -498,11 +498,45 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     
+    // ========== OFFLINE OPTIMIZATION: CACHING ==========
     let allRegistrations = [];
     let filteredRegistrations = [];
     let currentGroupMode = 'qirat';
     let currentGroups = [];
     let allUniqueQirats = [];
+    let dataLoaded = false;
+    let isLoading = false;
+    
+    // Save to localStorage cache
+    function saveToCache() {
+        try {
+            const cacheData = {
+                registrations: allRegistrations,
+                allQirats: allUniqueQirats,
+                timestamp: new Date().toISOString(),
+                version: '1.0'
+            };
+            localStorage.setItem('groups_cache', JSON.stringify(cacheData));
+        } catch (e) { console.warn('Cache save failed:', e); }
+    }
+    
+    // Load from localStorage cache
+    function loadFromCache() {
+        try {
+            const cached = localStorage.getItem('groups_cache');
+            if (cached) {
+                const data = JSON.parse(cached);
+                if (data.registrations && data.registrations.length > 0) {
+                    allRegistrations = data.registrations;
+                    allUniqueQirats = data.allQirats || [];
+                    dataLoaded = true;
+                    console.log('Loaded from cache:', allRegistrations.length, 'students');
+                    return true;
+                }
+            }
+        } catch (e) { console.warn('Cache load failed:', e); }
+        return false;
+    }
     
     const searchInput = document.getElementById('searchInput');
     const genderFilter = document.getElementById('genderFilter');
@@ -558,7 +592,16 @@
         return { maleCount, femaleCount, uniqueDepts, multiQiratCount, recentWeek };
     }
     
-    async function loadData() {
+    async function loadDataFromFirestore(force = false) {
+        if (isLoading) return;
+        if (dataLoaded && !force) {
+            console.log('Using cached data, not loading from Firestore');
+            return;
+        }
+        
+        isLoading = true;
+        showToast('Loading data...');
+        
         try {
             const querySnapshot = await getDocs(collection(db, "registrations"));
             allRegistrations = [];
@@ -583,11 +626,29 @@
                 schedules.forEach(s => { if(s.qirat_name) qiratSet.add(s.qirat_name); });
             });
             allUniqueQirats = Array.from(qiratSet).sort();
+            dataLoaded = true;
+            saveToCache();
+            showToast(`Loaded ${allRegistrations.length} students`);
             populateFilters();
             applyFilters();
         } catch (error) {
-            groupsContainer.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-triangle"></i> Error: ${error.message}</div>`;
+            console.error("Error loading from Firestore:", error);
+            if (loadFromCache()) {
+                showToast('Using cached data (offline mode)', false);
+                populateFilters();
+                applyFilters();
+            } else {
+                groupsContainer.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-triangle"></i> Error: ${error.message}</div>`;
+            }
+        } finally {
+            isLoading = false;
         }
+    }
+    
+    async function refreshFromCloud() {
+        showToast('Refreshing from cloud...');
+        await loadDataFromFirestore(true);
+        showToast('Data refreshed from cloud');
     }
     
     function populateFilters() {
@@ -773,7 +834,7 @@
             });
             showToast('Student updated successfully!');
             closeEditModal();
-            await loadData();
+            await refreshFromCloud();
         } catch (error) {
             showToast('Update failed: ' + error.message, true);
         }
@@ -946,7 +1007,7 @@
             </div>
             <table><thead><tr><th>No.</th><th>Name</th><th>Gender</th><th>Phone</th><th>Dept</th><th>Batch</th><th>Qirats</th></tr></thead><tbody>`;
             group.members.forEach((m, idx) => {
-                html += `<tr><td>${idx + 1}</td><td>${escapeHtml(m.full_name)}</td><td>${escapeHtml(m.gender)}</td><td>${escapeHtml(m.phone)}</td><td>${escapeHtml(m.department)}</td><td>${escapeHtml(m.batch)}</td><td>${escapeHtml(getQiratNames(m).join(', ') || '-')}</td></tr>`;
+                html += `<tr>}&nbsp;${idx + 1}</td>}&nbsp;${escapeHtml(m.full_name)}</span></td>}&nbsp;${escapeHtml(m.gender)}</span></td>}&nbsp;${escapeHtml(m.phone)}</span></td>}&nbsp;${escapeHtml(m.department)}</span></td>}&nbsp;${escapeHtml(m.batch)}</span></td>}&nbsp;${escapeHtml(getQiratNames(m).join(', ') || '-')}</span></td></tr>`;
             });
             html += `</tbody></table><br>`;
         });
@@ -1027,8 +1088,16 @@
     
     initNavigation();
     if (admin?.role === 'super-admin') setTimeout(() => refreshNavigation(), 100);
-    loadData();
-    setInterval(loadData, 30000);
+    
+    // ========== OFFLINE OPTIMIZATION: Try cache first, then Firestore ==========
+    if (!loadFromCache()) {
+        loadDataFromFirestore();
+    } else {
+        populateFilters();
+        applyFilters();
+        // Silently refresh in background
+        setTimeout(() => loadDataFromFirestore(), 100);
+    }
 </script>
 </body>
 </html>
