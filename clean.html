@@ -83,7 +83,6 @@
 
         .main-container { max-width: 1400px; margin: 0 auto; padding: 24px; }
 
-        /* Hero Section */
         .hero-section {
             background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
             border-radius: 32px;
@@ -93,19 +92,10 @@
             position: relative;
             overflow: hidden;
         }
-        .hero-section::before {
-            content: "🧹";
-            position: absolute;
-            bottom: -20px;
-            right: 20px;
-            font-size: 120px;
-            opacity: 0.1;
-            pointer-events: none;
-        }
+        .hero-section::before { content: "🧹"; position: absolute; bottom: -20px; right: 20px; font-size: 120px; opacity: 0.1; pointer-events: none; }
         .hero-title { font-size: 1.8rem; font-weight: 800; margin-bottom: 8px; }
         .hero-subtitle { opacity: 0.9; margin-bottom: 20px; }
 
-        /* Stats Cards */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -125,7 +115,6 @@
         .stat-value { font-size: 2rem; font-weight: 800; color: var(--primary); }
         .stat-label { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
 
-        /* Detection Controls */
         .detection-controls {
             background: var(--card-bg);
             border-radius: 28px;
@@ -140,7 +129,7 @@
             margin-bottom: 20px;
         }
         .method-btn {
-            padding: 12px 24px;
+            padding: 10px 20px;
             border: 2px solid var(--border);
             border-radius: 60px;
             background: white;
@@ -150,19 +139,23 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            font-size: 0.85rem;
         }
-        .method-btn.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
+        .method-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
         .method-btn:hover:not(.active) { background: var(--primary-light); border-color: var(--primary); }
-        .detection-actions { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 20px; }
+        .bulk-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
         .btn-primary {
             background: linear-gradient(135deg, #10b981, #059669);
             color: white;
             border: none;
-            padding: 12px 28px;
+            padding: 10px 24px;
             border-radius: 40px;
             font-weight: 700;
             cursor: pointer;
@@ -175,20 +168,19 @@
             background: linear-gradient(135deg, #ef4444, #dc2626);
             color: white;
             border: none;
-            padding: 12px 28px;
+            padding: 10px 24px;
             border-radius: 40px;
             font-weight: 700;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            transition: all 0.2s;
         }
         .btn-warning {
             background: linear-gradient(135deg, #f59e0b, #d97706);
             color: white;
             border: none;
-            padding: 12px 28px;
+            padding: 10px 24px;
             border-radius: 40px;
             font-weight: 700;
             cursor: pointer;
@@ -197,17 +189,22 @@
             background: #64748b;
             color: white;
             border: none;
-            padding: 12px 28px;
+            padding: 10px 24px;
             border-radius: 40px;
             font-weight: 700;
             cursor: pointer;
         }
-        .btn-primary:hover, .btn-danger:hover, .btn-warning:hover, .btn-secondary:hover {
-            transform: translateY(-2px);
-            filter: brightness(1.05);
+        .btn-success {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 40px;
+            font-weight: 700;
+            cursor: pointer;
         }
+        .btn-primary:hover, .btn-danger:hover, .btn-warning:hover, .btn-secondary:hover, .btn-success:hover { transform: translateY(-2px); filter: brightness(1.05); }
 
-        /* Duplicate Groups */
         .duplicate-group {
             background: var(--card-bg);
             border-radius: 24px;
@@ -227,81 +224,26 @@
             flex-wrap: wrap;
             gap: 12px;
         }
-        .group-title {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .group-name {
-            font-weight: 800;
-            font-size: 1rem;
-            color: #92400e;
-        }
-        .group-count {
-            background: white;
-            padding: 4px 12px;
-            border-radius: 30px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: #92400e;
-        }
-        .group-actions {
-            display: flex;
-            gap: 8px;
-        }
-        .keep-btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 6px 14px;
-            border-radius: 30px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        .delete-group-btn {
-            background: var(--danger);
-            color: white;
-            border: none;
-            padding: 6px 14px;
-            border-radius: 30px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        .group-content {
-            display: none;
-            padding: 20px;
-            border-top: 1px solid var(--border);
-        }
+        .group-title { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .group-name { font-weight: 800; font-size: 1rem; color: #92400e; }
+        .group-count { background: white; padding: 4px 12px; border-radius: 30px; font-size: 0.7rem; font-weight: 600; color: #92400e; }
+        .group-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .keep-btn { background: var(--primary); color: white; border: none; padding: 6px 14px; border-radius: 30px; font-size: 0.7rem; font-weight: 600; cursor: pointer; }
+        .keep-diverse-btn { background: #8b5cf6; color: white; border: none; padding: 6px 14px; border-radius: 30px; font-size: 0.7rem; font-weight: 600; cursor: pointer; }
+        .keep-oldest-btn { background: var(--secondary); color: white; border: none; padding: 6px 14px; border-radius: 30px; font-size: 0.7rem; font-weight: 600; cursor: pointer; }
+        .keep-newest-btn { background: var(--accent); color: white; border: none; padding: 6px 14px; border-radius: 30px; font-size: 0.7rem; font-weight: 600; cursor: pointer; }
+        .delete-group-btn { background: var(--danger); color: white; border: none; padding: 6px 14px; border-radius: 30px; font-size: 0.7rem; font-weight: 600; cursor: pointer; }
+        .group-content { display: none; padding: 20px; border-top: 1px solid var(--border); overflow-x: auto; }
         .group-content.show { display: block; }
-        .duplicate-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.8rem;
-        }
-        .duplicate-table th, .duplicate-table td {
-            padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid var(--border);
-        }
-        .duplicate-table th {
-            background: #f8fafc;
-            font-weight: 700;
-        }
-        .radio-select {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-        }
-        .badge {
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 600;
-        }
+        .duplicate-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; min-width: 900px; }
+        .duplicate-table th, .duplicate-table td { padding: 10px; text-align: left; border-bottom: 1px solid var(--border); }
+        .duplicate-table th { background: #f8fafc; font-weight: 700; position: sticky; top: 0; }
+        .radio-select { width: 18px; height: 18px; cursor: pointer; }
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; }
         .badge-male { background: #dbeafe; color: #1e40af; }
         .badge-female { background: #fce7f3; color: #be185d; }
+        .diversity-badge { background: #e0e7ff; color: #3730a3; margin-left: 8px; }
+        .checkbox-select { width: 18px; height: 18px; cursor: pointer; }
 
         .toast {
             position: fixed;
@@ -353,7 +295,7 @@
         .nav-item.active { color: var(--primary); background: var(--primary-light); }
 
         @media (min-width: 768px) { body { padding-bottom: 0; } .bottom-nav { display: none; } }
-        @media (max-width: 768px) { .desktop-nav { display: none; } .bottom-nav { display: flex; } .main-container { padding: 16px; padding-bottom: 80px; } }
+        @media (max-width: 768px) { .desktop-nav { display: none; } .bottom-nav { display: flex; } .main-container { padding: 16px; padding-bottom: 80px; } .group-header { flex-direction: column; align-items: flex-start; } .group-actions { width: 100%; justify-content: flex-start; } }
     </style>
 </head>
 <body>
@@ -368,7 +310,7 @@
 <div class="main-container">
     <div class="hero-section">
         <div class="hero-title"><i class="fas fa-exclamation-triangle"></i> Duplicate Detection & Cleaner</div>
-        <div class="hero-subtitle">Find, review, and remove duplicate student records from your database</div>
+        <div class="hero-subtitle">Find, review, and remove duplicate student records - Keep the one with most Qirats!</div>
     </div>
 
     <div class="stats-grid" id="statsGrid">
@@ -381,16 +323,23 @@
     <div class="detection-controls">
         <h3 style="margin-bottom: 16px;"><i class="fas fa-sliders-h"></i> Detection Settings</h3>
         <div class="detection-methods">
-            <button class="method-btn active" data-method="exact"><i class="fas fa-font"></i> Exact Name Match</button>
-            <button class="method-btn" data-method="fuzzy"><i class="fas fa-language"></i> Fuzzy Name Match</button>
-            <button class="method-btn" data-method="email"><i class="fas fa-envelope"></i> Email Match</button>
-            <button class="method-btn" data-method="phone"><i class="fas fa-phone"></i> Phone Match</button>
+            <button class="method-btn active" data-method="exact"><i class="fas fa-font"></i> Exact Name</button>
+            <button class="method-btn" data-method="name+qirat"><i class="fas fa-book-quran"></i> Name + Qirat</button>
+            <button class="method-btn" data-method="fuzzy"><i class="fas fa-language"></i> Fuzzy Name</button>
+            <button class="method-btn" data-method="email"><i class="fas fa-envelope"></i> Telegram</button>
+            <button class="method-btn" data-method="phone"><i class="fas fa-phone"></i> Phone</button>
             <button class="method-btn" data-method="name+phone"><i class="fas fa-link"></i> Name + Phone</button>
         </div>
-        <div class="detection-actions">
+        <div class="detection-actions" style="margin-top: 16px;">
             <button class="btn-primary" id="detectBtn"><i class="fas fa-search"></i> Detect Duplicates</button>
-            <button class="btn-danger" id="deleteAllDupBtn" style="display:none;"><i class="fas fa-trash-alt"></i> Delete All Selected</button>
             <button class="btn-secondary" id="refreshBtn"><i class="fas fa-sync-alt"></i> Refresh Data</button>
+        </div>
+        <div class="bulk-actions">
+            <span style="font-weight:600;"><i class="fas fa-layer-group"></i> Bulk Actions:</span>
+            <button class="btn-success" id="bulkKeepMostQirats"><i class="fas fa-star"></i> Keep Most Qirats (Diverse)</button>
+            <button class="btn-warning" id="bulkKeepNewest"><i class="fas fa-calendar-plus"></i> Keep Newest</button>
+            <button class="btn-secondary" id="bulkKeepOldest"><i class="fas fa-calendar-minus"></i> Keep Oldest</button>
+            <button class="btn-danger" id="bulkDeleteAllDup"><i class="fas fa-trash-alt"></i> Delete All Duplicates</button>
         </div>
     </div>
 
@@ -437,6 +386,7 @@
     let duplicateGroups = [];
     let currentMethod = 'exact';
     let selectedKeepIds = new Map(); // groupKey -> selected student id to keep
+    let individualDeleteSelected = new Map(); // groupKey -> Set of ids to delete
     
     const toast = document.getElementById('toast');
     
@@ -454,6 +404,31 @@
     
     function getQiratNames(student) {
         return (student.schedules || []).map(s => s.qirat_name).filter(Boolean);
+    }
+    
+    function getQiratCount(student) {
+        return getQiratNames(student).length;
+    }
+    
+    function normalizeName(name) {
+        return name.toLowerCase().trim().replace(/[^\w\s]/g, '').replace(/\s+/g, ' ');
+    }
+    
+    function levenshteinDistance(a, b) {
+        const matrix = [];
+        for (let i = 0; i <= b.length; i++) matrix[i] = [i];
+        for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+        for (let i = 1; i <= b.length; i++) {
+            for (let j = 1; j <= a.length; j++) {
+                const cost = a[j-1] === b[i-1] ? 0 : 1;
+                matrix[i][j] = Math.min(
+                    matrix[i-1][j] + 1,
+                    matrix[i][j-1] + 1,
+                    matrix[i-1][j-1] + cost
+                );
+            }
+        }
+        return matrix[b.length][a.length];
     }
     
     async function loadData() {
@@ -486,27 +461,6 @@
         document.getElementById('totalStudents').textContent = allStudents.length;
     }
     
-    function normalizeName(name) {
-        return name.toLowerCase().trim().replace(/[^\w\s]/g, '').replace(/\s+/g, ' ');
-    }
-    
-    function levenshteinDistance(a, b) {
-        const matrix = [];
-        for (let i = 0; i <= b.length; i++) matrix[i] = [i];
-        for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
-        for (let i = 1; i <= b.length; i++) {
-            for (let j = 1; j <= a.length; j++) {
-                const cost = a[j-1] === b[i-1] ? 0 : 1;
-                matrix[i][j] = Math.min(
-                    matrix[i-1][j] + 1,
-                    matrix[i][j-1] + 1,
-                    matrix[i-1][j-1] + cost
-                );
-            }
-        }
-        return matrix[b.length][a.length];
-    }
-    
     function detectDuplicates() {
         const groups = new Map();
         
@@ -516,7 +470,20 @@
                 if (!groups.has(key)) groups.set(key, []);
                 groups.get(key).push(student);
             });
-        } 
+        }
+        else if (currentMethod === 'name+qirat') {
+            allStudents.forEach(student => {
+                const qirats = getQiratNames(student);
+                if (qirats.length > 0) {
+                    const nameKey = normalizeName(student.full_name);
+                    qirats.forEach(qirat => {
+                        const key = `${nameKey}|${qirat}`;
+                        if (!groups.has(key)) groups.set(key, []);
+                        groups.get(key).push(student);
+                    });
+                }
+            });
+        }
         else if (currentMethod === 'fuzzy') {
             const processed = new Set();
             for (let i = 0; i < allStudents.length; i++) {
@@ -577,9 +544,13 @@
             .map(([key, students]) => ({ key, students, count: students.length }));
         
         selectedKeepIds.clear();
+        individualDeleteSelected.clear();
+        
         duplicateGroups.forEach(group => {
-            const newest = group.students.reduce((a, b) => a.timestamp > b.timestamp ? a : b);
-            selectedKeepIds.set(group.key, newest.id);
+            // Default: Keep the student with MOST Qirats (diverse)
+            const mostQirats = group.students.reduce((a, b) => getQiratCount(a) >= getQiratCount(b) ? a : b);
+            selectedKeepIds.set(group.key, mostQirats.id);
+            individualDeleteSelected.set(group.key, new Set());
         });
         
         document.getElementById('duplicateGroups').textContent = duplicateGroups.length;
@@ -594,13 +565,13 @@
         const container = document.getElementById('resultsContainer');
         if (duplicateGroups.length === 0) {
             container.innerHTML = `<div class="empty-state"><i class="fas fa-check-circle" style="color:#10b981; font-size:3rem;"></i><p style="margin-top:16px;">No duplicates found! Your data is clean.</p></div>`;
-            document.getElementById('deleteAllDupBtn').style.display = 'none';
             return;
         }
         
-        document.getElementById('deleteAllDupBtn').style.display = 'flex';
-        
-        container.innerHTML = duplicateGroups.map((group, idx) => `
+        container.innerHTML = duplicateGroups.map((group, idx) => {
+            const toDeleteSet = individualDeleteSelected.get(group.key) || new Set();
+            const mostQiratsStudent = group.students.reduce((a, b) => getQiratCount(a) >= getQiratCount(b) ? a : b);
+            return `
             <div class="duplicate-group">
                 <div class="group-header" onclick="toggleGroup(${idx})">
                     <div class="group-title">
@@ -609,33 +580,42 @@
                         <span class="group-count">${group.count} records</span>
                     </div>
                     <div class="group-actions" onclick="event.stopPropagation()">
-                        <button class="keep-btn" onclick="keepSelected('${group.key}')">Keep Selected</button>
-                        <button class="delete-group-btn" onclick="deleteGroup('${group.key}')">Delete All</button>
+                        <button class="keep-btn" onclick="keepSelected('${group.key}')"><i class="fas fa-save"></i> Keep Selected</button>
+                        <button class="keep-diverse-btn" onclick="keepMostQirats('${group.key}')"><i class="fas fa-star"></i> Keep Most Qirats</button>
+                        <button class="keep-oldest-btn" onclick="keepOldest('${group.key}')"><i class="fas fa-calendar-minus"></i> Keep Oldest</button>
+                        <button class="keep-newest-btn" onclick="keepNewest('${group.key}')"><i class="fas fa-calendar-plus"></i> Keep Newest</button>
+                        <button class="delete-group-btn" onclick="deleteSelected('${group.key}')"><i class="fas fa-trash"></i> Delete Selected</button>
+                        <button class="delete-group-btn" onclick="deleteAllInGroup('${group.key}')"><i class="fas fa-trash-alt"></i> Delete All</button>
                     </div>
                 </div>
                 <div class="group-content" id="groupContent-${idx}">
                     <table class="duplicate-table">
                         <thead>
-                            <tr><th>Select</th><th>Name</th><th>Gender</th><th>Phone</th><th>Department</th><th>Batch</th><th>Qirats</th><th>Registered</th>
+                            <tr><th><input type="checkbox" class="select-all" data-group="${group.key}" ${group.students.length === toDeleteSet.size ? 'checked' : ''} onchange="toggleSelectAll('${group.key}', this.checked)"></th><th>Name</th><th>Gender</th><th>Phone</th><th>Department</th><th>Batch</th><th>Qirats</th><th>Qirat Count</th><th>Registered</th><th>Keep</th>
                         </thead>
                         <tbody>
-                            ${group.students.map(s => `
+                            ${group.students.map(s => {
+                                const qiratCount = getQiratCount(s);
+                                const isMostQirats = qiratCount === getQiratCount(mostQiratsStudent);
+                                return `
                                 <tr>
-                                    <td><input type="radio" name="keep_${group.key}" value="${s.id}" class="radio-select" ${selectedKeepIds.get(group.key) === s.id ? 'checked' : ''} onchange="window.updateSelected('${group.key}', '${s.id}')"></td>
-                                    <td><strong>${escapeHtml(s.full_name)}</strong></td>
+                                    <td><input type="checkbox" class="delete-checkbox" data-group="${group.key}" data-id="${s.id}" ${toDeleteSet.has(s.id) ? 'checked' : ''} onchange="toggleIndividualDelete('${group.key}', '${s.id}', this.checked)"></td>
+                                    <td><strong>${escapeHtml(s.full_name)}</strong> ${isMostQirats ? '<span class="diversity-badge badge">🏆 Most Qirats</span>' : ''}</td>
                                     <td><span class="badge ${s.gender === 'Male' ? 'badge-male' : 'badge-female'}">${escapeHtml(s.gender)}</span></td>
                                     <td>${escapeHtml(s.phone)}</td>
                                     <td>${escapeHtml(s.department)}</td>
                                     <td>${escapeHtml(s.batch)}</td>
                                     <td>${escapeHtml(getQiratNames(s).join(', ') || '-')}</td>
-                                    <td>${s.timestamp.toLocaleDateString()}</td>
+                                    <td><span class="badge" style="background:#e0e7ff; color:#3730a3;">${qiratCount} Qirats</span></td>
+                                    <td>${s.timestamp.toLocaleDateString()} ${s.timestamp.toLocaleTimeString()}</td>
+                                    <td><input type="radio" name="keep_${group.key}" value="${s.id}" class="radio-select" ${selectedKeepIds.get(group.key) === s.id ? 'checked' : ''} onchange="updateSelected('${group.key}', '${s.id}')"></td>
                                 </tr>
-                            `).join('')}
+                            `}).join('')}
                         </tbody>
                     </table>
                 </div>
             </div>
-        `).join('');
+        `}).join('');
     }
     
     window.toggleGroup = (idx) => {
@@ -645,6 +625,35 @@
     
     window.updateSelected = (groupKey, studentId) => {
         selectedKeepIds.set(groupKey, studentId);
+    };
+    
+    window.toggleIndividualDelete = (groupKey, studentId, checked) => {
+        const toDeleteSet = individualDeleteSelected.get(groupKey) || new Set();
+        if (checked) toDeleteSet.add(studentId);
+        else toDeleteSet.delete(studentId);
+        individualDeleteSelected.set(groupKey, toDeleteSet);
+        
+        const group = duplicateGroups.find(g => g.key === groupKey);
+        if (group) {
+            const selectAllCheckbox = document.querySelector(`.select-all[data-group="${groupKey}"]`);
+            if (selectAllCheckbox) {
+                selectAllCheckbox.checked = toDeleteSet.size === group.students.length;
+            }
+        }
+    };
+    
+    window.toggleSelectAll = (groupKey, checked) => {
+        const group = duplicateGroups.find(g => g.key === groupKey);
+        if (!group) return;
+        const toDeleteSet = new Set();
+        if (checked) {
+            group.students.forEach(s => toDeleteSet.add(s.id));
+        }
+        individualDeleteSelected.set(groupKey, toDeleteSet);
+        
+        document.querySelectorAll(`.delete-checkbox[data-group="${groupKey}"]`).forEach(cb => {
+            cb.checked = checked;
+        });
     };
     
     window.keepSelected = async (groupKey) => {
@@ -658,46 +667,148 @@
             return;
         }
         
-        if (confirm(`Keep "${groupKey}" and delete ${toDelete.length} duplicate(s)?`)) {
-            showToast(`Deleting ${toDelete.length} duplicate(s)...`);
-            const batch = writeBatch(db);
-            toDelete.forEach(s => batch.delete(doc(db, "registrations", s.id)));
-            await batch.commit();
+        if (confirm(`Keep selected record and delete ${toDelete.length} duplicate(s)?`)) {
+            await deleteRecords(toDelete);
             showToast(`Deleted ${toDelete.length} duplicate(s)`);
             await loadData();
             detectDuplicates();
         }
     };
     
-    window.deleteGroup = async (groupKey) => {
+    window.keepMostQirats = async (groupKey) => {
         const group = duplicateGroups.find(g => g.key === groupKey);
         if (!group) return;
-        
-        if (confirm(`⚠️ Delete ALL ${group.count} records for "${groupKey}"? This cannot be undone!`)) {
-            showToast(`Deleting ${group.count} records...`);
-            const batch = writeBatch(db);
-            group.students.forEach(s => batch.delete(doc(db, "registrations", s.id)));
-            await batch.commit();
+        const mostQirats = group.students.reduce((a, b) => getQiratCount(a) >= getQiratCount(b) ? a : b);
+        const toDelete = group.students.filter(s => s.id !== mostQirats.id);
+        if (toDelete.length === 0) return;
+        if (confirm(`Keep the record with MOST QIRATS (${getQiratCount(mostQirats)} Qirats) and delete ${toDelete.length} duplicate(s)?`)) {
+            await deleteRecords(toDelete);
+            showToast(`Deleted ${toDelete.length} duplicate(s)`);
+            await loadData();
+            detectDuplicates();
+        }
+    };
+    
+    window.keepOldest = async (groupKey) => {
+        const group = duplicateGroups.find(g => g.key === groupKey);
+        if (!group) return;
+        const oldest = group.students.reduce((a, b) => a.timestamp < b.timestamp ? a : b);
+        const toDelete = group.students.filter(s => s.id !== oldest.id);
+        if (toDelete.length === 0) return;
+        if (confirm(`Keep oldest record and delete ${toDelete.length} duplicate(s)?`)) {
+            await deleteRecords(toDelete);
+            showToast(`Deleted ${toDelete.length} duplicate(s)`);
+            await loadData();
+            detectDuplicates();
+        }
+    };
+    
+    window.keepNewest = async (groupKey) => {
+        const group = duplicateGroups.find(g => g.key === groupKey);
+        if (!group) return;
+        const newest = group.students.reduce((a, b) => a.timestamp > b.timestamp ? a : b);
+        const toDelete = group.students.filter(s => s.id !== newest.id);
+        if (toDelete.length === 0) return;
+        if (confirm(`Keep newest record and delete ${toDelete.length} duplicate(s)?`)) {
+            await deleteRecords(toDelete);
+            showToast(`Deleted ${toDelete.length} duplicate(s)`);
+            await loadData();
+            detectDuplicates();
+        }
+    };
+    
+    window.deleteSelected = async (groupKey) => {
+        const toDeleteSet = individualDeleteSelected.get(groupKey);
+        if (!toDeleteSet || toDeleteSet.size === 0) {
+            showToast('No records selected to delete', true);
+            return;
+        }
+        const group = duplicateGroups.find(g => g.key === groupKey);
+        const toDelete = group.students.filter(s => toDeleteSet.has(s.id));
+        if (confirm(`Delete ${toDelete.length} selected record(s)?`)) {
+            await deleteRecords(toDelete);
+            showToast(`Deleted ${toDelete.length} record(s)`);
+            await loadData();
+            detectDuplicates();
+        }
+    };
+    
+    window.deleteAllInGroup = async (groupKey) => {
+        const group = duplicateGroups.find(g => g.key === groupKey);
+        if (!group) return;
+        if (confirm(`⚠️ Delete ALL ${group.count} records? This cannot be undone!`)) {
+            await deleteRecords(group.students);
             showToast(`Deleted ${group.count} records`);
             await loadData();
             detectDuplicates();
         }
     };
     
-    document.getElementById('deleteAllDupBtn').addEventListener('click', async () => {
-        if (duplicateGroups.length === 0) { showToast('No duplicates to delete', true); return; }
+    async function deleteRecords(students) {
+        const batch = writeBatch(db);
+        students.forEach(s => batch.delete(doc(db, "registrations", s.id)));
+        await batch.commit();
+    }
+    
+    document.getElementById('bulkKeepMostQirats').addEventListener('click', async () => {
+        if (duplicateGroups.length === 0) { showToast('No duplicates found', true); return; }
         const totalToDelete = duplicateGroups.reduce((sum, g) => sum + (g.count - 1), 0);
-        if (confirm(`⚠️ DELETE ALL ${totalToDelete} duplicate records? This will keep 1 record per duplicate group. This cannot be undone!`)) {
-            showToast(`Deleting ${totalToDelete} duplicates...`);
-            const batch = writeBatch(db);
+        if (confirm(`Keep the record with MOST QIRATS in each group and delete ${totalToDelete} duplicate(s)?`)) {
+            const allToDelete = [];
+            duplicateGroups.forEach(group => {
+                const mostQirats = group.students.reduce((a, b) => getQiratCount(a) >= getQiratCount(b) ? a : b);
+                group.students.forEach(s => { if (s.id !== mostQirats.id) allToDelete.push(s); });
+            });
+            await deleteRecords(allToDelete);
+            showToast(`Deleted ${allToDelete.length} duplicates`);
+            await loadData();
+            detectDuplicates();
+        }
+    });
+    
+    document.getElementById('bulkKeepNewest').addEventListener('click', async () => {
+        if (duplicateGroups.length === 0) { showToast('No duplicates found', true); return; }
+        const totalToDelete = duplicateGroups.reduce((sum, g) => sum + (g.count - 1), 0);
+        if (confirm(`Keep NEWEST record in each group and delete ${totalToDelete} duplicate(s)?`)) {
+            const allToDelete = [];
+            duplicateGroups.forEach(group => {
+                const newest = group.students.reduce((a, b) => a.timestamp > b.timestamp ? a : b);
+                group.students.forEach(s => { if (s.id !== newest.id) allToDelete.push(s); });
+            });
+            await deleteRecords(allToDelete);
+            showToast(`Deleted ${allToDelete.length} duplicates`);
+            await loadData();
+            detectDuplicates();
+        }
+    });
+    
+    document.getElementById('bulkKeepOldest').addEventListener('click', async () => {
+        if (duplicateGroups.length === 0) { showToast('No duplicates found', true); return; }
+        const totalToDelete = duplicateGroups.reduce((sum, g) => sum + (g.count - 1), 0);
+        if (confirm(`Keep OLDEST record in each group and delete ${totalToDelete} duplicate(s)?`)) {
+            const allToDelete = [];
+            duplicateGroups.forEach(group => {
+                const oldest = group.students.reduce((a, b) => a.timestamp < b.timestamp ? a : b);
+                group.students.forEach(s => { if (s.id !== oldest.id) allToDelete.push(s); });
+            });
+            await deleteRecords(allToDelete);
+            showToast(`Deleted ${allToDelete.length} duplicates`);
+            await loadData();
+            detectDuplicates();
+        }
+    });
+    
+    document.getElementById('bulkDeleteAllDup').addEventListener('click', async () => {
+        if (duplicateGroups.length === 0) { showToast('No duplicates found', true); return; }
+        const totalToDelete = duplicateGroups.reduce((sum, g) => sum + (g.count - 1), 0);
+        if (confirm(`⚠️ DELETE ALL ${totalToDelete} duplicate records? This will keep 1 record per duplicate group.`)) {
+            const allToDelete = [];
             duplicateGroups.forEach(group => {
                 const keepId = selectedKeepIds.get(group.key);
-                group.students.forEach(s => {
-                    if (s.id !== keepId) batch.delete(doc(db, "registrations", s.id));
-                });
+                group.students.forEach(s => { if (s.id !== keepId) allToDelete.push(s); });
             });
-            await batch.commit();
-            showToast(`Deleted ${totalToDelete} duplicates`);
+            await deleteRecords(allToDelete);
+            showToast(`Deleted ${allToDelete.length} duplicates`);
             await loadData();
             detectDuplicates();
         }
