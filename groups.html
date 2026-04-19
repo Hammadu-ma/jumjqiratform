@@ -404,7 +404,6 @@
         .btn-save { background: var(--primary); color: white; border: none; padding: 12px 24px; border-radius: 40px; font-weight: 700; cursor: pointer; width: 100%; }
         .btn-save:hover { background: var(--primary-dark); }
 
-        /* Attendance Modal */
         .attendance-modal {
             position: fixed;
             top: 0;
@@ -516,7 +515,6 @@
 
 <div id="toast" class="toast"></div>
 
-<!-- Attendance Modal -->
 <div id="attendanceModal" class="attendance-modal">
     <div class="attendance-modal-content">
         <h3><i class="fas fa-calendar-check"></i> Export Attendance Sheet</h3>
@@ -851,7 +849,6 @@
         return icons[currentGroupMode] || 'fa-folder';
     }
     
-    // ========== ATTENDANCE EXPORT ==========
     function openAttendanceModal(groupIdx) {
         currentAttendanceGroup = currentGroups[groupIdx];
         attendanceModal.classList.add('active');
@@ -872,6 +869,7 @@
         closeAttendanceModal();
     });
     
+    // FULLY WORKING ATTENDANCE EXPORT FUNCTION
     function exportAttendanceSheet(group, days, notes) {
         if (!group || group.members.length === 0) {
             showToast('No students in this group', true);
@@ -883,12 +881,33 @@
         const timestamp = new Date().toLocaleString();
         
         // Generate day columns
-        const dayColumns = [];
+        let dayColumnsHtml = '';
         for (let i = 1; i <= days; i++) {
-            dayColumns.push(`Day ${i}`);
+            dayColumnsHtml += `<th class="checkbox-cell">Day ${i}</th>`;
         }
         
-        // Build beautiful HTML for Word
+        // Generate student rows
+        let studentRowsHtml = '';
+        group.members.forEach((student, idx) => {
+            let checkboxesHtml = '';
+            for (let i = 1; i <= days; i++) {
+                checkboxesHtml += `<td class="checkbox-cell"><span></span></td>`;
+            }
+            studentRowsHtml += `
+                <tr>
+                    <td style="text-align:center;">${idx + 1}</td>
+                    <td style="text-align: left;"><strong>${escapeHtml(student.full_name)}</strong></td>
+                    <td style="text-align:center;">${escapeHtml(student.gender)}</td>
+                    <td style="text-align: left;">${escapeHtml(student.department)}</td>
+                    <td style="text-align: left;">${escapeHtml(student.batch)}</td>
+                    ${checkboxesHtml}
+                    <td style="text-align:center;"><span style="display:inline-block; width:20px; height:20px; border:1px solid #10b981; border-radius:4px;"></span></td>
+                    <td style="text-align:center;"><span style="display:inline-block; width:20px; height:20px; border:1px solid #ef4444; border-radius:4px;"></span></td>
+                </tr>
+            `;
+        });
+        
+        // Build complete HTML document for Word
         let html = `<!DOCTYPE html>
         <html>
         <head>
@@ -938,14 +957,14 @@
                 .info-item strong {
                     color: #059669;
                 }
-                .notes-section {
+                ${notes ? `.notes-section {
                     background: #fef3c7;
                     padding: 12px 20px;
                     border-radius: 10px;
                     margin-bottom: 25px;
                     font-size: 12px;
                     color: #92400e;
-                }
+                }` : ''}
                 table {
                     width: 100%;
                     border-collapse: collapse;
@@ -963,12 +982,8 @@
                     color: white;
                     font-weight: bold;
                     font-size: 12px;
-                    position: sticky;
-                    top: 0;
                 }
                 td:first-child, th:first-child {
-                    position: sticky;
-                    left: 0;
                     background: #f8fafc;
                     font-weight: 600;
                 }
@@ -976,7 +991,7 @@
                     background: #059669;
                 }
                 .checkbox-cell {
-                    width: 50px;
+                    width: 55px;
                     text-align: center;
                 }
                 .checkbox-cell span {
@@ -1005,10 +1020,6 @@
                     gap: 20px;
                     flex-wrap: wrap;
                 }
-                @media print {
-                    body { margin: 0; padding: 15px; }
-                    th, td { border-color: #000; }
-                }
             </style>
         </head>
         <body>
@@ -1023,6 +1034,8 @@
                 <div class="info-item"><strong>Total Students:</strong> ${totalStudents}</div>
                 <div class="info-item"><strong>Attendance Period:</strong> ${days} Days</div>
                 <div class="info-item"><strong>Gender Split:</strong> ♂ ${group.stats.maleCount} | ♀ ${group.stats.femaleCount}</div>
+                <div class="info-item"><strong>Departments:</strong> ${group.stats.uniqueDepts}</div>
+                <div class="info-item"><strong>Multi-Qirat:</strong> ${group.stats.multiQiratCount}</div>
             </div>
             
             ${notes ? `<div class="notes-section"><strong>📝 Notes:</strong> ${escapeHtml(notes)}</div>` : ''}
@@ -1035,24 +1048,13 @@
                         <th style="width: 70px;">Gender</th>
                         <th style="text-align: left; min-width: 150px;">Department</th>
                         <th style="text-align: left; min-width: 100px;">Batch</th>
-                        ${dayColumns.map(day => `<th class="checkbox-cell">${day}</th>`).join('')}
-                        <th style="width: 70px;">✓</th>
-                        <th style="width: 70px;">✗</th>
+                        ${dayColumnsHtml}
+                        <th style="width: 60px;">✓</th>
+                        <th style="width: 60px;">✗</th>
                     </tr>
                 </thead>
                 <tbody>
-                    ${group.members.map((student, idx) => `
-                        <tr>
-                            <td>${idx + 1}</td>
-                            <td style="text-align: left;"><strong>${escapeHtml(student.full_name)}</strong></td>
-                            <td>${escapeHtml(student.gender)}</span></td>
-                            <td style="text-align: left;">${escapeHtml(student.department)}</span></td>
-                            <td style="text-align: left;">${escapeHtml(student.batch)}</span></td>
-                            ${dayColumns.map(() => `<td class="checkbox-cell"><span></span></td>`).join('')}
-                            <td><span style="display:inline-block; width:20px; height:20px; border:1px solid #10b981; border-radius:4px;"></span></td>
-                            <td><span style="display:inline-block; width:20px; height:20px; border:1px solid #ef4444; border-radius:4px;"></span></td>
-                        </tr>
-                    `).join('')}
+                    ${studentRowsHtml}
                 </tbody>
             </table>
             
@@ -1060,6 +1062,7 @@
                 <span>✅ <strong>Instructions:</strong> Check (✓) for Present, Leave blank or mark (✗) for Absent</span>
                 <span>📅 Each column represents one day of attendance</span>
                 <span>📝 Use the "✓" and "✗" columns to track daily totals</span>
+                <span>🖨️ Print this sheet and mark attendance manually</span>
             </div>
             
             <div class="footer">
@@ -1071,10 +1074,10 @@
         const blob = new Blob([html], { type: 'application/msword' });
         const filename = `Attendance_${groupName.replace(/[^a-z0-9]/gi, '_')}_${days}days.doc`;
         downloadBlob(blob, filename);
-        showToast(`Attendance sheet for "${groupName}" exported with ${days} days`);
+        showToast(`✅ Attendance sheet for "${groupName}" exported with ${days} days`);
     }
     
-    // ========== REGULAR EXPORT FUNCTIONS (BEAUTIFUL) ==========
+    // ========== REGULAR EXPORT FUNCTIONS ==========
     function exportSingleGroup(group, format) {
         if (!group || group.members.length === 0) { showToast('No students', true); return; }
         const exportData = group.members.map((m, idx) => formatStudentForExport(m, idx + 1));
@@ -1153,43 +1156,25 @@
                 h1 { color: #10b981; border-bottom: 2px solid #10b981; padding-bottom: 10px; }
                 .subtitle { color: #059669; margin: 10px 0; }
                 .kpi-box { background: #f0fdf4; padding: 15px; border-radius: 12px; margin: 20px 0; }
-                .kpi-box h3 { color: #059669; margin-bottom: 10px; }
                 table { border-collapse: collapse; width: 100%; margin-top: 20px; }
                 th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
                 th { background: #10b981; color: white; }
-                tr:nth-child(even) { background: #f9fafb; }
             </style>
         </head>
         <body>
             <h1>📊 JUMJ Irshad - Group Report</h1>
             <div class="subtitle">Group: ${escapeHtml(groupName)}</div>
             <p>Generated: ${new Date().toLocaleString()} | Total Students: ${totalCount}</p>
-            
             <div class="kpi-box">
                 <h3>Summary KPIs</h3>
                 <p><strong>Gender Split:</strong> Male ${stats.maleCount} | Female ${stats.femaleCount}</p>
-                <p><strong>Departments:</strong> ${stats.uniqueDepts} departments represented</p>
+                <p><strong>Departments:</strong> ${stats.uniqueDepts}</p>
                 <p><strong>Multi-Qirat Students:</strong> ${stats.multiQiratCount}</p>
-                <p><strong>New Students (30 days):</strong> ${stats.recentWeek}</p>
             </div>
-            
-            <h3>Student List</h3>
             <table>
-                <thead>
-                    <tr><th>No.</th><th>Name</th><th>Gender</th><th>Phone</th><th>Department</th><th>Batch</th><th>Qirats</th></tr>
-                </thead>
+                <thead><tr><th>No.</th><th>Name</th><th>Gender</th><th>Phone</th><th>Department</th><th>Batch</th><th>Qirats</th></tr></thead>
                 <tbody>
-                    ${data.map(row => `
-                        <tr>
-                            <td>${escapeHtml(String(row['No.']))}</td>
-                            <td>${escapeHtml(row.Name)}</strong></td>
-                            <td>${escapeHtml(row.Gender)}</span></td>
-                            <td>${escapeHtml(row.Phone)}</span></td>
-                            <td>${escapeHtml(row.Department)}</span></td>
-                            <td>${escapeHtml(row.Batch)}</span></td>
-                            <td>${escapeHtml(row['Qirats Enrolled'])}</span></td>
-                        </tr>
-                    `).join('')}
+                    ${data.map(row => `<tr><td style="text-align:center;">${escapeHtml(String(row['No.']))}</td><td><strong>${escapeHtml(row.Name)}</strong></td><td>${escapeHtml(row.Gender)}</td><td>${escapeHtml(row.Phone)}</td><td>${escapeHtml(row.Department)}</td><td>${escapeHtml(row.Batch)}</td><td>${escapeHtml(row['Qirats Enrolled'])}</td></tr>`).join('')}
                 </tbody>
             </table>
         </body>
@@ -1198,7 +1183,6 @@
         downloadBlob(new Blob([html], { type: 'application/msword' }), `${groupName.replace(/[^a-z0-9]/gi, '_')}_report.doc`);
     }
     
-    // ========== MASTER EXPORTS ==========
     function exportAllGroupsToExcel() {
         if (currentGroups.length === 0) { showToast('No groups to export', true); return; }
         const wb = XLSX.utils.book_new();
@@ -1215,38 +1199,16 @@
     
     function exportAllGroupsToWord() {
         if (currentGroups.length === 0) { showToast('No groups', true); return; }
-        let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>JUMJ_All_Groups</title>
-        <style>
-            body { font-family: 'Segoe UI', Arial, sans-serif; margin: 40px; }
-            h1 { color: #10b981; border-bottom: 3px solid #10b981; padding-bottom: 10px; }
-            h2 { background: #f1f5f9; padding: 12px 16px; border-radius: 16px; margin-top: 30px; color: #0f172a; border-left: 5px solid #10b981; }
-            .group-summary { background: #f0fdf4; padding: 12px 20px; border-radius: 20px; margin: 10px 0 20px 0; display: flex; gap: 20px; flex-wrap: wrap; }
-            .kpi-badge { background: white; padding: 6px 14px; border-radius: 40px; font-size: 0.8rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-            table { width: 100%; border-collapse: collapse; margin: 15px 0; }
-            th, td { border: 1px solid #cbd5e1; padding: 8px 10px; text-align: left; font-size: 0.75rem; }
-            th { background: #10b981; color: white; }
-            .footer { margin-top: 40px; text-align: center; font-size: 0.7rem; color: #64748b; }
-        </style></head><body>
-        <h1>📊 JUMJ Irshad - Complete Groups Report</h1>
-        <p><strong>Grouping Mode:</strong> ${currentGroupMode.toUpperCase()} | <strong>Generated:</strong> ${new Date().toLocaleString()} | <strong>Total Groups:</strong> ${currentGroups.length}</p>`;
-        
+        let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>All Groups Report</title><style>body{font-family:Arial;margin:40px;}h1{color:#10b981;}h2{background:#f1f5f9;padding:10px;margin-top:30px;}table{border-collapse:collapse;width:100%;margin:15px 0;}th,td{border:1px solid #ddd;padding:8px;}th{background:#10b981;color:white;}</style></head><body><h1>📊 JUMJ Irshad - All Groups Report</h1><p>Generated: ${new Date().toLocaleString()} | Total Groups: ${currentGroups.length}</p>`;
         currentGroups.forEach(group => {
-            const s = group.stats;
-            html += `<h2>📁 ${escapeHtml(group.name)} <span style="font-size:0.8rem;">(${group.memberCount} students)</span></h2>
-            <div class="group-summary">
-                <span class="kpi-badge">👥 Male: ${s.maleCount} | Female: ${s.femaleCount}</span>
-                <span class="kpi-badge">🏢 Departments: ${s.uniqueDepts}</span>
-                <span class="kpi-badge">🔄 Multi-Qirat: ${s.multiQiratCount}</span>
-                <span class="kpi-badge">🆕 New (30d): ${s.recentWeek}</span>
-            </div>
-            <table><thead><tr><th>No.</th><th>Name</th><th>Gender</th><th>Phone</th><th>Dept</th><th>Batch</th><th>Qirats</th></tr></thead><tbody>`;
+            html += `<h2>📁 ${escapeHtml(group.name)} (${group.memberCount} students)</h2><div style="background:#f0fdf4;padding:10px;margin-bottom:15px;"><span>Male: ${group.stats.maleCount} | Female: ${group.stats.femaleCount} | Depts: ${group.stats.uniqueDepts}</span></div><table><thead><tr><th>No.</th><th>Name</th><th>Gender</th><th>Phone</th><th>Dept</th><th>Batch</th><th>Qirats</th></tr></thead><tbody>`;
             group.members.forEach((m, idx) => {
                 html += `<tr><td style="text-align:center;">${idx + 1}</td><td><strong>${escapeHtml(m.full_name)}</strong></td><td>${escapeHtml(m.gender)}</td><td>${escapeHtml(m.phone)}</td><td>${escapeHtml(m.department)}</td><td>${escapeHtml(m.batch)}</td><td>${escapeHtml(getQiratNames(m).join(', ') || '-')}</td></tr>`;
             });
-            html += `</tbody><tr><br>`;
+            html += `</tbody></table><br>`;
         });
         html += `<div class="footer">© JUMJ Irshad • Exported on ${new Date().toLocaleString()}</div></body></html>`;
-        downloadBlob(new Blob([html], { type: 'application/msword' }), `JUMJ_AllGroups_${currentGroupMode}_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.doc`);
+        downloadBlob(new Blob([html], { type: 'application/msword' }), `All_Groups_${currentGroupMode}_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.doc`);
         showToast(`Exported all ${currentGroups.length} groups to Word`);
     }
     
@@ -1266,8 +1228,7 @@
             doc.setFontSize(14); doc.setTextColor(16,185,129);
             doc.text(`${group.name} (${group.memberCount} students)`, 14, yPos); yPos += 7;
             doc.setFontSize(9); doc.setTextColor(80,80,80);
-            const s = group.stats;
-            doc.text(`Stats: Male ${s.maleCount} | Female ${s.femaleCount} | Depts ${s.uniqueDepts} | Multi-Qirat ${s.multiQiratCount} | New30d ${s.recentWeek}`, 14, yPos); yPos += 7;
+            doc.text(`Stats: Male ${group.stats.maleCount} | Female ${group.stats.femaleCount} | Depts ${group.stats.uniqueDepts} | Multi-Qirat ${group.stats.multiQiratCount}`, 14, yPos); yPos += 7;
             
             const tableData = group.members.map((m, idx) => [idx + 1, m.full_name, m.gender, m.phone, m.department, m.batch, getQiratNames(m).join(', ').substring(0, 25)]);
             const result = doc.autoTable({
@@ -1276,13 +1237,12 @@
                 startY: yPos,
                 theme: 'striped',
                 headStyles: { fillColor: [16,185,129], textColor: [255,255,255], fontStyle: 'bold' },
-                styles: { fontSize: 7, cellPadding: 2 },
-                margin: { left: 14, right: 14 }
+                styles: { fontSize: 7, cellPadding: 2 }
             });
             yPos = result.finalY + 10;
             if (i !== currentGroups.length - 1 && yPos > 190) { doc.addPage(); yPos = 20; }
         }
-        doc.save(`JUMJ_AllGroups_${currentGroupMode}_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.pdf`);
+        doc.save(`All_Groups_${currentGroupMode}_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.pdf`);
         showToast(`Exported all ${currentGroups.length} groups to PDF`);
     }
     
