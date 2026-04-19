@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>JUMJ Irshad | Groups View - Full Export Suite</title>
+    <title>JUMJ Irshad | Groups View - Advanced Editor</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -90,7 +90,7 @@
 
         .filter-group {
             flex: 1;
-            min-width: 150px;
+            min-width: 140px;
         }
 
         .filter-group label {
@@ -191,7 +191,6 @@
             gap: 8px;
             transition: all 0.2s;
         }
-        .export-excel { background: #10b981; color: white; }
         .export-all-excel { background: #6366f1; color: white; }
         .export-all-word { background: #2b5797; color: white; }
         .export-all-pdf { background: #d32f2f; color: white; }
@@ -267,7 +266,6 @@
             box-shadow: var(--shadow-sm);
         }
         .stat-item i { color: var(--primary); font-size: 0.75rem; }
-        .stat-value { font-weight: 800; color: var(--dark); margin-left: 4px; }
 
         .group-export-buttons {
             display: flex;
@@ -275,7 +273,7 @@
             flex-wrap: wrap;
         }
 
-        .group-export-item {
+        .group-export-item, .edit-student-btn {
             background: white;
             border: 1px solid var(--border);
             padding: 6px 14px;
@@ -288,11 +286,9 @@
             gap: 6px;
             transition: all 0.2s;
         }
-        .group-export-item:hover {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
+        .edit-student-btn { background: #fef3c7; border-color: #f59e0b; color: #b45309; }
+        .edit-student-btn:hover { background: #f59e0b; color: white; border-color: #f59e0b; }
+        .group-export-item:hover { background: var(--primary); color: white; border-color: var(--primary); }
 
         .toggle-icon {
             font-size: 1.2rem;
@@ -360,6 +356,55 @@
             animation: slideIn 0.3s ease;
         }
 
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            visibility: hidden;
+            opacity: 0;
+            transition: all 0.2s;
+        }
+        .modal-overlay.active {
+            visibility: visible;
+            opacity: 1;
+        }
+        .modal-container {
+            background: white;
+            border-radius: 32px;
+            width: 90%;
+            max-width: 550px;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 28px;
+            box-shadow: var(--shadow-lg);
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--primary-light);
+        }
+        .modal-header h3 { font-size: 1.3rem; color: var(--primary-dark); }
+        .close-modal { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted); }
+        .form-group { margin-bottom: 18px; }
+        .form-group label { font-weight: 600; display: block; margin-bottom: 6px; color: var(--text-primary); }
+        .form-group input, .form-group select { width: 100%; padding: 10px 14px; border: 2px solid var(--border); border-radius: 16px; font-family: inherit; }
+        .qirat-list { background: #f8fafc; padding: 12px; border-radius: 20px; margin: 12px 0; }
+        .qirat-tag { display: inline-block; background: var(--primary-light); padding: 4px 12px; border-radius: 20px; margin: 4px; font-size: 0.8rem; }
+        .btn-save { background: var(--primary); color: white; border: none; padding: 12px 24px; border-radius: 40px; font-weight: 700; cursor: pointer; width: 100%; }
+        .btn-save:hover { background: var(--primary-dark); }
+
         @keyframes slideIn {
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
@@ -371,7 +416,6 @@
             .group-export-buttons { width: 100%; justify-content: flex-start; }
             .filters-bar { flex-direction: column; }
             .filter-group { width: 100%; }
-            .group-stats { margin-top: 8px; width: 100%; justify-content: flex-start; }
         }
     </style>
 </head>
@@ -379,16 +423,17 @@
 
 <div class="glass-header">
     <div class="header-content">
-        <div class="logo"><h1><i class="fas fa-layer-group"></i> Groups View</h1></div>
+        <div class="logo"><h1><i class="fas fa-layer-group"></i> Groups View + Editor</h1></div>
     </div>
 </div>
 
 <div class="main-container">
     <div class="filters-bar">
-        <div class="filter-group"><label><i class="fas fa-search"></i> Search</label><input type="text" id="searchInput" placeholder="Name or Phone..."></div>
+        <div class="filter-group"><label><i class="fas fa-search"></i> Search</label><input type="text" id="searchInput" placeholder="Name, Phone, or Telegram..."></div>
         <div class="filter-group"><label><i class="fas fa-venus-mars"></i> Gender</label><select id="genderFilter"><option value="">All</option><option value="Male">Male</option><option value="Female">Female</option></select></div>
         <div class="filter-group"><label><i class="fas fa-building"></i> Department</label><select id="deptFilter"><option value="">All</option></select></div>
         <div class="filter-group"><label><i class="fas fa-calendar"></i> Batch</label><select id="batchFilter"><option value="">All</option></select></div>
+        <div class="filter-group"><label><i class="fas fa-book-quran"></i> Qirat</label><select id="qiratFilter"><option value="">All Qirats</option></select></div>
         <button class="btn-clear" id="clearFiltersBtn"><i class="fas fa-eraser"></i> Clear</button>
     </div>
 
@@ -415,16 +460,36 @@
 
 <div id="toast" class="toast"></div>
 
+<!-- Edit Modal -->
+<div id="editModal" class="modal-overlay">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h3><i class="fas fa-user-edit"></i> Edit Student</h3>
+            <button class="close-modal" onclick="closeEditModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <form id="editForm">
+            <input type="hidden" id="editStudentId">
+            <div class="form-group"><label>Full Name</label><input type="text" id="editName" required></div>
+            <div class="form-group"><label>Gender</label><select id="editGender"><option value="Male">Male</option><option value="Female">Female</option></select></div>
+            <div class="form-group"><label>Phone</label><input type="text" id="editPhone"></div>
+            <div class="form-group"><label>Telegram</label><input type="text" id="editTelegram"></div>
+            <div class="form-group"><label>Department</label><input type="text" id="editDepartment"></div>
+            <div class="form-group"><label>Batch</label><input type="text" id="editBatch"></div>
+            <div class="form-group"><label>Qirats (comma separated, e.g., Hafs, Warsh)</label><input type="text" id="editQirats" placeholder="Hafs, Warsh, Qalun..."></div>
+            <button type="submit" class="btn-save"><i class="fas fa-save"></i> Save Changes</button>
+        </form>
+    </div>
+</div>
+
 <script type="module">
-    import { protectPage, initAuthUI, setupAutoLogout, getCurrentAdminSync } from './auth.js';
+    import { protectPage, initAuthUI, setupAutoLogout } from './auth.js';
     import { initNavigation, refreshNavigation } from './nav.js';
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     
     if (!protectPage('admin-login.html')) throw new Error('Redirecting');
     const admin = initAuthUI();
     setupAutoLogout(60);
-    
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     
     const firebaseConfig = {
         apiKey: "AIzaSyAR_g5y04YAGCrTvZCowrE7hw8h7k1du08",
@@ -434,7 +499,6 @@
         messagingSenderId: "253413984903",
         appId: "1:253413984903:web:c1577e0fdef1711f960622"
     };
-    
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     
@@ -442,11 +506,13 @@
     let filteredRegistrations = [];
     let currentGroupMode = 'qirat';
     let currentGroups = [];
+    let allUniqueQirats = [];
     
     const searchInput = document.getElementById('searchInput');
     const genderFilter = document.getElementById('genderFilter');
     const deptFilter = document.getElementById('deptFilter');
     const batchFilter = document.getElementById('batchFilter');
+    const qiratFilter = document.getElementById('qiratFilter');
     const clearFiltersBtn = document.getElementById('clearFiltersBtn');
     const groupsContainer = document.getElementById('groupsContainer');
     const resultCountSpan = document.getElementById('resultCount');
@@ -471,7 +537,6 @@
         return (student.schedules || []).map(s => s.qirat_name).filter(Boolean);
     }
     
-    // Format for export - NO registration date, with sequential number
     function formatStudentForExport(student, index) {
         return {
             'No.': index,
@@ -486,29 +551,29 @@
     }
     
     function computeGroupStats(members) {
-        const total = members.length;
         const maleCount = members.filter(m => m.gender === 'Male').length;
         const femaleCount = members.filter(m => m.gender === 'Female').length;
         const uniqueDepts = new Set(members.map(m => m.department)).size;
         const multiQiratCount = members.filter(m => getQiratNames(m).length > 1).length;
         const recentWeek = members.filter(m => {
             const regDate = m.timestamp instanceof Date ? m.timestamp : new Date(m.timestamp);
-            const daysDiff = (new Date() - regDate) / (1000 * 3600 * 24);
-            return daysDiff <= 30;
+            return (new Date() - regDate) / (1000 * 3600 * 24) <= 30;
         }).length;
-        return { total, maleCount, femaleCount, uniqueDepts, multiQiratCount, recentWeek };
+        return { maleCount, femaleCount, uniqueDepts, multiQiratCount, recentWeek };
     }
     
     async function loadData() {
         try {
             const querySnapshot = await getDocs(collection(db, "registrations"));
             allRegistrations = [];
+            const qiratSet = new Set();
             querySnapshot.forEach((docSnap) => {
                 const data = docSnap.data();
                 let timestamp = data.timestamp;
                 if (timestamp && typeof timestamp.toDate === 'function') timestamp = timestamp.toDate();
                 else timestamp = new Date();
-                allRegistrations.push({
+                const schedules = data.schedules || [];
+                const student = {
                     id: docSnap.id,
                     full_name: data.full_name || 'N/A',
                     gender: data.gender || 'Not Specified',
@@ -516,10 +581,13 @@
                     telegram: data.telegram || 'N/A',
                     department: data.department || 'N/A',
                     batch: data.batch || 'N/A',
-                    schedules: data.schedules || [],
+                    schedules: schedules,
                     timestamp: timestamp
-                });
+                };
+                allRegistrations.push(student);
+                schedules.forEach(s => { if(s.qirat_name) qiratSet.add(s.qirat_name); });
             });
+            allUniqueQirats = Array.from(qiratSet).sort();
             populateFilters();
             applyFilters();
         } catch (error) {
@@ -532,20 +600,25 @@
         const batches = [...new Set(allRegistrations.map(r => r.batch))];
         deptFilter.innerHTML = '<option value="">All Departments</option>' + departments.map(d => `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join('');
         batchFilter.innerHTML = '<option value="">All Batches</option>' + batches.map(b => `<option value="${escapeHtml(b)}">${escapeHtml(b)}</option>`).join('');
+        qiratFilter.innerHTML = '<option value="">All Qirats</option>' + allUniqueQirats.map(q => `<option value="${escapeHtml(q)}">${escapeHtml(q)}</option>`).join('');
     }
     
     function applyFilters() {
-        const search = searchInput.value.toLowerCase();
+        const search = searchInput.value.toLowerCase().trim();
         const gender = genderFilter.value;
         const department = deptFilter.value;
         const batch = batchFilter.value;
+        const selectedQirat = qiratFilter.value;
         
         filteredRegistrations = allRegistrations.filter(r => {
-            const matchSearch = r.full_name.toLowerCase().includes(search) || r.phone.includes(search);
+            const matchSearch = r.full_name.toLowerCase().includes(search) || 
+                               r.phone.toLowerCase().includes(search) || 
+                               r.telegram.toLowerCase().includes(search);
             const matchGender = !gender || r.gender === gender;
             const matchDept = !department || r.department === department;
             const matchBatch = !batch || r.batch === batch;
-            return matchSearch && matchGender && matchDept && matchBatch;
+            const matchQirat = !selectedQirat || getQiratNames(r).includes(selectedQirat);
+            return matchSearch && matchGender && matchDept && matchBatch && matchQirat;
         });
         
         resultCountSpan.textContent = `${filteredRegistrations.length} students`;
@@ -554,11 +627,9 @@
     
     function buildGroups() {
         const groups = new Map();
-        
         if (currentGroupMode === 'qirat') {
             filteredRegistrations.forEach(student => {
-                const studentQirats = getQiratNames(student);
-                studentQirats.forEach(qirat => {
+                getQiratNames(student).forEach(qirat => {
                     if (!groups.has(qirat)) groups.set(qirat, []);
                     groups.get(qirat).push(student);
                 });
@@ -575,18 +646,16 @@
                 if (!groups.has(key)) groups.set(key, []);
                 groups.get(key).push(student);
             });
-        } else if (currentGroupMode === 'gender') {
+        } else {
             filteredRegistrations.forEach(student => {
                 const key = student.gender;
                 if (!groups.has(key)) groups.set(key, []);
                 groups.get(key).push(student);
             });
         }
-        
         currentGroups = Array.from(groups.entries())
             .map(([name, members]) => ({ name, members, memberCount: members.length, stats: computeGroupStats(members) }))
             .sort((a, b) => b.memberCount - a.memberCount);
-        
         renderGroups();
     }
     
@@ -608,8 +677,8 @@
                         <div class="group-stats">
                             <span class="stat-item"><i class="fas fa-venus-mars"></i> M:${s.maleCount} / F:${s.femaleCount}</span>
                             <span class="stat-item"><i class="fas fa-building"></i> Depts: ${s.uniqueDepts}</span>
-                            <span class="stat-item"><i class="fas fa-chalkboard-user"></i> Multi-Qirat: ${s.multiQiratCount}</span>
-                            <span class="stat-item"><i class="fas fa-calendar-week"></i> New (30d): ${s.recentWeek}</span>
+                            <span class="stat-item"><i class="fas fa-chalkboard-user"></i> Multi-Q: ${s.multiQiratCount}</span>
+                            <span class="stat-item"><i class="fas fa-calendar-week"></i> New: ${s.recentWeek}</span>
                         </div>
                     </div>
                     <div class="group-export-buttons" onclick="event.stopPropagation()">
@@ -623,7 +692,7 @@
                 <div class="group-content" id="groupContent-${idx}">
                     <div class="group-table-wrapper">
                         <table class="student-table">
-                            <thead><tr><th>Name</th><th>Gender</th><th>Phone</th><th>Department</th><th>Batch</th><th>Qirats</th><th>Registered</th></tr></thead>
+                            <thead><tr><th>Name</th><th>Gender</th><th>Phone</th><th>Department</th><th>Batch</th><th>Qirats</th><th>Actions</th></tr></thead>
                             <tbody>
                                 ${group.members.map(m => `
                                     <tr>
@@ -633,7 +702,7 @@
                                         <td>${escapeHtml(m.department)}</td>
                                         <td>${escapeHtml(m.batch)}</td>
                                         <td>${escapeHtml(getQiratNames(m).join(', ') || '-')}</td>
-                                        <td>${m.timestamp.toLocaleDateString()}</td>
+                                        <td><button class="edit-student-btn" data-student='${JSON.stringify({id:m.id, name:m.full_name, gender:m.gender, phone:m.phone, telegram:m.telegram, dept:m.department, batch:m.batch, qirats:getQiratNames(m)})}'><i class="fas fa-pen"></i> Edit</button></td>
                                     </tr>
                                 `).join('')}
                             </tbody>
@@ -651,6 +720,14 @@
                 exportSingleGroup(currentGroups[idx], format);
             });
         });
+        
+        document.querySelectorAll('.edit-student-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const studentData = JSON.parse(btn.getAttribute('data-student'));
+                openEditModal(studentData);
+            });
+        });
     }
     
     function getGroupIcon() {
@@ -658,139 +735,123 @@
         return icons[currentGroupMode] || 'fa-folder';
     }
     
+    // ========== EDIT MODAL ==========
+    window.openEditModal = function(student) {
+        document.getElementById('editStudentId').value = student.id;
+        document.getElementById('editName').value = student.name;
+        document.getElementById('editGender').value = student.gender;
+        document.getElementById('editPhone').value = student.phone;
+        document.getElementById('editTelegram').value = student.telegram || '';
+        document.getElementById('editDepartment').value = student.dept;
+        document.getElementById('editBatch').value = student.batch;
+        document.getElementById('editQirats').value = (student.qirats || []).join(', ');
+        document.getElementById('editModal').classList.add('active');
+    };
+    
+    window.closeEditModal = function() {
+        document.getElementById('editModal').classList.remove('active');
+    };
+    
+    document.getElementById('editForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('editStudentId').value;
+        const newName = document.getElementById('editName').value;
+        const newGender = document.getElementById('editGender').value;
+        const newPhone = document.getElementById('editPhone').value;
+        const newTelegram = document.getElementById('editTelegram').value;
+        const newDept = document.getElementById('editDepartment').value;
+        const newBatch = document.getElementById('editBatch').value;
+        const qiratsStr = document.getElementById('editQirats').value;
+        const qiratNames = qiratsStr.split(',').map(s => s.trim()).filter(s => s);
+        const newSchedules = qiratNames.map(q => ({ qirat_name: q }));
+        
+        try {
+            const studentRef = doc(db, "registrations", id);
+            await updateDoc(studentRef, {
+                full_name: newName,
+                gender: newGender,
+                phone: newPhone,
+                telegram: newTelegram,
+                department: newDept,
+                batch: newBatch,
+                schedules: newSchedules
+            });
+            showToast('Student updated successfully!');
+            closeEditModal();
+            await loadData();
+        } catch (error) {
+            showToast('Update failed: ' + error.message, true);
+        }
+    });
+    
+    // Export functions (simplified but complete)
     function exportSingleGroup(group, format) {
         if (!group || group.members.length === 0) { showToast('No students', true); return; }
         const exportData = group.members.map((m, idx) => formatStudentForExport(m, idx + 1));
         const groupName = group.name.replace(/[^a-z0-9]/gi, '_').slice(0, 30);
-        const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
-        if (format === 'csv') downloadCSV(exportData, `${groupName}_${timestamp}`);
-        else if (format === 'excel') exportSingleExcel(exportData, groupName);
-        else if (format === 'pdf') exportSinglePDF(exportData, group.name, group.members.length, group.stats);
-        else if (format === 'word') exportSingleWord(exportData, group.name, group.members.length, group.stats);
-        showToast(`Exported "${group.name}" as ${format.toUpperCase()}`);
+        if (format === 'csv') downloadCSV(exportData, groupName);
+        else if (format === 'excel') exportExcel(exportData, groupName);
+        else if (format === 'pdf') exportPDF(exportData, group.name, group.members.length, group.stats);
+        else if (format === 'word') exportWord(exportData, group.name, group.members.length, group.stats);
+        showToast(`Exported "${group.name}"`);
     }
     
-    // ========== MASTER EXPORT: ALL GROUPS IN ONE FILE ==========
-    function exportAllGroupsToWord() {
-        if (currentGroups.length === 0) { showToast('No groups to export', true); return; }
-        let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>JUMJ_All_Groups_${currentGroupMode}</title>
-        <style>
-            body { font-family: 'Segoe UI', Arial, sans-serif; margin: 40px; }
-            h1 { color: #10b981; border-bottom: 3px solid #10b981; padding-bottom: 10px; }
-            h2 { background: #f1f5f9; padding: 12px 16px; border-radius: 16px; margin-top: 30px; color: #0f172a; border-left: 5px solid #10b981; }
-            .group-summary { background: #f0fdf4; padding: 12px 20px; border-radius: 20px; margin: 10px 0 20px 0; display: flex; gap: 20px; flex-wrap: wrap; }
-            .kpi-badge { background: white; padding: 6px 14px; border-radius: 40px; font-size: 0.8rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-            table { width: 100%; border-collapse: collapse; margin: 15px 0; }
-            th, td { border: 1px solid #cbd5e1; padding: 8px 10px; text-align: left; font-size: 0.75rem; }
-            th { background: #10b981; color: white; }
-            .footer { margin-top: 40px; text-align: center; font-size: 0.7rem; color: #64748b; }
-        </style></head><body>
-        <h1>📊 JUMJ Irshad - Complete Groups Report</h1>
-        <p><strong>Grouping Mode:</strong> ${currentGroupMode.toUpperCase()} | <strong>Generated:</strong> ${new Date().toLocaleString()} | <strong>Total Groups:</strong> ${currentGroups.length}</p>`;
-        
-        currentGroups.forEach(group => {
-            const s = group.stats;
-            html += `<h2><i class="fas fa-layer-group"></i> ${escapeHtml(group.name)} <span style="font-size:0.8rem;">(${group.memberCount} students)</span></h2>
-            <div class="group-summary">
-                <span class="kpi-badge">👥 Male: ${s.maleCount} | Female: ${s.femaleCount}</span>
-                <span class="kpi-badge">🏢 Departments: ${s.uniqueDepts}</span>
-                <span class="kpi-badge">🔄 Multi-Qirat: ${s.multiQiratCount}</span>
-                <span class="kpi-badge">🆕 New (30d): ${s.recentWeek}</span>
-            </div>
-            <table><thead><tr><th>No.</th><th>Name</th><th>Gender</th><th>Phone</th><th>Dept</th><th>Batch</th><th>Qirats</th></tr></thead><tbody>`;
-            group.members.forEach((m, idx) => {
-                html += `<tr><td>${idx + 1}</td><td>${escapeHtml(m.full_name)}</td><td>${escapeHtml(m.gender)}</td><td>${escapeHtml(m.phone)}</td><td>${escapeHtml(m.department)}</td><td>${escapeHtml(m.batch)}</td><td>${escapeHtml(getQiratNames(m).join(', ') || '-')}</td></tr>`;
-            });
-            html += `</tbody></table>`;
-        });
-        html += `<div class="footer">© JUMJ Irshad • Exported on ${new Date().toLocaleString()}</div></body></html>`;
-        downloadBlob(new Blob([html], { type: 'application/msword' }), `JUMJ_AllGroups_${currentGroupMode}_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.doc`);
-        showToast(`Exported all ${currentGroups.length} groups to Word`);
-    }
-    
-    async function exportAllGroupsToPdf() {
-        if (currentGroups.length === 0) { showToast('No groups', true); return; }
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-        let yPos = 20;
-        doc.setFontSize(20); doc.setTextColor(16, 185, 129);
-        doc.text(`JUMJ Irshad - Complete Groups Export`, 14, yPos); yPos += 10;
-        doc.setFontSize(11); doc.setTextColor(0,0,0);
-        doc.text(`Group Mode: ${currentGroupMode.toUpperCase()} | Generated: ${new Date().toLocaleString()} | Total Groups: ${currentGroups.length}`, 14, yPos); yPos += 10;
-        
-        for (let i = 0; i < currentGroups.length; i++) {
-            const group = currentGroups[i];
-            if (yPos > 180) { doc.addPage(); yPos = 20; }
-            doc.setFontSize(14); doc.setTextColor(16, 185, 129);
-            doc.text(`${group.name} (${group.memberCount} students)`, 14, yPos); yPos += 7;
-            doc.setFontSize(9); doc.setTextColor(80,80,80);
-            const s = group.stats;
-            doc.text(`Stats: Male ${s.maleCount} | Female ${s.femaleCount} | Depts ${s.uniqueDepts} | Multi-Qirat ${s.multiQiratCount} | New30d ${s.recentWeek}`, 14, yPos); yPos += 7;
-            
-            const tableData = group.members.map((m, idx) => [idx + 1, m.full_name, m.gender, m.phone, m.department, m.batch, getQiratNames(m).join(', ').substring(0, 25)]);
-            const result = doc.autoTable({
-                head: [['No.', 'Name', 'Gender', 'Phone', 'Dept', 'Batch', 'Qirats']],
-                body: tableData,
-                startY: yPos,
-                theme: 'striped',
-                headStyles: { fillColor: [16, 185, 129], textColor: [255,255,255], fontStyle: 'bold' },
-                styles: { fontSize: 7, cellPadding: 2 },
-                margin: { left: 14, right: 14 }
-            });
-            yPos = result.finalY + 10;
-            if (i !== currentGroups.length - 1 && yPos > 190) { doc.addPage(); yPos = 20; }
-        }
-        doc.save(`JUMJ_AllGroups_${currentGroupMode}_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.pdf`);
-        showToast(`Exported all ${currentGroups.length} groups to PDF`);
-    }
-    
-    function exportAllGroupsToExcel() {
-        if (currentGroups.length === 0) { showToast('No groups', true); return; }
-        const wb = XLSX.utils.book_new();
-        currentGroups.forEach(group => {
-            const sheetData = group.members.map((m, idx) => formatStudentForExport(m, idx + 1));
-            const ws = XLSX.utils.json_to_sheet(sheetData);
-            let sheetName = group.name.replace(/[\\/*?:[\]]/g, '').slice(0, 31);
-            XLSX.utils.book_append_sheet(wb, ws, sheetName);
-        });
-        XLSX.writeFile(wb, `All_Groups_${currentGroupMode}_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.xlsx`);
-        showToast(`Exported all ${currentGroups.length} groups to Excel`);
-    }
-    
-    // Single group exports with No. column and no registration date
     function downloadCSV(data, filename) {
         const headers = ['No.', 'Name', 'Gender', 'Phone', 'Telegram', 'Department', 'Batch', 'Qirats Enrolled'];
         const rows = data.map(row => headers.map(h => `"${String(row[h] || '').replace(/"/g, '""')}"`).join(','));
-        const csvContent = [headers.join(','), ...rows].join('\n');
-        downloadBlob(new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' }), `${filename}.csv`);
+        const blob = new Blob(["\uFEFF" + headers.join(',') + '\n' + rows.join('\n')], { type: 'text/csv' });
+        downloadBlob(blob, `${filename}.csv`);
     }
-    
-    function exportSingleExcel(data, sheetName) {
+    function exportExcel(data, sheetName) {
         const ws = XLSX.utils.json_to_sheet(data);
-        ws['!cols'] = [{wch:6},{wch:25},{wch:10},{wch:15},{wch:18},{wch:20},{wch:15},{wch:35}];
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, sheetName.slice(0,31));
         XLSX.writeFile(wb, `${sheetName}.xlsx`);
     }
-    
-    async function exportSinglePDF(data, groupName, totalCount, stats) {
+    async function exportPDF(data, groupName, total, stats) {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-        doc.setFontSize(18); doc.setTextColor(16,185,129); doc.text(`JUMJ - ${groupName}`, 14,20);
-        doc.setFontSize(10); doc.text(`Total: ${totalCount} | M:${stats.maleCount} F:${stats.femaleCount} | Multi-Q:${stats.multiQiratCount}`, 14,30);
-        const tableData = data.map(row => [row['No.'], row.Name, row.Gender, row.Phone, row.Department, row.Batch, row['Qirats Enrolled']]);
-        doc.autoTable({ head: [['No.', 'Name', 'Gender', 'Phone', 'Dept', 'Batch', 'Qirats']], body: tableData, startY: 38, theme: 'striped', headStyles: { fillColor: [16,185,129] }, styles: { fontSize: 8 } });
-        doc.save(`${groupName.replace(/[^a-z0-9]/gi, '_')}_report.pdf`);
+        doc.text(`JUMJ - ${groupName}`, 14, 20);
+        doc.text(`Total: ${total} | M:${stats.maleCount} F:${stats.femaleCount}`, 14, 30);
+        doc.autoTable({ head: [['No.','Name','Gender','Phone','Dept','Batch','Qirats']], body: data.map(r => [r['No.'], r.Name, r.Gender, r.Phone, r.Department, r.Batch, r['Qirats Enrolled']]), startY: 38, headStyles: { fillColor: [16,185,129] } });
+        doc.save(`${groupName.replace(/[^a-z0-9]/gi, '_')}.pdf`);
     }
-    
-    function exportSingleWord(data, groupName, totalCount, stats) {
-        let html = `<html><head><meta charset="UTF-8"><title>${groupName}</title><style>table{border-collapse:collapse;width:100%}th,td{border:1px solid #ccc;padding:6px}th{background:#10b981;color:white}</style></head><body>
-        <h2>${escapeHtml(groupName)} (${totalCount})</h2><p>Stats: M:${stats.maleCount} F:${stats.femaleCount} | Multi-Q:${stats.multiQiratCount} | New30d:${stats.recentWeek}</p>
-        <table><thead><tr><th>No.</th><th>Name</th><th>Gender</th><th>Phone</th><th>Dept</th><th>Batch</th><th>Qirats</th></tr></thead><tbody>${data.map(r => `<tr><td>${r['No.']}</td><td>${escapeHtml(r.Name)}</td><td>${escapeHtml(r.Gender)}</td><td>${escapeHtml(r.Phone)}</td><td>${escapeHtml(r.Department)}</td><td>${escapeHtml(r.Batch)}</td><td>${escapeHtml(r['Qirats Enrolled'])}</td></tr>`).join('')}</tbody></table></body></html>`;
-        downloadBlob(new Blob([html], { type: 'application/msword' }), `${groupName.replace(/[^a-z0-9]/gi, '_')}_report.doc`);
+    function exportWord(data, groupName, total, stats) {
+        let html = `<html><body><h2>${groupName} (${total})</h2><table border="1"><thead><tr><th>No.</th><th>Name</th><th>Gender</th><th>Phone</th><th>Dept</th><th>Batch</th><th>Qirats</th></tr></thead><tbody>${data.map(r => `<tr><td>${r['No.']}</td><td>${r.Name}</td><td>${r.Gender}</td><td>${r.Phone}</td><td>${r.Department}</td><td>${r.Batch}</td><td>${r['Qirats Enrolled']}</td></tr>`).join('')}</tbody></table></body></html>`;
+        downloadBlob(new Blob([html], { type: 'application/msword' }), `${groupName.replace(/[^a-z0-9]/gi, '_')}.doc`);
     }
-    
-    function downloadBlob(blob, filename) { const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = filename; link.click(); URL.revokeObjectURL(link.href); }
+    function exportAllGroupsToExcel() {
+        const wb = XLSX.utils.book_new();
+        currentGroups.forEach(g => { const ws = XLSX.utils.json_to_sheet(g.members.map((m,i)=>formatStudentForExport(m,i+1))); XLSX.utils.book_append_sheet(wb, ws, g.name.slice(0,31)); });
+        XLSX.writeFile(wb, `AllGroups_${currentGroupMode}.xlsx`);
+        showToast(`Exported ${currentGroups.length} groups`);
+    }
+    async function exportAllGroupsToPdf() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+        let y=20;
+        for(let g of currentGroups){
+            if(y>180){ doc.addPage(); y=20; }
+            doc.text(`${g.name} (${g.memberCount})`,14,y); y+=7;
+            const data = g.members.map((m,i)=>[i+1, m.full_name, m.gender, m.phone, m.department, m.batch, getQiratNames(m).join(',')]);
+            const res = doc.autoTable({ head:[['#','Name','Gender','Phone','Dept','Batch','Qirats']], body:data, startY:y, headStyles:{fillColor:[16,185,129]}, styles:{fontSize:7} });
+            y = res.finalY+10;
+        }
+        doc.save(`AllGroups_${currentGroupMode}.pdf`);
+        showToast('PDF exported');
+    }
+    function exportAllGroupsToWord() {
+        let html = `<html><body><h1>All Groups (${currentGroupMode})</h1>`;
+        currentGroups.forEach(g => {
+            html += `<h2>${g.name} (${g.memberCount})</h2><table border="1"><thead><tr><th>#</th><th>Name</th><th>Gender</th><th>Phone</th><th>Dept</th><th>Batch</th><th>Qirats</th></tr></thead><tbody>`;
+            g.members.forEach((m,i) => { html += `<tr><td>${i+1}</td><td>${m.full_name}</td><td>${m.gender}</td><td>${m.phone}</td><td>${m.department}</td><td>${m.batch}</td><td>${getQiratNames(m).join(',')}</td></tr>`; });
+            html += `</tbody></table><br>`;
+        });
+        html += `</body></html>`;
+        downloadBlob(new Blob([html], { type: 'application/msword' }), `AllGroups_${currentGroupMode}.doc`);
+        showToast('Word exported');
+    }
+    function downloadBlob(blob, filename) { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; a.click(); URL.revokeObjectURL(a.href); }
     
     window.toggleGroup = function(idx) {
         const content = document.getElementById(`groupContent-${idx}`);
@@ -803,7 +864,8 @@
     genderFilter.addEventListener('change', applyFilters);
     deptFilter.addEventListener('change', applyFilters);
     batchFilter.addEventListener('change', applyFilters);
-    clearFiltersBtn.addEventListener('click', () => { searchInput.value = ''; genderFilter.value = ''; deptFilter.value = ''; batchFilter.value = ''; applyFilters(); showToast('Filters cleared'); });
+    qiratFilter.addEventListener('change', applyFilters);
+    clearFiltersBtn.addEventListener('click', () => { searchInput.value = ''; genderFilter.value = ''; deptFilter.value = ''; batchFilter.value = ''; qiratFilter.value = ''; applyFilters(); showToast('Filters cleared'); });
     exportAllExcelBtn.addEventListener('click', exportAllGroupsToExcel);
     exportAllWordBtn.addEventListener('click', exportAllGroupsToWord);
     exportAllPdfBtn.addEventListener('click', exportAllGroupsToPdf);
