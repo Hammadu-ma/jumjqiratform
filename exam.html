@@ -2,305 +2,1023 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ALIF Analytics | Exam Intelligence</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>JUMJ Irshad | Exam Intelligence Suite</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap');
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         :root {
-            --bg-deep: #080a0f;
-            --glass: rgba(17, 25, 40, 0.75);
-            --accent: #6366f1;
-            --accent-glow: rgba(99, 102, 241, 0.4);
+            --primary: #10b981;
+            --primary-dark: #059669;
+            --primary-light: #d1fae5;
+            --primary-glow: rgba(16, 185, 129, 0.2);
+            --secondary: #6366f1;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --dark: #0f172a;
+            --card-bg: rgba(255, 255, 255, 0.98);
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
         }
 
         body {
-            background-color: var(--bg-deep);
-            color: #e2e8f0;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-image: radial-gradient(circle at 50% -20%, #1e1b4b 0%, var(--bg-deep) 60%);
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e6f7f0 100%);
+            min-height: 100vh;
+            padding-bottom: 80px;
         }
 
-        .glass-panel {
-            background: var(--glass);
-            backdrop-filter: blur(16px) saturate(180%);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+        .glass-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(16, 185, 129, 0.2);
+            padding: 16px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .header-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, #10b981, #059669);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .back-btn {
+            background: var(--primary-light);
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            color: var(--primary-dark);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        .back-btn:hover { background: var(--primary); color: white; }
+
+        .main-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        /* Hero Stats */
+        .hero-stats {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-radius: 32px;
+            padding: 32px;
+            margin-bottom: 32px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-stats::before {
+            content: "📊";
+            position: absolute;
+            bottom: -20px;
+            right: 20px;
+            font-size: 100px;
+            opacity: 0.1;
+            pointer-events: none;
+        }
+        .hero-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 4px; }
+        .hero-subtitle { opacity: 0.9; font-size: 0.9rem; margin-bottom: 20px; }
+        .stats-row { display: flex; gap: 24px; flex-wrap: wrap; }
+        .hero-stat { background: rgba(255,255,255,0.15); backdrop-filter: blur(4px); border-radius: 20px; padding: 12px 24px; min-width: 120px; }
+        .hero-stat .number { font-size: 1.8rem; font-weight: 800; }
+        .hero-stat .label { font-size: 0.7rem; opacity: 0.8; }
+
+        /* Quick Stats Cards */
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+        .quick-stat-card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s;
+        }
+        .quick-stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); border-color: var(--primary); }
+        .quick-stat-icon { width: 48px; height: 48px; background: var(--primary-light); border-radius: 24px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; color: var(--primary); font-size: 1.5rem; }
+        .quick-stat-value { font-size: 1.8rem; font-weight: 800; color: var(--text-primary); }
+        .quick-stat-label { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
+
+        /* Mode Selector */
+        .mode-selector {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+            background: var(--card-bg);
+            padding: 8px;
+            border-radius: 60px;
+            width: fit-content;
+            border: 1px solid var(--border);
+        }
+        .mode-btn {
+            padding: 10px 28px;
+            border: none;
+            background: transparent;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .mode-btn.active {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        /* Groups Grid */
+        .groups-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+        .group-card {
+            background: var(--card-bg);
+            border-radius: 28px;
+            padding: 24px;
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .group-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .group-card:hover::before { opacity: 1; }
+        .group-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-xl); border-color: var(--primary-light); }
+        .group-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px; }
+        .group-name { font-size: 1.2rem; font-weight: 800; color: var(--primary-dark); display: flex; align-items: center; gap: 8px; }
+        .group-badge { background: var(--primary-light); padding: 4px 12px; border-radius: 30px; font-size: 0.7rem; font-weight: 600; color: var(--primary-dark); }
+        .progress-bar { height: 6px; background: var(--border); border-radius: 10px; overflow: hidden; margin: 16px 0; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--primary-dark)); border-radius: 10px; transition: width 0.5s; }
+        .group-stats { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); margin-top: 12px; }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: white;
+            border-radius: 32px;
+            padding: 28px;
+            max-width: 1400px;
+            width: 95%;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 16px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--primary-light);
+        }
+        .modal-title { font-size: 1.4rem; font-weight: 800; color: var(--primary-dark); display: flex; align-items: center; gap: 10px; }
+        .modal-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+        .btn-icon { background: var(--border); border: none; padding: 8px 16px; border-radius: 30px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; }
+        .btn-icon:hover { background: var(--primary); color: white; }
+        .btn-primary { background: var(--primary); color: white; border: none; padding: 8px 20px; border-radius: 30px; font-weight: 600; cursor: pointer; }
+
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 24px;
+            padding: 16px;
+            background: #f8fafc;
             border-radius: 20px;
+            align-items: flex-end;
         }
+        .filter-group { display: flex; flex-direction: column; gap: 6px; }
+        .filter-group label { font-size: 0.7rem; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; }
+        .filter-group input, .filter-group select { padding: 8px 14px; border-radius: 20px; border: 1px solid var(--border); font-family: inherit; background: white; min-width: 140px; }
 
-        .glow-button {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-            box-shadow: 0 4px 15px var(--accent-glow);
+        .exam-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+        .exam-table th, .exam-table td { padding: 12px 10px; text-align: left; border-bottom: 1px solid var(--border); vertical-align: middle; }
+        .exam-table th { background: #f8fafc; font-weight: 700; position: sticky; top: 0; color: var(--text-primary); }
+        .score-input { width: 75px; padding: 6px 8px; border: 2px solid var(--border); border-radius: 12px; text-align: center; font-family: inherit; transition: all 0.2s; }
+        .score-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
+
+        .rank-badge { background: #fef3c7; color: #92400e; padding: 4px 12px; border-radius: 30px; font-size: 0.7rem; font-weight: 600; display: inline-block; }
+        .rank-badge.gold { background: #fbbf24; color: #78350f; }
+        .rank-badge.silver { background: #e5e7eb; color: #374151; }
+        .rank-badge.bronze { background: #fdba74; color: #7c2d12; }
+
+        .qirat-selector { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+        .qirat-chip { background: var(--border); border: none; padding: 8px 20px; border-radius: 40px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .qirat-chip.active { background: var(--primary); color: white; box-shadow: 0 2px 8px rgba(16,185,129,0.3); }
+
+        .badge { padding: 4px 10px; border-radius: 30px; font-size: 0.7rem; font-weight: 600; display: inline-block; }
+        .badge-male { background: #dbeafe; color: #1e40af; }
+        .badge-female { background: #fce7f3; color: #be185d; }
+        .badge-dept { background: #e0e7ff; color: #3730a3; }
+
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            right: 24px;
+            background: #1f2937;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            display: none;
+            z-index: 1100;
+            animation: slideIn 0.3s ease;
         }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
-        .glow-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px var(--accent-glow);
-            filter: brightness(1.1);
+        .empty-state { text-align: center; padding: 60px; color: var(--text-muted); }
+
+        @media (max-width: 768px) {
+            .main-container { padding: 16px; }
+            .mode-selector { width: 100%; justify-content: center; }
+            .mode-btn { padding: 8px 20px; font-size: 0.8rem; }
+            .groups-grid { grid-template-columns: 1fr; }
+            .filter-bar { flex-direction: column; }
+            .filter-group input, .filter-group select { width: 100%; }
         }
-
-        .stat-card {
-            background: linear-gradient(145deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);
-            border-left: 3px solid var(--accent);
-        }
-
-        /* Modern Table Styling */
-        tr { transition: background 0.2s; cursor: pointer; }
-        tr:hover { background: rgba(255, 255, 255, 0.03); }
-
-        .rank-gold { color: #fbbf24; text-shadow: 0 0 10px rgba(251, 191, 36, 0.3); }
-        
-        .custom-loader {
-            width: 40px; height: 40px;
-            border: 3px solid rgba(99, 102, 241, 0.1);
-            border-top-color: var(--accent);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="min-h-screen p-6 md:p-12">
+<body>
 
-    <nav class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center mb-12 gap-6">
-        <div class="flex items-center gap-4">
-            <div class="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/20">
-                <i class="fas fa-graduation-cap text-2xl text-white"></i>
-            </div>
-            <div>
-                <h1 class="text-2xl font-extrabold tracking-tight">Exam Intelligence</h1>
-                <p class="text-slate-500 text-sm">Academic Year 2026 • Term II</p>
-            </div>
-        </div>
+<div class="glass-header">
+    <div class="header-content">
+        <div class="logo"><h1><i class="fas fa-graduation-cap"></i> Exam Intelligence Suite</h1></div>
+        <button class="back-btn" onclick="window.location.href='index.html'"><i class="fas fa-arrow-left"></i> Back to Dashboard</button>
+    </div>
+</div>
 
-        <div class="flex bg-slate-900/50 p-1 rounded-2xl border border-slate-800">
-            <button onclick="updateView('qirat')" id="btn-qirat" class="view-tab px-6 py-2.5 rounded-xl text-sm font-semibold transition-all bg-indigo-600 text-white">Qirat Wise</button>
-            <button onclick="updateView('dept')" id="btn-dept" class="view-tab px-6 py-2.5 rounded-xl text-sm font-semibold transition-all text-slate-400 hover:text-white">Departmental</button>
-            <button onclick="updateView('gen')" id="btn-gen" class="view-tab px-6 py-2.5 rounded-xl text-sm font-semibold transition-all text-slate-400 hover:text-white">General Rank</button>
-        </div>
-    </nav>
-
-    <section class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-        <div class="glass-panel p-6 stat-card">
-            <div class="flex justify-between items-start mb-4">
-                <span class="text-slate-400 text-xs font-bold uppercase tracking-widest">Global Proficiency</span>
-                <i class="fas fa-chart-line text-indigo-400"></i>
-            </div>
-            <div class="text-4xl font-bold">88.4%</div>
-            <div class="flex items-center gap-2 mt-2 text-emerald-400 text-sm font-medium">
-                <i class="fas fa-caret-up"></i>
-                <span>4.2% Improvement</span>
-            </div>
-        </div>
-
-        <div class="glass-panel p-6 stat-card" style="border-color: #a855f7;">
-            <div class="flex justify-between items-start mb-4">
-                <span class="text-slate-400 text-xs font-bold uppercase tracking-widest">Exam Completion</span>
-                <i class="fas fa-check-double text-purple-400"></i>
-            </div>
-            <div class="text-4xl font-bold">92%</div>
-            <div class="w-full bg-slate-800 h-1.5 rounded-full mt-4">
-                <div class="bg-purple-500 h-1.5 rounded-full" style="width: 92%"></div>
-            </div>
-        </div>
-
-        <div class="glass-panel p-6 stat-card" style="border-color: #ec4899;">
-            <div class="flex justify-between items-start mb-4">
-                <span class="text-slate-400 text-xs font-bold uppercase tracking-widest">AI Insights</span>
-                <i class="fas fa-brain text-pink-400"></i>
-            </div>
-            <div class="text-sm italic text-slate-300">"Peak performance detected in Glycolysis; metabolism recall requires focus."</div>
-        </div>
-    </section>
-
-    <main class="max-w-7xl mx-auto glass-panel overflow-hidden">
-        <div class="p-8 border-b border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
-            <h3 id="current-title" class="text-xl font-semibold">Qirat Distribution List</h3>
-            <div class="relative w-full md:w-72">
-                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i>
-                <input type="text" placeholder="Filter by student or ID..." class="w-full bg-slate-950/50 border border-slate-800 rounded-xl py-2.5 pl-11 pr-4 text-sm focus:border-indigo-500 focus:outline-none transition-all">
-            </div>
-        </div>
-
-        <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
-                <thead class="bg-slate-900/40 text-slate-500 text-[10px] uppercase tracking-[0.2em] font-bold">
-                    <tr>
-                        <th class="px-8 py-5">Student Identity</th>
-                        <th class="px-8 py-5">Active Path</th>
-                        <th class="px-8 py-5">Performance Map</th>
-                        <th class="px-8 py-5 text-right">Action</th>
-                    </tr>
-                </thead>
-                <tbody id="table-body" class="divide-y divide-white/5">
-                    <tr>
-                        <td class="px-8 py-6">
-                            <div class="flex items-center gap-4">
-                                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center font-bold text-white shadow-lg">FT</div>
-                                <div>
-                                    <p class="font-bold text-slate-200">Fuad Temam</p>
-                                    <p class="text-xs text-slate-500">ID: ALIF-2026-001</p>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-8 py-6">
-                            <span class="px-3 py-1 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded-lg text-xs font-semibold uppercase tracking-wider">Clinical Biochemistry</span>
-                        </td>
-                        <td class="px-8 py-6">
-                            <div class="flex items-center gap-4">
-                                <span class="text-lg font-bold text-slate-200">94%</span>
-                                <div class="flex-1 min-w-[100px] h-1.5 bg-slate-800 rounded-full overflow-hidden">
-                                    <div class="h-full bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]" style="width: 94%"></div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-8 py-6 text-right">
-                            <button onclick="showAnalysis('Fuad Temam')" class="glow-button px-5 py-2 rounded-xl text-xs font-bold text-white uppercase tracking-tighter">View Intel</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </main>
-
-    <div id="intel-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
-        <div class="absolute inset-0 bg-slate-950/90 backdrop-blur-md" onclick="closeModal()"></div>
-        
-        <div class="glass-panel w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col relative z-10 border border-white/10 shadow-2xl">
-            <div class="p-8 border-b border-white/5 flex justify-between items-center bg-slate-900/20">
-                <div>
-                    <h2 class="text-2xl font-bold text-white" id="modal-user-name">Student Analysis</h2>
-                    <p class="text-slate-500 text-sm">Real-time performance metrics</p>
-                </div>
-                <button onclick="closeModal()" class="w-10 h-10 rounded-full bg-slate-800/50 hover:bg-slate-700 transition-colors flex items-center justify-center">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-
-            <div class="p-8 overflow-y-auto custom-scrollbar grid grid-cols-1 lg:grid-cols-12 gap-8">
-                <div class="lg:col-span-5 space-y-6">
-                    <div class="glass-panel p-6 bg-slate-900/40">
-                        <canvas id="performanceChart" height="300"></canvas>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="p-4 bg-emerald-500/5 border border-emerald-500/10 rounded-2xl">
-                            <p class="text-xs text-emerald-500 font-bold uppercase mb-1">Global Rank</p>
-                            <p class="text-2xl font-bold text-slate-100">#12 <span class="text-xs text-slate-500 font-normal">/ 1.2k</span></p>
-                        </div>
-                        <div class="p-4 bg-indigo-500/5 border border-indigo-500/10 rounded-2xl">
-                            <p class="text-xs text-indigo-500 font-bold uppercase mb-1">Consistency</p>
-                            <p class="text-2xl font-bold text-slate-100">High</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="lg:col-span-7 space-y-6">
-                    <div class="bg-slate-900/40 rounded-2xl p-2 border border-white/5">
-                        <table class="w-full">
-                            <thead class="text-left text-xs text-slate-500 border-b border-white/5">
-                                <tr>
-                                    <th class="p-4">Assessment</th>
-                                    <th class="p-4">Score</th>
-                                    <th class="p-4">Group Rank</th>
-                                    <th class="p-4 text-right">Result</th>
-                                </tr>
-                            </thead>
-                            <tbody class="text-sm divide-y divide-white/5">
-                                <tr>
-                                    <td class="p-4 text-slate-300">Continuous Assessment 1</td>
-                                    <td class="p-4 font-bold text-indigo-400">48/50</td>
-                                    <td class="p-4">#03</td>
-                                    <td class="p-4 text-right"><span class="text-emerald-400 font-bold">A+</span></td>
-                                </tr>
-                                <tr>
-                                    <td class="p-4 text-slate-300 font-bold">Final Average</td>
-                                    <td class="p-4 font-bold text-white text-lg">96.0%</td>
-                                    <td class="p-4 text-slate-500">Global Mean</td>
-                                    <td class="p-4 text-right text-indigo-400 font-black">TOP 1%</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="glass-panel p-6 bg-indigo-600/5 border-indigo-500/20">
-                        <h4 class="text-sm font-bold text-indigo-300 uppercase mb-3 flex items-center gap-2">
-                            <i class="fas fa-magic"></i> AI Recommendation
-                        </h4>
-                        <p class="text-sm text-slate-400 leading-relaxed">
-                            Based on Assessment 2, the student excels in <span class="text-slate-100 font-bold">Structural Identification</span> but was 12% slower in <span class="text-slate-100 font-bold">Kinetic Calculations</span>. Suggesting a 20-minute focused review on Enzyme Inhibition.
-                        </p>
-                    </div>
-                </div>
-            </div>
+<div class="main-container">
+    <!-- Hero Stats -->
+    <div class="hero-stats">
+        <div class="hero-title"><i class="fas fa-chart-line"></i> Exam Intelligence Dashboard</div>
+        <div class="hero-subtitle">Track student performance, manage assessments, and visualize academic progress</div>
+        <div class="stats-row" id="heroStats">
+            <div class="hero-stat"><div class="number" id="heroTotal">0</div><div class="label">Students</div></div>
+            <div class="hero-stat"><div class="number" id="heroQirats">0</div><div class="label">Qirats</div></div>
+            <div class="hero-stat"><div class="number" id="heroExams">0</div><div class="label">Exam Records</div></div>
+            <div class="hero-stat"><div class="number" id="heroCompletion">0%</div><div class="label">Completion</div></div>
         </div>
     </div>
 
-    <script>
-        // Mock Performance Logic
-        function updateView(view) {
-            const title = document.getElementById('current-title');
-            const tabs = document.querySelectorAll('.view-tab');
-            tabs.forEach(t => t.classList.remove('bg-indigo-600', 'text-white'));
-            tabs.forEach(t => t.classList.add('text-slate-400'));
+    <!-- Quick Stats -->
+    <div class="quick-stats" id="quickStats"></div>
 
-            if (view === 'qirat') {
-                title.innerText = "Qirat Distribution List";
-                document.getElementById('btn-qirat').classList.add('bg-indigo-600', 'text-white');
-            } else if (view === 'dept') {
-                title.innerText = "Departmental Performance Overview";
-                document.getElementById('btn-dept').classList.add('bg-indigo-600', 'text-white');
-            } else {
-                title.innerText = "General Institutional Leaderboard";
-                document.getElementById('btn-gen').classList.add('bg-indigo-600', 'text-white');
+    <!-- Mode Selector -->
+    <div class="mode-selector">
+        <button class="mode-btn active" data-mode="qirat"><i class="fas fa-book-quran"></i> By Qirat</button>
+        <button class="mode-btn" data-mode="department"><i class="fas fa-building"></i> By Department</button>
+        <button class="mode-btn" data-mode="overall"><i class="fas fa-trophy"></i> Overall Ranking</button>
+    </div>
+
+    <!-- Groups Grid -->
+    <div class="groups-grid" id="groupsGrid">
+        <div class="empty-state">Loading...</div>
+    </div>
+</div>
+
+<!-- Modals -->
+<div id="examModal" class="modal"><div class="modal-content"><div id="modalDynamicContent"></div></div></div>
+
+<div id="toast" class="toast"></div>
+
+<script type="module">
+    import { protectPage, initAuthUI, setupAutoLogout, getCurrentAdminSync } from './auth.js';
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, doc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    
+    if (!protectPage('admin-login.html')) throw new Error('Redirecting');
+    const admin = initAuthUI();
+    setupAutoLogout(60);
+    
+    const firebaseConfig = {
+        apiKey: "AIzaSyAR_g5y04YAGCrTvZCowrE7hw8h7k1du08",
+        authDomain: "jujm-qirat.firebaseapp.com",
+        projectId: "jujm-qirat",
+        storageBucket: "jujm-qirat.firebasestorage.app",
+        messagingSenderId: "253413984903",
+        appId: "1:253413984903:web:c1577e0fdef1711f960622"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    
+    let allStudents = [];
+    let examScores = new Map(); // Map: studentId -> { qiratName -> { assessment1, assessment2, ... } }
+    let assessmentConfig = { names: ['Quiz 1', 'Mid Exam', 'Assignment', 'Final Exam'], outOf: [30, 50, 20, 100] };
+    let currentGroupMode = 'qirat';
+    let groups = [];
+    let isEditMode = false;
+    let currentModalContext = null;
+    
+    const toast = document.getElementById('toast');
+    function showToast(msg, isErr = false) { toast.textContent = msg; toast.style.background = isErr ? '#ef4444' : '#10b981'; toast.style.display = 'block'; setTimeout(() => toast.style.display = 'none', 3000); }
+    function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
+    function getQiratNames(student) { return (student.schedules || []).map(s => s.qirat_name).filter(Boolean); }
+    
+    async function loadAssessmentConfig() { 
+        try { 
+            const configDoc = await getDocs(collection(db, "settings")); 
+            configDoc.forEach(doc => { 
+                if (doc.id === 'assessmentConfig') assessmentConfig = doc.data(); 
+            }); 
+        } catch(e) { console.warn(e); } 
+    }
+    async function saveAssessmentConfig() { 
+        await setDoc(doc(db, "settings", "assessmentConfig"), assessmentConfig); 
+        showToast('Settings saved'); 
+    }
+    
+    function getStudentExamScores(studentId, qiratName) { 
+        const studentScores = examScores.get(studentId) || {}; 
+        return studentScores[qiratName] || {}; 
+    }
+    function calculatePercentage(score, outOf) { 
+        if (score === null || score === '' || !outOf) return null; 
+        return Math.round((parseFloat(score) / outOf) * 100); 
+    }
+    function calculateAverage(scores) {
+        let totalPercent = 0, count = 0;
+        for (let i = 0; i < assessmentConfig.names.length; i++) {
+            const score = scores[`assessment${i+1}`];
+            if (score !== null && score !== '' && !isNaN(score)) {
+                const percent = calculatePercentage(parseFloat(score), assessmentConfig.outOf[i]);
+                if (percent !== null) { totalPercent += percent; count++; }
             }
         }
-
-        function showAnalysis(name) {
-            document.getElementById('modal-user-name').innerText = name;
-            document.getElementById('intel-modal').classList.remove('hidden');
-            initChart();
-        }
-
-        function closeModal() {
-            document.getElementById('intel-modal').classList.add('hidden');
-        }
-
-        let chartInstance = null;
-        function initChart() {
-            const ctx = document.getElementById('performanceChart').getContext('2d');
-            if (chartInstance) chartInstance.destroy();
-            
-            chartInstance = new Chart(ctx, {
-                type: 'radar',
-                data: {
-                    labels: ['Logic', 'Recall', 'Practical', 'Theory', 'Speed', 'Accuracy'],
-                    datasets: [{
-                        label: 'Student Capability Index',
-                        data: [95, 80, 90, 85, 75, 98],
-                        backgroundColor: 'rgba(99, 102, 241, 0.2)',
-                        borderColor: '#6366f1',
-                        borderWidth: 2,
-                        pointBackgroundColor: '#6366f1'
-                    }]
-                },
-                options: {
-                    scales: {
-                        r: {
-                            angleLines: { color: 'rgba(255,255,255,0.1)' },
-                            grid: { color: 'rgba(255,255,255,0.1)' },
-                            pointLabels: { color: '#94a3b8', font: { size: 10 } },
-                            ticks: { display: false }
-                        }
-                    },
-                    plugins: { legend: { display: false } }
+        return count > 0 ? Math.round(totalPercent / count) : null;
+    }
+    
+    async function saveExamScore(studentId, qiratName, assessmentKey, value) {
+        const currentScores = examScores.get(studentId) || {};
+        const qiratScores = currentScores[qiratName] || {};
+        qiratScores[assessmentKey] = value ? parseFloat(value) : null;
+        currentScores[qiratName] = qiratScores;
+        examScores.set(studentId, currentScores);
+        const examRef = doc(db, "examScores", studentId);
+        await setDoc(examRef, { scores: Object.fromEntries(examScores) }, { merge: true });
+    }
+    
+    async function loadExamScores() {
+        try {
+            const snapshot = await getDocs(collection(db, "examScores"));
+            examScores.clear();
+            snapshot.forEach(docSnap => { 
+                const data = docSnap.data();
+                if (data.scores) { 
+                    Object.entries(data.scores).forEach(([studentId, studentData]) => {
+                        examScores.set(studentId, studentData);
+                    });
                 }
             });
+        } catch(e) { console.warn(e); }
+    }
+    
+    async function loadData() {
+        try {
+            const querySnapshot = await getDocs(collection(db, "registrations"));
+            allStudents = [];
+            querySnapshot.forEach(docSnap => {
+                const data = docSnap.data();
+                let timestamp = data.timestamp?.toDate?.() || new Date(data.timestamp) || new Date();
+                allStudents.push({
+                    id: docSnap.id, 
+                    full_name: data.full_name || 'N/A', 
+                    gender: data.gender || 'Not Specified',
+                    phone: data.phone || '', 
+                    department: data.department || 'Other', 
+                    batch: data.batch || 'General',
+                    schedules: data.schedules || [], 
+                    timestamp: timestamp
+                });
+            });
+            await loadAssessmentConfig();
+            await loadExamScores();
+            buildGroups();
+            renderHeroStats();
+            renderQuickStats();
+        } catch(e) { showToast("Error: " + e.message, true); }
+    }
+    
+    function renderHeroStats() {
+        const total = allStudents.length;
+        const allQirats = new Set(); 
+        allStudents.forEach(s => getQiratNames(s).forEach(q => allQirats.add(q)));
+        let examRecords = 0;
+        examScores.forEach(studentScores => { 
+            Object.values(studentScores).forEach(qScores => { 
+                if (Object.values(qScores).some(v => v !== null && v !== '')) examRecords++; 
+            }); 
+        });
+        const totalPossible = total * allQirats.size;
+        const completion = totalPossible > 0 ? Math.round((examRecords / totalPossible) * 100) : 0;
+        document.getElementById('heroTotal').textContent = total;
+        document.getElementById('heroQirats').textContent = allQirats.size;
+        document.getElementById('heroExams').textContent = examRecords;
+        document.getElementById('heroCompletion').textContent = completion;
+    }
+    
+    function renderQuickStats() {
+        const allQirats = new Set(); 
+        allStudents.forEach(s => getQiratNames(s).forEach(q => allQirats.add(q)));
+        let totalScore = 0, scoreCount = 0;
+        examScores.forEach(studentScores => { 
+            Object.values(studentScores).forEach(qScores => {
+                const avg = calculateAverage(qScores);
+                if (avg !== null) { totalScore += avg; scoreCount++; }
+            }); 
+        });
+        const avgScore = scoreCount > 0 ? Math.round(totalScore / scoreCount) : 0;
+        document.getElementById('quickStats').innerHTML = `
+            <div class="quick-stat-card"><div class="quick-stat-icon"><i class="fas fa-users"></i></div><div class="quick-stat-value">${allStudents.length}</div><div class="quick-stat-label">Total Students</div></div>
+            <div class="quick-stat-card"><div class="quick-stat-icon"><i class="fas fa-book-quran"></i></div><div class="quick-stat-value">${allQirats.size}</div><div class="quick-stat-label">Active Qirats</div></div>
+            <div class="quick-stat-card"><div class="quick-stat-icon"><i class="fas fa-chart-line"></i></div><div class="quick-stat-value">${avgScore}%</div><div class="quick-stat-label">Average Score</div></div>
+            <div class="quick-stat-card"><div class="quick-stat-icon"><i class="fas fa-cog"></i></div><div class="quick-stat-value">${assessmentConfig.names.length}</div><div class="quick-stat-label">Assessments</div></div>
+        `;
+    }
+    
+    function calculateGroupAverageScore(qiratName, students) { 
+        let total = 0, count = 0; 
+        students.forEach(s => { 
+            const scores = getStudentExamScores(s.id, qiratName); 
+            const avg = calculateAverage(scores); 
+            if (avg !== null) { total += avg; count++; } 
+        }); 
+        return count > 0 ? Math.round(total / count) : 0; 
+    }
+    
+    function calculateDepartmentAverageScore(students) { 
+        let total = 0, count = 0; 
+        students.forEach(s => { 
+            const qirats = getQiratNames(s); 
+            let studentTotal = 0, studentCount = 0; 
+            qirats.forEach(q => { 
+                const scores = getStudentExamScores(s.id, q); 
+                const avg = calculateAverage(scores); 
+                if (avg !== null) { studentTotal += avg; studentCount++; } 
+            }); 
+            if (studentCount > 0) { total += (studentTotal / studentCount); count++; } 
+        }); 
+        return count > 0 ? Math.round(total / count) : 0; 
+    }
+    
+    function calculateStudentOverallAverage(studentId) { 
+        let total = 0, count = 0; 
+        const student = allStudents.find(s => s.id === studentId); 
+        if (student) { 
+            getQiratNames(student).forEach(q => { 
+                const scores = getStudentExamScores(studentId, q); 
+                const avg = calculateAverage(scores); 
+                if (avg !== null) { total += avg; count++; } 
+            }); 
+        } 
+        return count > 0 ? Math.round(total / count) : null; 
+    }
+    
+    function buildGroups() {
+        if (currentGroupMode === 'qirat') {
+            const qiratMap = new Map();
+            allStudents.forEach(s => { 
+                getQiratNames(s).forEach(q => { 
+                    if (!qiratMap.has(q)) qiratMap.set(q, []); 
+                    qiratMap.get(q).push(s); 
+                }); 
+            });
+            groups = Array.from(qiratMap.entries()).map(([name, students]) => ({ 
+                name, students, count: students.length, 
+                avgScore: calculateGroupAverageScore(name, students) 
+            })).sort((a,b) => b.count - a.count);
+        } else if (currentGroupMode === 'department') {
+            const deptMap = new Map();
+            allStudents.forEach(s => { 
+                const dept = s.department; 
+                if (!deptMap.has(dept)) deptMap.set(dept, []); 
+                deptMap.get(dept).push(s); 
+            });
+            groups = Array.from(deptMap.entries()).map(([name, students]) => ({ 
+                name, students, count: students.length, 
+                avgScore: calculateDepartmentAverageScore(students) 
+            })).sort((a,b) => b.count - a.count);
+        } else {
+            const studentScores = allStudents.map(s => ({ 
+                student: s, 
+                avgScore: calculateStudentOverallAverage(s.id) 
+            })).sort((a,b) => (b.avgScore || 0) - (a.avgScore || 0));
+            groups = [{ name: "All Students", students: allStudents, rankings: studentScores, count: allStudents.length }];
         }
-    </script>
+        renderGroups();
+    }
+    
+    function renderGroups() {
+        const container = document.getElementById('groupsGrid');
+        if (groups.length === 0) { container.innerHTML = '<div class="empty-state">No data available</div>'; return; }
+        const maxCount = Math.max(...groups.map(g => g.count), 1);
+        container.innerHTML = groups.map((group, idx) => `
+            <div class="group-card" onclick="openGroupModal('${escapeHtml(group.name)}', ${idx})">
+                <div class="group-header">
+                    <div class="group-name"><i class="fas ${currentGroupMode === 'qirat' ? 'fa-book-quran' : (currentGroupMode === 'department' ? 'fa-building' : 'fa-trophy')}"></i> ${escapeHtml(group.name)}</div>
+                    <div class="group-badge">${group.avgScore || 0}% Avg</div>
+                </div>
+                <div class="progress-bar"><div class="progress-fill" style="width: ${(group.count / maxCount) * 100}%;"></div></div>
+                <div class="group-stats"><span><i class="fas fa-users"></i> ${group.count} students</span><span><i class="fas fa-chart-line"></i> ${group.avgScore || 0}% Average</span></div>
+                <div style="margin-top: 12px; font-size:0.7rem; color:var(--text-muted);"><i class="fas fa-arrow-right"></i> Click to manage exam scores</div>
+            </div>
+        `).join('');
+    }
+    
+    window.openGroupModal = async (groupName, idx) => {
+        const group = groups[idx];
+        if (!group) return;
+        currentModalContext = group;
+        isEditMode = false;
+        if (currentGroupMode === 'qirat') await renderQiratModal(group.name, group.students);
+        else if (currentGroupMode === 'department') await renderDepartmentModal(group.name, group.students);
+        else await renderOverallModal(group.rankings);
+    };
+    
+    async function renderQiratModal(qiratName, students) {
+        currentModalContext = { type: 'qirat', name: qiratName, students };
+        const filtered = applyFilters(students);
+        const ranked = filtered.map(s => ({ 
+            student: s, 
+            avg: calculateAverage(getStudentExamScores(s.id, qiratName)) 
+        })).sort((a,b) => (b.avg || 0) - (a.avg || 0));
+        
+        const tableRows = ranked.map((item, rank) => {
+            const s = item.student;
+            const scores = getStudentExamScores(s.id, qiratName);
+            const rankClass = rank === 0 ? 'gold' : rank === 1 ? 'silver' : rank === 2 ? 'bronze' : '';
+            return `<tr>
+                <td><span class="rank-badge ${rankClass}">${rank + 1}</span></td>
+                <td><strong>${escapeHtml(s.full_name)}</strong><br><small>${escapeHtml(s.department)}</small></td>
+                <td><span class="badge ${s.gender === 'Male' ? 'badge-male' : 'badge-female'}">${escapeHtml(s.gender)}</span></td>
+                <td>${escapeHtml(s.batch)}</td>
+                ${assessmentConfig.names.map((name, i) => {
+                    const score = scores[`assessment${i+1}`];
+                    const percent = calculatePercentage(score, assessmentConfig.outOf[i]);
+                    return `<td>${isEditMode ? 
+                        `<input type="number" class="score-input" data-student="${s.id}" data-qirat="${qiratName}" data-assessment="${i+1}" value="${score !== null ? score : ''}" step="0.5" min="0" max="${assessmentConfig.outOf[i]}" style="width:75px;"><span style="font-size:0.7rem;">/${assessmentConfig.outOf[i]}</span>` : 
+                        `<span><strong>${score !== null ? score : '-'}</strong> <span style="color:gray;">/${assessmentConfig.outOf[i]}</span><br><small>${percent !== null ? percent+'%' : '-'}</small></span>`}</td>`;
+                }).join('')}
+                <td><strong>${item.avg !== null ? item.avg+'%' : '-'}</strong></td>
+            </tr>`;
+        }).join('');
+        
+        document.getElementById('modalDynamicContent').innerHTML = `
+            <div class="modal-header">
+                <div class="modal-title"><i class="fas fa-book-quran"></i> ${escapeHtml(qiratName)} - Exam Scores</div>
+                <div class="modal-actions">
+                    <button class="btn-icon" onclick="toggleEditMode()"><i class="fas ${isEditMode ? 'fa-eye' : 'fa-edit'}"></i> ${isEditMode ? 'View Mode' : 'Edit Mode'}</button>
+                    <button class="btn-icon" onclick="closeExamModal()">&times;</button>
+                </div>
+            </div>
+            <div class="filter-bar">
+                <div class="filter-group"><label>Search</label><input type="text" id="modalSearch" placeholder="Student name"></div>
+                <div class="filter-group"><label>Gender</label><select id="modalGender"><option value="">All</option><option value="Male">Male</option><option value="Female">Female</option></select></div>
+                <div class="filter-group"><label>Department</label><select id="modalDept"><option value="">All</option>${[...new Set(students.map(s=>s.department))].map(d=>`<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join('')}</select></div>
+                <div class="filter-group"><label>Batch</label><select id="modalBatch"><option value="">All</option>${[...new Set(students.map(s=>s.batch))].map(b=>`<option value="${escapeHtml(b)}">${escapeHtml(b)}</option>`).join('')}</select></div>
+                <button class="btn-icon" onclick="clearModalFilters()"><i class="fas fa-eraser"></i> Clear</button>
+            </div>
+            <div style="display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;">
+                <button class="btn-icon" onclick="exportModalToCSV()"><i class="fas fa-file-csv"></i> CSV</button>
+                <button class="btn-icon" onclick="exportModalToExcel()"><i class="fas fa-file-excel"></i> Excel</button>
+                <button class="btn-icon" onclick="exportModalToPDF()"><i class="fas fa-file-pdf"></i> PDF</button>
+                ${isEditMode ? `<button class="btn-primary" onclick="saveAllScores()"><i class="fas fa-save"></i> Save All Changes</button>` : ''}
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="exam-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th><th>Student</th><th>Gender</th><th>Batch</th>
+                            ${assessmentConfig.names.map((n,i)=>`<th>${escapeHtml(n)}<br><small>/ ${assessmentConfig.outOf[i]}</small></th>`).join('')}
+                            <th>Avg %</th>
+                        </tr>
+                    </thead>
+                    <tbody>${tableRows}</tbody>
+                </table>
+            </div>
+        `;
+        document.getElementById('examModal').classList.add('active');
+        if (isEditMode) attachScoreEvents();
+        attachFilterEvents();
+    }
+    
+    async function renderDepartmentModal(deptName, students) {
+        currentModalContext = { type: 'department', name: deptName, students };
+        const allQirats = [...new Set(students.flatMap(s => getQiratNames(s)))];
+        let selectedQirat = allQirats[0] || '';
+        
+        const renderTable = async (qirat) => {
+            const qiratStudents = students.filter(s => getQiratNames(s).includes(qirat));
+            const filtered = applyFilters(qiratStudents);
+            const ranked = filtered.map(s => ({ 
+                student: s, 
+                avg: calculateAverage(getStudentExamScores(s.id, qirat)) 
+            })).sort((a,b) => (b.avg || 0) - (a.avg || 0));
+            
+            const rows = ranked.map((item, rank) => {
+                const s = item.student;
+                const scores = getStudentExamScores(s.id, qirat);
+                const rankClass = rank === 0 ? 'gold' : rank === 1 ? 'silver' : rank === 2 ? 'bronze' : '';
+                return `<tr>
+                    <td><span class="rank-badge ${rankClass}">${rank+1}</span></td>
+                    <td><strong>${escapeHtml(s.full_name)}</strong><br><small>${escapeHtml(s.department)}</small></td>
+                    <td><span class="badge ${s.gender==='Male'?'badge-male':'badge-female'}">${escapeHtml(s.gender)}</span></td>
+                    <td>${escapeHtml(s.batch)}</span></td>
+                    ${assessmentConfig.names.map((name,i)=>{
+                        const score = scores[`assessment${i+1}`];
+                        const percent = calculatePercentage(score, assessmentConfig.outOf[i]);
+                        return `<td>${isEditMode ? 
+                            `<input type="number" class="score-input" data-student="${s.id}" data-qirat="${qirat}" data-assessment="${i+1}" value="${score !== null ? score : ''}" step="0.5" min="0" max="${assessmentConfig.outOf[i]}" style="width:75px;"><span style="font-size:0.7rem;">/${assessmentConfig.outOf[i]}</span>` : 
+                            `<span><strong>${score !== null ? score : '-'}</strong> <span style="color:gray;">/${assessmentConfig.outOf[i]}</span><br><small>${percent !== null ? percent+'%' : '-'}</small></span>`}</td>`;
+                    }).join('')}
+                    <td><strong>${item.avg !== null ? item.avg+'%' : '-'}</strong></span></td>
+                </tr>`;
+            }).join('');
+            
+            document.getElementById('modalDynamicContent').innerHTML = `
+                <div class="modal-header">
+                    <div class="modal-title"><i class="fas fa-building"></i> ${escapeHtml(deptName)} - Exam Scores</div>
+                    <div class="modal-actions">
+                        <button class="btn-icon" onclick="toggleEditMode()"><i class="fas ${isEditMode?'fa-eye':'fa-edit'}"></i> ${isEditMode?'View Mode':'Edit Mode'}</button>
+                        <button class="btn-icon" onclick="closeExamModal()">&times;</button>
+                    </div>
+                </div>
+                ${allQirats.length ? `<div class="qirat-selector">${allQirats.map(q=>`<button class="qirat-chip ${q===selectedQirat?'active':''}" onclick="switchQirat('${escapeHtml(q)}')">📖 ${escapeHtml(q)}</button>`).join('')}</div>` : '<div class="empty-state">No Qirats available</div>'}
+                <div class="filter-bar">
+                    <div class="filter-group"><label>Search</label><input type="text" id="modalSearch" placeholder="Name"></div>
+                    <div class="filter-group"><label>Gender</label><select id="modalGender"><option value="">All</option><option value="Male">Male</option><option value="Female">Female</option></select></div>
+                    <div class="filter-group"><label>Batch</label><select id="modalBatch"><option value="">All</option>${[...new Set(students.map(s=>s.batch))].map(b=>`<option value="${escapeHtml(b)}">${escapeHtml(b)}</option>`).join('')}</select></div>
+                    <button class="btn-icon" onclick="clearModalFilters()">Clear</button>
+                </div>
+                <div style="display:flex;gap:12px;margin-bottom:20px;">
+                    <button class="btn-icon" onclick="exportModalToCSV()">CSV</button>
+                    <button class="btn-icon" onclick="exportModalToExcel()">Excel</button>
+                    <button class="btn-icon" onclick="exportModalToPDF()">PDF</button>
+                    ${isEditMode ? `<button class="btn-primary" onclick="saveAllScores()">Save All</button>` : ''}
+                </div>
+                <div style="overflow-x:auto;">
+                    <table class="exam-table">
+                        <thead>
+                            <tr>
+                                <th>Rank</th><th>Name</th><th>Gender</th><th>Batch</th>
+                                ${assessmentConfig.names.map((n,i)=>`<th>${escapeHtml(n)}<br><small>/ ${assessmentConfig.outOf[i]}</small></th>`).join('')}
+                                <th>Avg %</th>
+                            </tr>
+                        </thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                </div>
+            `;
+            if(isEditMode) attachScoreEvents();
+            attachFilterEvents();
+        };
+        
+        if (selectedQirat) await renderTable(selectedQirat);
+        window.switchQirat = async (q) => { selectedQirat = q; await renderTable(q); };
+        document.getElementById('examModal').classList.add('active');
+    }
+    
+    async function renderOverallModal(rankings) {
+        currentModalContext = { type: 'overall', rankings };
+        const filtered = applyFiltersToRankings(rankings);
+        const rows = filtered.map((item, idx) => {
+            const rankClass = idx === 0 ? 'gold' : idx === 1 ? 'silver' : idx === 2 ? 'bronze' : '';
+            return `<tr>
+                <td><span class="rank-badge ${rankClass}">${idx+1}</span></td>
+                <td><strong>${escapeHtml(item.student.full_name)}</strong><br><small>${escapeHtml(item.student.department)}</small></td>
+                <td><span class="badge ${item.student.gender==='Male'?'badge-male':'badge-female'}">${escapeHtml(item.student.gender)}</span></td>
+                <td>${escapeHtml(item.student.batch)}</span></td>
+                <td><strong>${item.avgScore !== null ? item.avgScore+'%' : '-'}</strong></td>
+                <td><button class="btn-icon" onclick="viewStudentDetails('${item.student.id}')" style="background:var(--primary-light);"><i class="fas fa-eye"></i> Details</button></td>
+            </tr>`;
+        }).join('');
+        
+        document.getElementById('modalDynamicContent').innerHTML = `
+            <div class="modal-header">
+                <div class="modal-title"><i class="fas fa-trophy"></i> Overall Student Rankings</div>
+                <div class="modal-actions">
+                    <button class="btn-icon" onclick="closeExamModal()">&times;</button>
+                </div>
+            </div>
+            <div class="filter-bar">
+                <div class="filter-group"><label>Search</label><input type="text" id="modalSearch" placeholder="Name"></div>
+                <div class="filter-group"><label>Gender</label><select id="modalGender"><option value="">All</option><option value="Male">Male</option><option value="Female">Female</option></select></div>
+                <div class="filter-group"><label>Department</label><select id="modalDept"><option value="">All</option>${[...new Set(rankings.map(r=>r.student.department))].map(d=>`<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join('')}</select></div>
+                <div class="filter-group"><label>Batch</label><select id="modalBatch"><option value="">All</option>${[...new Set(rankings.map(r=>r.student.batch))].map(b=>`<option value="${escapeHtml(b)}">${escapeHtml(b)}</option>`).join('')}</select></div>
+                <button class="btn-icon" onclick="clearModalFilters()">Clear</button>
+            </div>
+            <div style="display:flex;gap:12px;margin-bottom:20px;">
+                <button class="btn-icon" onclick="exportModalToCSV()">CSV</button>
+                <button class="btn-icon" onclick="exportModalToExcel()">Excel</button>
+                <button class="btn-icon" onclick="exportModalToPDF()">PDF</button>
+            </div>
+            <div style="overflow-x:auto;">
+                <table class="exam-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th><th>Student</th><th>Gender</th><th>Batch</th><th>Overall Avg</th><th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>${rows}</tbody>
+                </table>
+            </div>
+        `;
+        attachFilterEvents();
+        document.getElementById('examModal').classList.add('active');
+    }
+    
+    window.viewStudentDetails = async (studentId) => {
+        const student = allStudents.find(s => s.id === studentId);
+        if (!student) return;
+        const qirats = getQiratNames(student);
+        const rows = qirats.map(q => {
+            const scores = getStudentExamScores(studentId, q);
+            const avg = calculateAverage(scores);
+            return `<tr>
+                <td><strong>📖 ${escapeHtml(q)}</strong></td>
+                ${assessmentConfig.names.map((name,i)=>{
+                    const score = scores[`assessment${i+1}`];
+                    const percent = calculatePercentage(score, assessmentConfig.outOf[i]);
+                    return `<td>${isEditMode ? 
+                        `<input type="number" class="score-input-student" data-student="${studentId}" data-qirat="${q}" data-assessment="${i+1}" value="${score !== null ? score : ''}" step="0.5" min="0" max="${assessmentConfig.outOf[i]}" style="width:75px;"><span style="font-size:0.7rem;">/${assessmentConfig.outOf[i]}</span>` : 
+                        `<span><strong>${score !== null ? score : '-'}</strong> <span style="color:gray;">/${assessmentConfig.outOf[i]}</span><br><small>${percent !== null ? percent+'%' : '-'}</small></span>`}</td>`;
+                }).join('')}
+                <td><strong>${avg !== null ? avg+'%' : '-'}</strong></td>
+            </tr>`;
+        }).join('');
+        
+        document.getElementById('modalDynamicContent').innerHTML = `
+            <div class="modal-header">
+                <div class="modal-title"><i class="fas fa-user-graduate"></i> ${escapeHtml(student.full_name)} - Qirat Details</div>
+                <div class="modal-actions">
+                    <button class="btn-icon" onclick="toggleEditMode()"><i class="fas ${isEditMode?'fa-eye':'fa-edit'}"></i> ${isEditMode?'View Mode':'Edit Mode'}</button>
+                    <button class="btn-icon" onclick="closeExamModal()">&times;</button>
+                </div>
+            </div>
+            <div style="margin-bottom: 16px; padding: 12px; background: #f8fafc; border-radius: 16px;">
+                <p><strong>Department:</strong> ${escapeHtml(student.department)} | <strong>Batch:</strong> ${escapeHtml(student.batch)} | <strong>Phone:</strong> ${escapeHtml(student.phone)}</p>
+            </div>
+            ${isEditMode ? `<div style="margin-bottom:16px;"><button class="btn-primary" onclick="saveStudentScores('${studentId}')">Save Changes</button></div>` : ''}
+            <div style="overflow-x:auto;">
+                <table class="exam-table">
+                    <thead>
+                        <tr>
+                            <th>Qirat</th>
+                            ${assessmentConfig.names.map((n,i)=>`<th>${escapeHtml(n)}<br><small>/ ${assessmentConfig.outOf[i]}</small></th>`).join('')}
+                            <th>Avg %</th>
+                        </tr>
+                    </thead>
+                    <tbody>${rows}</tbody>
+                </table>
+            </div>
+        `;
+        if(isEditMode) attachStudentScoreEvents(studentId);
+    };
+    
+    function applyFilters(students) {
+        const search = document.getElementById('modalSearch')?.value.toLowerCase() || '';
+        const gender = document.getElementById('modalGender')?.value || '';
+        const dept = document.getElementById('modalDept')?.value || '';
+        const batch = document.getElementById('modalBatch')?.value || '';
+        return students.filter(s => {
+            const matchSearch = s.full_name.toLowerCase().includes(search);
+            const matchGender = !gender || s.gender === gender;
+            const matchDept = !dept || s.department === dept;
+            const matchBatch = !batch || s.batch === batch;
+            return matchSearch && matchGender && matchDept && matchBatch;
+        });
+    }
+    
+    function applyFiltersToRankings(rankings) {
+        const search = document.getElementById('modalSearch')?.value.toLowerCase() || '';
+        const gender = document.getElementById('modalGender')?.value || '';
+        const dept = document.getElementById('modalDept')?.value || '';
+        const batch = document.getElementById('modalBatch')?.value || '';
+        return rankings.filter(r => {
+            const s = r.student;
+            const matchSearch = s.full_name.toLowerCase().includes(search);
+            const matchGender = !gender || s.gender === gender;
+            const matchDept = !dept || s.department === dept;
+            const matchBatch = !batch || s.batch === batch;
+            return matchSearch && matchGender && matchDept && matchBatch;
+        });
+    }
+    
+    window.clearModalFilters = () => { 
+        ['modalSearch','modalGender','modalDept','modalBatch'].forEach(id => { 
+            const el = document.getElementById(id); 
+            if(el) el.value = ''; 
+        }); 
+        applyModalFilters(); 
+    };
+    
+    function attachFilterEvents() { 
+        ['modalSearch','modalGender','modalDept','modalBatch'].forEach(id => { 
+            const el = document.getElementById(id); 
+            if(el) el.addEventListener('input', () => applyModalFilters()); 
+        }); 
+    }
+    
+    function applyModalFilters() { 
+        if(currentModalContext?.type === 'qirat') renderQiratModal(currentModalContext.name, currentModalContext.students); 
+        else if(currentModalContext?.type === 'department') renderDepartmentModal(currentModalContext.name, currentModalContext.students); 
+        else if(currentModalContext?.type === 'overall') renderOverallModal(currentModalContext.rankings); 
+    }
+    
+    window.toggleEditMode = () => { 
+        isEditMode = !isEditMode; 
+        applyModalFilters(); 
+    };
+    
+    async function saveAllScores() {
+        const inputs = document.querySelectorAll('.score-input');
+        for(const input of inputs) {
+            const studentId = input.dataset.student, qirat = input.dataset.qirat, assessment = `assessment${input.dataset.assessment}`, value = input.value;
+            if(studentId && qirat) await saveExamScore(studentId, qirat, assessment, value);
+        }
+        showToast('All scores saved'); 
+        await loadExamScores(); 
+        applyModalFilters();
+    }
+    
+    async function saveStudentScores(studentId) {
+        const inputs = document.querySelectorAll('.score-input-student');
+        for(const input of inputs) {
+            const qirat = input.dataset.qirat, assessment = `assessment${input.dataset.assessment}`, value = input.value;
+            if(qirat) await saveExamScore(studentId, qirat, assessment, value);
+        }
+        showToast('Scores saved'); 
+        await loadExamScores(); 
+        viewStudentDetails(studentId);
+    }
+    
+    function attachScoreEvents() { 
+        document.querySelectorAll('.score-input').forEach(inp => inp.addEventListener('change', () => updateAvgDisplay(inp))); 
+    }
+    
+    function attachStudentScoreEvents(studentId) { 
+        document.querySelectorAll('.score-input-student').forEach(inp => inp.addEventListener('change', () => updateAvgDisplay(inp))); 
+    }
+    
+    function updateAvgDisplay(input) { 
+        const row = input.closest('tr'); 
+        const avgCell = row?.querySelector('td:last-child'); 
+        if(avgCell) avgCell.textContent = '...'; 
+        setTimeout(() => applyModalFilters(), 500); 
+    }
+    
+    function getCurrentExportData() {
+        const rows = []; 
+        const table = document.querySelector('.exam-table');
+        if(!table) return [];
+        const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.innerText.trim().replace(/\n/g, ' '));
+        table.querySelectorAll('tbody tr').forEach(row => { 
+            const rowData = {}; 
+            Array.from(row.querySelectorAll('td')).forEach((td, idx) => { 
+                // Get text without input values for export
+                const input = td.querySelector('input');
+                if(input) {
+                    rowData[headers[idx] || `col${idx}`] = input.value;
+                } else {
+                    rowData[headers[idx] || `col${idx}`] = td.innerText.trim();
+                }
+            }); 
+            rows.push(rowData); 
+        });
+        return rows;
+    }
+    
+    window.exportModalToCSV = () => { 
+        const data = getCurrentExportData(); 
+        if(!data.length) return showToast('No data to export'); 
+        const ws = XLSX.utils.json_to_sheet(data); 
+        const csv = XLSX.utils.sheet_to_csv(ws); 
+        const blob = new Blob(["\uFEFF" + csv], {type:'text/csv'}); 
+        const a = document.createElement('a'); 
+        a.href = URL.createObjectURL(blob); 
+        a.download = `exam_export_${Date.now()}.csv`; 
+        a.click(); 
+        showToast('CSV exported'); 
+    };
+    
+    window.exportModalToExcel = () => { 
+        const data = getCurrentExportData(); 
+        if(!data.length) return showToast('No data to export'); 
+        const ws = XLSX.utils.json_to_sheet(data); 
+        const wb = XLSX.utils.book_new(); 
+        XLSX.utils.book_append_sheet(wb, ws, 'ExamData'); 
+        XLSX.writeFile(wb, `exam_export_${Date.now()}.xlsx`); 
+        showToast('Excel exported'); 
+    };
+    
+    window.exportModalToPDF = async () => { 
+        const table = document.querySelector('.exam-table');
+        if(!table) return showToast('No data to export');
+        const { jsPDF } = window.jspdf; 
+        const doc = new jsPDF({ orientation: 'landscape' }); 
+        doc.setFontSize(16); 
+        doc.setTextColor(16, 185, 129);
+        doc.text("Exam Results Report", 14, 20); 
+        doc.setFontSize(10);
+        doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 30);
+        doc.autoTable({ html: '.exam-table', startY: 40, styles: { fontSize: 8 } }); 
+        doc.save(`exam_report_${Date.now()}.pdf`); 
+        showToast('PDF exported'); 
+    };
+    
+    window.closeExamModal = () => document.getElementById('examModal').classList.remove('active');
+    
+    // Event Listeners
+    document.querySelectorAll('.mode-btn').forEach(btn => btn.addEventListener('click', () => {
+        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentGroupMode = btn.dataset.mode;
+        buildGroups();
+        renderHeroStats();
+        renderQuickStats();
+    }));
+    
+    // Make functions global for onclick
+    window.saveAllScores = saveAllScores;
+    window.saveStudentScores = saveStudentScores;
+    window.toggleEditMode = toggleEditMode;
+    window.clearModalFilters = clearModalFilters;
+    window.exportModalToCSV = exportModalToCSV;
+    window.exportModalToExcel = exportModalToExcel;
+    window.exportModalToPDF = exportModalToPDF;
+    window.closeExamModal = closeExamModal;
+    window.viewStudentDetails = viewStudentDetails;
+    
+    // Initial load
+    loadData();
+</script>
 </body>
 </html>
