@@ -3,25 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>JUMJ Irshad | Smart Import Center</title>
+    <title>Noor Academy | Smart Import Center</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mammoth@1.4.2/mammoth.browser.min.js"></script>
-    <!-- PWA Meta Tags -->
-    <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#3b82f6">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="ALIF Med">
-    
-    <!-- Apple Touch Icons -->
-    <link rel="apple-touch-icon" href="/icons/icon-152x152.png">
-    <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-192x192.png">
-
-  
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -388,7 +375,13 @@
 <div class="glass-header">
     <div class="header-content">
         <div class="logo"><h1><i class="fas fa-cloud-upload-alt"></i> Smart Import Center</h1></div>
-
+        <div class="desktop-nav">
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="groups.html" class="nav-link">Groups</a>
+            <a href="tables.html" class="nav-link">Tables</a>
+            <a href="analytics.html" class="nav-link">Analytics</a>
+            <a href="import.html" class="nav-link active">Import</a>
+        </div>
         <button class="back-btn" onclick="window.location.href='index.html'"><i class="fas fa-arrow-left"></i> Back</button>
     </div>
 </div>
@@ -445,7 +438,13 @@
     </div>
 </div>
 
-
+<div class="bottom-nav">
+    <button class="nav-item" onclick="window.location.href='index.html'"><i class="fas fa-home"></i><span>Home</span></button>
+    <button class="nav-item" onclick="window.location.href='groups.html'"><i class="fas fa-layer-group"></i><span>Groups</span></button>
+    <button class="nav-item" onclick="window.location.href='tables.html'"><i class="fas fa-table"></i><span>Tables</span></button>
+    <button class="nav-item" onclick="window.location.href='analytics.html'"><i class="fas fa-chart-line"></i><span>Analytics</span></button>
+    <button class="nav-item active" onclick="window.location.href='import.html'"><i class="fas fa-upload"></i><span>Import</span></button>
+</div>
 
 <div id="toast" class="toast"></div>
 
@@ -457,22 +456,6 @@
 </div>
 
 <script type="module">
-
-      import { protectPage, initAuthUI, setupAutoLogout, getCurrentAdminSync } from './auth.js';
-    import { initNavigation } from './nav.js';
-    
-    // SYNC check - no await needed
-    if (!protectPage('admin-login.html')) {
-        throw new Error('Redirecting to login');
-    }
-    
-    // SYNC init - no await needed
-    const admin = initAuthUI();
-    setupAutoLogout(60);
-    
-    console.log('Logged in as:', admin?.name, admin?.email);
-    
-
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, getDocs, doc, updateDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     
@@ -1001,24 +984,6 @@
     headerContent.appendChild(templateBtn);
     
     loadExistingStudents();
-
-</script>
-    <!-- Navigation Script - Add this at the end of body -->
-<script type="module">
-    import { initNavigation, refreshNavigation } from './nav.js';
-    import { getCurrentAdminSync } from './auth.js';
-    
-    // Initialize base navigation
-    initNavigation();
-    
-    // Check if Super Admin and refresh to show hidden items
-    const admin = getCurrentAdminSync();
-    if (admin?.role === 'super-admin') {
-        // Refresh navigation to show Keys and Admins
-        refreshNavigation();
-    }
-    
-    console.log('Navigation loaded for role:', admin?.role || 'guest');
 </script>
 </body>
 </html>
