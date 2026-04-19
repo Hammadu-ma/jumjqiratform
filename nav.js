@@ -1,5 +1,6 @@
 // nav.js - Universal Navigation System for JUMJ Irshad Admin Dashboard
 // Handles desktop header navigation and mobile bottom navigation with role-based access
+// ENHANCED: Fully responsive with horizontal scroll & adaptive mobile display for many items
 
 import { getCurrentAdminSync } from './auth.js';
 
@@ -71,7 +72,7 @@ export function isActivePage(path) {
 }
 
 /**
- * Create desktop navigation HTML (role-aware)
+ * Create desktop navigation HTML (role-aware) with horizontal scroll support for many items
  * @returns {string} HTML string for desktop navigation
  */
 export function createDesktopNav() {
@@ -79,19 +80,26 @@ export function createDesktopNav() {
     
     if (desktopNavItems.length === 0) return '';
     
+    // Wrap desktop nav in a scrollable container for responsiveness with many tabs
     return `
-        <div class="desktop-nav">
-            ${desktopNavItems.map(item => `
-                <a href="${item.path}" class="nav-link ${isActivePage(item.path) ? 'active' : ''}">
-                    <i class="fas ${item.icon}"></i> ${item.name}
-                </a>
-            `).join('')}
+        <div class="desktop-nav-wrapper">
+            <div class="desktop-nav-scroll">
+                <div class="desktop-nav">
+                    ${desktopNavItems.map(item => `
+                        <a href="${item.path}" class="nav-link ${isActivePage(item.path) ? 'active' : ''}">
+                            <i class="fas ${item.icon}"></i> <span>${item.name}</span>
+                        </a>
+                    `).join('')}
+                </div>
+            </div>
+            <button class="nav-scroll-btn nav-scroll-left" aria-label="Scroll left"><i class="fas fa-chevron-left"></i></button>
+            <button class="nav-scroll-btn nav-scroll-right" aria-label="Scroll right"><i class="fas fa-chevron-right"></i></button>
         </div>
     `;
 }
 
 /**
- * Create mobile bottom navigation HTML (role-aware)
+ * Create mobile bottom navigation HTML (role-aware) - enhanced for many items with horizontal scroll
  * @returns {string} HTML string for mobile bottom navigation
  */
 export function createMobileNav() {
@@ -101,12 +109,14 @@ export function createMobileNav() {
     
     return `
         <div class="bottom-nav">
-            ${mobileItems.map(item => `
-                <button class="nav-item ${isActivePage(item.path) ? 'active' : ''}" onclick="window.location.href='${item.path}'">
-                    <i class="fas ${item.icon}"></i>
-                    <span>${item.name}</span>
-                </button>
-            `).join('')}
+            <div class="bottom-nav-scroll">
+                ${mobileItems.map(item => `
+                    <button class="nav-item ${isActivePage(item.path) ? 'active' : ''}" onclick="window.location.href='${item.path}'">
+                        <i class="fas ${item.icon}"></i>
+                        <span>${item.name}</span>
+                    </button>
+                `).join('')}
+            </div>
         </div>
     `;
 }
@@ -148,6 +158,8 @@ export function injectNavigation() {
     // Inject desktop nav HTML
     if (desktopContainer) {
         desktopContainer.innerHTML = createDesktopNav();
+        // Initialize scroll buttons after desktop nav is rendered
+        initDesktopNavScroll();
     }
     
     // Check if mobile nav container exists, if not create it
@@ -163,7 +175,63 @@ export function injectNavigation() {
 }
 
 /**
- * Add navigation styles to the page
+ * Initialize desktop navigation scroll buttons functionality
+ */
+function initDesktopNavScroll() {
+    const wrapper = document.querySelector('.desktop-nav-wrapper');
+    if (!wrapper) return;
+    
+    const scrollContainer = wrapper.querySelector('.desktop-nav-scroll');
+    const leftBtn = wrapper.querySelector('.nav-scroll-left');
+    const rightBtn = wrapper.querySelector('.nav-scroll-right');
+    
+    if (!scrollContainer) return;
+    
+    // Function to update scroll buttons visibility
+    function updateScrollButtons() {
+        if (!leftBtn || !rightBtn) return;
+        const scrollLeft = scrollContainer.scrollLeft;
+        const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
+        
+        leftBtn.style.opacity = scrollLeft <= 10 ? '0' : '1';
+        leftBtn.style.visibility = scrollLeft <= 10 ? 'hidden' : 'visible';
+        rightBtn.style.opacity = maxScroll - scrollLeft <= 10 ? '0' : '1';
+        rightBtn.style.visibility = maxScroll - scrollLeft <= 10 ? 'hidden' : 'visible';
+    }
+    
+    // Scroll function
+    const scrollAmount = 200;
+    if (leftBtn) {
+        leftBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            scrollContainer.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+        });
+    }
+    if (rightBtn) {
+        rightBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            scrollContainer.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+        });
+    }
+    
+    // Listen for scroll events
+    scrollContainer.addEventListener('scroll', updateScrollButtons);
+    window.addEventListener('resize', () => {
+        updateScrollButtons();
+        // Adjust for responsive layout
+        if (window.innerWidth <= 768) {
+            scrollContainer.style.scrollBehavior = 'auto';
+        } else {
+            scrollContainer.style.scrollBehavior = 'smooth';
+        }
+    });
+    
+    // Initial update
+    setTimeout(updateScrollButtons, 100);
+}
+
+/**
+ * Add navigation styles to the page - ENHANCED for full responsiveness with many tabs
  */
 export function addNavigationStyles() {
     const styleId = 'navigation-styles';
@@ -172,7 +240,40 @@ export function addNavigationStyles() {
     const style = document.createElement('style');
     style.id = styleId;
     style.textContent = `
-        /* Desktop Navigation */
+        /* Desktop Navigation Wrapper - fully responsive */
+        .desktop-nav-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            max-width: 100%;
+            flex: 1;
+            min-width: 0; /* Prevent flex overflow */
+        }
+        
+        .desktop-nav-scroll {
+            overflow-x: auto;
+            overflow-y: hidden;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+            flex: 1;
+            margin: 0 4px;
+        }
+        
+        .desktop-nav-scroll::-webkit-scrollbar {
+            height: 4px;
+        }
+        
+        .desktop-nav-scroll::-webkit-scrollbar-track {
+            background: var(--border, #e2e8f0);
+            border-radius: 4px;
+        }
+        
+        .desktop-nav-scroll::-webkit-scrollbar-thumb {
+            background: var(--primary, #10b981);
+            border-radius: 4px;
+        }
+        
         .desktop-nav {
             display: flex;
             gap: 8px;
@@ -181,10 +282,33 @@ export function addNavigationStyles() {
             border-radius: 60px;
             box-shadow: var(--shadow-sm, 0 1px 2px 0 rgb(0 0 0 / 0.05));
             border: 1px solid var(--border, #e2e8f0);
+            width: max-content;
+            min-width: 100%;
+        }
+        
+        .nav-scroll-btn {
+            background: white;
+            border: 1px solid var(--border, #e2e8f0);
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--primary, #10b981);
+            transition: all 0.2s;
+            box-shadow: var(--shadow-sm, 0 1px 2px 0 rgb(0 0 0 / 0.05));
+            flex-shrink: 0;
+        }
+        
+        .nav-scroll-btn:hover {
+            background: var(--primary-light, #d1fae5);
+            border-color: var(--primary, #10b981);
         }
         
         .nav-link {
-            padding: 10px 24px;
+            padding: 10px 20px;
             border-radius: 40px;
             text-decoration: none;
             font-weight: 600;
@@ -193,6 +317,25 @@ export function addNavigationStyles() {
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            white-space: nowrap;
+        }
+        
+        /* Responsive text adjustment for desktop nav when screen gets smaller */
+        @media (max-width: 1100px) {
+            .nav-link {
+                padding: 8px 16px;
+                font-size: 0.9rem;
+            }
+        }
+        
+        @media (max-width: 950px) {
+            .nav-link {
+                padding: 6px 12px;
+                font-size: 0.85rem;
+            }
+            .nav-link i {
+                font-size: 0.9rem;
+            }
         }
         
         .nav-link:hover {
@@ -206,7 +349,7 @@ export function addNavigationStyles() {
             box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
         }
         
-        /* Mobile Bottom Navigation */
+        /* Mobile Bottom Navigation - Enhanced for many items with horizontal scroll */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -215,12 +358,25 @@ export function addNavigationStyles() {
             background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(20px);
             display: none;
-            justify-content: space-around;
-            align-items: center;
-            padding: 12px 20px 20px;
             border-top: 1px solid var(--border, #e2e8f0);
             box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
             z-index: 200;
+            padding: 8px 0;
+        }
+        
+        .bottom-nav-scroll {
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none; /* Hide scrollbar for cleaner look */
+            display: flex;
+            justify-content: space-between;
+            scroll-behavior: smooth;
+            padding: 4px 12px;
+        }
+        
+        .bottom-nav-scroll::-webkit-scrollbar {
+            display: none; /* Hide scrollbar on Chrome/Safari */
         }
         
         .nav-item {
@@ -231,20 +387,23 @@ export function addNavigationStyles() {
             background: none;
             border: none;
             cursor: pointer;
-            padding: 8px 16px;
+            padding: 8px 14px;
             border-radius: 40px;
             transition: all 0.2s;
             color: var(--text-muted, #64748b);
             font-family: inherit;
+            flex-shrink: 0;
+            min-width: 64px;
         }
         
         .nav-item i {
-            font-size: 1.4rem;
+            font-size: 1.3rem;
         }
         
         .nav-item span {
             font-size: 0.7rem;
             font-weight: 500;
+            white-space: nowrap;
         }
         
         .nav-item.active {
@@ -256,22 +415,36 @@ export function addNavigationStyles() {
             background: var(--primary-light, #d1fae5);
         }
         
+        /* Responsive adjustments for many tabs on mobile */
+        @media (max-width: 480px) {
+            .nav-item {
+                padding: 6px 10px;
+                min-width: 56px;
+            }
+            .nav-item i {
+                font-size: 1.2rem;
+            }
+            .nav-item span {
+                font-size: 0.65rem;
+            }
+        }
+        
         /* Responsive: Hide desktop nav on mobile, show mobile nav */
         @media (max-width: 768px) {
-            .desktop-nav {
+            .desktop-nav-wrapper {
                 display: none;
             }
             .bottom-nav {
-                display: flex;
+                display: block;
             }
             body {
-                padding-bottom: 80px;
+                padding-bottom: 70px;
             }
         }
         
         /* Show desktop nav on larger screens */
         @media (min-width: 769px) {
-            .desktop-nav {
+            .desktop-nav-wrapper {
                 display: flex;
             }
             .bottom-nav {
@@ -279,13 +452,21 @@ export function addNavigationStyles() {
             }
         }
         
-        /* Ensure header-content has proper spacing */
+        /* Ensure header-content has proper spacing and doesn't wrap awkwardly */
         .header-content {
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
             gap: 12px;
+        }
+        
+        /* On very large screens, allow more breathing room */
+        @media (min-width: 1400px) {
+            .desktop-nav .nav-link {
+                padding: 12px 28px;
+                font-size: 1rem;
+            }
         }
         
         /* Admin info header styles */
@@ -296,6 +477,7 @@ export function addNavigationStyles() {
             background: var(--primary-light, #d1fae5);
             padding: 6px 20px 6px 16px;
             border-radius: 50px;
+            flex-shrink: 0;
         }
         
         .admin-avatar-sm {
@@ -339,6 +521,16 @@ export function addNavigationStyles() {
                 font-size: 1rem;
             }
         }
+        
+        /* Hide scroll buttons on touch devices where they might be less useful, but keep functionality */
+        @media (max-width: 768px) and (hover: none) {
+            .nav-scroll-btn {
+                display: none;
+            }
+            .desktop-nav-scroll {
+                margin: 0;
+            }
+        }
     `;
     document.head.appendChild(style);
 }
@@ -366,6 +558,13 @@ export function initNavigation(options = {}) {
             window.location.href = 'admin-login.html';
         });
     }
+    
+    // Optional: Add resize listener to reinitialize scroll buttons on orientation change
+    window.addEventListener('resize', () => {
+        if (document.querySelector('.desktop-nav-wrapper')) {
+            initDesktopNavScroll();
+        }
+    });
 }
 
 /**
@@ -416,6 +615,7 @@ export function refreshNavigation() {
     
     if (desktopContainer) {
         desktopContainer.innerHTML = createDesktopNav();
+        initDesktopNavScroll();
     }
     if (mobileContainer) {
         mobileContainer.innerHTML = createMobileNav();
