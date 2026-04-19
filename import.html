@@ -3,12 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>Noor Academy | Smart Data Import Center</title>
+    <title>JUMJ Irshad | Smart Import Center</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mammoth@1.4.2/mammoth.browser.min.js"></script>
+    
+    <!-- Set PDF.js worker -->
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+    </script>
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#10b981">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="JUMJ Irshad">
+    
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -28,7 +41,6 @@
             --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
             --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
             --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
         }
 
         body {
@@ -70,6 +82,31 @@
             gap: 10px;
         }
 
+        .desktop-nav {
+            display: flex;
+            gap: 8px;
+            background: var(--card-bg);
+            padding: 6px;
+            border-radius: 60px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+        }
+
+        .nav-link {
+            padding: 10px 24px;
+            border-radius: 40px;
+            text-decoration: none;
+            font-weight: 600;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-link:hover { background: var(--primary-light); color: var(--primary-dark); }
+        .nav-link.active { background: linear-gradient(135deg, #10b981, #059669); color: white; }
+
         .back-btn {
             background: var(--primary-light);
             border: none;
@@ -87,7 +124,6 @@
 
         .main-container { max-width: 1400px; margin: 0 auto; padding: 24px; }
 
-        /* Hero Section */
         .hero-import {
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             border-radius: 32px;
@@ -100,7 +136,6 @@
         .hero-import h2 { font-size: 1.8rem; margin-bottom: 8px; }
         .hero-import p { opacity: 0.9; margin-bottom: 20px; }
 
-        /* Upload Zone */
         .upload-zone {
             background: var(--card-bg);
             border-radius: 28px;
@@ -110,17 +145,63 @@
             transition: all 0.3s;
             cursor: pointer;
             margin-bottom: 24px;
+            position: relative;
         }
-        .upload-zone:hover {
-            border-color: var(--primary);
-            background: var(--primary-light);
-            transform: translateY(-2px);
+        .upload-zone:hover { border-color: var(--primary); background: var(--primary-light); transform: translateY(-2px); }
+        .upload-zone.loading {
+            pointer-events: none;
+            opacity: 0.7;
         }
         .upload-zone i { font-size: 3rem; color: var(--primary); margin-bottom: 16px; }
         .upload-zone h3 { margin-bottom: 8px; }
-        .upload-zone p { color: var(--text-muted); font-size: 0.85rem; }
 
-        /* File Type Buttons */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .loading-overlay.active { display: flex; }
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--primary-light);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        .loading-text {
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        .loading-progress {
+            width: 300px;
+            height: 8px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .loading-progress-bar {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            border-radius: 10px;
+            transition: width 0.3s;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
         .file-types {
             display: flex;
             gap: 12px;
@@ -143,8 +224,7 @@
         .type-btn:hover { border-color: var(--primary); background: var(--primary-light); }
         .type-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
 
-        /* Preview Table */
-        .preview-container {
+        .preview-container, .mapping-section {
             background: var(--card-bg);
             border-radius: 28px;
             padding: 24px;
@@ -177,21 +257,8 @@
             text-align: left;
             border-bottom: 1px solid var(--border);
         }
-        .preview-table th {
-            background: #f8fafc;
-            position: sticky;
-            top: 0;
-            font-weight: 700;
-        }
+        .preview-table th { background: #f8fafc; position: sticky; top: 0; font-weight: 700; }
 
-        /* Field Mapping */
-        .mapping-section {
-            background: var(--card-bg);
-            border-radius: 28px;
-            padding: 24px;
-            margin-bottom: 24px;
-            border: 1px solid var(--border);
-        }
         .mapping-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -209,9 +276,9 @@
             border-radius: 12px;
             border: 1px solid var(--border);
             background: white;
+            cursor: pointer;
         }
 
-        /* Stats Cards */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -228,7 +295,6 @@
         .stat-value { font-size: 1.5rem; font-weight: 800; color: var(--primary); }
         .stat-label { font-size: 0.7rem; color: var(--text-muted); }
 
-        /* Buttons */
         .action-buttons { display: flex; gap: 16px; justify-content: flex-end; flex-wrap: wrap; }
         .btn-primary {
             background: linear-gradient(135deg, #10b981, #059669);
@@ -241,6 +307,10 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
+        }
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
         .btn-secondary {
             background: #e2e8f0;
@@ -279,6 +349,7 @@
             padding: 12px 20px 20px;
             border-top: 1px solid var(--border);
             z-index: 200;
+            display: none;
         }
         .nav-item {
             display: flex;
@@ -297,11 +368,18 @@
         .nav-item.active { color: var(--primary); background: var(--primary-light); }
 
         @media (min-width: 768px) { body { padding-bottom: 0; } .bottom-nav { display: none; } }
-        @media (max-width: 768px) { .main-container { padding: 16px; padding-bottom: 80px; } .hero-import { padding: 24px; } .upload-zone { padding: 24px; } }
+        @media (max-width: 768px) { 
+            .desktop-nav { display: none; } 
+            .bottom-nav { display: flex; } 
+            .main-container { padding: 16px; padding-bottom: 80px; } 
+            .hero-import { padding: 24px; } 
+            .upload-zone { padding: 24px; }
+        }
         
         .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; }
         .badge-success { background: #d1fae5; color: #065f46; }
         .badge-warning { background: #fef3c7; color: #92400e; }
+        .badge-info { background: #dbeafe; color: #1e40af; }
     </style>
 </head>
 <body>
@@ -314,38 +392,35 @@
 </div>
 
 <div class="main-container">
-    <!-- Hero -->
     <div class="hero-import">
-        <h2><i class="fas fa-database"></i> Bulk Data Import</h2>
-        <p>Import student registrations from CSV, Excel, PDF, Word, or JSON files with smart field mapping</p>
+        <h2><i class="fas fa-database"></i> Bulk Import</h2>
+        <p>Upload CSV, Excel, PDF, Word, or JSON files • Auto-merge Qirats • Smart duplicate detection</p>
         <div class="file-types" id="fileTypeButtons">
             <button class="type-btn" data-type="csv"><i class="fas fa-file-csv"></i> CSV</button>
-            <button class="type-btn" data-type="excel"><i class="fas fa-file-excel"></i> Excel</button>
-            <button class="type-btn" data-type="pdf"><i class="fas fa-file-pdf"></i> PDF (Tables)</button>
-            <button class="type-btn" data-type="word"><i class="fas fa-file-word"></i> Word (Tables)</button>
+            <button class="type-btn active" data-type="excel"><i class="fas fa-file-excel"></i> Excel</button>
+            <button class="type-btn" data-type="pdf"><i class="fas fa-file-pdf"></i> PDF</button>
+            <button class="type-btn" data-type="word"><i class="fas fa-file-word"></i> Word</button>
             <button class="type-btn" data-type="json"><i class="fas fa-code"></i> JSON</button>
         </div>
     </div>
 
-    <!-- Upload Zone -->
     <div class="upload-zone" id="uploadZone">
         <i class="fas fa-cloud-upload-alt"></i>
         <h3>Drag & Drop or Click to Upload</h3>
-        <p>Supports CSV, Excel (.xlsx, .xls), PDF (with tables), Word (.docx with tables), JSON</p>
+        <p>Supports CSV, Excel, PDF, Word, JSON</p>
         <input type="file" id="fileInput" accept=".csv,.xlsx,.xls,.pdf,.docx,.json" style="display:none">
     </div>
 
-    <!-- Stats Preview -->
     <div class="stats-grid" id="statsGrid" style="display:none;">
         <div class="stat-card"><div class="stat-value" id="rowCount">0</div><div class="stat-label">Rows Detected</div></div>
-        <div class="stat-card"><div class="stat-value" id="columnCount">0</div><div class="stat-label">Columns</div></div>
-        <div class="stat-card"><div class="stat-value" id="validCount">0</div><div class="stat-label">Valid Records</div></div>
+        <div class="stat-card"><div class="stat-value" id="newCount">0</div><div class="stat-label">New Students</div></div>
+        <div class="stat-card"><div class="stat-value" id="updateCount">0</div><div class="stat-label">To Update</div></div>
+        <div class="stat-card"><div class="stat-value" id="mergeCount">0</div><div class="stat-label">Qirats Merged</div></div>
     </div>
 
-    <!-- Preview Table -->
     <div class="preview-container" id="previewContainer" style="display:none;">
         <div class="preview-header">
-            <h3><i class="fas fa-eye"></i> Data Preview (First 20 rows)</h3>
+            <h3><i class="fas fa-eye"></i> Data Preview</h3>
             <span class="badge badge-success" id="fileInfo">File loaded</span>
         </div>
         <div class="table-wrapper">
@@ -356,34 +431,40 @@
         </div>
     </div>
 
-    <!-- Field Mapping -->
     <div class="mapping-section" id="mappingSection" style="display:none;">
         <h3><i class="fas fa-code-branch"></i> Field Mapping</h3>
         <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:16px;">Map your file columns to database fields</p>
         <div class="mapping-grid" id="mappingGrid"></div>
     </div>
 
-    <!-- Action Buttons -->
     <div class="action-buttons" id="actionButtons" style="display:none;">
         <button class="btn-secondary" id="cancelBtn"><i class="fas fa-times"></i> Cancel</button>
-        <button class="btn-primary" id="importBtn"><i class="fas fa-database"></i> Import to Database</button>
+        <button class="btn-primary" id="importBtn"><i class="fas fa-database"></i> Smart Import</button>
     </div>
-</div>
-
-<!-- Bottom Navigation -->
-<div class="bottom-nav">
-    <button class="nav-item" onclick="window.location.href='index.html'"><i class="fas fa-home"></i><span>Home</span></button>
-    <button class="nav-item" onclick="window.location.href='groups.html'"><i class="fas fa-layer-group"></i><span>Groups</span></button>
-    <button class="nav-item" onclick="window.location.href='tables.html'"><i class="fas fa-table"></i><span>Tables</span></button>
-    <button class="nav-item" onclick="window.location.href='analytics.html'"><i class="fas fa-chart-line"></i><span>Analytics</span></button>
-    <button class="nav-item active" onclick="window.location.href='import.html'"><i class="fas fa-upload"></i><span>Import</span></button>
 </div>
 
 <div id="toast" class="toast"></div>
 
+<div id="loadingOverlay" class="loading-overlay">
+    <div class="loading-spinner"></div>
+    <div class="loading-text" id="loadingText">Processing file...</div>
+    <div class="loading-progress"><div class="loading-progress-bar" id="loadingProgressBar"></div></div>
+</div>
+
 <script type="module">
+    import { protectPage, initAuthUI, setupAutoLogout, getCurrentAdminSync } from './auth.js';
+    import { initNavigation } from './nav.js';
+    
+    if (!protectPage('admin-login.html')) {
+        throw new Error('Redirecting to login');
+    }
+    
+    const admin = initAuthUI();
+    setupAutoLogout(60);
+    console.log('Logged in as:', admin?.name, admin?.email);
+
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, doc, updateDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     
     const firebaseConfig = {
         apiKey: "AIzaSyAR_g5y04YAGCrTvZCowrE7hw8h7k1du08",
@@ -399,8 +480,9 @@
     
     let parsedData = [];
     let headers = [];
-    let currentFileType = 'csv';
-    let currentFileName = '';
+    let currentFileType = 'excel';
+    let existingStudentsMap = new Map();
+    let currentMappingSelections = {};
     
     const toast = document.getElementById('toast');
     const uploadZone = document.getElementById('uploadZone');
@@ -412,17 +494,63 @@
     const previewTable = document.getElementById('previewTable');
     const mappingGrid = document.getElementById('mappingGrid');
     const rowCountSpan = document.getElementById('rowCount');
-    const columnCountSpan = document.getElementById('columnCount');
-    const validCountSpan = document.getElementById('validCount');
+    const newCountSpan = document.getElementById('newCount');
+    const updateCountSpan = document.getElementById('updateCount');
+    const mergeCountSpan = document.getElementById('mergeCount');
     const fileInfoSpan = document.getElementById('fileInfo');
     const cancelBtn = document.getElementById('cancelBtn');
     const importBtn = document.getElementById('importBtn');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const loadingText = document.getElementById('loadingText');
+    const loadingProgressBar = document.getElementById('loadingProgressBar');
     
     function showToast(msg, isErr = false) {
         toast.textContent = msg;
         toast.style.background = isErr ? '#ef4444' : '#10b981';
         toast.style.display = 'block';
         setTimeout(() => toast.style.display = 'none', 3000);
+    }
+    
+    function showLoading(message, progress = null) {
+        loadingOverlay.classList.add('active');
+        loadingText.textContent = message;
+        if (progress !== null) loadingProgressBar.style.width = `${progress}%`;
+    }
+    
+    function hideLoading() {
+        loadingOverlay.classList.remove('active');
+        loadingProgressBar.style.width = '0%';
+    }
+    
+    function updateLoadingProgress(progress, message) {
+        loadingProgressBar.style.width = `${progress}%`;
+        loadingText.textContent = message;
+    }
+    
+    async function loadExistingStudents() {
+        try {
+            const querySnapshot = await getDocs(collection(db, "registrations"));
+            existingStudentsMap.clear();
+            querySnapshot.forEach((docSnap) => {
+                const data = docSnap.data();
+                const name = (data.full_name || '').trim().toLowerCase();
+                if (name) {
+                    existingStudentsMap.set(name, {
+                        id: docSnap.id,
+                        full_name: data.full_name,
+                        gender: data.gender || 'Not Specified',
+                        phone: data.phone || '',
+                        telegram: data.telegram || '',
+                        department: data.department || 'Other',
+                        batch: data.batch || 'General',
+                        schedules: data.schedules || []
+                    });
+                }
+            });
+            console.log("Loaded existing students:", existingStudentsMap.size);
+        } catch (error) {
+            console.error("Error loading existing students:", error);
+        }
     }
     
     // File type selection
@@ -436,15 +564,22 @@
         });
     });
     
-    // Upload zone click
     uploadZone.addEventListener('click', () => fileInput.click());
     uploadZone.addEventListener('dragover', (e) => { e.preventDefault(); uploadZone.style.borderColor = 'var(--primary)'; });
     uploadZone.addEventListener('dragleave', () => { uploadZone.style.borderColor = 'var(--border)'; });
-    uploadZone.addEventListener('drop', (e) => { e.preventDefault(); uploadZone.style.borderColor = 'var(--border)'; const file = e.dataTransfer.files[0]; if (file) processFile(file); });
-    fileInput.addEventListener('change', (e) => { if (e.target.files[0]) processFile(e.target.files[0]); });
+    uploadZone.addEventListener('drop', async (e) => { 
+        e.preventDefault(); 
+        uploadZone.style.borderColor = 'var(--border)'; 
+        const file = e.dataTransfer.files[0]; 
+        if (file) await processFile(file); 
+    });
+    fileInput.addEventListener('change', async (e) => { if (e.target.files[0]) await processFile(e.target.files[0]); });
     
     async function processFile(file) {
-        currentFileName = file.name;
+        showLoading(`Loading ${file.name}...`, 10);
+        await loadExistingStudents();
+        
+        updateLoadingProgress(30, `Parsing ${currentFileType.toUpperCase()} file...`);
         fileInfoSpan.textContent = `${file.name} (${(file.size/1024).toFixed(1)} KB)`;
         
         try {
@@ -453,8 +588,13 @@
             else if (currentFileType === 'pdf') await parsePDF(file);
             else if (currentFileType === 'word') await parseWord(file);
             else if (currentFileType === 'json') await parseJSON(file);
+            
+            updateLoadingProgress(80, "Analyzing data...");
+            await new Promise(r => setTimeout(r, 300));
+            hideLoading();
         } catch (error) {
-            showToast(`Error parsing file: ${error.message}`, true);
+            hideLoading();
+            showToast(`Error: ${error.message}`, true);
             console.error(error);
         }
     }
@@ -464,7 +604,7 @@
         const lines = text.split(/\r?\n/).filter(l => l.trim());
         if (lines.length < 2) throw new Error('CSV must have headers and data');
         headers = lines[0].split(',').map(h => h.replace(/^"|"$/g, '').trim());
-        parsedData = lines.slice(1, 101).map(line => {
+        parsedData = lines.slice(1, 501).map(line => {
             const values = line.split(',').map(v => v.replace(/^"|"$/g, '').trim());
             const obj = {};
             headers.forEach((h, i) => obj[h] = values[i] || '');
@@ -478,9 +618,9 @@
         const workbook = XLSX.read(data);
         const sheet = workbook.Sheets[workbook.SheetNames[0]];
         const json = XLSX.utils.sheet_to_json(sheet);
-        if (json.length === 0) throw new Error('No data found in Excel');
+        if (json.length === 0) throw new Error('No data found');
         headers = Object.keys(json[0]);
-        parsedData = json.slice(0, 100);
+        parsedData = json.slice(0, 500);
         renderPreview();
     }
     
@@ -492,39 +632,59 @@
         for (let i = 1; i <= Math.min(pdf.numPages, 10); i++) {
             const page = await pdf.getPage(i);
             const textContent = await page.getTextContent();
-            const pageText = textContent.items.map(item => item.str).join(' ');
-            allText += pageText + '\n';
+            allText += textContent.items.map(item => item.str).join(' ') + '\n';
         }
-        // Simple table extraction from PDF text (line-based)
-        const lines = allText.split(/\r?\n/).filter(l => l.trim().length > 5);
-        if (lines.length < 2) throw new Error('Could not extract table data from PDF');
-        const possibleHeaders = lines[0].split(/\s{2,}/);
-        if (possibleHeaders.length > 1) headers = possibleHeaders;
-        else headers = ['Name', 'Gender', 'Phone', 'Department', 'Batch', 'Qirats'];
-        parsedData = lines.slice(1, 51).map(line => {
-            const parts = line.split(/\s{2,}/);
+        
+        // Parse text into rows (simple line-based parsing)
+        const lines = allText.split(/\r?\n/).filter(l => l.trim().length > 3);
+        if (lines.length < 2) throw new Error('Could not extract data from PDF');
+        
+        // Try to detect headers from first line
+        const possibleHeaders = lines[0].split(/\s{2,}|\t/);
+        if (possibleHeaders.length >= 2) {
+            headers = possibleHeaders.slice(0, 7);
+        } else {
+            headers = ['Name', 'Gender', 'Phone', 'Department', 'Batch', 'Qirats'];
+        }
+        
+        parsedData = [];
+        for (let i = 1; i < Math.min(lines.length, 101); i++) {
+            const parts = lines[i].split(/\s{2,}|\t/);
             const obj = {};
-            headers.forEach((h, i) => obj[h] = parts[i] || '');
-            return obj;
-        }).filter(row => row[headers[0]]);
+            headers.forEach((h, idx) => {
+                obj[h] = parts[idx] || '';
+            });
+            if (obj[headers[0]] && obj[headers[0]].trim()) {
+                parsedData.push(obj);
+            }
+        }
         renderPreview();
     }
     
     async function parseWord(file) {
         const arrayBuffer = await file.arrayBuffer();
-        const result = await mammoth.extractRawText({ arrayBuffer: arrayBuffer });
-        const text = result.value;
-        const lines = text.split(/\r?\n/).filter(l => l.trim().length > 3);
-        if (lines.length < 2) throw new Error('Could not extract table data from Word');
+        const result = await mammoth.extractRawText({ arrayBuffer });
+        const lines = result.value.split(/\r?\n/).filter(l => l.trim().length > 3);
+        if (lines.length < 2) throw new Error('Could not extract data from Word document');
+        
         const possibleHeaders = lines[0].split(/\t|\s{2,}/);
-        if (possibleHeaders.length > 1) headers = possibleHeaders;
-        else headers = ['Name', 'Gender', 'Phone', 'Department', 'Batch', 'Qirats'];
-        parsedData = lines.slice(1, 51).map(line => {
-            const parts = line.split(/\t|\s{2,}/);
+        if (possibleHeaders.length >= 2) {
+            headers = possibleHeaders.slice(0, 7);
+        } else {
+            headers = ['Name', 'Gender', 'Phone', 'Department', 'Batch', 'Qirats'];
+        }
+        
+        parsedData = [];
+        for (let i = 1; i < Math.min(lines.length, 101); i++) {
+            const parts = lines[i].split(/\t|\s{2,}/);
             const obj = {};
-            headers.forEach((h, i) => obj[h] = parts[i] || '');
-            return obj;
-        }).filter(row => row[headers[0]]);
+            headers.forEach((h, idx) => {
+                obj[h] = parts[idx] || '';
+            });
+            if (obj[headers[0]] && obj[headers[0]].trim()) {
+                parsedData.push(obj);
+            }
+        }
         renderPreview();
     }
     
@@ -534,19 +694,123 @@
         if (Array.isArray(json)) {
             if (json.length === 0) throw new Error('JSON array is empty');
             headers = Object.keys(json[0]);
-            parsedData = json.slice(0, 100);
+            parsedData = json.slice(0, 500);
         } else if (json.data && Array.isArray(json.data)) {
             headers = Object.keys(json.data[0]);
-            parsedData = json.data.slice(0, 100);
+            parsedData = json.data.slice(0, 500);
         } else {
             throw new Error('JSON must be an array or have a "data" array');
         }
         renderPreview();
     }
     
+    function getMappedValue(row, fieldKey) {
+        const selectedColumn = currentMappingSelections[fieldKey];
+        if (!selectedColumn) {
+            const lowerKeys = Object.keys(row).map(k => k.toLowerCase());
+            if (fieldKey === 'full_name') {
+                for (let key of ['full name', 'name', 'student name', 'full_name']) {
+                    const idx = lowerKeys.indexOf(key);
+                    if (idx !== -1) return row[Object.keys(row)[idx]] || '';
+                }
+                return '';
+            }
+            if (fieldKey === 'gender') {
+                const idx = lowerKeys.indexOf('gender');
+                if (idx !== -1) return row[Object.keys(row)[idx]] || '';
+                return '';
+            }
+            if (fieldKey === 'phone') {
+                const idx = lowerKeys.indexOf('phone');
+                if (idx !== -1) return row[Object.keys(row)[idx]] || '';
+                return '';
+            }
+            if (fieldKey === 'telegram') {
+                const idx = lowerKeys.indexOf('telegram');
+                if (idx !== -1) return row[Object.keys(row)[idx]] || '';
+                return '';
+            }
+            if (fieldKey === 'department') {
+                const idx = lowerKeys.indexOf('department');
+                if (idx !== -1) return row[Object.keys(row)[idx]] || '';
+                return '';
+            }
+            if (fieldKey === 'batch') {
+                const idx = lowerKeys.indexOf('batch');
+                if (idx !== -1) return row[Object.keys(row)[idx]] || '';
+                return '';
+            }
+            if (fieldKey === 'qirats') {
+                for (let key of ['qirats', 'qirat', 'qiraat', 'qurans']) {
+                    const idx = lowerKeys.indexOf(key);
+                    if (idx !== -1) return row[Object.keys(row)[idx]] || '';
+                }
+                return '';
+            }
+            return '';
+        }
+        if (selectedColumn.startsWith('constant:')) {
+            return selectedColumn.replace('constant:', '');
+        }
+        return row[selectedColumn] || '';
+    }
+    
+    function analyzeDuplicates() {
+        let newCount = 0;
+        let updateCount = 0;
+        let mergeCount = 0;
+        
+        for (const row of parsedData) {
+            const fullName = getMappedValue(row, 'full_name');
+            if (!fullName || fullName.trim() === '') continue;
+            const normalizedName = fullName.trim().toLowerCase();
+            const existing = existingStudentsMap.get(normalizedName);
+            
+            if (!existing) {
+                newCount++;
+            } else {
+                updateCount++;
+                const existingQirats = (existing.schedules || []).map(s => s.qirat_name);
+                const newQiratsRaw = getMappedValue(row, 'qirats');
+                if (newQiratsRaw) {
+                    const newQirats = newQiratsRaw.split(',').map(q => q.trim()).filter(q => q);
+                    const hasNewQirats = newQirats.some(q => !existingQirats.includes(q));
+                    if (hasNewQirats) mergeCount++;
+                }
+            }
+        }
+        
+        newCountSpan.textContent = newCount;
+        updateCountSpan.textContent = updateCount;
+        mergeCountSpan.textContent = mergeCount;
+    }
+    
+    function updateMappingAndAnalyze() {
+        document.querySelectorAll('.mapping-select').forEach(select => {
+            const field = select.getAttribute('data-field');
+            let value = select.value;
+            if (value === '[constant]') {
+                const constVal = prompt('Enter constant value:');
+                if (constVal) {
+                    value = `constant:${constVal}`;
+                    const option = document.createElement('option');
+                    option.value = value;
+                    option.text = `Constant: ${constVal}`;
+                    option.selected = true;
+                    select.appendChild(option);
+                } else {
+                    value = '';
+                    select.value = '';
+                }
+            }
+            currentMappingSelections[field] = value || '';
+        });
+        analyzeDuplicates();
+    }
+    
     function renderPreview() {
         if (parsedData.length === 0) {
-            showToast('No valid data found in file', true);
+            showToast('No valid data found', true);
             return;
         }
         
@@ -556,10 +820,7 @@
         actionButtons.style.display = 'flex';
         
         rowCountSpan.textContent = parsedData.length;
-        columnCountSpan.textContent = headers.length;
-        validCountSpan.textContent = parsedData.filter(row => row[headers[0]]).length;
         
-        // Render preview table
         const previewRows = parsedData.slice(0, 20);
         const thead = `<tr>${headers.map(h => `<th>${escapeHtml(h)}</th>`).join('')}</tr>`;
         const tbody = previewRows.map(row => 
@@ -567,7 +828,6 @@
         ).join('');
         previewTable.innerHTML = `<thead>${thead}</thead><tbody>${tbody}</tbody>`;
         
-        // Render mapping UI
         const dbFields = [
             { key: 'full_name', label: 'Full Name', required: true },
             { key: 'gender', label: 'Gender', required: false },
@@ -583,51 +843,48 @@
                 <label>${field.label} ${field.required ? '<span style="color:#ef4444;">*</span>' : ''}</label>
                 <select data-field="${field.key}" class="mapping-select">
                     <option value="">-- Auto-detect --</option>
-                    ${headers.map(h => `<option value="${escapeHtml(h)}" ${h.toLowerCase().includes(field.key.replace('_', ' ')) || (field.key === 'full_name' && (h.toLowerCase().includes('name'))) ? 'selected' : ''}>${escapeHtml(h)}</option>`).join('')}
-                    <option value="[constant]">Set constant: ${field.label}</option>
+                    ${headers.map(h => `<option value="${escapeHtml(h)}">${escapeHtml(h)}</option>`).join('')}
+                    <option value="[constant]">✏️ Set constant value...</option>
                 </select>
             </div>
         `).join('');
         
-        // Add constant value inputs
         document.querySelectorAll('.mapping-select').forEach(select => {
-            select.addEventListener('change', (e) => {
-                if (e.target.value === '[constant]') {
-                    const constantVal = prompt(`Enter constant value for ${e.target.parentElement.querySelector('label').innerText.replace('*', '')}:`);
-                    if (constantVal) {
-                        const option = document.createElement('option');
-                        option.value = constantVal;
-                        option.text = `Constant: ${constantVal}`;
-                        option.selected = true;
-                        e.target.appendChild(option);
-                    } else e.target.value = '';
-                }
-            });
+            const field = select.getAttribute('data-field');
+            const lowerHeaders = headers.map(h => h.toLowerCase());
+            
+            if (field === 'full_name') {
+                const idx = lowerHeaders.findIndex(h => h.includes('name'));
+                if (idx !== -1) select.value = headers[idx];
+            } else if (field === 'gender') {
+                const idx = lowerHeaders.findIndex(h => h === 'gender');
+                if (idx !== -1) select.value = headers[idx];
+            } else if (field === 'phone') {
+                const idx = lowerHeaders.findIndex(h => h === 'phone' || h.includes('mobile'));
+                if (idx !== -1) select.value = headers[idx];
+            } else if (field === 'telegram') {
+                const idx = lowerHeaders.findIndex(h => h === 'telegram');
+                if (idx !== -1) select.value = headers[idx];
+            } else if (field === 'department') {
+                const idx = lowerHeaders.findIndex(h => h.includes('dept') || h === 'department');
+                if (idx !== -1) select.value = headers[idx];
+            } else if (field === 'batch') {
+                const idx = lowerHeaders.findIndex(h => h.includes('batch') || h === 'year');
+                if (idx !== -1) select.value = headers[idx];
+            } else if (field === 'qirats') {
+                const idx = lowerHeaders.findIndex(h => h.includes('qirat') || h.includes('qiraat'));
+                if (idx !== -1) select.value = headers[idx];
+            }
+            
+            select.addEventListener('change', updateMappingAndAnalyze);
         });
+        
+        updateMappingAndAnalyze();
     }
     
     function escapeHtml(str) {
         if (!str) return '';
         return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m]));
-    }
-    
-    function getMappedValue(row, fieldKey) {
-        const select = document.querySelector(`.mapping-select[data-field="${fieldKey}"]`);
-        if (!select) return '';
-        const mapping = select.value;
-        if (!mapping) {
-            // Auto-detect
-            if (fieldKey === 'full_name') return row['Name'] || row['full_name'] || row['Student Name'] || '';
-            if (fieldKey === 'gender') return row['Gender'] || row['gender'] || '';
-            if (fieldKey === 'phone') return row['Phone'] || row['phone'] || '';
-            if (fieldKey === 'telegram') return row['Telegram'] || row['telegram'] || '';
-            if (fieldKey === 'department') return row['Department'] || row['department'] || '';
-            if (fieldKey === 'batch') return row['Batch'] || row['batch'] || '';
-            if (fieldKey === 'qirats') return row['Qirats'] || row['qirats'] || '';
-            return '';
-        }
-        if (mapping.startsWith('Constant:')) return mapping.replace('Constant: ', '');
-        return row[mapping] || '';
     }
     
     cancelBtn.addEventListener('click', () => {
@@ -646,54 +903,93 @@
             return;
         }
         
-        const batch = writeBatch(db);
-        const registrationsRef = collection(db, "registrations");
-        let successCount = 0;
-        let errorCount = 0;
+        showLoading("Starting import...", 0);
+        let added = 0;
+        let updated = 0;
+        let merged = 0;
+        const total = parsedData.length;
         
-        for (const row of parsedData) {
+        for (let i = 0; i < parsedData.length; i++) {
+            const row = parsedData[i];
+            const progress = Math.round((i / total) * 100);
+            updateLoadingProgress(progress, `Importing ${i+1}/${total} records...`);
+            
             try {
                 const full_name = getMappedValue(row, 'full_name');
-                if (!full_name) {
-                    errorCount++;
-                    continue;
-                }
+                if (!full_name || full_name.trim() === '') continue;
                 
+                const normalizedName = full_name.trim().toLowerCase();
+                const existing = existingStudentsMap.get(normalizedName);
+                
+                const gender = getMappedValue(row, 'gender') || 'Not Specified';
+                const phone = getMappedValue(row, 'phone') || '';
+                const telegram = getMappedValue(row, 'telegram') || '';
+                const department = getMappedValue(row, 'department') || 'Other';
+                const batch = getMappedValue(row, 'batch') || 'General';
                 const qiratsRaw = getMappedValue(row, 'qirats');
-                const schedules = qiratsRaw ? qiratsRaw.split(',').map(q => ({ qirat_name: q.trim(), days: ["Flexible"], time_preference: "Evening" })) : [];
                 
-                const studentData = {
-                    full_name: full_name,
-                    gender: getMappedValue(row, 'gender') || 'Not Specified',
-                    phone: getMappedValue(row, 'phone') || '',
-                    telegram: getMappedValue(row, 'telegram') || '',
-                    department: getMappedValue(row, 'department') || 'Other',
-                    batch: getMappedValue(row, 'batch') || 'General',
-                    schedules: schedules,
-                    timestamp: new Date()
-                };
+                const newQirats = qiratsRaw ? qiratsRaw.split(',').map(q => q.trim()).filter(q => q) : [];
+                const schedules = newQirats.map(q => ({ qirat_name: q, days: ["Flexible"], time_preference: "Evening" }));
                 
-                await addDoc(registrationsRef, studentData);
-                successCount++;
+                if (!existing) {
+                    await addDoc(collection(db, "registrations"), {
+                        full_name: full_name.trim(),
+                        gender, phone, telegram, department, batch,
+                        schedules, timestamp: new Date()
+                    });
+                    added++;
+                    existingStudentsMap.set(normalizedName, { id: 'temp', full_name, gender, phone, telegram, department, batch, schedules });
+                } else {
+                    const existingQirats = (existing.schedules || []).map(s => s.qirat_name);
+                    const mergedQirats = [...new Set([...existingQirats, ...newQirats])];
+                    const mergedSchedules = mergedQirats.map(q => ({ qirat_name: q, days: ["Flexible"], time_preference: "Evening" }));
+                    
+                    const hasChanges = (
+                        existing.gender !== gender ||
+                        existing.phone !== phone ||
+                        existing.telegram !== telegram ||
+                        existing.department !== department ||
+                        existing.batch !== batch ||
+                        mergedQirats.length !== existingQirats.length
+                    );
+                    
+                    if (hasChanges) {
+                        const studentRef = doc(db, "registrations", existing.id);
+                        await updateDoc(studentRef, {
+                            gender, phone, telegram, department, batch,
+                            schedules: mergedSchedules,
+                            timestamp: new Date()
+                        });
+                        updated++;
+                        if (mergedQirats.length > existingQirats.length) merged++;
+                        
+                        existing.gender = gender;
+                        existing.phone = phone;
+                        existing.telegram = telegram;
+                        existing.department = department;
+                        existing.batch = batch;
+                        existing.schedules = mergedSchedules;
+                    }
+                }
             } catch (err) {
-                errorCount++;
-                console.error(err);
+                console.error("Import error:", err);
             }
         }
         
-        showToast(`Import complete: ${successCount} added, ${errorCount} failed`);
+        updateLoadingProgress(100, "Finalizing...");
+        await new Promise(r => setTimeout(r, 500));
+        hideLoading();
         
-        if (successCount > 0) {
-            parsedData = [];
-            previewContainer.style.display = 'none';
-            mappingSection.style.display = 'none';
-            actionButtons.style.display = 'none';
-            statsGrid.style.display = 'none';
-            fileInput.value = '';
-        }
+        showToast(`✅ Import complete: ${added} new, ${updated} updated, ${merged} Qirats merged`);
+        
+        parsedData = [];
+        previewContainer.style.display = 'none';
+        mappingSection.style.display = 'none';
+        actionButtons.style.display = 'none';
+        statsGrid.style.display = 'none';
+        fileInput.value = '';
     });
     
-    // Template download
     function downloadTemplate() {
         const template = [
             { 'Full Name': 'Ahmed Hassan', 'Gender': 'Male', 'Phone': '+1234567890', 'Telegram': 'ahmed_h', 'Department': 'Medicine', 'Batch': '1st Year', 'Qirats': 'Hafs, Warsh' },
@@ -706,7 +1002,6 @@
         showToast('Template downloaded');
     }
     
-    // Add template download button to header
     const headerContent = document.querySelector('.header-content');
     const templateBtn = document.createElement('button');
     templateBtn.className = 'back-btn';
@@ -715,6 +1010,24 @@
     templateBtn.style.color = 'white';
     templateBtn.onclick = downloadTemplate;
     headerContent.appendChild(templateBtn);
+    
+    await loadExistingStudents();
+
+    // Initialize navigation
+    initNavigation();
+    if (admin?.role === 'super-admin') {
+        setTimeout(() => refreshNavigation(), 100);
+    }
+</script>
+<script type="module">
+    import { initNavigation, refreshNavigation } from './nav.js';
+    import { getCurrentAdminSync } from './auth.js';
+    
+    initNavigation();
+    const adminNav = getCurrentAdminSync();
+    if (adminNav?.role === 'super-admin') {
+        refreshNavigation();
+    }
 </script>
 </body>
 </html>
