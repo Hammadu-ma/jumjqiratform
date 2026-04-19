@@ -2,982 +2,237 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>JUMJ Irshad | Exam Intelligence Suite</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academic Performance | Exam Analytics</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
         :root {
-            --primary: #10b981;
-            --primary-dark: #059669;
-            --primary-light: #d1fae5;
-            --primary-glow: rgba(16, 185, 129, 0.2);
-            --secondary: #6366f1;
-            --accent: #f59e0b;
-            --danger: #ef4444;
-            --dark: #0f172a;
-            --card-bg: rgba(255, 255, 255, 0.98);
-            --text-primary: #0f172a;
-            --text-secondary: #475569;
-            --text-muted: #64748b;
-            --border: #e2e8f0;
-            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+            --glass-bg: rgba(255, 255, 255, 0.07);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --accent-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
         }
 
         body {
+            background: #0f172a;
+            color: #f1f5f9;
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #f0f9ff 0%, #e6f7f0 100%);
             min-height: 100vh;
-            padding-bottom: 80px;
         }
 
-        .glass-header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(16, 185, 129, 0.2);
-            padding: 16px 24px;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: var(--shadow-sm);
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 1.5rem;
         }
 
-        .header-content {
-            max-width: 1600px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 12px;
+        .btn-premium {
+            background: var(--accent-gradient);
+            transition: all 0.3s ease;
         }
 
-        .logo h1 {
-            font-size: 1.5rem;
-            background: linear-gradient(135deg, #10b981, #059669);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        .btn-premium:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
         }
 
-        .desktop-nav {
-            display: flex;
-            gap: 8px;
-            background: var(--card-bg);
-            padding: 6px;
-            border-radius: 60px;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border);
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
         }
 
-        .nav-link {
-            padding: 10px 24px;
-            border-radius: 40px;
-            text-decoration: none;
-            font-weight: 600;
-            color: var(--text-secondary);
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
         }
 
-        .nav-link:hover { background: var(--primary-light); color: var(--primary-dark); }
-        .nav-link.active { background: linear-gradient(135deg, #10b981, #059669); color: white; }
-
-        .main-container {
-            max-width: 1600px;
-            margin: 0 auto;
-            padding: 24px;
+        /* Modal Animation */
+        .modal-enter {
+            animation: modalFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* Hero Stats */
-        .hero-stats {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            border-radius: 32px;
-            padding: 32px;
-            margin-bottom: 32px;
-            color: white;
-            position: relative;
-            overflow: hidden;
-        }
-        .hero-stats::before {
-            content: "📊";
-            position: absolute;
-            bottom: -20px;
-            right: 20px;
-            font-size: 100px;
-            opacity: 0.1;
-            pointer-events: none;
-        }
-        .hero-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 4px; }
-        .hero-subtitle { opacity: 0.9; font-size: 0.9rem; margin-bottom: 20px; }
-        .stats-row { display: flex; gap: 24px; flex-wrap: wrap; }
-        .hero-stat { background: rgba(255,255,255,0.15); backdrop-filter: blur(4px); border-radius: 20px; padding: 12px 24px; min-width: 120px; }
-        .hero-stat .number { font-size: 1.8rem; font-weight: 800; }
-        .hero-stat .label { font-size: 0.7rem; opacity: 0.8; }
-
-        /* Quick Stats Cards */
-        .quick-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 32px;
-        }
-        .quick-stat-card {
-            background: var(--card-bg);
-            border-radius: 24px;
-            padding: 20px;
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow-sm);
-            transition: all 0.3s;
-        }
-        .quick-stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); border-color: var(--primary); }
-        .quick-stat-icon { width: 48px; height: 48px; background: var(--primary-light); border-radius: 24px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; color: var(--primary); font-size: 1.5rem; }
-        .quick-stat-value { font-size: 1.8rem; font-weight: 800; color: var(--text-primary); }
-        .quick-stat-label { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
-
-        /* Mode Selector */
-        .mode-selector {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 28px;
-            flex-wrap: wrap;
-            background: var(--card-bg);
-            padding: 8px;
-            border-radius: 60px;
-            width: fit-content;
-            border: 1px solid var(--border);
-        }
-        .mode-btn {
-            padding: 10px 28px;
-            border: none;
-            background: transparent;
-            border-radius: 50px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .mode-btn.active {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: white;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.95) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
         }
 
-        /* Groups Grid */
-        .groups-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-            gap: 24px;
-            margin-bottom: 32px;
+        .status-badge {
+            padding: 2px 8px;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.2);
         }
-        .group-card {
-            background: var(--card-bg);
-            border-radius: 28px;
-            padding: 24px;
-            border: 1px solid var(--border);
-            transition: all 0.3s;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-        }
-        .group-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        .group-card:hover::before { opacity: 1; }
-        .group-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-xl); border-color: var(--primary-light); }
-        .group-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px; }
-        .group-name { font-size: 1.2rem; font-weight: 800; color: var(--primary-dark); display: flex; align-items: center; gap: 8px; }
-        .group-badge { background: var(--primary-light); padding: 4px 12px; border-radius: 30px; font-size: 0.7rem; font-weight: 600; color: var(--primary-dark); }
-        .progress-bar { height: 6px; background: var(--border); border-radius: 10px; overflow: hidden; margin: 16px 0; }
-        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--primary-dark)); border-radius: 10px; transition: width 0.5s; }
-        .group-stats { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); margin-top: 12px; }
-
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(8px);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
-        }
-        .modal.active { display: flex; }
-        .modal-content {
-            background: white;
-            border-radius: 32px;
-            padding: 28px;
-            max-width: 1400px;
-            width: 95%;
-            max-height: 85vh;
-            overflow-y: auto;
-        }
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-            gap: 16px;
-            padding-bottom: 16px;
-            border-bottom: 2px solid var(--primary-light);
-        }
-        .modal-title { font-size: 1.4rem; font-weight: 800; color: var(--primary-dark); display: flex; align-items: center; gap: 10px; }
-        .modal-actions { display: flex; gap: 12px; flex-wrap: wrap; }
-        .btn-icon { background: var(--border); border: none; padding: 8px 16px; border-radius: 30px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; }
-        .btn-icon:hover { background: var(--primary); color: white; }
-        .btn-primary { background: var(--primary); color: white; border: none; padding: 8px 20px; border-radius: 30px; font-weight: 600; cursor: pointer; }
-
-        /* Student Qirat Cards */
-        .student-qirat-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-        .student-card {
-            background: white;
-            border-radius: 24px;
-            border: 1px solid var(--border);
-            overflow: hidden;
-            transition: all 0.3s;
-        }
-        .student-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
-        .student-card-header {
-            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-            padding: 16px 20px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border);
-        }
-        .student-name { font-weight: 800; font-size: 1rem; color: var(--primary-dark); }
-        .student-avg { background: var(--primary-light); padding: 4px 12px; border-radius: 30px; font-size: 0.7rem; font-weight: 600; }
-        .student-detail { padding: 16px 20px; display: none; background: white; }
-        .student-detail.show { display: block; }
-        .qirat-performance-list { display: flex; flex-direction: column; gap: 16px; }
-        .qirat-item {
-            background: #f8fafc;
-            border-radius: 20px;
-            padding: 16px;
-            border-left: 4px solid var(--primary);
-        }
-        .qirat-name { font-weight: 700; margin-bottom: 12px; color: var(--primary-dark); }
-        .exam-scores-row { display: flex; flex-wrap: wrap; gap: 12px; margin: 12px 0; }
-        .exam-chip { background: white; padding: 6px 12px; border-radius: 20px; font-size: 0.7rem; border: 1px solid var(--border); }
-        .rank-row { display: flex; justify-content: space-between; margin-top: 8px; font-size: 0.7rem; }
-        .rank-badge { background: #fef3c7; color: #92400e; padding: 4px 10px; border-radius: 30px; font-size: 0.7rem; font-weight: 600; display: inline-block; }
-        .rank-badge.gold { background: #fbbf24; color: #78350f; }
-        .rank-badge.silver { background: #e5e7eb; color: #374151; }
-        .rank-badge.bronze { background: #fdba74; color: #7c2d12; }
-
-        .filter-bar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-bottom: 24px;
-            padding: 16px;
-            background: #f8fafc;
-            border-radius: 20px;
-            align-items: flex-end;
-        }
-        .filter-group { display: flex; flex-direction: column; gap: 6px; }
-        .filter-group label { font-size: 0.7rem; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; }
-        .filter-group input, .filter-group select { padding: 8px 14px; border-radius: 20px; border: 1px solid var(--border); font-family: inherit; background: white; min-width: 140px; }
-
-        .exam-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
-        .exam-table th, .exam-table td { padding: 12px 10px; text-align: left; border-bottom: 1px solid var(--border); vertical-align: middle; }
-        .exam-table th { background: #f8fafc; font-weight: 700; position: sticky; top: 0; }
-        .score-input { width: 75px; padding: 6px 8px; border: 2px solid var(--border); border-radius: 12px; text-align: center; font-family: inherit; }
-        .score-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
-
-        .toast {
-            position: fixed;
-            bottom: 100px;
-            right: 24px;
-            background: #1f2937;
-            color: white;
-            padding: 12px 24px;
-            border-radius: 50px;
-            display: none;
-            z-index: 1100;
-            animation: slideIn 0.3s ease;
-        }
-        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(20px);
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            padding: 12px 20px 20px;
-            border-top: 1px solid var(--border);
-            z-index: 200;
-            display: none;
-        }
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 8px 16px;
-            border-radius: 40px;
-            color: var(--text-muted);
-        }
-        .nav-item i { font-size: 1.4rem; }
-        .nav-item span { font-size: 0.7rem; font-weight: 500; }
-        .nav-item.active { color: var(--primary); background: var(--primary-light); }
-
-        @media (min-width: 768px) { body { padding-bottom: 0; } .bottom-nav { display: none; } }
-        @media (max-width: 768px) { .desktop-nav { display: none; } .bottom-nav { display: flex; } .main-container { padding: 16px; padding-bottom: 80px; } .groups-grid { grid-template-columns: 1fr; } .student-qirat-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
-<body>
+<body class="p-4 md:p-8">
 
-<div class="glass-header">
-    <div class="header-content">
-        <div class="logo"><h1><i class="fas fa-graduation-cap"></i> Exam Intelligence Suite</h1></div>
-        <div class="desktop-nav">
-            <a href="index.html" class="nav-link">Home</a>
-            <a href="groups.html" class="nav-link">Groups</a>
-            <a href="tables.html" class="nav-link">Tables</a>
-            <a href="analytics.html" class="nav-link">Analytics</a>
-            <a href="exam.html" class="nav-link active">Exams</a>
-            <a href="import.html" class="nav-link">Import</a>
+    <header class="max-w-7xl mx-auto mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div>
+            <h1 class="text-3xl font-bold tracking-tight">Exam Performance</h1>
+            <p class="text-slate-400 mt-1">Detailed analytics and score management</p>
         </div>
-    </div>
-</div>
-
-<div class="main-container">
-    <div class="hero-stats">
-        <div class="hero-title"><i class="fas fa-chart-line"></i> Exam Intelligence Dashboard</div>
-        <div class="hero-subtitle">Track student performance, manage assessments, and visualize academic progress</div>
-        <div class="stats-row" id="heroStats">
-            <div class="hero-stat"><div class="number" id="heroTotal">0</div><div class="label">Students</div></div>
-            <div class="hero-stat"><div class="number" id="heroQirats">0</div><div class="label">Qirats</div></div>
-            <div class="hero-stat"><div class="number" id="heroExams">0</div><div class="label">Exam Records</div></div>
-            <div class="hero-stat"><div class="number" id="heroCompletion">0%</div><div class="label">Completion</div></div>
+        
+        <div class="flex gap-3 bg-slate-800/50 p-1.5 rounded-2xl border border-slate-700">
+            <button onclick="switchView('qirat')" class="view-btn px-6 py-2 rounded-xl text-sm font-medium transition-all bg-indigo-600">By Qirat</button>
+            <button onclick="switchView('department')" class="view-btn px-6 py-2 rounded-xl text-sm font-medium transition-all text-slate-400">By Department</button>
+            <button onclick="switchView('general')" class="view-btn px-6 py-2 rounded-xl text-sm font-medium transition-all text-slate-400">General</button>
         </div>
-    </div>
+    </header>
 
-    <div class="quick-stats" id="quickStats"></div>
-
-    <div class="mode-selector">
-        <button class="mode-btn active" data-mode="qirat"><i class="fas fa-book-quran"></i> By Qirat</button>
-        <button class="mode-btn" data-mode="department"><i class="fas fa-building"></i> By Department</button>
-        <button class="mode-btn" data-mode="overall"><i class="fas fa-trophy"></i> Overall Ranking</button>
-    </div>
-
-    <div class="groups-grid" id="groupsGrid">
-        <div class="empty-state">Loading...</div>
-    </div>
-</div>
-
-<div id="examModal" class="modal"><div class="modal-content"><div id="modalDynamicContent"></div></div></div>
-<div id="settingsModal" class="modal"><div class="modal-content"><div id="settingsDynamicContent"></div></div></div>
-
-<div class="bottom-nav">
-    <button class="nav-item" onclick="window.location.href='index.html'"><i class="fas fa-home"></i><span>Home</span></button>
-    <button class="nav-item" onclick="window.location.href='groups.html'"><i class="fas fa-layer-group"></i><span>Groups</span></button>
-    <button class="nav-item" onclick="window.location.href='tables.html'"><i class="fas fa-table"></i><span>Tables</span></button>
-    <button class="nav-item" onclick="window.location.href='analytics.html'"><i class="fas fa-chart-line"></i><span>Analytics</span></button>
-    <button class="nav-item active" onclick="window.location.href='exam.html'"><i class="fas fa-graduation-cap"></i><span>Exams</span></button>
-    <button class="nav-item" onclick="window.location.href='import.html'"><i class="fas fa-upload"></i><span>Import</span></button>
-</div>
-
-<div id="toast" class="toast"></div>
-
-<script type="module">
-    import { protectPage, initAuthUI, setupAutoLogout, getCurrentAdminSync } from './auth.js';
-    import { initNavigation, refreshNavigation } from './nav.js';
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, doc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-    
-    if (!protectPage('admin-login.html')) throw new Error('Redirecting');
-    const admin = initAuthUI();
-    setupAutoLogout(60);
-    
-    const firebaseConfig = {
-        apiKey: "AIzaSyAR_g5y04YAGCrTvZCowrE7hw8h7k1du08",
-        authDomain: "jujm-qirat.firebaseapp.com",
-        projectId: "jujm-qirat",
-        storageBucket: "jujm-qirat.firebasestorage.app",
-        messagingSenderId: "253413984903",
-        appId: "1:253413984903:web:c1577e0fdef1711f960622"
-    };
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    
-    let allStudents = [];
-    let examScores = new Map();
-    let assessmentConfig = { names: ['Quiz 1', 'Mid Exam', 'Assignment', 'Final Exam', 'Project'], outOf: [30, 50, 20, 100, 40] };
-    let currentGroupMode = 'qirat';
-    let groups = [];
-    let isEditMode = false;
-    let currentModalContext = null;
-    
-    const toast = document.getElementById('toast');
-    function showToast(msg, isErr = false) { toast.textContent = msg; toast.style.background = isErr ? '#ef4444' : '#10b981'; toast.style.display = 'block'; setTimeout(() => toast.style.display = 'none', 3000); }
-    function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
-    function getQiratNames(student) { return (student.schedules || []).map(s => s.qirat_name).filter(Boolean); }
-    
-    async function loadAssessmentConfig() { try { const configDoc = await getDocs(collection(db, "settings")); configDoc.forEach(doc => { if (doc.id === 'assessmentConfig') assessmentConfig = doc.data(); }); } catch(e) {} }
-    async function saveAssessmentConfig() { await setDoc(doc(db, "settings", "assessmentConfig"), assessmentConfig); showToast('Settings saved'); }
-    
-    function getStudentExamScores(studentId, qiratName) { const studentScores = examScores.get(studentId) || {}; return studentScores[qiratName] || {}; }
-    function calculatePercentage(score, outOf) { if (score === null || score === '' || !outOf) return null; return Math.round((parseFloat(score) / outOf) * 100); }
-    function calculateAverage(scores) {
-        let totalPercent = 0, count = 0;
-        for (let i = 0; i < assessmentConfig.names.length; i++) {
-            const score = scores[`assessment${i+1}`];
-            if (score !== null && score !== '' && !isNaN(score)) {
-                const percent = calculatePercentage(parseFloat(score), assessmentConfig.outOf[i]);
-                if (percent !== null) { totalPercent += percent; count++; }
-            }
-        }
-        return count > 0 ? Math.round(totalPercent / count) : null;
-    }
-    
-    async function saveExamScore(studentId, qiratName, assessmentKey, value) {
-        const currentScores = examScores.get(studentId) || {};
-        const qiratScores = currentScores[qiratName] || {};
-        qiratScores[assessmentKey] = value ? parseFloat(value) : null;
-        currentScores[qiratName] = qiratScores;
-        examScores.set(studentId, currentScores);
-        const examRef = doc(db, "examScores", studentId);
-        await setDoc(examRef, { scores: Object.fromEntries(examScores) }, { merge: true });
-    }
-    
-    async function loadExamScores() {
-        try {
-            const snapshot = await getDocs(collection(db, "examScores"));
-            examScores.clear();
-            snapshot.forEach(docSnap => { const data = docSnap.data();
-                if (data.scores) { Object.entries(data.scores).forEach(([studentId, studentData]) => examScores.set(studentId, studentData)); }
-            });
-        } catch(e) {}
-    }
-    
-    async function loadData() {
-        try {
-            const querySnapshot = await getDocs(collection(db, "registrations"));
-            allStudents = [];
-            querySnapshot.forEach(docSnap => {
-                const data = docSnap.data();
-                let timestamp = data.timestamp?.toDate?.() || new Date(data.timestamp) || new Date();
-                allStudents.push({
-                    id: docSnap.id, full_name: data.full_name || 'N/A', gender: data.gender || 'Not Specified',
-                    phone: data.phone || '', department: data.department || 'Other', batch: data.batch || 'General',
-                    schedules: data.schedules || [], timestamp: timestamp
-                });
-            });
-            await loadAssessmentConfig();
-            await loadExamScores();
-            buildGroups();
-            renderHeroStats();
-            renderQuickStats();
-        } catch(e) { showToast("Error: " + e.message, true); }
-    }
-    
-    function renderHeroStats() {
-        const total = allStudents.length;
-        const allQirats = new Set(); allStudents.forEach(s => getQiratNames(s).forEach(q => allQirats.add(q)));
-        let examRecords = 0;
-        examScores.forEach(studentScores => { Object.values(studentScores).forEach(qScores => { if (Object.values(qScores).some(v => v !== null)) examRecords++; }); });
-        const totalPossible = total * allQirats.size;
-        const completion = totalPossible > 0 ? Math.round((examRecords / totalPossible) * 100) : 0;
-        document.getElementById('heroTotal').textContent = total;
-        document.getElementById('heroQirats').textContent = allQirats.size;
-        document.getElementById('heroExams').textContent = examRecords;
-        document.getElementById('heroCompletion').textContent = completion;
-    }
-    
-    function renderQuickStats() {
-        const allQirats = new Set(); allStudents.forEach(s => getQiratNames(s).forEach(q => allQirats.add(q)));
-        let totalScore = 0, scoreCount = 0;
-        examScores.forEach(studentScores => { Object.values(studentScores).forEach(qScores => {
-            const avg = calculateAverage(qScores);
-            if (avg !== null) { totalScore += avg; scoreCount++; }
-        }); });
-        const avgScore = scoreCount > 0 ? Math.round(totalScore / scoreCount) : 0;
-        document.getElementById('quickStats').innerHTML = `
-            <div class="quick-stat-card"><div class="quick-stat-icon"><i class="fas fa-users"></i></div><div class="quick-stat-value">${allStudents.length}</div><div class="quick-stat-label">Total Students</div></div>
-            <div class="quick-stat-card"><div class="quick-stat-icon"><i class="fas fa-book-quran"></i></div><div class="quick-stat-value">${allQirats.size}</div><div class="quick-stat-label">Active Qirats</div></div>
-            <div class="quick-stat-card"><div class="quick-stat-icon"><i class="fas fa-chart-line"></i></div><div class="quick-stat-value">${avgScore}%</div><div class="quick-stat-label">Average Score</div></div>
-            <div class="quick-stat-card"><div class="quick-stat-icon"><i class="fas fa-cog"></i></div><div class="quick-stat-value">${assessmentConfig.names.length}</div><div class="quick-stat-label">Assessments</div></div>
-        `;
-    }
-    
-    function calculateGroupAverageScore(qiratName, students) { let total = 0, count = 0; students.forEach(s => { const scores = getStudentExamScores(s.id, qiratName); const avg = calculateAverage(scores); if (avg !== null) { total += avg; count++; } }); return count > 0 ? Math.round(total / count) : 0; }
-    function calculateDepartmentAverageScore(students) { let total = 0, count = 0; students.forEach(s => { const qirats = getQiratNames(s); let studentTotal = 0, studentCount = 0; qirats.forEach(q => { const scores = getStudentExamScores(s.id, q); const avg = calculateAverage(scores); if (avg !== null) { studentTotal += avg; studentCount++; } }); if (studentCount > 0) { total += (studentTotal / studentCount); count++; } }); return count > 0 ? Math.round(total / count) : 0; }
-    function calculateStudentOverallAverage(studentId) { let total = 0, count = 0; const student = allStudents.find(s => s.id === studentId); if (student) { getQiratNames(student).forEach(q => { const scores = getStudentExamScores(studentId, q); const avg = calculateAverage(scores); if (avg !== null) { total += avg; count++; } }); } return count > 0 ? Math.round(total / count) : null; }
-    
-    function buildGroups() {
-        if (currentGroupMode === 'qirat') {
-            const qiratMap = new Map();
-            allStudents.forEach(s => { getQiratNames(s).forEach(q => { if (!qiratMap.has(q)) qiratMap.set(q, []); qiratMap.get(q).push(s); }); });
-            groups = Array.from(qiratMap.entries()).map(([name, students]) => ({ name, students, count: students.length, avgScore: calculateGroupAverageScore(name, students) })).sort((a,b) => b.count - a.count);
-        } else if (currentGroupMode === 'department') {
-            const deptMap = new Map();
-            allStudents.forEach(s => { const dept = s.department; if (!deptMap.has(dept)) deptMap.set(dept, []); deptMap.get(dept).push(s); });
-            groups = Array.from(deptMap.entries()).map(([name, students]) => ({ name, students, count: students.length, avgScore: calculateDepartmentAverageScore(students) })).sort((a,b) => b.count - a.count);
-        } else {
-            const studentScores = allStudents.map(s => ({ student: s, avgScore: calculateStudentOverallAverage(s.id) })).sort((a,b) => (b.avgScore || 0) - (a.avgScore || 0));
-            groups = [{ name: "All Students", students: allStudents, rankings: studentScores, count: allStudents.length }];
-        }
-        renderGroups();
-    }
-    
-    function renderGroups() {
-        const container = document.getElementById('groupsGrid');
-        if (groups.length === 0) { container.innerHTML = '<div class="empty-state">No data available</div>'; return; }
-        const maxCount = Math.max(...groups.map(g => g.count), 1);
-        container.innerHTML = groups.map((group, idx) => `
-            <div class="group-card" onclick="openGroupModal('${escapeHtml(group.name)}', ${idx})">
-                <div class="group-header">
-                    <div class="group-name"><i class="fas ${currentGroupMode === 'qirat' ? 'fa-book-quran' : (currentGroupMode === 'department' ? 'fa-building' : 'fa-trophy')}"></i> ${escapeHtml(group.name)}</div>
-                    <div class="group-badge">${group.avgScore || 0}% Avg</div>
-                </div>
-                <div class="progress-bar"><div class="progress-fill" style="width: ${(group.count / maxCount) * 100}%;"></div></div>
-                <div class="group-stats"><span><i class="fas fa-users"></i> ${group.count} students</span><span><i class="fas fa-chart-line"></i> ${group.avgScore || 0}% Average</span></div>
-                <div style="margin-top: 12px; font-size:0.7rem; color:var(--text-muted);"><i class="fas fa-arrow-right"></i> Click to manage exam scores</div>
+    <main class="max-w-7xl mx-auto">
+        
+        <section id="general-stats" class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+            <div class="glass-card p-6">
+                <div class="text-slate-400 text-sm mb-2">Total Students</div>
+                <div class="text-3xl font-bold">1,284</div>
+                <div class="text-emerald-400 text-xs mt-2"><i class="fas fa-arrow-up"></i> 12% vs last term</div>
             </div>
-        `).join('');
-    }
-    
-    window.openGroupModal = async (groupName, idx) => {
-        const group = groups[idx];
-        if (!group) return;
-        currentModalContext = group;
-        isEditMode = false;
-        if (currentGroupMode === 'qirat') await renderQiratModal(group.name, group.students);
-        else if (currentGroupMode === 'department') await renderDepartmentModal(group.name, group.students);
-        else await renderOverallModal(group.rankings);
-    };
-    
-    // ========== DEPARTMENT MODAL WITH STUDENT QIRAT CARDS ==========
-    async function renderDepartmentModal(deptName, students) {
-        currentModalContext = { type: 'department', name: deptName, students };
-        
-        // Calculate department-wide rankings for each Qirat
-        const allQiratsInDept = [...new Set(students.flatMap(s => getQiratNames(s)))];
-        
-        // For each student, calculate their performance in each Qirat
-        const studentData = students.map(student => {
-            const qirats = getQiratNames(student);
-            const qiratPerformances = qirats.map(qirat => {
-                const scores = getStudentExamScores(student.id, qirat);
-                const avg = calculateAverage(scores);
-                // Calculate rank of this student within the department for this Qirat
-                const allScoresForQirat = students.filter(s => getQiratNames(s).includes(qirat)).map(s => ({
-                    studentId: s.id,
-                    avg: calculateAverage(getStudentExamScores(s.id, qirat))
-                })).filter(s => s.avg !== null).sort((a,b) => (b.avg || 0) - (a.avg || 0));
-                const qiratRank = allScoresForQirat.findIndex(s => s.studentId === student.id) + 1;
-                const totalInQirat = allScoresForQirat.length;
-                return { qirat, avg, qiratRank, totalInQirat, scores };
-            }).filter(q => q.avg !== null);
-            
-            // Calculate student's overall average across all Qirats
-            const overallAvg = qiratPerformances.length > 0 ? 
-                Math.round(qiratPerformances.reduce((sum, q) => sum + (q.avg || 0), 0) / qiratPerformances.length) : null;
-            
-            // Rank Qirats for this student (best to worst)
-            const rankedQirats = [...qiratPerformances].sort((a,b) => (b.avg || 0) - (a.avg || 0));
-            
-            return { student, qiratPerformances, rankedQirats, overallAvg };
-        }).sort((a,b) => (b.overallAvg || 0) - (a.overallAvg || 0));
-        
-        // Build student cards HTML
-        const studentCardsHtml = studentData.map((data, studentRank) => {
-            const student = data.student;
-            const rankClass = studentRank === 0 ? 'gold' : studentRank === 1 ? 'silver' : studentRank === 2 ? 'bronze' : '';
-            
-            const qiratItemsHtml = data.rankedQirats.map(q => {
-                // Determine rank badge class for Qirat within department
-                let qiratRankClass = '';
-                if (q.qiratRank === 1) qiratRankClass = 'gold';
-                else if (q.qiratRank === 2) qiratRankClass = 'silver';
-                else if (q.qiratRank === 3) qiratRankClass = 'bronze';
-                
-                // Build exam scores display
-                const examScoresHtml = assessmentConfig.names.map((name, idx) => {
-                    const score = q.scores[`assessment${idx+1}`];
-                    const outOf = assessmentConfig.outOf[idx];
-                    const percent = calculatePercentage(score, outOf);
-                    return `<div class="exam-chip"><strong>${escapeHtml(name)}</strong>: ${score !== null ? score : '-'} / ${outOf}<br><small>${percent !== null ? percent+'%' : '-'}</small></div>`;
-                }).join('');
-                
-                return `
-                    <div class="qirat-item">
-                        <div class="qirat-name">📖 ${escapeHtml(q.qirat)}</div>
-                        <div class="exam-scores-row">${examScoresHtml}</div>
-                        <div class="rank-row">
-                            <span><i class="fas fa-chart-line"></i> Average: <strong>${q.avg !== null ? q.avg+'%' : '-'}</strong></span>
-                            <span class="rank-badge ${qiratRankClass}">🏆 Department Rank: ${q.qiratRank}/${q.totalInQirat}</span>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-            
-            return `
-                <div class="student-card">
-                    <div class="student-card-header" onclick="toggleStudentDetail('student-${student.id}')">
-                        <div class="student-name"><i class="fas fa-user-graduate"></i> ${escapeHtml(student.full_name)}</div>
-                        <div><span class="student-avg">⭐ Overall: ${data.overallAvg !== null ? data.overallAvg+'%' : '-'}</span> <span class="rank-badge ${rankClass}">#${studentRank+1} in Dept</span> <i class="fas fa-chevron-down" style="color:var(--text-muted);"></i></div>
-                    </div>
-                    <div class="student-detail" id="student-${student.id}">
-                        <div><strong>Department:</strong> ${escapeHtml(student.department)} | <strong>Batch:</strong> ${escapeHtml(student.batch)}</div>
-                        <div style="margin-top: 12px;"><strong>📚 Qirat Performance (Ranked Best to Worst):</strong></div>
-                        <div class="qirat-performance-list">${qiratItemsHtml}</div>
-                    </div>
-                </div>
-            `;
-        }).join('');
-        
-        document.getElementById('modalDynamicContent').innerHTML = `
-            <div class="modal-header">
-                <div class="modal-title"><i class="fas fa-building"></i> ${escapeHtml(deptName)} - Student Qirat Analysis</div>
-                <div class="modal-actions">
-                    <button class="btn-icon" onclick="toggleEditMode()"><i class="fas ${isEditMode ? 'fa-eye' : 'fa-edit'}"></i> ${isEditMode ? 'View Mode' : 'Edit Mode'}</button>
-                    <button class="btn-icon" onclick="openSettingsModal()"><i class="fas fa-cog"></i> Settings</button>
-                    <button class="close-modal" onclick="closeExamModal()">&times;</button>
+            <div class="glass-card p-6">
+                <div class="text-slate-400 text-sm mb-2">Average Score</div>
+                <div class="text-3xl font-bold">84.2%</div>
+                <div class="w-full bg-slate-700 h-1.5 rounded-full mt-4">
+                    <div class="bg-indigo-500 h-1.5 rounded-full" style="width: 84%"></div>
                 </div>
             </div>
-            <div class="filter-bar">
-                <div class="filter-group"><label>Search</label><input type="text" id="modalSearch" placeholder="Student name"></div>
-                <div class="filter-group"><label>Gender</label><select id="modalGender"><option value="">All</option><option value="Male">Male</option><option value="Female">Female</option></select></div>
-                <div class="filter-group"><label>Batch</label><select id="modalBatch"><option value="">All</option>${[...new Set(students.map(s=>s.batch))].map(b=>`<option value="${escapeHtml(b)}">${escapeHtml(b)}</option>`).join('')}</select></div>
-                <div class="filter-group"><label>Qirat Focus</label><select id="modalQiratFilter"><option value="">All Qirats</option>${allQiratsInDept.map(q=>`<option value="${escapeHtml(q)}">${escapeHtml(q)}</option>`).join('')}</select></div>
-                <button class="btn-icon" onclick="clearModalFilters()">Clear</button>
+            <div class="glass-card p-6">
+                <div class="text-slate-400 text-sm mb-2">Global Rank</div>
+                <div class="text-3xl font-bold">Top 5</div>
+                <p class="text-xs text-slate-500 mt-2">Across all departments</p>
             </div>
-            <div style="display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;">
-                <button class="btn-icon" onclick="exportModalToCSV()"><i class="fas fa-file-csv"></i> CSV</button>
-                <button class="btn-icon" onclick="exportModalToExcel()"><i class="fas fa-file-excel"></i> Excel</button>
-                <button class="btn-icon" onclick="exportModalToPDF()"><i class="fas fa-file-pdf"></i> PDF</button>
+            <div class="glass-card p-6 border-indigo-500/30">
+                <div class="text-slate-400 text-sm mb-2">System Health</div>
+                <div class="flex items-center gap-2">
+                    <span class="relative flex h-3 w-3">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                    </span>
+                    <span class="text-xl font-semibold">Live Sync</span>
+                </div>
+                <p class="text-xs text-slate-500 mt-3 italic">"AI Recommended: Focus on Lipid Metabolism Qirat next week."</p>
             </div>
-            <div class="student-qirat-grid" id="studentQiratGrid">${studentCardsHtml}</div>
-        `;
-        
-        document.getElementById('examModal').classList.add('active');
-        attachDepartmentFilterEvents(students);
-    }
-    
-    window.toggleStudentDetail = (id) => {
-        const element = document.getElementById(id);
-        if (element) element.classList.toggle('show');
-    };
-    
-    function attachDepartmentFilterEvents(students) {
-        const searchInput = document.getElementById('modalSearch');
-        const genderSelect = document.getElementById('modalGender');
-        const batchSelect = document.getElementById('modalBatch');
-        const qiratFilter = document.getElementById('modalQiratFilter');
-        
-        const filterStudents = () => {
-            const search = searchInput?.value.toLowerCase() || '';
-            const gender = genderSelect?.value || '';
-            const batch = batchSelect?.value || '';
-            const qiratFocus = qiratFilter?.value || '';
-            
-            const filteredStudents = students.filter(s => {
-                const matchSearch = s.full_name.toLowerCase().includes(search);
-                const matchGender = !gender || s.gender === gender;
-                const matchBatch = !batch || s.batch === batch;
-                return matchSearch && matchGender && matchBatch;
-            });
-            
-            // Re-render with filtered students and optional qirat highlighting
-            const studentData = filteredStudents.map(student => {
-                const qirats = getQiratNames(student);
-                let qiratPerformances = qirats.map(qirat => {
-                    const scores = getStudentExamScores(student.id, qirat);
-                    const avg = calculateAverage(scores);
-                    const allScoresForQirat = filteredStudents.filter(s => getQiratNames(s).includes(qirat)).map(s => ({
-                        studentId: s.id,
-                        avg: calculateAverage(getStudentExamScores(s.id, qirat))
-                    })).filter(s => s.avg !== null).sort((a,b) => (b.avg || 0) - (a.avg || 0));
-                    const qiratRank = allScoresForQirat.findIndex(s => s.studentId === student.id) + 1;
-                    const totalInQirat = allScoresForQirat.length;
-                    return { qirat, avg, qiratRank, totalInQirat, scores };
-                }).filter(q => q.avg !== null);
-                
-                if (qiratFocus) {
-                    qiratPerformances = qiratPerformances.filter(q => q.qirat === qiratFocus);
-                }
-                
-                const rankedQirats = [...qiratPerformances].sort((a,b) => (b.avg || 0) - (a.avg || 0));
-                const overallAvg = qiratPerformances.length > 0 ? 
-                    Math.round(qiratPerformances.reduce((sum, q) => sum + (q.avg || 0), 0) / qiratPerformances.length) : null;
-                
-                return { student, qiratPerformances, rankedQirats, overallAvg };
-            }).sort((a,b) => (b.overallAvg || 0) - (a.overallAvg || 0));
-            
-            const container = document.getElementById('studentQiratGrid');
-            if (container) {
-                container.innerHTML = studentData.map((data, studentRank) => {
-                    const student = data.student;
-                    const rankClass = studentRank === 0 ? 'gold' : studentRank === 1 ? 'silver' : studentRank === 2 ? 'bronze' : '';
-                    const qiratItemsHtml = data.rankedQirats.map(q => {
-                        let qiratRankClass = '';
-                        if (q.qiratRank === 1) qiratRankClass = 'gold';
-                        else if (q.qiratRank === 2) qiratRankClass = 'silver';
-                        else if (q.qiratRank === 3) qiratRankClass = 'bronze';
-                        const examScoresHtml = assessmentConfig.names.map((name, idx) => {
-                            const score = q.scores[`assessment${idx+1}`];
-                            const outOf = assessmentConfig.outOf[idx];
-                            const percent = calculatePercentage(score, outOf);
-                            return `<div class="exam-chip"><strong>${escapeHtml(name)}</strong>: ${score !== null ? score : '-'} / ${outOf}<br><small>${percent !== null ? percent+'%' : '-'}</small></div>`;
-                        }).join('');
-                        return `
-                            <div class="qirat-item">
-                                <div class="qirat-name">📖 ${escapeHtml(q.qirat)}</div>
-                                <div class="exam-scores-row">${examScoresHtml}</div>
-                                <div class="rank-row">
-                                    <span><i class="fas fa-chart-line"></i> Average: <strong>${q.avg !== null ? q.avg+'%' : '-'}</strong></span>
-                                    <span class="rank-badge ${qiratRankClass}">🏆 Dept Rank: ${q.qiratRank}/${q.totalInQirat}</span>
+        </section>
+
+        <div class="glass-card overflow-hidden">
+            <div class="p-6 border-b border-slate-700 flex justify-between items-center">
+                <h3 id="table-title" class="text-xl font-semibold">Qirat Students List</h3>
+                <input type="text" placeholder="Search students..." class="bg-slate-900 border border-slate-700 px-4 py-2 rounded-xl text-sm focus:outline-none focus:border-indigo-500">
+            </div>
+            <div class="overflow-x-auto custom-scrollbar">
+                <table class="w-full text-left">
+                    <thead class="bg-slate-800/50 text-slate-400 text-xs uppercase tracking-wider">
+                        <tr>
+                            <th class="px-6 py-4">Student Name</th>
+                            <th class="px-6 py-4">Department</th>
+                            <th class="px-6 py-4">Current Qirat</th>
+                            <th class="px-6 py-4">Status</th>
+                            <th class="px-6 py-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-700/50">
+                        <tr class="hover:bg-white/5 transition-colors group">
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="h-10 w-10 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold border border-indigo-500/30">FT</div>
+                                    <div>
+                                        <div class="font-medium">Fuad Temam</div>
+                                        <div class="text-xs text-slate-500">ID: #44021</div>
+                                    </div>
                                 </div>
-                            </div>
-                        `;
-                    }).join('');
-                    return `
-                        <div class="student-card">
-                            <div class="student-card-header" onclick="toggleStudentDetail('student-${student.id}')">
-                                <div class="student-name"><i class="fas fa-user-graduate"></i> ${escapeHtml(student.full_name)}</div>
-                                <div><span class="student-avg">⭐ Overall: ${data.overallAvg !== null ? data.overallAvg+'%' : '-'}</span> <span class="rank-badge ${rankClass}">#${studentRank+1}</span> <i class="fas fa-chevron-down" style="color:var(--text-muted);"></i></div>
-                            </div>
-                            <div class="student-detail" id="student-${student.id}">
-                                <div><strong>Department:</strong> ${escapeHtml(student.department)} | <strong>Batch:</strong> ${escapeHtml(student.batch)}</div>
-                                <div style="margin-top: 12px;"><strong>📚 Qirat Performance:</strong></div>
-                                <div class="qirat-performance-list">${qiratItemsHtml}</div>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
+                            </td>
+                            <td class="px-6 py-4 text-slate-300">Medical Science</td>
+                            <td class="px-6 py-4 text-slate-300">Glycolysis Pathways</td>
+                            <td class="px-6 py-4"><span class="status-badge">Active</span></td>
+                            <td class="px-6 py-4">
+                                <button onclick="openModal('qirat-modal')" class="btn-premium px-4 py-2 rounded-lg text-xs font-semibold">View Analytics</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <div id="qirat-modal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="glass-card w-full max-w-4xl max-h-[90vh] overflow-hidden modal-enter flex flex-col bg-slate-900">
+            <div class="p-6 border-b border-slate-700 flex justify-between items-center bg-slate-800/30">
+                <h2 class="text-2xl font-bold">Detailed Scorecard</h2>
+                <button onclick="closeModal('qirat-modal')" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <div class="p-6 overflow-y-auto custom-scrollbar">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                    <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700 text-center">
+                        <p class="text-xs text-slate-400 uppercase">Average Percentage</p>
+                        <p class="text-2xl font-bold text-indigo-400">92.5%</p>
+                    </div>
+                    <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700 text-center">
+                        <p class="text-xs text-slate-400 uppercase">Total Points</p>
+                        <p class="text-2xl font-bold text-purple-400">462/500</p>
+                    </div>
+                    <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700 text-center">
+                        <p class="text-xs text-slate-400 uppercase">Group Rank</p>
+                        <p class="text-2xl font-bold text-emerald-400">#02</p>
+                    </div>
+                </div>
+
+                <table class="w-full text-sm">
+                    <thead class="text-slate-400 border-b border-slate-700">
+                        <tr>
+                            <th class="py-3 text-left font-medium">Assessment</th>
+                            <th class="py-3 text-center font-medium">Score</th>
+                            <th class="py-3 text-center font-medium">Weight</th>
+                            <th class="py-3 text-right font-medium">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-800">
+                        <tr>
+                            <td class="py-4">Assessment 1 (Quizzes)</td>
+                            <td class="py-4 text-center">45/50</td>
+                            <td class="py-4 text-center">10%</td>
+                            <td class="py-4 text-right"><span class="text-emerald-400">Passed</span></td>
+                        </tr>
+                        <tr>
+                            <td class="py-4 font-bold text-indigo-400 underline italic">Average Total</td>
+                            <td class="py-4 text-center font-bold">90%</td>
+                            <td class="py-4 text-center">---</td>
+                            <td class="py-4 text-right font-bold text-indigo-400">Distinction</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        function switchView(view) {
+            // UI logic to update table headers and stats based on user prompt logic
+            const title = document.getElementById('table-title');
+            const btns = document.querySelectorAll('.view-btn');
+            
+            btns.forEach(b => b.classList.remove('bg-indigo-600', 'text-white'));
+            btns.forEach(b => b.classList.add('text-slate-400'));
+            
+            if(view === 'qirat') {
+                title.innerText = "Student Rankings by Qirat";
+                event.target.classList.add('bg-indigo-600', 'text-white');
+            } else if(view === 'department') {
+                title.innerText = "Departmental Overview";
+                event.target.classList.add('bg-indigo-600', 'text-white');
+            } else {
+                title.innerText = "General Leaderboard";
+                event.target.classList.add('bg-indigo-600', 'text-white');
             }
-        };
-        
-        if (searchInput) searchInput.addEventListener('input', filterStudents);
-        if (genderSelect) genderSelect.addEventListener('change', filterStudents);
-        if (batchSelect) batchSelect.addEventListener('change', filterStudents);
-        if (qiratFilter) qiratFilter.addEventListener('change', filterStudents);
-    }
-    
-    async function renderQiratModal(qiratName, students) {
-        currentModalContext = { type: 'qirat', name: qiratName, students };
-        const filtered = applyFilters(students);
-        const ranked = filtered.map(s => ({ student: s, avg: calculateAverage(getStudentExamScores(s.id, qiratName)) })).sort((a,b) => (b.avg || 0) - (a.avg || 0));
-        const tableRows = ranked.map((item, rank) => {
-            const s = item.student;
-            const scores = getStudentExamScores(s.id, qiratName);
-            const rankClass = rank === 0 ? 'gold' : rank === 1 ? 'silver' : rank === 2 ? 'bronze' : '';
-            return `<tr><td class="rank-badge ${rankClass}">${rank + 1}</span></td>}<strong>${escapeHtml(s.full_name)}</strong></td>}<span class="badge ${s.gender==='Male'?'badge-male':'badge-female'}">${escapeHtml(s.gender)}</span></td>}<span class="badge badge-dept">${escapeHtml(s.department)}</span></td>}${escapeHtml(s.batch)}</span>${assessmentConfig.names.map((name, i) => {
-                const score = scores[`assessment${i+1}`];
-                const percent = calculatePercentage(score, assessmentConfig.outOf[i]);
-                return `<td>${isEditMode ? `<input type="number" class="score-input" data-student="${s.id}" data-qirat="${qiratName}" data-assessment="${i+1}" value="${score !== null ? score : ''}" step="0.5" min="0" max="${assessmentConfig.outOf[i]}" style="width:75px;"><span style="font-size:0.7rem;">/${assessmentConfig.outOf[i]}</span>` : `<span><strong>${score !== null ? score : '-'}</strong> <span style="color:gray;">/${assessmentConfig.outOf[i]}</span><br><small>${percent !== null ? percent+'%' : '-'}</small></span>`}`;
-            }).join('')}<td><strong>${item.avg !== null ? item.avg+'%' : '-'}</strong></td></tr>`;
-        }).join('');
-        
-        document.getElementById('modalDynamicContent').innerHTML = `
-            <div class="modal-header">
-                <div class="modal-title"><i class="fas fa-book-quran"></i> ${escapeHtml(qiratName)} - Exam Scores</div>
-                <div class="modal-actions"><button class="btn-icon" onclick="toggleEditMode()"><i class="fas ${isEditMode ? 'fa-eye' : 'fa-edit'}"></i> ${isEditMode ? 'View Mode' : 'Edit Mode'}</button><button class="btn-icon" onclick="openSettingsModal()"><i class="fas fa-cog"></i> Settings</button><button class="close-modal" onclick="closeExamModal()">&times;</button></div>
-            </div>
-            <div class="filter-bar">
-                <div class="filter-group"><label>Search</label><input type="text" id="modalSearch" placeholder="Student name"></div>
-                <div class="filter-group"><label>Gender</label><select id="modalGender"><option value="">All</option><option value="Male">Male</option><option value="Female">Female</option></select></div>
-                <div class="filter-group"><label>Department</label><select id="modalDept"><option value="">All</option>${[...new Set(students.map(s=>s.department))].map(d=>`<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join('')}</select></div>
-                <div class="filter-group"><label>Batch</label><select id="modalBatch"><option value="">All</option>${[...new Set(students.map(s=>s.batch))].map(b=>`<option value="${escapeHtml(b)}">${escapeHtml(b)}</option>`).join('')}</select></div>
-                <button class="btn-icon" onclick="clearModalFilters()">Clear</button>
-            </div>
-            <div style="display:flex;gap:12px;margin-bottom:20px;"><button class="btn-icon" onclick="exportModalToCSV()">CSV</button><button class="btn-icon" onclick="exportModalToExcel()">Excel</button><button class="btn-icon" onclick="exportModalToPDF()">PDF</button>${isEditMode?`<button class="btn-primary" onclick="saveAllScores()">Save All</button>`:''}</div>
-            <div style="overflow-x:auto;"><table class="exam-table"><thead><tr><th>Rank</th><th>Student</th><th>Gender</th><th>Dept</th><th>Batch</th>${assessmentConfig.names.map((n,i)=>`<th>${escapeHtml(n)}<br><small>/ ${assessmentConfig.outOf[i]}</small></th>`).join('')}<th>Avg %</th></tr></thead><tbody>${tableRows}</tbody></tr></div>
-        `;
-        document.getElementById('examModal').classList.add('active');
-        if(isEditMode) attachScoreEvents();
-        attachFilterEvents();
-    }
-    
-    async function renderOverallModal(rankings) {
-        currentModalContext = { type: 'overall', rankings };
-        const filtered = applyFiltersToRankings(rankings);
-        const rows = filtered.map((item, idx) => {
-            const rankClass = idx === 0 ? 'gold' : idx === 1 ? 'silver' : idx === 2 ? 'bronze' : '';
-            return `<tr><td class="rank-badge ${rankClass}">${idx+1}</span></td>}<strong>${escapeHtml(item.student.full_name)}</strong></td>}<span class="badge ${item.student.gender==='Male'?'badge-male':'badge-female'}">${escapeHtml(item.student.gender)}</span></td>}<span class="badge badge-dept">${escapeHtml(item.student.department)}</span></td>}${escapeHtml(item.student.batch)}</span><td><strong>${item.avgScore !== null ? item.avgScore+'%' : '-'}</strong></span><td><button class="btn-icon" onclick="viewStudentDetails('${item.student.id}')" style="background:var(--primary-light);"><i class="fas fa-eye"></i> Details</button></td></tr>`;
-        }).join('');
-        document.getElementById('modalDynamicContent').innerHTML = `
-            <div class="modal-header"><div class="modal-title"><i class="fas fa-trophy"></i> Overall Student Rankings</div><div class="modal-actions"><button class="close-modal" onclick="closeExamModal()">&times;</button></div></div>
-            <div class="filter-bar"><div class="filter-group"><label>Search</label><input type="text" id="modalSearch" placeholder="Name"></div><div class="filter-group"><label>Gender</label><select id="modalGender"><option value="">All</option><option value="Male">Male</option><option value="Female">Female</option></select></div><div class="filter-group"><label>Department</label><select id="modalDept"><option value="">All</option>${[...new Set(rankings.map(r=>r.student.department))].map(d=>`<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join('')}</select></div><div class="filter-group"><label>Batch</label><select id="modalBatch"><option value="">All</option>${[...new Set(rankings.map(r=>r.student.batch))].map(b=>`<option value="${escapeHtml(b)}">${escapeHtml(b)}</option>`).join('')}</select></div><button class="btn-icon" onclick="clearModalFilters()">Clear</button></div>
-            <div style="display:flex;gap:12px;margin-bottom:20px;"><button class="btn-icon" onclick="exportModalToCSV()">CSV</button><button class="btn-icon" onclick="exportModalToExcel()">Excel</button><button class="btn-icon" onclick="exportModalToPDF()">PDF</button></div>
-            <div style="overflow-x:auto;"><table class="exam-table"><thead><tr><th>Rank</th><th>Student</th><th>Gender</th><th>Department</th><th>Batch</th><th>Overall Avg</th><th>Actions</th></tr></thead><tbody>${rows}</tbody></table></div>
-        `;
-        attachFilterEvents();
-        document.getElementById('examModal').classList.add('active');
-    }
-    
-    window.viewStudentDetails = async (studentId) => {
-        const student = allStudents.find(s => s.id === studentId);
-        if (!student) return;
-        const qirats = getQiratNames(student);
-        const rows = qirats.map(q => {
-            const scores = getStudentExamScores(studentId, q);
-            const avg = calculateAverage(scores);
-            return `<tr>}<strong>📖 ${escapeHtml(q)}</strong>${assessmentConfig.names.map((name,i)=>{
-                const score = scores[`assessment${i+1}`];
-                const percent = calculatePercentage(score, assessmentConfig.outOf[i]);
-                return `<td>${isEditMode ? `<input type="number" class="score-input-student" data-student="${studentId}" data-qirat="${q}" data-assessment="${i+1}" value="${score !== null ? score : ''}" step="0.5" min="0" max="${assessmentConfig.outOf[i]}" style="width:75px;"><span style="font-size:0.7rem;">/${assessmentConfig.outOf[i]}</span>` : `<span><strong>${score !== null ? score : '-'}</strong> <span style="color:gray;">/${assessmentConfig.outOf[i]}</span><br><small>${percent !== null ? percent+'%' : '-'}</small></span>`}`;
-            }).join('')}<td><strong>${avg !== null ? avg+'%' : '-'}</strong></td></tr>`;
-        }).join('');
-        document.getElementById('modalDynamicContent').innerHTML = `
-            <div class="modal-header"><div class="modal-title"><i class="fas fa-user-graduate"></i> ${escapeHtml(student.full_name)} - Qirat Details</div><div class="modal-actions"><button class="btn-icon" onclick="toggleEditMode()"><i class="fas ${isEditMode?'fa-eye':'fa-edit'}"></i> ${isEditMode?'View Mode':'Edit Mode'}</button><button class="close-modal" onclick="closeExamModal()">&times;</button></div></div>
-            <div><p><strong>Department:</strong> ${escapeHtml(student.department)} | <strong>Batch:</strong> ${escapeHtml(student.batch)}</p></div>
-            ${isEditMode ? `<div style="margin-bottom:16px;"><button class="btn-primary" onclick="saveStudentScores('${studentId}')">Save Changes</button></div>` : ''}
-            <div style="overflow-x:auto;"><table class="exam-table"><thead><tr><th>Qirat</th>${assessmentConfig.names.map((n,i)=>`<th>${escapeHtml(n)}<br><small>/ ${assessmentConfig.outOf[i]}</small></th>`).join('')}<th>Avg %</th></tr></thead><tbody>${rows}</tbody></table></div>
-        `;
-        if(isEditMode) attachStudentScoreEvents(studentId);
-    };
-    
-    function applyFilters(students) {
-        const search = document.getElementById('modalSearch')?.value.toLowerCase() || '';
-        const gender = document.getElementById('modalGender')?.value || '';
-        const dept = document.getElementById('modalDept')?.value || '';
-        const batch = document.getElementById('modalBatch')?.value || '';
-        return students.filter(s => {
-            const matchSearch = s.full_name.toLowerCase().includes(search);
-            const matchGender = !gender || s.gender === gender;
-            const matchDept = !dept || s.department === dept;
-            const matchBatch = !batch || s.batch === batch;
-            return matchSearch && matchGender && matchDept && matchBatch;
-        });
-    }
-    
-    function applyFiltersToRankings(rankings) {
-        const search = document.getElementById('modalSearch')?.value.toLowerCase() || '';
-        const gender = document.getElementById('modalGender')?.value || '';
-        const dept = document.getElementById('modalDept')?.value || '';
-        const batch = document.getElementById('modalBatch')?.value || '';
-        return rankings.filter(r => {
-            const s = r.student;
-            const matchSearch = s.full_name.toLowerCase().includes(search);
-            const matchGender = !gender || s.gender === gender;
-            const matchDept = !dept || s.department === dept;
-            const matchBatch = !batch || s.batch === batch;
-            return matchSearch && matchGender && matchDept && matchBatch;
-        });
-    }
-    
-    window.clearModalFilters = () => { ['modalSearch','modalGender','modalDept','modalBatch','modalQiratFilter'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; }); applyModalFilters(); };
-    function attachFilterEvents() { ['modalSearch','modalGender','modalDept','modalBatch'].forEach(id => { const el = document.getElementById(id); if(el) el.addEventListener('input', () => applyModalFilters()); }); }
-    function applyModalFilters() { if(currentModalContext?.type === 'qirat') renderQiratModal(currentModalContext.name, currentModalContext.students); else if(currentModalContext?.type === 'department') renderDepartmentModal(currentModalContext.name, currentModalContext.students); else if(currentModalContext?.type === 'overall') renderOverallModal(currentModalContext.rankings); }
-    
-    window.toggleEditMode = () => { isEditMode = !isEditMode; applyModalFilters(); };
-    async function saveAllScores() {
-        const inputs = document.querySelectorAll('.score-input');
-        for(const input of inputs) {
-            const studentId = input.dataset.student, qirat = input.dataset.qirat, assessment = `assessment${input.dataset.assessment}`, value = input.value;
-            if(studentId && qirat) await saveExamScore(studentId, qirat, assessment, value);
         }
-        showToast('All scores saved'); await loadExamScores(); applyModalFilters();
-    }
-    async function saveStudentScores(studentId) {
-        const inputs = document.querySelectorAll('.score-input-student');
-        for(const input of inputs) {
-            const qirat = input.dataset.qirat, assessment = `assessment${input.dataset.assessment}`, value = input.value;
-            if(qirat) await saveExamScore(studentId, qirat, assessment, value);
-        }
-        showToast('Scores saved'); await loadExamScores(); viewStudentDetails(studentId);
-    }
-    function attachScoreEvents() { document.querySelectorAll('.score-input').forEach(inp => inp.addEventListener('change', () => updateAvgDisplay(inp))); }
-    function attachStudentScoreEvents(studentId) { document.querySelectorAll('.score-input-student').forEach(inp => inp.addEventListener('change', () => updateAvgDisplay(inp))); }
-    function updateAvgDisplay(input) { const row = input.closest('tr'); const avgCell = row?.querySelector('td:last-child'); if(avgCell) avgCell.textContent = '...'; setTimeout(() => applyModalFilters(), 500); }
-    
-    function getCurrentExportData() {
-        const rows = []; const table = document.querySelector('.exam-table');
-        if(!table) return [];
-        const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.innerText.trim());
-        table.querySelectorAll('tbody tr').forEach(row => { const rowData = {}; Array.from(row.querySelectorAll('td')).forEach((td, idx) => { rowData[headers[idx] || `col${idx}`] = td.innerText.trim(); }); rows.push(rowData); });
-        return rows;
-    }
-    window.exportModalToCSV = () => { const data = getCurrentExportData(); if(!data.length) return; const ws = XLSX.utils.json_to_sheet(data); const csv = XLSX.utils.sheet_to_csv(ws); const blob = new Blob(["\uFEFF" + csv], {type:'text/csv'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `exam_export.csv`; a.click(); showToast('CSV exported'); };
-    window.exportModalToExcel = () => { const data = getCurrentExportData(); if(!data.length) return; const ws = XLSX.utils.json_to_sheet(data); XLSX.writeFile(XLSX.utils.book_new(), XLSX.utils.book_append_sheet(XLSX.utils.book_new(), ws, 'ExamData'), 'exam_export.xlsx'); showToast('Excel exported'); };
-    window.exportModalToPDF = async () => { const data = getCurrentExportData(); if(!data.length) return; const { jsPDF } = window.jspdf; const doc = new jsPDF({ orientation: 'landscape' }); doc.setFontSize(16); doc.text("Exam Results Report", 14, 20); doc.autoTable({ html: '.exam-table', startY: 30 }); doc.save('exam_report.pdf'); showToast('PDF exported'); };
-    
-    window.openSettingsModal = () => {
-        document.getElementById('settingsDynamicContent').innerHTML = `
-            <div class="modal-header"><div class="modal-title"><i class="fas fa-cog"></i> Assessment Settings</div><button class="close-modal" onclick="closeSettingsModal()">&times;</button></div>
-            <div style="margin-bottom:20px;"><p style="font-size:0.75rem;color:gray;">Customize assessment names and maximum points</p></div>
-            ${assessmentConfig.names.map((name, idx) => `<div style="display:flex;gap:12px;margin-bottom:12px;align-items:center;"><input type="text" class="assessment-name" data-idx="${idx}" value="${escapeHtml(name)}" style="flex:1;padding:10px;border-radius:16px;border:1px solid var(--border);"><input type="number" class="assessment-outof" data-idx="${idx}" value="${assessmentConfig.outOf[idx]}" style="width:80px;padding:10px;border-radius:16px;border:1px solid var(--border);" min="1" max="500"><button class="btn-icon" onclick="removeAssessment(${idx})" style="background:#ef4444;color:white;">Remove</button></div>`).join('')}
-            <button class="btn-primary" onclick="addAssessment()" style="margin:12px 0;"><i class="fas fa-plus"></i> Add Assessment</button>
-            <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:20px;"><button class="btn-icon" onclick="closeSettingsModal()">Cancel</button><button class="btn-primary" onclick="saveSettings()">Save Settings</button></div>
-        `;
-        document.getElementById('settingsModal').classList.add('active');
-    };
-    window.addAssessment = () => { assessmentConfig.names.push(`Assessment ${assessmentConfig.names.length+1}`); assessmentConfig.outOf.push(100); openSettingsModal(); };
-    window.removeAssessment = (idx) => { assessmentConfig.names.splice(idx,1); assessmentConfig.outOf.splice(idx,1); openSettingsModal(); };
-    window.saveSettings = async () => {
-        const names = Array.from(document.querySelectorAll('.assessment-name')).map(inp => inp.value);
-        const outOf = Array.from(document.querySelectorAll('.assessment-outof')).map(inp => parseInt(inp.value));
-        assessmentConfig = { names, outOf };
-        await saveAssessmentConfig();
-        closeSettingsModal();
-        showToast('Settings saved');
-        await loadData();
-    };
-    
-    window.closeExamModal = () => document.getElementById('examModal').classList.remove('active');
-    window.closeSettingsModal = () => document.getElementById('settingsModal').classList.remove('active');
-    
-    document.querySelectorAll('.mode-btn').forEach(btn => btn.addEventListener('click', () => {
-        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        currentGroupMode = btn.dataset.mode;
-        buildGroups();
-        renderHeroStats();
-        renderQuickStats();
-    }));
-    
-    initNavigation();
-    const adminUser = getCurrentAdminSync();
-    if(adminUser?.role === 'super-admin') setTimeout(() => refreshNavigation(), 100);
-    loadData();
-</script>
+    </script>
 </body>
 </html>
