@@ -10,18 +10,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
-    <!-- PWA Meta Tags -->
-    <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#3b82f6">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="ALIF Med">
-    
-    <!-- Apple Touch Icons -->
-    <link rel="apple-touch-icon" href="/icons/icon-152x152.png">
-    <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-192x192.png">
-
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -108,6 +96,21 @@
         .nav-link:hover { background: var(--primary-light); color: var(--primary-dark); }
         .nav-link.active { background: linear-gradient(135deg, #10b981, #059669); color: white; }
 
+        .refresh-btn {
+            background: #f59e0b;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        .refresh-btn:hover { transform: translateY(-2px); filter: brightness(1.05); }
+
         .back-btn {
             background: var(--primary-light);
             border: none;
@@ -125,7 +128,6 @@
 
         .main-container { max-width: 1600px; margin: 0 auto; padding: 24px; }
 
-        /* KPI Grid */
         .kpi-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -149,7 +151,6 @@
         .trend-up { color: #10b981; }
         .trend-down { color: #ef4444; }
 
-        /* Charts Row */
         .charts-row {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
@@ -166,7 +167,6 @@
         .chart-title { font-weight: 700; margin-bottom: 16px; border-left: 4px solid var(--primary); padding-left: 12px; }
         canvas { max-height: 220px; width: 100%; }
 
-        /* Filters Bar */
         .filters-bar {
             background: var(--card-bg);
             border-radius: 24px;
@@ -183,7 +183,6 @@
         .filter-group input, .filter-group select { width: 100%; padding: 10px 14px; border: 2px solid var(--border); border-radius: 16px; font-family: inherit; background: white; }
         .btn-clear { background: #64748b; color: white; border: none; padding: 10px 24px; border-radius: 16px; font-weight: 600; cursor: pointer; }
 
-        /* Qirat Performance Grid */
         .section-title { font-size: 1.2rem; font-weight: 700; margin: 32px 0 20px 0; display: flex; align-items: center; gap: 10px; justify-content: space-between; flex-wrap: wrap; }
         .qirat-grid {
             display: grid;
@@ -221,7 +220,6 @@
         .drill-btn { background: var(--border); border: none; padding: 8px 16px; border-radius: 30px; font-weight: 600; cursor: pointer; width: 100%; margin-top: 12px; transition: all 0.2s; }
         .drill-btn:hover { background: var(--primary); color: white; }
 
-        /* Smart Insights */
         .insights-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
@@ -246,7 +244,6 @@
         .insight-btn { background: white; border: none; padding: 6px 14px; border-radius: 30px; font-size: 0.7rem; font-weight: 600; cursor: pointer; }
         .insight-btn:hover { background: var(--primary); color: white; }
 
-        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -302,7 +299,6 @@
 
         .empty-state { text-align: center; padding: 60px; color: var(--text-muted); }
 
-        /* Bottom Navigation */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -349,22 +345,29 @@
 <div class="glass-header">
     <div class="header-content">
         <div class="logo"><h1><i class="fas fa-chart-line"></i> Analytics Studio</h1></div>
+        <div class="desktop-nav">
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="groups.html" class="nav-link">Groups</a>
+            <a href="tables.html" class="nav-link">Tables</a>
+            <a href="analytics.html" class="nav-link active">Analytics</a>
+            <a href="qirat-analytics.html" class="nav-link">Qirat Analytics</a>
+            <a href="department-stats.html" class="nav-link">Dept Stats</a>
+            <a href="import.html" class="nav-link">Import</a>
+        </div>
+        <button class="refresh-btn" id="refreshDataBtn"><i class="fas fa-sync-alt"></i> Refresh from Cloud</button>
         <button class="back-btn" onclick="window.location.href='index.html'"><i class="fas fa-arrow-left"></i> Back</button>
     </div>
 </div>
 
 <div class="main-container">
-    <!-- KPI Cards -->
     <div class="kpi-grid" id="kpiGrid"></div>
 
-    <!-- Charts -->
     <div class="charts-row">
         <div class="chart-card"><div class="chart-title"><i class="fas fa-chart-line"></i> 30-Day Registration Trend</div><canvas id="trendChart"></canvas></div>
         <div class="chart-card"><div class="chart-title"><i class="fas fa-chart-bar"></i> Top Qirats by Students</div><canvas id="barChart"></canvas></div>
         <div class="chart-card"><div class="chart-title"><i class="fas fa-chart-pie"></i> Gender Distribution</div><canvas id="pieChart"></canvas></div>
     </div>
 
-    <!-- Filters -->
     <div class="filters-bar">
         <div class="filter-group"><label><i class="fas fa-search"></i> Search</label><input type="text" id="searchInput" placeholder="Name/Phone"></div>
         <div class="filter-group"><label><i class="fas fa-venus-mars"></i> Gender</label><select id="genderFilter"><option value="">All</option><option value="Male">Male</option><option value="Female">Female</option></select></div>
@@ -374,11 +377,9 @@
         <button class="btn-clear" id="clearFiltersBtn"><i class="fas fa-eraser"></i> Clear Filters</button>
     </div>
 
-    <!-- Smart Insights -->
     <div class="section-title"><i class="fas fa-lightbulb"></i> Smart Insights <span style="font-size:0.8rem;">(Click to analyze with filters)</span></div>
     <div class="insights-grid" id="insightsContainer"></div>
 
-    <!-- Qirat Performance -->
     <div class="section-title">
         <span><i class="fas fa-chart-simple"></i> Qirat Performance Analytics</span>
         <button class="btn-clear" id="deleteAllQiratsBtn" style="background:#ef4444; padding:8px 16px;"><i class="fas fa-trash"></i> Delete All Qirats</button>
@@ -386,10 +387,16 @@
     <div class="qirat-grid" id="qiratGrid"></div>
 </div>
 
-<!-- Bottom Navigation -->
+<div class="bottom-nav">
+    <button class="nav-item" onclick="window.location.href='index.html'"><i class="fas fa-home"></i><span>Home</span></button>
+    <button class="nav-item" onclick="window.location.href='groups.html'"><i class="fas fa-layer-group"></i><span>Groups</span></button>
+    <button class="nav-item" onclick="window.location.href='tables.html'"><i class="fas fa-table"></i><span>Tables</span></button>
+    <button class="nav-item active" onclick="window.location.href='analytics.html'"><i class="fas fa-chart-line"></i><span>Analytics</span></button>
+    <button class="nav-item" onclick="window.location.href='qirat-analytics.html'"><i class="fas fa-project-diagram"></i><span>Qirat</span></button>
+    <button class="nav-item" onclick="window.location.href='department-stats.html'"><i class="fas fa-building"></i><span>Dept</span></button>
+    <button class="nav-item" onclick="window.location.href='import.html'"><i class="fas fa-upload"></i><span>Import</span></button>
+</div>
 
-
-<!-- Drill Modal -->
 <div id="drillModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
@@ -422,22 +429,15 @@
 
 <script type="module">
     import { protectPage, initAuthUI, setupAutoLogout, getCurrentAdminSync } from './auth.js';
-    import { initNavigation } from './nav.js';
+    import { initNavigation, refreshNavigation } from './nav.js';
     
-    // SYNC check - no await needed
-    if (!protectPage('admin-login.html')) {
-        throw new Error('Redirecting to login');
-    }
-    
-    // SYNC init - no await needed
+    if (!protectPage('admin-login.html')) throw new Error('Redirecting to login');
     const admin = initAuthUI();
     setupAutoLogout(60);
-    
     console.log('Logged in as:', admin?.name, admin?.email);
-    
 
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     
     const firebaseConfig = {
         apiKey: "AIzaSyAR_g5y04YAGCrTvZCowrE7hw8h7k1du08",
@@ -451,11 +451,13 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     
+    // ========== CACHED DATA (SINGLE LOAD) ==========
     let allStudents = [];
     let filteredStudents = [];
     let charts = {};
     let currentDrillData = { originalData: [], filteredData: [], title: "", insightType: null, kpi: null };
-    let currentQiratToDelete = null;
+    let dataLoaded = false;
+    let isLoading = false;
     
     // DOM Elements
     const searchInput = document.getElementById('searchInput');
@@ -464,6 +466,7 @@
     const batchFilter = document.getElementById('batchFilter');
     const qiratFilter = document.getElementById('qiratFilter');
     const clearFiltersBtn = document.getElementById('clearFiltersBtn');
+    const refreshDataBtn = document.getElementById('refreshDataBtn');
     const kpiGrid = document.getElementById('kpiGrid');
     const insightsContainer = document.getElementById('insightsContainer');
     const qiratGrid = document.getElementById('qiratGrid');
@@ -484,7 +487,45 @@
     function getQiratNames(student) { return (student.schedules || []).map(s => s.qirat_name).filter(Boolean); }
     function formatStudent(s) { return { Name: s.full_name, Gender: s.gender, Phone: s.phone, Department: s.department, Batch: s.batch, Qirats: getQiratNames(s).join(', ') || '-', RegistrationDate: s.timestamp.toLocaleDateString(), id: s.id, schedules: s.schedules }; }
     
-    async function loadData() {
+    // Save to localStorage cache
+    function saveToCache() {
+        try {
+            const cacheData = {
+                students: allStudents,
+                timestamp: new Date().toISOString(),
+                version: '1.0'
+            };
+            localStorage.setItem('analytics_cache', JSON.stringify(cacheData));
+        } catch (e) { console.warn('Cache save failed:', e); }
+    }
+    
+    // Load from localStorage cache
+    function loadFromCache() {
+        try {
+            const cached = localStorage.getItem('analytics_cache');
+            if (cached) {
+                const data = JSON.parse(cached);
+                if (data.students && data.students.length > 0) {
+                    allStudents = data.students;
+                    dataLoaded = true;
+                    console.log('Loaded from cache:', allStudents.length, 'students');
+                    return true;
+                }
+            }
+        } catch (e) { console.warn('Cache load failed:', e); }
+        return false;
+    }
+    
+    async function loadDataFromFirestore(force = false) {
+        if (isLoading) return;
+        if (dataLoaded && !force) {
+            console.log('Using cached data, not loading from Firestore');
+            return;
+        }
+        
+        isLoading = true;
+        showToast('Loading data...');
+        
         try {
             const querySnapshot = await getDocs(collection(db, "registrations"));
             allStudents = [];
@@ -497,9 +538,31 @@
                     batch: data.batch || 'General', schedules: data.schedules || [], timestamp: timestamp
                 });
             });
+            
+            dataLoaded = true;
+            saveToCache();
+            showToast(`Loaded ${allStudents.length} students`);
+            
             populateFilters();
             applyFilters();
-        } catch (error) { showToast("Error: " + error.message, true); }
+        } catch (error) {
+            console.error("Error loading from Firestore:", error);
+            if (loadFromCache()) {
+                showToast('Using cached data (offline mode)', false);
+                populateFilters();
+                applyFilters();
+            } else {
+                showToast("Error loading data: " + error.message, true);
+            }
+        } finally {
+            isLoading = false;
+        }
+    }
+    
+    async function refreshFromCloud() {
+        showToast('Refreshing from cloud...');
+        await loadDataFromFirestore(true);
+        showToast('Data refreshed from cloud');
     }
     
     function populateFilters() {
@@ -567,6 +630,7 @@
     async function deleteQiratFromAllStudents(qiratName) {
         if (!confirm(`⚠️ Remove "${qiratName}" from ALL students? This action cannot be undone.`)) return;
         showLoading("Removing Qirat...");
+        const batch = writeBatch(db);
         let updatedCount = 0;
         for (const student of allStudents) {
             const currentQirats = student.schedules || [];
@@ -574,29 +638,32 @@
             if (hasQirat) {
                 const newSchedules = currentQirats.filter(s => s.qirat_name !== qiratName);
                 const studentRef = doc(db, "registrations", student.id);
-                await updateDoc(studentRef, { schedules: newSchedules });
+                batch.update(studentRef, { schedules: newSchedules });
                 updatedCount++;
             }
         }
+        await batch.commit();
         hideLoading();
         showToast(`✅ Removed "${qiratName}" from ${updatedCount} student(s)`);
-        await loadData();
+        await refreshFromCloud();
     }
     
     async function deleteAllQirats() {
         if (!confirm("⚠️ DELETE ALL QIRATS from ALL students? This will remove every Qirat from every student. This cannot be undone!")) return;
         showLoading("Removing all Qirats...");
+        const batch = writeBatch(db);
         let updatedCount = 0;
         for (const student of allStudents) {
             if (student.schedules && student.schedules.length > 0) {
                 const studentRef = doc(db, "registrations", student.id);
-                await updateDoc(studentRef, { schedules: [] });
+                batch.update(studentRef, { schedules: [] });
                 updatedCount++;
             }
         }
+        await batch.commit();
         hideLoading();
         showToast(`✅ Removed all Qirats from ${updatedCount} student(s)`);
-        await loadData();
+        await refreshFromCloud();
     }
     
     function renderQiratPerformance() {
@@ -663,7 +730,7 @@
     }
     
     function renderModalTable() {
-        if (!currentDrillData.filteredData.length) { drillTableBody.innerHTML = `<tr><td colspan="8" class="empty-state">No students found</td></tr>`; return; }
+        if (!currentDrillData.filteredData.length) { drillTableBody.innerHTML = `<tr><td colspan="8" class="empty-state">No students found</td></td>`; return; }
         drillTableBody.innerHTML = currentDrillData.filteredData.map(s => `
             <tr>
                 <td><strong>${escapeHtml(s.Name)}</strong></td>
@@ -682,7 +749,7 @@
         if (confirm('Delete this student?')) {
             await deleteDoc(doc(db, "registrations", id));
             showToast('Student deleted');
-            await loadData();
+            await refreshFromCloud();
             const newData = currentDrillData.originalData.filter(s => s.id !== id);
             currentDrillData.originalData = newData;
             applyModalFilters();
@@ -694,7 +761,7 @@
     function modalExportCSV() { const data = getModalExportData(); if (!data.length) return alert('No data'); const headers = ['Name','Gender','Phone','Department','Batch','Qirats','RegistrationDate']; const rows = data.map(r => headers.map(h => `"${String(r[h]||'').replace(/"/g,'""')}"`).join(',')); const blob = new Blob(["\uFEFF" + [headers.join(','), ...rows].join('\n')], {type:'text/csv'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${currentDrillData.title.replace(/[^a-z0-9]/gi,'_')}.csv`; a.click(); URL.revokeObjectURL(a.href); showToast('CSV exported'); }
     function modalExportExcel() { const data = getModalExportData(); if (!data.length) return alert('No data'); const ws = XLSX.utils.json_to_sheet(data); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Data'); XLSX.writeFile(wb, `${currentDrillData.title.replace(/[^a-z0-9]/gi,'_')}.xlsx`); showToast('Excel exported'); }
     async function modalExportPDF() { const data = getModalExportData(); if (!data.length) return alert('No data'); const { jsPDF } = window.jspdf; const doc = new jsPDF({ orientation: 'landscape' }); const kpi = currentDrillData.kpi || getKPIs(); doc.setFontSize(18); doc.setTextColor(16,185,129); doc.text("JUMJ Irshad - Insight Report", 14, 20); doc.setFontSize(12); doc.text(currentDrillData.title, 14, 32); doc.setFontSize(9); doc.text(`Generated: ${new Date().toLocaleString()} | Total: ${data.length} students`, 14, 40); if(currentDrillData.insightType) { doc.setFontSize(10); doc.setTextColor(245,158,11); doc.text(`Context: ${currentDrillData.insightType}`, 14, 48); } let y = 56; doc.setFontSize(10); doc.text("Summary KPIs", 14, y); y+=6; doc.setFontSize(9); doc.text(`Total Students: ${kpi.total}`, 14, y); y+=5; doc.text(`Active Qirats: ${kpi.activeQirats}`, 14, y); y+=5; doc.text(`Gender: ♂ ${kpi.male} | ♀ ${kpi.female}`, 14, y); y+=5; doc.text(`Multi-Enrolled: ${kpi.multi}`, 14, y); y+=8; doc.autoTable({ head: [['Name','Gender','Phone','Department','Batch','Qirats','Date']], body: data.map(r => [r.Name, r.Gender, r.Phone, r.Department, r.Batch, r.Qirats, r.RegistrationDate]), startY: y+2, headStyles: { fillColor: [16,185,129] }, styles: { fontSize: 8 } }); doc.save(`${currentDrillData.title.replace(/[^a-z0-9]/gi,'_')}_report.pdf`); showToast('PDF exported'); }
-    function modalExportWord() { const data = getModalExportData(); if (!data.length) return alert('No data'); let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${currentDrillData.title}</title><style>body{font-family:Arial;} table{border-collapse:collapse;width:100%;} th,td{border:1px solid #ddd;padding:8px;} th{background:#10b981;color:white;}</style></head><body><h1>JUMJ Irshad Report</h1><h2>${currentDrillData.title}</h2><p>Generated: ${new Date().toLocaleString()} | Total: ${data.length}</p>${currentDrillData.insightType ? `<p><strong>Insight:</strong> ${currentDrillData.insightType}</p>` : ''}<h3>Student List</h3><table><thead><tr><th>Name</th><th>Gender</th><th>Phone</th><th>Department</th><th>Batch</th><th>Qirats</th><th>Date</th></tr></thead><tbody>${data.map(r => `<tr><td>${escapeHtml(r.Name)}</td><td>${escapeHtml(r.Gender)}</td><td>${escapeHtml(r.Phone)}</td><td>${escapeHtml(r.Department)}</td><td>${escapeHtml(r.Batch)}</td><td>${escapeHtml(r.Qirats)}</td><td>${escapeHtml(r.RegistrationDate)}</td>`).join('')}</tbody></table></body></html>`;
+    function modalExportWord() { const data = getModalExportData(); if (!data.length) return alert('No data'); let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${currentDrillData.title}</title><style>body{font-family:Arial;} table{border-collapse:collapse;width:100%;} th,td{border:1px solid #ddd;padding:8px;} th{background:#10b981;color:white;}</style></head><body><h1>JUMJ Irshad Report</h1><h2>${currentDrillData.title}</h2><p>Generated: ${new Date().toLocaleString()} | Total: ${data.length}</p>${currentDrillData.insightType ? `<p><strong>Insight:</strong> ${currentDrillData.insightType}</p>` : ''}<h3>Student List</h3><table><thead><tr><th>Name</th><th>Gender</th><th>Phone</th><th>Department</th><th>Batch</th><th>Qirats</th><th>Date</th></tr></thead><tbody>${data.map(r => `<tr>}<strong>${escapeHtml(r.Name)}</strong></td>}<span class="badge ${r.Gender === 'Male' ? 'badge-male' : 'badge-female'}">${escapeHtml(r.Gender)}</span></td>} ${escapeHtml(r.Phone)}</td><td>${escapeHtml(r.Department)}</td><td>${escapeHtml(r.Batch)}</td><td>${escapeHtml(r.Qirats)}</td><td>${escapeHtml(r.RegistrationDate)}</td></tr>`).join('')}</tbody></table></body></html>`;
         const blob = new Blob([html], { type: 'application/msword' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${currentDrillData.title.replace(/[^a-z0-9]/gi,'_')}.doc`; a.click(); URL.revokeObjectURL(a.href); showToast('Word exported'); }
     
     function showLoading(msg) { const overlay = document.createElement('div'); overlay.id = 'customLoading'; overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);display:flex;justify-content:center;align-items:center;z-index:2000;'; overlay.innerHTML = `<div style="background:white;padding:30px;border-radius:30px;text-align:center;"><div class="loading-spinner" style="width:50px;height:50px;border:4px solid #d1fae5;border-top-color:#10b981;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px;"></div><p>${msg}</p></div>`; document.body.appendChild(overlay); }
@@ -706,6 +773,7 @@
     batchFilter.addEventListener('change', applyFilters);
     qiratFilter.addEventListener('change', applyFilters);
     clearFiltersBtn.addEventListener('click', () => { searchInput.value = ''; genderFilter.value = ''; deptFilter.value = ''; batchFilter.value = ''; qiratFilter.value = ''; applyFilters(); });
+    refreshDataBtn.addEventListener('click', refreshFromCloud);
     deleteAllQiratsBtn.addEventListener('click', deleteAllQirats);
     modalSearch.addEventListener('input', applyModalFilters);
     modalGender.addEventListener('change', applyModalFilters);
@@ -719,25 +787,19 @@
     document.getElementById('modalExportPDF').addEventListener('click', modalExportPDF);
     document.getElementById('modalExportWord').addEventListener('click', modalExportWord);
     
-    loadData();
-    setInterval(loadData, 30000);
-</script>
-    <!-- Navigation Script - Add this at the end of body -->
-<script type="module">
-    import { initNavigation, refreshNavigation } from './nav.js';
-    import { getCurrentAdminSync } from './auth.js';
-    
-    // Initialize base navigation
+    // Initialize
     initNavigation();
+    const adminUser = getCurrentAdminSync();
+    if (adminUser?.role === 'super-admin') setTimeout(() => refreshNavigation(), 100);
     
-    // Check if Super Admin and refresh to show hidden items
-    const admin = getCurrentAdminSync();
-    if (admin?.role === 'super-admin') {
-        // Refresh navigation to show Keys and Admins
-        refreshNavigation();
+    // Try cache first, then Firestore
+    if (!loadFromCache()) {
+        loadDataFromFirestore();
+    } else {
+        populateFilters();
+        applyFilters();
+        setTimeout(() => loadDataFromFirestore(), 100);
     }
-    
-    console.log('Navigation loaded for role:', admin?.role || 'guest');
 </script>
 </body>
 </html>
