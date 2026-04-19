@@ -9,18 +9,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
-    <!-- PWA Meta Tags -->
-    <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#3b82f6">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="ALIF Med">
-    
-    <!-- Apple Touch Icons -->
-    <link rel="apple-touch-icon" href="/icons/icon-152x152.png">
-    <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-192x192.png">
-
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -106,7 +94,6 @@
             padding: 24px;
         }
 
-        /* Stats Bar */
         .stats-bar {
             display: flex;
             gap: 16px;
@@ -129,7 +116,6 @@
         .stat-pill .value { font-weight: 800; font-size: 1.2rem; }
         .stat-pill .label { color: var(--text-muted); font-size: 0.75rem; }
 
-        /* Filters Row */
         .filters-row {
             background: var(--card-bg);
             border-radius: 28px;
@@ -150,8 +136,8 @@
 
         .btn-clear { background: #64748b; color: white; border: none; padding: 10px 24px; border-radius: 16px; font-weight: 600; cursor: pointer; }
         .btn-primary { background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; padding: 10px 24px; border-radius: 16px; font-weight: 600; cursor: pointer; }
+        .btn-refresh { background: #f59e0b; color: white; border: none; padding: 10px 24px; border-radius: 16px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
 
-        /* Export Bar */
         .export-bar {
             background: var(--card-bg);
             border-radius: 24px;
@@ -173,7 +159,6 @@
         .export-word { background: #3b82f6; color: white; }
         .export-btn:hover { transform: translateY(-2px); filter: brightness(1.05); }
 
-        /* Table Container */
         .table-container {
             background: var(--card-bg);
             border-radius: 28px;
@@ -230,7 +215,6 @@
         .icon-btn.edit:hover { background: #d1fae5; color: #10b981; }
         .icon-btn.delete:hover { background: #fee2e2; color: #ef4444; }
 
-        /* Pagination */
         .pagination {
             display: flex;
             justify-content: center;
@@ -256,7 +240,6 @@
         }
         .page-btn:hover:not(.active) { background: var(--primary-light); }
 
-        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -302,7 +285,18 @@
         .checkbox-col { width: 30px; text-align: center; }
         .batch-actions { display: flex; gap: 12px; margin-left: auto; }
 
-        /* Bottom Nav */
+        .offline-badge {
+            background: #fef3c7;
+            color: #92400e;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -347,14 +341,13 @@
 </div>
 
 <div class="main-container">
-    <!-- Stats Bar -->
     <div class="stats-bar">
         <div class="stat-pill"><i class="fas fa-users"></i><div><span class="value" id="totalCount">0</span><span class="label"> Total</span></div></div>
         <div class="stat-pill"><i class="fas fa-filter"></i><div><span class="value" id="filteredCount">0</span><span class="label"> Filtered</span></div></div>
         <div class="stat-pill"><i class="fas fa-check-square"></i><div><span class="value" id="selectedCount">0</span><span class="label"> Selected</span></div></div>
+        <div class="stat-pill" id="offlineIndicator" style="display:none;"><i class="fas fa-wifi-slash"></i><div><span class="value">Offline</span><span class="label"> Mode</span></div></div>
     </div>
 
-    <!-- Filters -->
     <div class="filters-row">
         <div class="filter-group"><label><i class="fas fa-search"></i> Search</label><input type="text" id="searchInput" placeholder="Name / Phone / Telegram"></div>
         <div class="filter-group"><label><i class="fas fa-venus-mars"></i> Gender</label><select id="genderFilter"><option value="">All</option><option value="Male">Male</option><option value="Female">Female</option></select></div>
@@ -362,9 +355,9 @@
         <div class="filter-group"><label><i class="fas fa-graduation-cap"></i> Batch</label><select id="batchFilter"><option value="">All</option></select></div>
         <button class="btn-clear" id="clearFiltersBtn"><i class="fas fa-eraser"></i> Clear</button>
         <button class="btn-primary" id="addStudentBtn"><i class="fas fa-plus"></i> Add Student</button>
+        <button class="btn-refresh" id="refreshDataBtn"><i class="fas fa-sync-alt"></i> Refresh from Cloud</button>
     </div>
 
-    <!-- Export Bar -->
     <div class="export-bar">
         <div class="export-buttons">
             <button class="export-btn export-csv" id="exportCSVBtn"><i class="fas fa-file-csv"></i> CSV</button>
@@ -377,7 +370,6 @@
         </div>
     </div>
 
-    <!-- Table -->
     <div class="table-container">
         <div class="table-wrapper">
             <table id="dataTable">
@@ -402,8 +394,15 @@
     </div>
 </div>
 
-<!-- Bottom Navigation -->
-
+<div class="bottom-nav">
+    <button class="nav-item" onclick="window.location.href='index.html'"><i class="fas fa-home"></i><span>Home</span></button>
+    <button class="nav-item" onclick="window.location.href='groups.html'"><i class="fas fa-layer-group"></i><span>Groups</span></button>
+    <button class="nav-item" onclick="window.location.href='tables.html'"><i class="fas fa-table"></i><span>Tables</span></button>
+    <button class="nav-item" onclick="window.location.href='analytics.html'"><i class="fas fa-chart-line"></i><span>Analytics</span></button>
+    <button class="nav-item" onclick="window.location.href='qirat-analytics.html'"><i class="fas fa-project-diagram"></i><span>Qirat</span></button>
+    <button class="nav-item" onclick="window.location.href='department-stats.html'"><i class="fas fa-building"></i><span>Dept</span></button>
+    <button class="nav-item active" onclick="window.location.href='import.html'"><i class="fas fa-upload"></i><span>Import</span></button>
+</div>
 
 <div id="studentModal" class="modal"><div class="modal-content"><h3 id="modalTitle">Add Student</h3><form id="studentForm"><div class="form-group"><label>Full Name *</label><input type="text" id="full_name" required></div><div class="form-group"><label>Gender</label><select id="gender"><option>Male</option><option>Female</option></select></div><div class="form-group"><label>Phone</label><input type="text" id="phone"></div><div class="form-group"><label>Telegram</label><input type="text" id="telegram"></div><div class="form-group"><label>Department</label><select id="department"><option>Medicine</option><option>Pharmacy</option><option>Nursing</option><option>Other</option></select></div><div class="form-group"><label>Batch</label><input type="text" id="batch" placeholder="e.g., 1st Year"></div><div class="form-group"><label>Qirats (comma)</label><input type="text" id="qirats" placeholder="Hafs, Warsh"></div><div style="display:flex; gap:12px; justify-content:flex-end;"><button type="button" class="btn-clear" id="cancelModalBtn">Cancel</button><button type="submit" class="btn-primary">Save</button></div></form><button id="modalClose" style="position:absolute; top:20px; right:24px; background:none; border:none; font-size:24px;">&times;</button></div></div>
 
@@ -411,16 +410,17 @@
 
 <script type="module">
     import { protectPage, initAuthUI, setupAutoLogout } from './auth.js';
+    import { initNavigation } from './nav.js';
 
-if (!protectPage('admin-login.html')) {
-    throw new Error('Redirecting to login');
-}
+    if (!protectPage('admin-login.html')) {
+        throw new Error('Redirecting to login');
+    }
 
-const admin = await initAuthUI();
-setupAutoLogout(60);
+    const admin = await initAuthUI();
+    setupAutoLogout(60);
 
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, deleteDoc, doc, addDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, deleteDoc, doc, addDoc, updateDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     
     const firebaseConfig = {
         apiKey: "AIzaSyAR_g5y04YAGCrTvZCowrE7hw8h7k1du08",
@@ -434,8 +434,12 @@ setupAutoLogout(60);
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     
+    // ========== CACHED DATA (SINGLE LOAD) ==========
     let allStudents = [];
     let filteredStudents = [];
+    let dataLoaded = false;
+    let isLoading = false;
+    
     let currentPage = 1;
     let rowsPerPage = 15;
     let sortColumn = 'timestamp';
@@ -456,6 +460,7 @@ setupAutoLogout(60);
     const selectAllCheckbox = document.getElementById('selectAllCheckbox');
     const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
     const addStudentBtn = document.getElementById('addStudentBtn');
+    const refreshDataBtn = document.getElementById('refreshDataBtn');
     const studentModal = document.getElementById('studentModal');
     const modalTitle = document.getElementById('modalTitle');
     const studentForm = document.getElementById('studentForm');
@@ -466,6 +471,7 @@ setupAutoLogout(60);
     const exportExcel = document.getElementById('exportExcelBtn');
     const exportPDF = document.getElementById('exportPDFBtn');
     const exportWord = document.getElementById('exportWordBtn');
+    const offlineIndicator = document.getElementById('offlineIndicator');
     
     function showToast(msg, isErr = false) {
         toast.textContent = msg;
@@ -477,7 +483,46 @@ setupAutoLogout(60);
     function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
     function getQiratNames(student) { return (student.schedules || []).map(s => s.qirat_name).filter(Boolean); }
     
-    async function loadData() {
+    // Save to localStorage cache
+    function saveToCache() {
+        try {
+            const cacheData = {
+                students: allStudents,
+                timestamp: new Date().toISOString(),
+                version: '1.0'
+            };
+            localStorage.setItem('tables_cache', JSON.stringify(cacheData));
+        } catch (e) { console.warn('Cache save failed:', e); }
+    }
+    
+    // Load from localStorage cache
+    function loadFromCache() {
+        try {
+            const cached = localStorage.getItem('tables_cache');
+            if (cached) {
+                const data = JSON.parse(cached);
+                if (data.students && data.students.length > 0) {
+                    allStudents = data.students;
+                    dataLoaded = true;
+                    console.log('Loaded from cache:', allStudents.length, 'students');
+                    return true;
+                }
+            }
+        } catch (e) { console.warn('Cache load failed:', e); }
+        return false;
+    }
+    
+    // Load from Firestore (ONCE)
+    async function loadDataFromFirestore(force = false) {
+        if (isLoading) return;
+        if (dataLoaded && !force) {
+            console.log('Using cached data, not loading from Firestore');
+            return;
+        }
+        
+        isLoading = true;
+        showToast('Loading data...');
+        
         try {
             const querySnapshot = await getDocs(collection(db, "registrations"));
             allStudents = [];
@@ -498,9 +543,51 @@ setupAutoLogout(60);
                     timestamp: timestamp
                 });
             });
+            
+            dataLoaded = true;
+            saveToCache();
+            offlineIndicator.style.display = 'none';
+            showToast(`Loaded ${allStudents.length} students`);
+            
             populateFilters();
             applyFiltersAndRender();
-        } catch (error) { showToast("Error: " + error.message, true); }
+        } catch (error) {
+            console.error("Error loading from Firestore:", error);
+            // Try to load from cache if available
+            if (loadFromCache()) {
+                offlineIndicator.style.display = 'flex';
+                showToast('Using cached data (offline mode)', false);
+                populateFilters();
+                applyFiltersAndRender();
+            } else {
+                showToast("Error loading data: " + error.message, true);
+            }
+        } finally {
+            isLoading = false;
+        }
+    }
+    
+    // Manual refresh from cloud
+    async function refreshFromCloud() {
+        showToast('Refreshing from cloud...');
+        await loadDataFromFirestore(true);
+        showToast('Data refreshed from cloud');
+    }
+    
+    // Update a single student in cache after edit/delete/add
+    function updateCacheAfterWrite(studentId, newData = null, isDelete = false) {
+        if (isDelete) {
+            allStudents = allStudents.filter(s => s.id !== studentId);
+        } else if (newData) {
+            const index = allStudents.findIndex(s => s.id === studentId);
+            if (index !== -1) {
+                allStudents[index] = { ...allStudents[index], ...newData };
+            } else {
+                allStudents.push(newData);
+            }
+        }
+        saveToCache();
+        applyFiltersAndRender();
     }
     
     function populateFilters() {
@@ -524,7 +611,6 @@ setupAutoLogout(60);
             return matchSearch && matchGender && matchDept && matchBatch;
         });
         
-        // Apply sorting
         filteredStudents.sort((a, b) => {
             let valA = a[sortColumn], valB = b[sortColumn];
             if (sortColumn === 'timestamp') { valA = a.timestamp; valB = b.timestamp; }
@@ -547,7 +633,7 @@ setupAutoLogout(60);
         const pageData = filteredStudents.slice(start, end);
         
         if (pageData.length === 0) {
-            tableBody.innerHTML = `<tr><td colspan="10" class="empty-state">No students found</td></tr>`;
+            tableBody.innerHTML = `<td><td colspan="10" class="empty-state">No students found</td></tr>`;
             return;
         }
         
@@ -569,7 +655,6 @@ setupAutoLogout(60);
             </tr>
         `).join('');
         
-        // Re-attach checkbox events
         document.querySelectorAll('.row-checkbox').forEach(cb => {
             cb.addEventListener('change', (e) => {
                 const id = cb.value;
@@ -630,20 +715,38 @@ setupAutoLogout(60);
     
     window.deleteStudent = async (id) => {
         if (confirm('Delete this student?')) {
-            await deleteDoc(doc(db, "registrations", id));
-            selectedIds.delete(id);
-            showToast('Deleted successfully');
-            await loadData();
+            try {
+                await deleteDoc(doc(db, "registrations", id));
+                selectedIds.delete(id);
+                updateCacheAfterWrite(id, null, true);
+                showToast('Deleted successfully');
+            } catch (error) {
+                showToast('Error deleting: ' + error.message, true);
+            }
         }
     };
     
     deleteSelectedBtn.addEventListener('click', async () => {
         if (selectedIds.size === 0) { showToast('No students selected', true); return; }
         if (confirm(`Delete ${selectedIds.size} selected student(s)?`)) {
-            for (const id of selectedIds) await deleteDoc(doc(db, "registrations", id));
-            selectedIds.clear();
-            showToast(`Deleted ${selectedIds.size} students`);
-            await loadData();
+            try {
+                const batch = writeBatch(db);
+                for (const id of selectedIds) {
+                    batch.delete(doc(db, "registrations", id));
+                }
+                await batch.commit();
+                
+                // Update cache
+                for (const id of selectedIds) {
+                    allStudents = allStudents.filter(s => s.id !== id);
+                }
+                selectedIds.clear();
+                saveToCache();
+                applyFiltersAndRender();
+                showToast(`Deleted ${selectedIds.size} students`);
+            } catch (error) {
+                showToast('Error: ' + error.message, true);
+            }
         }
     });
     
@@ -651,32 +754,95 @@ setupAutoLogout(60);
     function closeModal() { studentModal.classList.remove('active'); currentEditId = null; }
     cancelModalBtn.addEventListener('click', closeModal);
     modalClose.addEventListener('click', closeModal);
+    refreshDataBtn.addEventListener('click', refreshFromCloud);
+    
+    // Find existing student in cached data
+    function findExistingStudent(full_name) {
+        const normalizedName = full_name.trim().toLowerCase();
+        return allStudents.find(s => s.full_name.trim().toLowerCase() === normalizedName);
+    }
     
     studentForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const full_name = document.getElementById('full_name').value.trim();
         if (!full_name) { showToast('Name required', true); return; }
+        
         const schedules = document.getElementById('qirats').value.split(',').filter(s => s.trim()).map(q => ({ qirat_name: q.trim(), days: ["Flexible"], time_preference: "Evening" }));
         const studentData = {
-            full_name, gender: document.getElementById('gender').value, phone: document.getElementById('phone').value,
-            telegram: document.getElementById('telegram').value, department: document.getElementById('department').value,
-            batch: document.getElementById('batch').value, schedules, timestamp: new Date()
+            full_name: full_name,
+            gender: document.getElementById('gender').value,
+            phone: document.getElementById('phone').value,
+            telegram: document.getElementById('telegram').value,
+            department: document.getElementById('department').value,
+            batch: document.getElementById('batch').value,
+            schedules: schedules,
+            timestamp: new Date()
         };
+        
         try {
-            if (currentEditId) await updateDoc(doc(db, "registrations", currentEditId), studentData);
-            else await addDoc(collection(db, "registrations"), studentData);
-            showToast(currentEditId ? 'Updated' : 'Added');
+            if (currentEditId) {
+                // Edit mode
+                const studentRef = doc(db, "registrations", currentEditId);
+                await updateDoc(studentRef, { ...studentData, updatedAt: new Date() });
+                updateCacheAfterWrite(currentEditId, studentData);
+                showToast('Student updated successfully');
+            } else {
+                // Add mode - check for duplicates
+                const existing = findExistingStudent(full_name);
+                if (existing) {
+                    const existingQirats = getQiratNames(existing);
+                    const newQirats = schedules.map(s => s.qirat_name);
+                    const mergedQirats = [...new Set([...existingQirats, ...newQirats])];
+                    const mergedSchedules = mergedQirats.map(q => ({ qirat_name: q, days: ["Flexible"], time_preference: "Evening" }));
+                    
+                    const hasChanges = (
+                        existing.gender !== studentData.gender ||
+                        existing.phone !== studentData.phone ||
+                        existing.telegram !== studentData.telegram ||
+                        existing.department !== studentData.department ||
+                        existing.batch !== studentData.batch ||
+                        mergedQirats.length !== existingQirats.length
+                    );
+                    
+                    if (hasChanges) {
+                        const studentRef = doc(db, "registrations", existing.id);
+                        await updateDoc(studentRef, {
+                            gender: studentData.gender,
+                            phone: studentData.phone,
+                            telegram: studentData.telegram,
+                            department: studentData.department,
+                            batch: studentData.batch,
+                            schedules: mergedSchedules,
+                            timestamp: new Date()
+                        });
+                        const mergedStudent = { ...existing, ...studentData, schedules: mergedSchedules };
+                        updateCacheAfterWrite(existing.id, mergedStudent);
+                        const newQiratsAdded = mergedQirats.length - existingQirats.length;
+                        showToast(`✅ Student exists! Merged ${newQiratsAdded} new Qirat(s) into existing record.`);
+                    } else {
+                        showToast(`⚠️ Student already exists with same information. No changes made.`);
+                    }
+                } else {
+                    // New student
+                    const docRef = await addDoc(collection(db, "registrations"), studentData);
+                    const newStudent = { id: docRef.id, ...studentData };
+                    allStudents.push(newStudent);
+                    saveToCache();
+                    applyFiltersAndRender();
+                    showToast('Student added successfully');
+                }
+            }
             closeModal();
-            await loadData();
+            applyFiltersAndRender();
         } catch (error) { showToast("Error: " + error.message, true); }
     });
     
-    // Export Functions
     function getExportData() { return filteredStudents.map(s => ({ 'Name': s.full_name, 'Gender': s.gender, 'Phone': s.phone, 'Telegram': s.telegram, 'Department': s.department, 'Batch': s.batch, 'Qirats': getQiratNames(s).join(', '), 'Registration Date': s.timestamp.toLocaleDateString() })); }
     
     exportCSV.addEventListener('click', () => {
         const data = getExportData();
-        const headers = Object.keys(data[0] || {});
+        if (!data.length) { showToast('No data to export', true); return; }
+        const headers = Object.keys(data[0]);
         const rows = data.map(row => headers.map(h => `"${String(row[h] || '').replace(/"/g, '""')}"`).join(','));
         const blob = new Blob(["\uFEFF" + [headers.join(','), ...rows].join('\n')], { type: 'text/csv' });
         const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `students_${new Date().toISOString().slice(0,19)}.csv`; a.click(); URL.revokeObjectURL(a.href);
@@ -684,15 +850,19 @@ setupAutoLogout(60);
     });
     
     exportExcel.addEventListener('click', () => {
-        const ws = XLSX.utils.json_to_sheet(getExportData());
+        const data = getExportData();
+        if (!data.length) { showToast('No data to export', true); return; }
+        const ws = XLSX.utils.json_to_sheet(data);
         const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Students');
         XLSX.writeFile(wb, `students_${new Date().toISOString().slice(0,19)}.xlsx`);
         showToast('Excel exported');
     });
     
     exportPDF.addEventListener('click', async () => {
+        const data = getExportData();
+        if (!data.length) { showToast('No data to export', true); return; }
         const { jsPDF } = window.jspdf; const doc = new jsPDF({ orientation: 'landscape' });
-        const data = getExportData(); const kpi = { total: filteredStudents.length, male: filteredStudents.filter(s=>s.gender==='Male').length, female: filteredStudents.filter(s=>s.gender==='Female').length };
+        const kpi = { total: filteredStudents.length, male: filteredStudents.filter(s=>s.gender==='Male').length, female: filteredStudents.filter(s=>s.gender==='Female').length };
         doc.setFontSize(18); doc.setTextColor(16,185,129); doc.text("JUMJ Irshad - Student Report", 14, 20);
         doc.setFontSize(10); doc.text(`Generated: ${new Date().toLocaleString()} | Total: ${kpi.total} | Male: ${kpi.male} | Female: ${kpi.female}`, 14, 30);
         doc.autoTable({ head: [['Name','Gender','Phone','Department','Batch','Qirats','Date']], body: data.map(r => [r.Name, r.Gender, r.Phone, r.Department, r.Batch, r.Qirats, r['Registration Date']]), startY: 40, headStyles: { fillColor: [16,185,129] } });
@@ -702,7 +872,8 @@ setupAutoLogout(60);
     
     exportWord.addEventListener('click', () => {
         const data = getExportData();
-        let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Students Report</title><style>body{font-family:Arial;} table{border-collapse:collapse;width:100%;} th,td{border:1px solid #ddd;padding:8px;} th{background:#10b981;color:white;}</style></head><body><h1>Student Report</h1><p>Generated: ${new Date().toLocaleString()} | Total: ${data.length}</p><table><thead><tr><th>Name</th><th>Gender</th><th>Phone</th><th>Department</th><th>Batch</th><th>Qirats</th><th>Date</th></tr></thead><tbody>${data.map(r => `<tr><td>${escapeHtml(r.Name)}</td><td>${escapeHtml(r.Gender)}</td><td>${escapeHtml(r.Phone)}</td><td>${escapeHtml(r.Department)}</td><td>${escapeHtml(r.Batch)}</td><td>${escapeHtml(r.Qirats)}</td><td>${escapeHtml(r['Registration Date'])}</td></tr>`).join('')}</tbody></table></body></html>`;
+        if (!data.length) { showToast('No data to export', true); return; }
+        let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Students Report</title><style>body{font-family:Arial;} table{border-collapse:collapse;width:100%;} th,td{border:1px solid #ddd;padding:8px;} th{background:#10b981;color:white;}</style></head><body><h1>Student Report</h1><p>Generated: ${new Date().toLocaleString()} | Total: ${data.length}</p><table><thead><tr><th>Name</th><th>Gender</th><th>Phone</th><th>Department</th><th>Batch</th><th>Qirats</th><th>Date</th></tr></thead><tbody>${data.map(r => `<tr>}<td>${escapeHtml(r.Name)}</td><td>${escapeHtml(r.Gender)}</td><td>${escapeHtml(r.Phone)}</td><td>${escapeHtml(r.Department)}</td><td>${escapeHtml(r.Batch)}</td><td>${escapeHtml(r.Qirats)}</td><td>${escapeHtml(r['Registration Date'])}</td></tr>`).join('')}</tbody></table></body></html>`;
         const blob = new Blob([html], { type: 'application/msword' });
         const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `students_report.doc`; a.click(); URL.revokeObjectURL(a.href);
         showToast('Word exported');
@@ -714,15 +885,20 @@ setupAutoLogout(60);
     batchFilter.addEventListener('change', () => { currentPage = 1; applyFiltersAndRender(); });
     clearFiltersBtn.addEventListener('click', () => { searchInput.value = ''; genderFilter.value = ''; deptFilter.value = ''; batchFilter.value = ''; currentPage = 1; applyFiltersAndRender(); });
     
-    loadData();
-    setInterval(loadData, 30000);
-    // ========== NAVIGATION INITIALIZATION ==========
-import { initNavigation } from './nav.js';
-
-// Initialize navigation when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-    initNavigation();
-});
+    // Try cache first, then Firestore
+    if (!loadFromCache()) {
+        loadDataFromFirestore();
+    } else {
+        populateFilters();
+        applyFiltersAndRender();
+        // Silently refresh in background (optional)
+        setTimeout(() => loadDataFromFirestore(), 100);
+    }
+    
+    // Navigation initialization
+    document.addEventListener('DOMContentLoaded', () => {
+        initNavigation();
+    });
 </script>
 </body>
 </html>
