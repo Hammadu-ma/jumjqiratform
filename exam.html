@@ -3,235 +3,303 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Academic Performance | Exam Analytics</title>
+    <title>ALIF Analytics | Exam Intelligence</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap');
+        
         :root {
-            --glass-bg: rgba(255, 255, 255, 0.07);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --accent-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            --bg-deep: #080a0f;
+            --glass: rgba(17, 25, 40, 0.75);
+            --accent: #6366f1;
+            --accent-glow: rgba(99, 102, 241, 0.4);
         }
 
         body {
-            background: #0f172a;
-            color: #f1f5f9;
-            font-family: 'Inter', sans-serif;
-            min-height: 100vh;
+            background-color: var(--bg-deep);
+            color: #e2e8f0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-image: radial-gradient(circle at 50% -20%, #1e1b4b 0%, var(--bg-deep) 60%);
         }
 
-        .glass-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--glass-border);
-            border-radius: 1.5rem;
+        .glass-panel {
+            background: var(--glass);
+            backdrop-filter: blur(16px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
         }
 
-        .btn-premium {
-            background: var(--accent-gradient);
-            transition: all 0.3s ease;
+        .glow-button {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            box-shadow: 0 4px 15px var(--accent-glow);
         }
 
-        .btn-premium:hover {
+        .glow-button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+            box-shadow: 0 8px 25px var(--accent-glow);
+            filter: brightness(1.1);
         }
 
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
+        .stat-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);
+            border-left: 3px solid var(--accent);
         }
 
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
+        /* Modern Table Styling */
+        tr { transition: background 0.2s; cursor: pointer; }
+        tr:hover { background: rgba(255, 255, 255, 0.03); }
+
+        .rank-gold { color: #fbbf24; text-shadow: 0 0 10px rgba(251, 191, 36, 0.3); }
+        
+        .custom-loader {
+            width: 40px; height: 40px;
+            border: 3px solid rgba(99, 102, 241, 0.1);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
         }
 
-        /* Modal Animation */
-        .modal-enter {
-            animation: modalFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        @keyframes modalFadeIn {
-            from { opacity: 0; transform: scale(0.95) translateY(20px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
-        }
-
-        .status-badge {
-            padding: 2px 8px;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            background: rgba(16, 185, 129, 0.1);
-            color: #10b981;
-            border: 1px solid rgba(16, 185, 129, 0.2);
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="p-4 md:p-8">
+<body class="min-h-screen p-6 md:p-12">
 
-    <header class="max-w-7xl mx-auto mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div>
-            <h1 class="text-3xl font-bold tracking-tight">Exam Performance</h1>
-            <p class="text-slate-400 mt-1">Detailed analytics and score management</p>
+    <nav class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center mb-12 gap-6">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                <i class="fas fa-graduation-cap text-2xl text-white"></i>
+            </div>
+            <div>
+                <h1 class="text-2xl font-extrabold tracking-tight">Exam Intelligence</h1>
+                <p class="text-slate-500 text-sm">Academic Year 2026 • Term II</p>
+            </div>
         </div>
-        
-        <div class="flex gap-3 bg-slate-800/50 p-1.5 rounded-2xl border border-slate-700">
-            <button onclick="switchView('qirat')" class="view-btn px-6 py-2 rounded-xl text-sm font-medium transition-all bg-indigo-600">By Qirat</button>
-            <button onclick="switchView('department')" class="view-btn px-6 py-2 rounded-xl text-sm font-medium transition-all text-slate-400">By Department</button>
-            <button onclick="switchView('general')" class="view-btn px-6 py-2 rounded-xl text-sm font-medium transition-all text-slate-400">General</button>
+
+        <div class="flex bg-slate-900/50 p-1 rounded-2xl border border-slate-800">
+            <button onclick="updateView('qirat')" id="btn-qirat" class="view-tab px-6 py-2.5 rounded-xl text-sm font-semibold transition-all bg-indigo-600 text-white">Qirat Wise</button>
+            <button onclick="updateView('dept')" id="btn-dept" class="view-tab px-6 py-2.5 rounded-xl text-sm font-semibold transition-all text-slate-400 hover:text-white">Departmental</button>
+            <button onclick="updateView('gen')" id="btn-gen" class="view-tab px-6 py-2.5 rounded-xl text-sm font-semibold transition-all text-slate-400 hover:text-white">General Rank</button>
         </div>
-    </header>
+    </nav>
 
-    <main class="max-w-7xl mx-auto">
-        
-        <section id="general-stats" class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
-            <div class="glass-card p-6">
-                <div class="text-slate-400 text-sm mb-2">Total Students</div>
-                <div class="text-3xl font-bold">1,284</div>
-                <div class="text-emerald-400 text-xs mt-2"><i class="fas fa-arrow-up"></i> 12% vs last term</div>
+    <section class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        <div class="glass-panel p-6 stat-card">
+            <div class="flex justify-between items-start mb-4">
+                <span class="text-slate-400 text-xs font-bold uppercase tracking-widest">Global Proficiency</span>
+                <i class="fas fa-chart-line text-indigo-400"></i>
             </div>
-            <div class="glass-card p-6">
-                <div class="text-slate-400 text-sm mb-2">Average Score</div>
-                <div class="text-3xl font-bold">84.2%</div>
-                <div class="w-full bg-slate-700 h-1.5 rounded-full mt-4">
-                    <div class="bg-indigo-500 h-1.5 rounded-full" style="width: 84%"></div>
-                </div>
+            <div class="text-4xl font-bold">88.4%</div>
+            <div class="flex items-center gap-2 mt-2 text-emerald-400 text-sm font-medium">
+                <i class="fas fa-caret-up"></i>
+                <span>4.2% Improvement</span>
             </div>
-            <div class="glass-card p-6">
-                <div class="text-slate-400 text-sm mb-2">Global Rank</div>
-                <div class="text-3xl font-bold">Top 5</div>
-                <p class="text-xs text-slate-500 mt-2">Across all departments</p>
-            </div>
-            <div class="glass-card p-6 border-indigo-500/30">
-                <div class="text-slate-400 text-sm mb-2">System Health</div>
-                <div class="flex items-center gap-2">
-                    <span class="relative flex h-3 w-3">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
-                    </span>
-                    <span class="text-xl font-semibold">Live Sync</span>
-                </div>
-                <p class="text-xs text-slate-500 mt-3 italic">"AI Recommended: Focus on Lipid Metabolism Qirat next week."</p>
-            </div>
-        </section>
+        </div>
 
-        <div class="glass-card overflow-hidden">
-            <div class="p-6 border-b border-slate-700 flex justify-between items-center">
-                <h3 id="table-title" class="text-xl font-semibold">Qirat Students List</h3>
-                <input type="text" placeholder="Search students..." class="bg-slate-900 border border-slate-700 px-4 py-2 rounded-xl text-sm focus:outline-none focus:border-indigo-500">
+        <div class="glass-panel p-6 stat-card" style="border-color: #a855f7;">
+            <div class="flex justify-between items-start mb-4">
+                <span class="text-slate-400 text-xs font-bold uppercase tracking-widest">Exam Completion</span>
+                <i class="fas fa-check-double text-purple-400"></i>
             </div>
-            <div class="overflow-x-auto custom-scrollbar">
-                <table class="w-full text-left">
-                    <thead class="bg-slate-800/50 text-slate-400 text-xs uppercase tracking-wider">
-                        <tr>
-                            <th class="px-6 py-4">Student Name</th>
-                            <th class="px-6 py-4">Department</th>
-                            <th class="px-6 py-4">Current Qirat</th>
-                            <th class="px-6 py-4">Status</th>
-                            <th class="px-6 py-4">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-700/50">
-                        <tr class="hover:bg-white/5 transition-colors group">
-                            <td class="px-6 py-4">
-                                <div class="flex items-center gap-3">
-                                    <div class="h-10 w-10 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold border border-indigo-500/30">FT</div>
-                                    <div>
-                                        <div class="font-medium">Fuad Temam</div>
-                                        <div class="text-xs text-slate-500">ID: #44021</div>
-                                    </div>
+            <div class="text-4xl font-bold">92%</div>
+            <div class="w-full bg-slate-800 h-1.5 rounded-full mt-4">
+                <div class="bg-purple-500 h-1.5 rounded-full" style="width: 92%"></div>
+            </div>
+        </div>
+
+        <div class="glass-panel p-6 stat-card" style="border-color: #ec4899;">
+            <div class="flex justify-between items-start mb-4">
+                <span class="text-slate-400 text-xs font-bold uppercase tracking-widest">AI Insights</span>
+                <i class="fas fa-brain text-pink-400"></i>
+            </div>
+            <div class="text-sm italic text-slate-300">"Peak performance detected in Glycolysis; metabolism recall requires focus."</div>
+        </div>
+    </section>
+
+    <main class="max-w-7xl mx-auto glass-panel overflow-hidden">
+        <div class="p-8 border-b border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
+            <h3 id="current-title" class="text-xl font-semibold">Qirat Distribution List</h3>
+            <div class="relative w-full md:w-72">
+                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i>
+                <input type="text" placeholder="Filter by student or ID..." class="w-full bg-slate-950/50 border border-slate-800 rounded-xl py-2.5 pl-11 pr-4 text-sm focus:border-indigo-500 focus:outline-none transition-all">
+            </div>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead class="bg-slate-900/40 text-slate-500 text-[10px] uppercase tracking-[0.2em] font-bold">
+                    <tr>
+                        <th class="px-8 py-5">Student Identity</th>
+                        <th class="px-8 py-5">Active Path</th>
+                        <th class="px-8 py-5">Performance Map</th>
+                        <th class="px-8 py-5 text-right">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body" class="divide-y divide-white/5">
+                    <tr>
+                        <td class="px-8 py-6">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center font-bold text-white shadow-lg">FT</div>
+                                <div>
+                                    <p class="font-bold text-slate-200">Fuad Temam</p>
+                                    <p class="text-xs text-slate-500">ID: ALIF-2026-001</p>
                                 </div>
-                            </td>
-                            <td class="px-6 py-4 text-slate-300">Medical Science</td>
-                            <td class="px-6 py-4 text-slate-300">Glycolysis Pathways</td>
-                            <td class="px-6 py-4"><span class="status-badge">Active</span></td>
-                            <td class="px-6 py-4">
-                                <button onclick="openModal('qirat-modal')" class="btn-premium px-4 py-2 rounded-lg text-xs font-semibold">View Analytics</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+                            </div>
+                        </td>
+                        <td class="px-8 py-6">
+                            <span class="px-3 py-1 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded-lg text-xs font-semibold uppercase tracking-wider">Clinical Biochemistry</span>
+                        </td>
+                        <td class="px-8 py-6">
+                            <div class="flex items-center gap-4">
+                                <span class="text-lg font-bold text-slate-200">94%</span>
+                                <div class="flex-1 min-w-[100px] h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                                    <div class="h-full bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]" style="width: 94%"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-8 py-6 text-right">
+                            <button onclick="showAnalysis('Fuad Temam')" class="glow-button px-5 py-2 rounded-xl text-xs font-bold text-white uppercase tracking-tighter">View Intel</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </main>
 
-    <div id="qirat-modal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="glass-card w-full max-w-4xl max-h-[90vh] overflow-hidden modal-enter flex flex-col bg-slate-900">
-            <div class="p-6 border-b border-slate-700 flex justify-between items-center bg-slate-800/30">
-                <h2 class="text-2xl font-bold">Detailed Scorecard</h2>
-                <button onclick="closeModal('qirat-modal')" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
+    <div id="intel-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-slate-950/90 backdrop-blur-md" onclick="closeModal()"></div>
+        
+        <div class="glass-panel w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col relative z-10 border border-white/10 shadow-2xl">
+            <div class="p-8 border-b border-white/5 flex justify-between items-center bg-slate-900/20">
+                <div>
+                    <h2 class="text-2xl font-bold text-white" id="modal-user-name">Student Analysis</h2>
+                    <p class="text-slate-500 text-sm">Real-time performance metrics</p>
+                </div>
+                <button onclick="closeModal()" class="w-10 h-10 rounded-full bg-slate-800/50 hover:bg-slate-700 transition-colors flex items-center justify-center">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
-            
-            <div class="p-6 overflow-y-auto custom-scrollbar">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                    <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700 text-center">
-                        <p class="text-xs text-slate-400 uppercase">Average Percentage</p>
-                        <p class="text-2xl font-bold text-indigo-400">92.5%</p>
+
+            <div class="p-8 overflow-y-auto custom-scrollbar grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <div class="lg:col-span-5 space-y-6">
+                    <div class="glass-panel p-6 bg-slate-900/40">
+                        <canvas id="performanceChart" height="300"></canvas>
                     </div>
-                    <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700 text-center">
-                        <p class="text-xs text-slate-400 uppercase">Total Points</p>
-                        <p class="text-2xl font-bold text-purple-400">462/500</p>
-                    </div>
-                    <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700 text-center">
-                        <p class="text-xs text-slate-400 uppercase">Group Rank</p>
-                        <p class="text-2xl font-bold text-emerald-400">#02</p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="p-4 bg-emerald-500/5 border border-emerald-500/10 rounded-2xl">
+                            <p class="text-xs text-emerald-500 font-bold uppercase mb-1">Global Rank</p>
+                            <p class="text-2xl font-bold text-slate-100">#12 <span class="text-xs text-slate-500 font-normal">/ 1.2k</span></p>
+                        </div>
+                        <div class="p-4 bg-indigo-500/5 border border-indigo-500/10 rounded-2xl">
+                            <p class="text-xs text-indigo-500 font-bold uppercase mb-1">Consistency</p>
+                            <p class="text-2xl font-bold text-slate-100">High</p>
+                        </div>
                     </div>
                 </div>
 
-                <table class="w-full text-sm">
-                    <thead class="text-slate-400 border-b border-slate-700">
-                        <tr>
-                            <th class="py-3 text-left font-medium">Assessment</th>
-                            <th class="py-3 text-center font-medium">Score</th>
-                            <th class="py-3 text-center font-medium">Weight</th>
-                            <th class="py-3 text-right font-medium">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-800">
-                        <tr>
-                            <td class="py-4">Assessment 1 (Quizzes)</td>
-                            <td class="py-4 text-center">45/50</td>
-                            <td class="py-4 text-center">10%</td>
-                            <td class="py-4 text-right"><span class="text-emerald-400">Passed</span></td>
-                        </tr>
-                        <tr>
-                            <td class="py-4 font-bold text-indigo-400 underline italic">Average Total</td>
-                            <td class="py-4 text-center font-bold">90%</td>
-                            <td class="py-4 text-center">---</td>
-                            <td class="py-4 text-right font-bold text-indigo-400">Distinction</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div class="lg:col-span-7 space-y-6">
+                    <div class="bg-slate-900/40 rounded-2xl p-2 border border-white/5">
+                        <table class="w-full">
+                            <thead class="text-left text-xs text-slate-500 border-b border-white/5">
+                                <tr>
+                                    <th class="p-4">Assessment</th>
+                                    <th class="p-4">Score</th>
+                                    <th class="p-4">Group Rank</th>
+                                    <th class="p-4 text-right">Result</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-sm divide-y divide-white/5">
+                                <tr>
+                                    <td class="p-4 text-slate-300">Continuous Assessment 1</td>
+                                    <td class="p-4 font-bold text-indigo-400">48/50</td>
+                                    <td class="p-4">#03</td>
+                                    <td class="p-4 text-right"><span class="text-emerald-400 font-bold">A+</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-4 text-slate-300 font-bold">Final Average</td>
+                                    <td class="p-4 font-bold text-white text-lg">96.0%</td>
+                                    <td class="p-4 text-slate-500">Global Mean</td>
+                                    <td class="p-4 text-right text-indigo-400 font-black">TOP 1%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="glass-panel p-6 bg-indigo-600/5 border-indigo-500/20">
+                        <h4 class="text-sm font-bold text-indigo-300 uppercase mb-3 flex items-center gap-2">
+                            <i class="fas fa-magic"></i> AI Recommendation
+                        </h4>
+                        <p class="text-sm text-slate-400 leading-relaxed">
+                            Based on Assessment 2, the student excels in <span class="text-slate-100 font-bold">Structural Identification</span> but was 12% slower in <span class="text-slate-100 font-bold">Kinetic Calculations</span>. Suggesting a 20-minute focused review on Enzyme Inhibition.
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        function openModal(id) {
-            document.getElementById(id).classList.remove('hidden');
-        }
+        // Mock Performance Logic
+        function updateView(view) {
+            const title = document.getElementById('current-title');
+            const tabs = document.querySelectorAll('.view-tab');
+            tabs.forEach(t => t.classList.remove('bg-indigo-600', 'text-white'));
+            tabs.forEach(t => t.classList.add('text-slate-400'));
 
-        function closeModal(id) {
-            document.getElementById(id).classList.add('hidden');
-        }
-
-        function switchView(view) {
-            // UI logic to update table headers and stats based on user prompt logic
-            const title = document.getElementById('table-title');
-            const btns = document.querySelectorAll('.view-btn');
-            
-            btns.forEach(b => b.classList.remove('bg-indigo-600', 'text-white'));
-            btns.forEach(b => b.classList.add('text-slate-400'));
-            
-            if(view === 'qirat') {
-                title.innerText = "Student Rankings by Qirat";
-                event.target.classList.add('bg-indigo-600', 'text-white');
-            } else if(view === 'department') {
-                title.innerText = "Departmental Overview";
-                event.target.classList.add('bg-indigo-600', 'text-white');
+            if (view === 'qirat') {
+                title.innerText = "Qirat Distribution List";
+                document.getElementById('btn-qirat').classList.add('bg-indigo-600', 'text-white');
+            } else if (view === 'dept') {
+                title.innerText = "Departmental Performance Overview";
+                document.getElementById('btn-dept').classList.add('bg-indigo-600', 'text-white');
             } else {
-                title.innerText = "General Leaderboard";
-                event.target.classList.add('bg-indigo-600', 'text-white');
+                title.innerText = "General Institutional Leaderboard";
+                document.getElementById('btn-gen').classList.add('bg-indigo-600', 'text-white');
             }
+        }
+
+        function showAnalysis(name) {
+            document.getElementById('modal-user-name').innerText = name;
+            document.getElementById('intel-modal').classList.remove('hidden');
+            initChart();
+        }
+
+        function closeModal() {
+            document.getElementById('intel-modal').classList.add('hidden');
+        }
+
+        let chartInstance = null;
+        function initChart() {
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            if (chartInstance) chartInstance.destroy();
+            
+            chartInstance = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Logic', 'Recall', 'Practical', 'Theory', 'Speed', 'Accuracy'],
+                    datasets: [{
+                        label: 'Student Capability Index',
+                        data: [95, 80, 90, 85, 75, 98],
+                        backgroundColor: 'rgba(99, 102, 241, 0.2)',
+                        borderColor: '#6366f1',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#6366f1'
+                    }]
+                },
+                options: {
+                    scales: {
+                        r: {
+                            angleLines: { color: 'rgba(255,255,255,0.1)' },
+                            grid: { color: 'rgba(255,255,255,0.1)' },
+                            pointLabels: { color: '#94a3b8', font: { size: 10 } },
+                            ticks: { display: false }
+                        }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
         }
     </script>
 </body>
