@@ -498,45 +498,11 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     
-    // ========== OFFLINE OPTIMIZATION: CACHING ==========
     let allRegistrations = [];
     let filteredRegistrations = [];
     let currentGroupMode = 'qirat';
     let currentGroups = [];
     let allUniqueQirats = [];
-    let dataLoaded = false;
-    let isLoading = false;
-    
-    // Save to localStorage cache
-    function saveToCache() {
-        try {
-            const cacheData = {
-                registrations: allRegistrations,
-                allQirats: allUniqueQirats,
-                timestamp: new Date().toISOString(),
-                version: '1.0'
-            };
-            localStorage.setItem('groups_cache', JSON.stringify(cacheData));
-        } catch (e) { console.warn('Cache save failed:', e); }
-    }
-    
-    // Load from localStorage cache
-    function loadFromCache() {
-        try {
-            const cached = localStorage.getItem('groups_cache');
-            if (cached) {
-                const data = JSON.parse(cached);
-                if (data.registrations && data.registrations.length > 0) {
-                    allRegistrations = data.registrations;
-                    allUniqueQirats = data.allQirats || [];
-                    dataLoaded = true;
-                    console.log('Loaded from cache:', allRegistrations.length, 'students');
-                    return true;
-                }
-            }
-        } catch (e) { console.warn('Cache load failed:', e); }
-        return false;
-    }
     
     const searchInput = document.getElementById('searchInput');
     const genderFilter = document.getElementById('genderFilter');
@@ -567,7 +533,6 @@
         return (student.schedules || []).map(s => s.qirat_name).filter(Boolean);
     }
     
-    // Export format WITHOUT Registration Date
     function formatStudentForExport(student, index) {
         return {
             'No.': index,
@@ -593,16 +558,7 @@
         return { maleCount, femaleCount, uniqueDepts, multiQiratCount, recentWeek };
     }
     
-    async function loadDataFromFirestore(force = false) {
-        if (isLoading) return;
-        if (dataLoaded && !force) {
-            console.log('Using cached data, not loading from Firestore');
-            return;
-        }
-        
-        isLoading = true;
-        showToast('Loading data...');
-        
+    async function loadData() {
         try {
             const querySnapshot = await getDocs(collection(db, "registrations"));
             allRegistrations = [];
@@ -627,29 +583,11 @@
                 schedules.forEach(s => { if(s.qirat_name) qiratSet.add(s.qirat_name); });
             });
             allUniqueQirats = Array.from(qiratSet).sort();
-            dataLoaded = true;
-            saveToCache();
-            showToast(`Loaded ${allRegistrations.length} students`);
             populateFilters();
             applyFilters();
         } catch (error) {
-            console.error("Error loading from Firestore:", error);
-            if (loadFromCache()) {
-                showToast('Using cached data (offline mode)', false);
-                populateFilters();
-                applyFilters();
-            } else {
-                groupsContainer.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-triangle"></i> Error: ${error.message}</div>`;
-            }
-        } finally {
-            isLoading = false;
+            groupsContainer.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-triangle"></i> Error: ${error.message}</div>`;
         }
-    }
-    
-    async function refreshFromCloud() {
-        showToast('Refreshing from cloud...');
-        await loadDataFromFirestore(true);
-        showToast('Data refreshed from cloud');
     }
     
     function populateFilters() {
@@ -835,13 +773,13 @@
             });
             showToast('Student updated successfully!');
             closeEditModal();
-            await refreshFromCloud();
+            await loadData();
         } catch (error) {
             showToast('Update failed: ' + error.message, true);
         }
     });
     
-    // ========== BEAUTIFUL EXPORT FUNCTIONS (WITHOUT REGISTRATION DATE) ==========
+    // ========== BEAUTIFUL EXPORT FUNCTIONS ==========
     function exportSingleGroup(group, format) {
         if (!group || group.members.length === 0) { showToast('No students', true); return; }
         const exportData = group.members.map((m, idx) => formatStudentForExport(m, idx + 1));
@@ -965,7 +903,7 @@
         downloadBlob(new Blob([html], { type: 'application/msword' }), `${groupName.replace(/[^a-z0-9]/gi, '_')}_report.doc`);
     }
     
-    // ========== MASTER EXPORTS (WITH NUMBER COLUMN, NO REGISTRATION DATE) ==========
+    // ========== MASTER EXPORTS ==========
     function exportAllGroupsToExcel() {
         if (currentGroups.length === 0) { showToast('No groups to export', true); return; }
         const wb = XLSX.utils.book_new();
@@ -1089,15 +1027,8 @@
     
     initNavigation();
     if (admin?.role === 'super-admin') setTimeout(() => refreshNavigation(), 100);
-    
-    // Try cache first, then Firestore
-    if (!loadFromCache()) {
-        loadDataFromFirestore();
-    } else {
-        populateFilters();
-        applyFilters();
-        setTimeout(() => loadDataFromFirestore(), 100);
-    }
+    loadData();
+    setInterval(loadData, 30000);
 </script>
 </body>
 </html>
