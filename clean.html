@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>JUMJ Irshad | Duplicate Data Cleaner - Merge & Clean</title>
+    <title>JUMJ Irshad | Duplicate Cleaner - Smart Ordering</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -143,6 +143,27 @@
         }
         .method-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
         .method-btn:hover:not(.active) { background: var(--primary-light); border-color: var(--primary); }
+        .ordering-controls {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            padding: 12px;
+            background: #f8fafc;
+            border-radius: 20px;
+            align-items: center;
+        }
+        .order-btn {
+            padding: 6px 16px;
+            border: 1px solid var(--border);
+            border-radius: 30px;
+            background: white;
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all 0.2s;
+        }
+        .order-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
         .bulk-actions {
             display: flex;
             gap: 12px;
@@ -194,15 +215,6 @@
             font-weight: 700;
             cursor: pointer;
         }
-        .btn-success {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: white;
-            border: none;
-            padding: 10px 24px;
-            border-radius: 40px;
-            font-weight: 700;
-            cursor: pointer;
-        }
         .btn-purple {
             background: linear-gradient(135deg, #8b5cf6, #7c3aed);
             color: white;
@@ -215,7 +227,7 @@
             align-items: center;
             gap: 8px;
         }
-        .btn-primary:hover, .btn-danger:hover, .btn-warning:hover, .btn-secondary:hover, .btn-success:hover, .btn-purple:hover { transform: translateY(-2px); filter: brightness(1.05); }
+        .btn-primary:hover, .btn-danger:hover, .btn-warning:hover, .btn-secondary:hover, .btn-purple:hover { transform: translateY(-2px); filter: brightness(1.05); }
 
         .duplicate-group {
             background: var(--card-bg);
@@ -224,7 +236,9 @@
             border: 1px solid var(--border);
             overflow: hidden;
             transition: all 0.2s;
+            animation: fadeIn 0.3s ease;
         }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .duplicate-group:hover { box-shadow: var(--shadow-md); }
         .group-header {
             background: linear-gradient(135deg, #fef3c7, #fde68a);
@@ -239,10 +253,10 @@
         .group-title { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
         .group-name { font-weight: 800; font-size: 1rem; color: #92400e; }
         .group-count { background: white; padding: 4px 12px; border-radius: 30px; font-size: 0.7rem; font-weight: 600; color: #92400e; }
+        .severity-badge { background: #ef4444; color: white; padding: 2px 8px; border-radius: 20px; font-size: 0.65rem; font-weight: 600; }
         .group-actions { display: flex; gap: 8px; flex-wrap: wrap; }
         .merge-btn { background: #8b5cf6; color: white; border: none; padding: 6px 14px; border-radius: 30px; font-size: 0.7rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
         .merge-delete-btn { background: var(--danger); color: white; border: none; padding: 6px 14px; border-radius: 30px; font-size: 0.7rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
-        .keep-diverse-btn { background: #8b5cf6; color: white; border: none; padding: 6px 14px; border-radius: 30px; font-size: 0.7rem; font-weight: 600; cursor: pointer; }
         .keep-oldest-btn { background: var(--secondary); color: white; border: none; padding: 6px 14px; border-radius: 30px; font-size: 0.7rem; font-weight: 600; cursor: pointer; }
         .keep-newest-btn { background: var(--accent); color: white; border: none; padding: 6px 14px; border-radius: 30px; font-size: 0.7rem; font-weight: 600; cursor: pointer; }
         .delete-group-btn { background: var(--danger); color: white; border: none; padding: 6px 14px; border-radius: 30px; font-size: 0.7rem; font-weight: 600; cursor: pointer; }
@@ -257,7 +271,7 @@
         .badge-female { background: #fce7f3; color: #be185d; }
         .diversity-badge { background: #e0e7ff; color: #3730a3; margin-left: 8px; }
         .checkbox-select { width: 18px; height: 18px; cursor: pointer; }
-        .merged-qirats { background: #d1fae5; color: #065f46; padding: 2px 8px; border-radius: 20px; font-size: 0.7rem; display: inline-block; margin-top: 4px; }
+        .priority-indicator { width: 4px; height: 40px; background: var(--primary); position: absolute; left: 0; top: 50%; transform: translateY(-50%); border-radius: 4px; }
 
         .toast {
             position: fixed;
@@ -314,26 +328,26 @@
 
 <div class="glass-header">
     <div class="header-content">
-        <div class="logo"><h1><i class="fas fa-broom"></i> Duplicate Cleaner - Merge & Clean</h1></div>
+        <div class="logo"><h1><i class="fas fa-broom"></i> Duplicate Cleaner - Smart Ordering</h1></div>
         <button class="back-btn" onclick="window.location.href='index.html'"><i class="fas fa-arrow-left"></i> Back to Dashboard</button>
     </div>
 </div>
 
 <div class="main-container">
     <div class="hero-section">
-        <div class="hero-title"><i class="fas fa-code-branch"></i> Merge & Clean Duplicates</div>
-        <div class="hero-subtitle">Merge Qirats from all duplicates into the most diverse record, then delete the rest</div>
+        <div class="hero-title"><i class="fas fa-chart-line"></i> Smart Duplicate Management</div>
+        <div class="hero-subtitle">Groups ordered by severity | Merge Qirats | Keep the most diverse record</div>
     </div>
 
     <div class="stats-grid" id="statsGrid">
         <div class="stat-card"><div class="stat-value" id="totalStudents">0</div><div class="stat-label">Total Students</div></div>
         <div class="stat-card"><div class="stat-value" id="duplicateGroups">0</div><div class="stat-label">Duplicate Groups</div></div>
         <div class="stat-card"><div class="stat-value" id="duplicateCount">0</div><div class="stat-label">Duplicate Records</div></div>
-        <div class="stat-card"><div class="stat-value" id="uniqueStudents">0</div><div class="stat-label">After Merge</div></div>
+        <div class="stat-card"><div class="stat-value" id="uniqueStudents">0</div><div class="stat-label">After Clean</div></div>
     </div>
 
     <div class="detection-controls">
-        <h3 style="margin-bottom: 16px;"><i class="fas fa-sliders-h"></i> Detection Settings</h3>
+        <h3 style="margin-bottom: 16px;"><i class="fas fa-sliders-h"></i> Detection & Ordering Settings</h3>
         <div class="detection-methods">
             <button class="method-btn active" data-method="exact"><i class="fas fa-font"></i> Exact Name</button>
             <button class="method-btn" data-method="name+qirat"><i class="fas fa-book-quran"></i> Name + Qirat</button>
@@ -342,19 +356,30 @@
             <button class="method-btn" data-method="phone"><i class="fas fa-phone"></i> Phone</button>
             <button class="method-btn" data-method="name+phone"><i class="fas fa-link"></i> Name + Phone</button>
         </div>
+        
+        <div class="ordering-controls">
+            <span style="font-weight:600;"><i class="fas fa-sort-amount-down"></i> Order By:</span>
+            <button class="order-btn active" data-order="severity">🔴 Most Duplicates First</button>
+            <button class="order-btn" data-order="qirat">⭐ Most Qirats to Merge</button>
+            <button class="order-btn" data-order="recent">🕐 Most Recent First</button>
+            <button class="order-btn" data-order="oldest">📅 Oldest First</button>
+        </div>
+        
         <div class="detection-actions" style="margin-top: 16px;">
             <button class="btn-primary" id="detectBtn"><i class="fas fa-search"></i> Detect Duplicates</button>
             <button class="btn-secondary" id="refreshBtn"><i class="fas fa-sync-alt"></i> Refresh Data</button>
         </div>
+        
         <div class="bulk-actions">
             <span style="font-weight:600;"><i class="fas fa-layer-group"></i> Bulk Actions:</span>
             <button class="btn-purple" id="bulkMergeAll"><i class="fas fa-code-branch"></i> Merge & Keep Most Qirats (All Groups)</button>
             <button class="btn-warning" id="bulkKeepNewest"><i class="fas fa-calendar-plus"></i> Keep Newest (No Merge)</button>
             <button class="btn-secondary" id="bulkKeepOldest"><i class="fas fa-calendar-minus"></i> Keep Oldest (No Merge)</button>
-            <button class="btn-danger" id="bulkDeleteAllDup"><i class="fas fa-trash-alt"></i> Delete All Duplicates (No Merge)</button>
+            <button class="btn-danger" id="bulkDeleteAllDup"><i class="fas fa-trash-alt"></i> Delete All Duplicates</button>
         </div>
+        
         <div class="info-note" style="margin-top: 16px; padding: 12px; background: #f0fdf4; border-radius: 16px; font-size: 0.75rem;">
-            <i class="fas fa-info-circle"></i> <strong>Merge & Keep Most Qirats:</strong> Merges ALL Qirats from every duplicate into the record with the most Qirats, then deletes all other duplicates. Preserves all enrollment data!
+            <i class="fas fa-info-circle"></i> <strong>Smart Ordering:</strong> Groups with most duplicates appear first. Merge preserves ALL Qirats from every duplicate into the most diverse record.
         </div>
     </div>
 
@@ -400,6 +425,7 @@
     let allStudents = [];
     let duplicateGroups = [];
     let currentMethod = 'exact';
+    let currentOrder = 'severity';
     let selectedKeepIds = new Map();
     let individualDeleteSelected = new Map();
     
@@ -427,6 +453,14 @@
     
     function getAllQiratsSet(student) {
         return new Set(getQiratNames(student));
+    }
+    
+    function getTotalQiratsInGroup(group) {
+        const allQirats = new Set();
+        group.students.forEach(s => {
+            getQiratNames(s).forEach(q => allQirats.add(q));
+        });
+        return allQirats.size;
     }
     
     function normalizeName(name) {
@@ -558,9 +592,31 @@
             });
         }
         
-        duplicateGroups = Array.from(groups.entries())
+        // Create groups array
+        let groupsArray = Array.from(groups.entries())
             .filter(([_, students]) => students.length > 1)
-            .map(([key, students]) => ({ key, students, count: students.length }));
+            .map(([key, students]) => ({ 
+                key, 
+                students, 
+                count: students.length,
+                totalQiratsToMerge: getTotalQiratsInGroup({ students }),
+                maxQiratsInGroup: Math.max(...students.map(s => getQiratCount(s))),
+                newestDate: new Date(Math.max(...students.map(s => s.timestamp.getTime()))),
+                oldestDate: new Date(Math.min(...students.map(s => s.timestamp.getTime())))
+            }));
+        
+        // Apply ordering
+        if (currentOrder === 'severity') {
+            groupsArray.sort((a, b) => b.count - a.count);
+        } else if (currentOrder === 'qirat') {
+            groupsArray.sort((a, b) => b.totalQiratsToMerge - a.totalQiratsToMerge);
+        } else if (currentOrder === 'recent') {
+            groupsArray.sort((a, b) => b.newestDate - a.newestDate);
+        } else if (currentOrder === 'oldest') {
+            groupsArray.sort((a, b) => a.oldestDate - b.oldestDate);
+        }
+        
+        duplicateGroups = groupsArray;
         
         selectedKeepIds.clear();
         individualDeleteSelected.clear();
@@ -586,7 +642,6 @@
         const targetStudent = group.students.find(s => s.id === targetId);
         const others = group.students.filter(s => s.id !== targetId);
         
-        // Merge all Qirats from others into target
         const allQirats = new Set(getQiratNames(targetStudent));
         others.forEach(other => {
             getQiratNames(other).forEach(q => allQirats.add(q));
@@ -594,7 +649,6 @@
         
         const mergedSchedules = Array.from(allQirats).map(q => ({ qirat_name: q, days: ["Flexible"], time_preference: "Evening" }));
         
-        // Update target student with merged Qirats
         const targetRef = doc(db, "registrations", targetId);
         await updateDoc(targetRef, { schedules: mergedSchedules, updatedAt: new Date() });
         
@@ -605,35 +659,6 @@
         }
         
         return { mergedCount: allQirats.size, deletedCount: others.length };
-    }
-    
-    async function mergeAndKeepSelected(groupKey) {
-        const selectedId = selectedKeepIds.get(groupKey);
-        const group = duplicateGroups.find(g => g.key === groupKey);
-        if (!group) return;
-        
-        const targetStudent = group.students.find(s => s.id === selectedId);
-        const others = group.students.filter(s => s.id !== selectedId);
-        
-        const allQirats = new Set(getQiratNames(targetStudent));
-        others.forEach(other => {
-            getQiratNames(other).forEach(q => allQirats.add(q));
-        });
-        
-        const mergedSchedules = Array.from(allQirats).map(q => ({ qirat_name: q, days: ["Flexible"], time_preference: "Evening" }));
-        
-        const targetRef = doc(db, "registrations", selectedId);
-        await updateDoc(targetRef, { schedules: mergedSchedules, updatedAt: new Date() });
-        
-        if (others.length > 0) {
-            const batch = writeBatch(db);
-            others.forEach(s => batch.delete(doc(db, "registrations", s.id)));
-            await batch.commit();
-        }
-        
-        showToast(`Merged ${others.length} duplicate(s) into ${targetStudent.full_name}. Total Qirats: ${allQirats.size}`);
-        await loadData();
-        detectDuplicates();
     }
     
     async function mergeAllGroups() {
@@ -670,6 +695,12 @@
         detectDuplicates();
     }
     
+    function getSeverityLabel(count) {
+        if (count >= 5) return { text: 'CRITICAL', color: '#ef4444' };
+        if (count >= 3) return { text: 'HIGH', color: '#f59e0b' };
+        return { text: 'MEDIUM', color: '#10b981' };
+    }
+    
     function renderResults() {
         const container = document.getElementById('resultsContainer');
         if (duplicateGroups.length === 0) {
@@ -680,19 +711,23 @@
         container.innerHTML = duplicateGroups.map((group, idx) => {
             const toDeleteSet = individualDeleteSelected.get(group.key) || new Set();
             const mostQiratsStudent = group.students.reduce((a, b) => getQiratCount(a) >= getQiratCount(b) ? a : b);
+            const severity = getSeverityLabel(group.count);
             return `
-            <div class="duplicate-group">
+            <div class="duplicate-group" style="position:relative;">
+                <div class="priority-indicator" style="background: ${severity.color};"></div>
                 <div class="group-header" onclick="toggleGroup(${idx})">
                     <div class="group-title">
                         <i class="fas fa-copy"></i>
                         <span class="group-name">${escapeHtml(group.key)}</span>
                         <span class="group-count">${group.count} records</span>
+                        <span class="severity-badge" style="background: ${severity.color};">${severity.text}</span>
+                        <span class="badge" style="background:#e0e7ff;">⭐ Potential Qirats: ${group.totalQiratsToMerge}</span>
                     </div>
                     <div class="group-actions" onclick="event.stopPropagation()">
                         <button class="merge-btn" onclick="mergeAndKeepSelected('${group.key}')"><i class="fas fa-code-branch"></i> Merge & Keep Selected</button>
                         <button class="merge-delete-btn" onclick="mergeAndKeepDiverse('${group.key}')"><i class="fas fa-star"></i> Merge & Keep Most Qirats</button>
-                        <button class="keep-oldest-btn" onclick="keepOldest('${group.key}')"><i class="fas fa-calendar-minus"></i> Keep Oldest (No Merge)</button>
-                        <button class="keep-newest-btn" onclick="keepNewest('${group.key}')"><i class="fas fa-calendar-plus"></i> Keep Newest (No Merge)</button>
+                        <button class="keep-oldest-btn" onclick="keepOldest('${group.key}')"><i class="fas fa-calendar-minus"></i> Keep Oldest</button>
+                        <button class="keep-newest-btn" onclick="keepNewest('${group.key}')"><i class="fas fa-calendar-plus"></i> Keep Newest</button>
                         <button class="delete-group-btn" onclick="deleteSelected('${group.key}')"><i class="fas fa-trash"></i> Delete Selected</button>
                         <button class="delete-group-btn" onclick="deleteAllInGroup('${group.key}')"><i class="fas fa-trash-alt"></i> Delete All</button>
                     </div>
@@ -748,7 +783,12 @@
     };
     
     window.mergeAndKeepSelected = async (groupKey) => {
-        await mergeAndKeepSelected(groupKey);
+        const selectedId = selectedKeepIds.get(groupKey);
+        if (!selectedId) { showToast('Please select a record to keep', true); return; }
+        await mergeAndKeep(groupKey, selectedId, true);
+        showToast(`Merged completed!`);
+        await loadData();
+        detectDuplicates();
     };
     
     window.toggleGroup = (idx) => {
@@ -838,6 +878,16 @@
         students.forEach(s => batch.delete(doc(db, "registrations", s.id)));
         await batch.commit();
     }
+    
+    // Ordering buttons
+    document.querySelectorAll('.order-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.order-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentOrder = btn.dataset.order;
+            detectDuplicates();
+        });
+    });
     
     document.getElementById('bulkMergeAll').addEventListener('click', async () => {
         if (duplicateGroups.length === 0) { showToast('No duplicates found', true); return; }
