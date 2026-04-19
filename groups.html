@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>JUMJ Irshad | Groups View - Advanced Editor</title>
+    <title>JUMJ Irshad | Groups View - Complete Suite</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -356,7 +356,6 @@
             animation: slideIn 0.3s ease;
         }
 
-        /* Modal Styles */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -400,8 +399,6 @@
         .form-group { margin-bottom: 18px; }
         .form-group label { font-weight: 600; display: block; margin-bottom: 6px; color: var(--text-primary); }
         .form-group input, .form-group select { width: 100%; padding: 10px 14px; border: 2px solid var(--border); border-radius: 16px; font-family: inherit; }
-        .qirat-list { background: #f8fafc; padding: 12px; border-radius: 20px; margin: 12px 0; }
-        .qirat-tag { display: inline-block; background: var(--primary-light); padding: 4px 12px; border-radius: 20px; margin: 4px; font-size: 0.8rem; }
         .btn-save { background: var(--primary); color: white; border: none; padding: 12px 24px; border-radius: 40px; font-weight: 700; cursor: pointer; width: 100%; }
         .btn-save:hover { background: var(--primary-dark); }
 
@@ -460,7 +457,6 @@
 
 <div id="toast" class="toast"></div>
 
-<!-- Edit Modal -->
 <div id="editModal" class="modal-overlay">
     <div class="modal-container">
         <div class="modal-header">
@@ -475,7 +471,7 @@
             <div class="form-group"><label>Telegram</label><input type="text" id="editTelegram"></div>
             <div class="form-group"><label>Department</label><input type="text" id="editDepartment"></div>
             <div class="form-group"><label>Batch</label><input type="text" id="editBatch"></div>
-            <div class="form-group"><label>Qirats (comma separated, e.g., Hafs, Warsh)</label><input type="text" id="editQirats" placeholder="Hafs, Warsh, Qalun..."></div>
+            <div class="form-group"><label>Qirats (comma separated)</label><input type="text" id="editQirats" placeholder="Hafs, Warsh, Qalun..."></div>
             <button type="submit" class="btn-save"><i class="fas fa-save"></i> Save Changes</button>
         </form>
     </div>
@@ -573,7 +569,7 @@
                 if (timestamp && typeof timestamp.toDate === 'function') timestamp = timestamp.toDate();
                 else timestamp = new Date();
                 const schedules = data.schedules || [];
-                const student = {
+                allRegistrations.push({
                     id: docSnap.id,
                     full_name: data.full_name || 'N/A',
                     gender: data.gender || 'Not Specified',
@@ -583,8 +579,7 @@
                     batch: data.batch || 'N/A',
                     schedules: schedules,
                     timestamp: timestamp
-                };
-                allRegistrations.push(student);
+                });
                 schedules.forEach(s => { if(s.qirat_name) qiratSet.add(s.qirat_name); });
             });
             allUniqueQirats = Array.from(qiratSet).sort();
@@ -692,10 +687,11 @@
                 <div class="group-content" id="groupContent-${idx}">
                     <div class="group-table-wrapper">
                         <table class="student-table">
-                            <thead><tr><th>Name</th><th>Gender</th><th>Phone</th><th>Department</th><th>Batch</th><th>Qirats</th><th>Actions</th></tr></thead>
+                            <thead><tr><th>No.</th><th>Name</th><th>Gender</th><th>Phone</th><th>Department</th><th>Batch</th><th>Qirats</th><th>Actions</th></tr></thead>
                             <tbody>
-                                ${group.members.map(m => `
+                                ${group.members.map((m, studentIdx) => `
                                     <tr>
+                                        <td>${studentIdx + 1}</td>
                                         <td><strong>${escapeHtml(m.full_name)}</strong></td>
                                         <td><span class="badge ${m.gender === 'Male' ? 'badge-male' : 'badge-female'}">${escapeHtml(m.gender)}</span></td>
                                         <td>${escapeHtml(m.phone)}</td>
@@ -735,7 +731,6 @@
         return icons[currentGroupMode] || 'fa-folder';
     }
     
-    // ========== EDIT MODAL ==========
     window.openEditModal = function(student) {
         document.getElementById('editStudentId').value = student.id;
         document.getElementById('editName').value = student.name;
@@ -784,74 +779,225 @@
         }
     });
     
-    // Export functions (simplified but complete)
+    // ========== BEAUTIFUL EXPORT FUNCTIONS ==========
     function exportSingleGroup(group, format) {
         if (!group || group.members.length === 0) { showToast('No students', true); return; }
         const exportData = group.members.map((m, idx) => formatStudentForExport(m, idx + 1));
         const groupName = group.name.replace(/[^a-z0-9]/gi, '_').slice(0, 30);
-        if (format === 'csv') downloadCSV(exportData, groupName);
-        else if (format === 'excel') exportExcel(exportData, groupName);
-        else if (format === 'pdf') exportPDF(exportData, group.name, group.members.length, group.stats);
-        else if (format === 'word') exportWord(exportData, group.name, group.members.length, group.stats);
-        showToast(`Exported "${group.name}"`);
+        const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+        
+        if (format === 'csv') exportToCSV(exportData, `${groupName}_${timestamp}`);
+        else if (format === 'excel') exportToExcel(exportData, groupName);
+        else if (format === 'pdf') exportToPDF(exportData, group.name, group.members.length, group.stats);
+        else if (format === 'word') exportToWord(exportData, group.name, group.members.length, group.stats);
+        showToast(`Exported "${group.name}" as ${format.toUpperCase()}`);
     }
     
-    function downloadCSV(data, filename) {
+    function exportToCSV(data, filename) {
         const headers = ['No.', 'Name', 'Gender', 'Phone', 'Telegram', 'Department', 'Batch', 'Qirats Enrolled'];
         const rows = data.map(row => headers.map(h => `"${String(row[h] || '').replace(/"/g, '""')}"`).join(','));
-        const blob = new Blob(["\uFEFF" + headers.join(',') + '\n' + rows.join('\n')], { type: 'text/csv' });
-        downloadBlob(blob, `${filename}.csv`);
+        const csvContent = [headers.join(','), ...rows].join('\n');
+        downloadBlob(new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' }), `${filename}.csv`);
     }
-    function exportExcel(data, sheetName) {
+    
+    function exportToExcel(data, sheetName) {
         const ws = XLSX.utils.json_to_sheet(data);
+        ws['!cols'] = [{wch:6},{wch:25},{wch:10},{wch:15},{wch:18},{wch:20},{wch:15},{wch:35}];
         const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, sheetName.slice(0,31));
+        XLSX.utils.book_append_sheet(wb, ws, sheetName.slice(0, 31));
         XLSX.writeFile(wb, `${sheetName}.xlsx`);
     }
-    async function exportPDF(data, groupName, total, stats) {
+    
+    async function exportToPDF(data, groupName, totalCount, stats) {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-        doc.text(`JUMJ - ${groupName}`, 14, 20);
-        doc.text(`Total: ${total} | M:${stats.maleCount} F:${stats.femaleCount}`, 14, 30);
-        doc.autoTable({ head: [['No.','Name','Gender','Phone','Dept','Batch','Qirats']], body: data.map(r => [r['No.'], r.Name, r.Gender, r.Phone, r.Department, r.Batch, r['Qirats Enrolled']]), startY: 38, headStyles: { fillColor: [16,185,129] } });
-        doc.save(`${groupName.replace(/[^a-z0-9]/gi, '_')}.pdf`);
+        
+        doc.setFontSize(18);
+        doc.setTextColor(16, 185, 129);
+        doc.text(`JUMJ Irshad - Group Report`, 14, 20);
+        
+        doc.setFontSize(14);
+        doc.setTextColor(0, 0, 0);
+        doc.text(`Group: ${groupName}`, 14, 32);
+        
+        doc.setFontSize(9);
+        doc.setTextColor(100, 100, 100);
+        doc.text(`Generated: ${new Date().toLocaleString()} | Total Students: ${totalCount}`, 14, 40);
+        
+        doc.setFontSize(10);
+        doc.setTextColor(0, 0, 0);
+        doc.text(`Summary KPIs:`, 14, 52);
+        doc.setFontSize(9);
+        doc.text(`• Gender Split: Male ${stats.maleCount} | Female ${stats.femaleCount}`, 14, 60);
+        doc.text(`• Departments Represented: ${stats.uniqueDepts}`, 14, 67);
+        doc.text(`• Multi-Qirat Students: ${stats.multiQiratCount}`, 14, 74);
+        doc.text(`• New Students (30 days): ${stats.recentWeek}`, 14, 81);
+        
+        const tableData = data.map(row => [row['No.'], row.Name, row.Gender, row.Phone, row.Department, row.Batch, row['Qirats Enrolled']]);
+        
+        doc.autoTable({
+            head: [['No.', 'Name', 'Gender', 'Phone', 'Department', 'Batch', 'Qirats']],
+            body: tableData,
+            startY: 90,
+            theme: 'striped',
+            headStyles: { fillColor: [16, 185, 129], textColor: [255, 255, 255], fontStyle: 'bold' },
+            styles: { fontSize: 8, cellPadding: 3 }
+        });
+        
+        doc.save(`${groupName.replace(/[^a-z0-9]/gi, '_')}_report.pdf`);
     }
-    function exportWord(data, groupName, total, stats) {
-        let html = `<html><body><h2>${groupName} (${total})</h2><table border="1"><thead><tr><th>No.</th><th>Name</th><th>Gender</th><th>Phone</th><th>Dept</th><th>Batch</th><th>Qirats</th></tr></thead><tbody>${data.map(r => `<tr><td>${r['No.']}</td><td>${r.Name}</td><td>${r.Gender}</td><td>${r.Phone}</td><td>${r.Department}</td><td>${r.Batch}</td><td>${r['Qirats Enrolled']}</td></tr>`).join('')}</tbody></table></body></html>`;
-        downloadBlob(new Blob([html], { type: 'application/msword' }), `${groupName.replace(/[^a-z0-9]/gi, '_')}.doc`);
+    
+    function exportToWord(data, groupName, totalCount, stats) {
+        let html = `<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>${groupName} - Group Report</title>
+            <style>
+                body { font-family: 'Arial', sans-serif; margin: 40px; }
+                h1 { color: #10b981; border-bottom: 2px solid #10b981; padding-bottom: 10px; }
+                .subtitle { color: #059669; margin: 10px 0; }
+                .kpi-box { background: #f0fdf4; padding: 15px; border-radius: 12px; margin: 20px 0; }
+                .kpi-box h3 { color: #059669; margin-bottom: 10px; }
+                table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+                th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+                th { background: #10b981; color: white; }
+                tr:nth-child(even) { background: #f9fafb; }
+            </style>
+        </head>
+        <body>
+            <h1>📊 JUMJ Irshad - Group Report</h1>
+            <div class="subtitle">Group: ${escapeHtml(groupName)}</div>
+            <p>Generated: ${new Date().toLocaleString()} | Total Students: ${totalCount}</p>
+            
+            <div class="kpi-box">
+                <h3>Summary KPIs</h3>
+                <p><strong>Gender Split:</strong> Male ${stats.maleCount} | Female ${stats.femaleCount}</p>
+                <p><strong>Departments:</strong> ${stats.uniqueDepts} departments represented</p>
+                <p><strong>Multi-Qirat Students:</strong> ${stats.multiQiratCount}</p>
+                <p><strong>New Students (30 days):</strong> ${stats.recentWeek}</p>
+            </div>
+            
+            <h3>Student List</h3>
+            <table>
+                <thead>
+                    <tr><th>No.</th><th>Name</th><th>Gender</th><th>Phone</th><th>Department</th><th>Batch</th><th>Qirats</th></tr>
+                </thead>
+                <tbody>
+                    ${data.map(row => `
+                        <tr>
+                            <td>${escapeHtml(String(row['No.']))}</td>
+                            <td>${escapeHtml(row.Name)}</td>
+                            <td>${escapeHtml(row.Gender)}</td>
+                            <td>${escapeHtml(row.Phone)}</td>
+                            <td>${escapeHtml(row.Department)}</td>
+                            <td>${escapeHtml(row.Batch)}</td>
+                            <td>${escapeHtml(row['Qirats Enrolled'])}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        </body>
+        </html>`;
+        
+        downloadBlob(new Blob([html], { type: 'application/msword' }), `${groupName.replace(/[^a-z0-9]/gi, '_')}_report.doc`);
     }
+    
+    // ========== MASTER EXPORTS ==========
     function exportAllGroupsToExcel() {
+        if (currentGroups.length === 0) { showToast('No groups to export', true); return; }
         const wb = XLSX.utils.book_new();
-        currentGroups.forEach(g => { const ws = XLSX.utils.json_to_sheet(g.members.map((m,i)=>formatStudentForExport(m,i+1))); XLSX.utils.book_append_sheet(wb, ws, g.name.slice(0,31)); });
-        XLSX.writeFile(wb, `AllGroups_${currentGroupMode}.xlsx`);
-        showToast(`Exported ${currentGroups.length} groups`);
+        currentGroups.forEach(group => {
+            const sheetData = group.members.map((m, idx) => formatStudentForExport(m, idx + 1));
+            const ws = XLSX.utils.json_to_sheet(sheetData);
+            ws['!cols'] = [{wch:6},{wch:25},{wch:10},{wch:15},{wch:18},{wch:20},{wch:15},{wch:35}];
+            let sheetName = group.name.replace(/[\\/*?:[\]]/g, '').slice(0, 31);
+            XLSX.utils.book_append_sheet(wb, ws, sheetName);
+        });
+        XLSX.writeFile(wb, `All_Groups_${currentGroupMode}_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.xlsx`);
+        showToast(`Exported all ${currentGroups.length} groups to Excel`);
     }
-    async function exportAllGroupsToPdf() {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-        let y=20;
-        for(let g of currentGroups){
-            if(y>180){ doc.addPage(); y=20; }
-            doc.text(`${g.name} (${g.memberCount})`,14,y); y+=7;
-            const data = g.members.map((m,i)=>[i+1, m.full_name, m.gender, m.phone, m.department, m.batch, getQiratNames(m).join(',')]);
-            const res = doc.autoTable({ head:[['#','Name','Gender','Phone','Dept','Batch','Qirats']], body:data, startY:y, headStyles:{fillColor:[16,185,129]}, styles:{fontSize:7} });
-            y = res.finalY+10;
-        }
-        doc.save(`AllGroups_${currentGroupMode}.pdf`);
-        showToast('PDF exported');
-    }
+    
     function exportAllGroupsToWord() {
-        let html = `<html><body><h1>All Groups (${currentGroupMode})</h1>`;
-        currentGroups.forEach(g => {
-            html += `<h2>${g.name} (${g.memberCount})</h2><table border="1"><thead><tr><th>#</th><th>Name</th><th>Gender</th><th>Phone</th><th>Dept</th><th>Batch</th><th>Qirats</th></tr></thead><tbody>`;
-            g.members.forEach((m,i) => { html += `<tr><td>${i+1}</td><td>${m.full_name}</td><td>${m.gender}</td><td>${m.phone}</td><td>${m.department}</td><td>${m.batch}</td><td>${getQiratNames(m).join(',')}</td></tr>`; });
+        if (currentGroups.length === 0) { showToast('No groups', true); return; }
+        let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>JUMJ_All_Groups</title>
+        <style>
+            body { font-family: 'Segoe UI', Arial, sans-serif; margin: 40px; }
+            h1 { color: #10b981; border-bottom: 3px solid #10b981; padding-bottom: 10px; }
+            h2 { background: #f1f5f9; padding: 12px 16px; border-radius: 16px; margin-top: 30px; color: #0f172a; border-left: 5px solid #10b981; }
+            .group-summary { background: #f0fdf4; padding: 12px 20px; border-radius: 20px; margin: 10px 0 20px 0; display: flex; gap: 20px; flex-wrap: wrap; }
+            .kpi-badge { background: white; padding: 6px 14px; border-radius: 40px; font-size: 0.8rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+            table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+            th, td { border: 1px solid #cbd5e1; padding: 8px 10px; text-align: left; font-size: 0.75rem; }
+            th { background: #10b981; color: white; }
+            .footer { margin-top: 40px; text-align: center; font-size: 0.7rem; color: #64748b; }
+        </style></head><body>
+        <h1>📊 JUMJ Irshad - Complete Groups Report</h1>
+        <p><strong>Grouping Mode:</strong> ${currentGroupMode.toUpperCase()} | <strong>Generated:</strong> ${new Date().toLocaleString()} | <strong>Total Groups:</strong> ${currentGroups.length}</p>`;
+        
+        currentGroups.forEach(group => {
+            const s = group.stats;
+            html += `<h2>📁 ${escapeHtml(group.name)} <span style="font-size:0.8rem;">(${group.memberCount} students)</span></h2>
+            <div class="group-summary">
+                <span class="kpi-badge">👥 Male: ${s.maleCount} | Female: ${s.femaleCount}</span>
+                <span class="kpi-badge">🏢 Departments: ${s.uniqueDepts}</span>
+                <span class="kpi-badge">🔄 Multi-Qirat: ${s.multiQiratCount}</span>
+                <span class="kpi-badge">🆕 New (30d): ${s.recentWeek}</span>
+            </div>
+            <table><thead><tr><th>No.</th><th>Name</th><th>Gender</th><th>Phone</th><th>Dept</th><th>Batch</th><th>Qirats</th></tr></thead><tbody>`;
+            group.members.forEach((m, idx) => {
+                html += `<tr><td>${idx + 1}</td><td>${escapeHtml(m.full_name)}</td><td>${escapeHtml(m.gender)}</td><td>${escapeHtml(m.phone)}</td><td>${escapeHtml(m.department)}</td><td>${escapeHtml(m.batch)}</td><td>${escapeHtml(getQiratNames(m).join(', ') || '-')}</td></tr>`;
+            });
             html += `</tbody></table><br>`;
         });
-        html += `</body></html>`;
-        downloadBlob(new Blob([html], { type: 'application/msword' }), `AllGroups_${currentGroupMode}.doc`);
-        showToast('Word exported');
+        html += `<div class="footer">© JUMJ Irshad • Exported on ${new Date().toLocaleString()}</div></body></html>`;
+        downloadBlob(new Blob([html], { type: 'application/msword' }), `JUMJ_AllGroups_${currentGroupMode}_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.doc`);
+        showToast(`Exported all ${currentGroups.length} groups to Word`);
     }
-    function downloadBlob(blob, filename) { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; a.click(); URL.revokeObjectURL(a.href); }
+    
+    async function exportAllGroupsToPdf() {
+        if (currentGroups.length === 0) { showToast('No groups', true); return; }
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+        let yPos = 20;
+        doc.setFontSize(20); doc.setTextColor(16, 185, 129);
+        doc.text(`JUMJ Irshad - Complete Groups Export`, 14, yPos); yPos += 10;
+        doc.setFontSize(11); doc.setTextColor(0,0,0);
+        doc.text(`Group Mode: ${currentGroupMode.toUpperCase()} | Generated: ${new Date().toLocaleString()} | Total Groups: ${currentGroups.length}`, 14, yPos); yPos += 10;
+        
+        for (let i = 0; i < currentGroups.length; i++) {
+            const group = currentGroups[i];
+            if (yPos > 180) { doc.addPage(); yPos = 20; }
+            doc.setFontSize(14); doc.setTextColor(16, 185, 129);
+            doc.text(`${group.name} (${group.memberCount} students)`, 14, yPos); yPos += 7;
+            doc.setFontSize(9); doc.setTextColor(80,80,80);
+            const s = group.stats;
+            doc.text(`Stats: Male ${s.maleCount} | Female ${s.femaleCount} | Depts ${s.uniqueDepts} | Multi-Qirat ${s.multiQiratCount} | New30d ${s.recentWeek}`, 14, yPos); yPos += 7;
+            
+            const tableData = group.members.map((m, idx) => [idx + 1, m.full_name, m.gender, m.phone, m.department, m.batch, getQiratNames(m).join(', ').substring(0, 25)]);
+            const result = doc.autoTable({
+                head: [['No.', 'Name', 'Gender', 'Phone', 'Dept', 'Batch', 'Qirats']],
+                body: tableData,
+                startY: yPos,
+                theme: 'striped',
+                headStyles: { fillColor: [16, 185, 129], textColor: [255,255,255], fontStyle: 'bold' },
+                styles: { fontSize: 7, cellPadding: 2 },
+                margin: { left: 14, right: 14 }
+            });
+            yPos = result.finalY + 10;
+            if (i !== currentGroups.length - 1 && yPos > 190) { doc.addPage(); yPos = 20; }
+        }
+        doc.save(`JUMJ_AllGroups_${currentGroupMode}_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.pdf`);
+        showToast(`Exported all ${currentGroups.length} groups to PDF`);
+    }
+    
+    function downloadBlob(blob, filename) {
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = filename;
+        link.click();
+        URL.revokeObjectURL(link.href);
+    }
     
     window.toggleGroup = function(idx) {
         const content = document.getElementById(`groupContent-${idx}`);
