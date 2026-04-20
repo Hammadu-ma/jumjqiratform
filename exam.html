@@ -196,12 +196,6 @@
         .qirat-list-header:hover, .qirat-list-header:active { background: rgba(99, 102, 241, 0.1); }
         .qirat-list-header.active { background: rgba(99, 102, 241, 0.15); }
         
-        .qirat-stats-row {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-        
         .qirat-stat-item {
             background: rgba(0, 0, 0, 0.3);
             padding: 0.2rem 0.6rem;
@@ -257,7 +251,6 @@
             -webkit-overflow-scrolling: touch;
         }
         
-        /* Bottom Navigation for Mobile */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -292,7 +285,6 @@
         .nav-item span { font-size: 0.6rem; font-weight: 500; }
         .nav-item.active { color: #6366f1; background: rgba(99, 102, 241, 0.15); }
         
-        /* Desktop Navigation */
         .desktop-nav {
             position: fixed;
             top: 0;
@@ -348,7 +340,6 @@
 </head>
 <body>
 
-    <!-- Desktop Navigation -->
     <div class="desktop-nav">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <div class="flex items-center gap-2">
@@ -365,7 +356,6 @@
         </div>
     </div>
 
-    <!-- Header -->
     <header class="max-w-7xl mx-auto mb-4 md:mb-6 flex flex-col md:flex-row md:items-center justify-between gap-3 px-3 md:px-0">
         <div>
             <h1 class="text-xl md:text-3xl font-bold tracking-tight bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">Exam Performance</h1>
@@ -384,7 +374,6 @@
     </header>
 
     <main class="max-w-7xl mx-auto px-3 md:px-0">
-        <!-- Hero Stats Section -->
         <div class="hero-stats">
             <div class="hero-title text-lg md:text-xl font-bold mb-1">Exam Intelligence Dashboard</div>
             <div class="hero-subtitle text-xs md:text-sm opacity-90 mb-3">Track student performance, manage assessments</div>
@@ -396,7 +385,6 @@
             </div>
         </div>
 
-        <!-- Charts Row -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-4 md:mb-6">
             <div class="glass-card p-3 md:p-4">
                 <h3 class="text-sm md:text-lg font-semibold mb-2 md:mb-3"><i class="fas fa-chart-line text-indigo-400 mr-2"></i> Performance Trend</h3>
@@ -408,7 +396,6 @@
             </div>
         </div>
 
-        <!-- Filters Bar -->
         <div class="glass-card p-3 md:p-4 mb-4 md:mb-6">
             <div class="grid grid-cols-2 md:flex md:flex-wrap gap-2 md:gap-3">
                 <div class="col-span-2 md:flex-1 min-w-[140px]">
@@ -440,7 +427,6 @@
             </div>
         </div>
 
-        <!-- Main Table Section -->
         <div class="glass-card overflow-hidden">
             <div class="p-3 md:p-4 border-b border-slate-700 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
                 <h3 id="table-title" class="text-base md:text-xl font-semibold">Student Rankings by Qirat</h3>
@@ -454,13 +440,12 @@
             <div class="overflow-x-auto custom-scrollbar responsive-table">
                 <table class="w-full text-left text-xs md:text-sm" id="dataTable">
                     <thead class="bg-slate-800/50 text-slate-400 text-xs uppercase tracking-wider"><tr id="tableHeader"></tr></thead>
-                    <tbody id="tableBody" class="divide-y divide-slate-700/50"><tr><td colspan="10" class="text-center py-8"><div class="loading-spinner mx-auto"></div><p class="mt-4 text-slate-400 text-sm">Loading data...</p></td></tr></tbody>
+                    <tbody id="tableBody" class="divide-y divide-slate-700/50"><tr><td colspan="10" class="text-center py-8"><div class="loading-spinner mx-auto"></div><p class="mt-4 text-slate-400 text-sm">Loading data...</p></td></tbody>
                 </table>
             </div>
         </div>
     </main>
 
-    <!-- Bottom Navigation for Mobile -->
     <div class="bottom-nav">
         <button class="nav-item" onclick="window.location.href='index.html'"><i class="fas fa-home"></i><span>Home</span></button>
         <button class="nav-item" onclick="window.location.href='analytics.html'"><i class="fas fa-chart-line"></i><span>Analytics</span></button>
@@ -469,7 +454,6 @@
         <button class="nav-item" onclick="window.location.href='profile.html'"><i class="fas fa-user"></i><span>Profile</span></button>
     </div>
 
-    <!-- Modals -->
     <div id="studentModal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 md:p-4">
         <div class="glass-card w-full max-w-6xl max-h-[90vh] overflow-hidden modal-enter flex flex-col bg-slate-900">
             <div class="p-4 md:p-6 border-b border-slate-700 flex justify-between items-center bg-slate-800/30 flex-wrap gap-2">
@@ -551,6 +535,8 @@
         let isEditMode = false;
         let currentFilters = { search: '', gender: '', department: '', batch: '', qirat: '' };
         let charts = {};
+        let currentStudentId = null;
+        let currentOpenQiratIndex = null;
         
         const defaultAssessments = [{ name: "Quiz 1", outOf: 30 }, { name: "Mid Exam", outOf: 50 }, { name: "Assignment", outOf: 20 }, { name: "Final Exam", outOf: 100 }];
         
@@ -711,7 +697,7 @@
             const groups = Array.from(qiratMap.entries()).map(([name, students]) => { const validScores = students.filter(s => s.overallAvg); const avgScore = validScores.length ? Math.round(validScores.reduce((sum, s) => sum + s.overallAvg, 0) / validScores.length) : 0; return { name, students, avgScore, count: students.length }; }).sort((a,b) => b.count - a.count);
             document.getElementById('table-title').innerHTML = '<i class="fas fa-book-quran mr-2"></i> Qirat Groups';
             document.getElementById('tableHeader').innerHTML = `<th class="px-3 md:px-6 py-3 md:py-4">Rank</th><th class="px-3 md:px-6 py-3 md:py-4">Qirat</th><th class="px-3 md:px-6 py-3 md:py-4">Students</th><th class="px-3 md:px-6 py-3 md:py-4">Avg</th><th class="px-3 md:px-6 py-3 md:py-4">Actions</th>`;
-            document.getElementById('tableBody').innerHTML = groups.map((group, idx) => `<tr class="hover:bg-white/5 transition-colors fade-in"><td class="px-3 md:px-6 py-3 md:py-4 font-medium ${idx === 0 ? 'text-yellow-400' : ''}">#${idx + 1}<td class="px-3 md:px-6 py-3 md:py-4"><div class="flex items-center gap-2"><div class="h-8 w-8 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold text-sm">${group.name.charAt(0)}</div><div class="font-medium text-sm">${escapeHtml(group.name)}</div></div><td class="px-3 md:px-6 py-3 md:py-4"><span class="status-badge">${group.count}</span><td class="px-3 md:px-6 py-3 md:py-4"><span class="text-emerald-400 font-semibold text-sm">${group.avgScore}%</span><td class="px-3 md:px-6 py-3 md:py-4"><button class="btn-premium px-3 py-1.5 rounded-lg text-xs font-semibold" onclick="openQiratModal('${escapeHtml(group.name)}')">View</button><tr>`).join('');
+            document.getElementById('tableBody').innerHTML = groups.map((group, idx) => `<tr class="hover:bg-white/5 transition-colors fade-in"><td class="px-3 md:px-6 py-3 md:py-4 font-medium ${idx === 0 ? 'text-yellow-400' : ''}">#${idx + 1}<td class="px-3 md:px-6 py-3 md:py-4"><div class="flex items-center gap-2"><div class="h-8 w-8 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold text-sm">${group.name.charAt(0)}</div><div class="font-medium text-sm">${escapeHtml(group.name)}</div></div><td class="px-3 md:px-6 py-3 md:py-4"><span class="status-badge">${group.count}</span><td class="px-3 md:px-6 py-3 md:py-4"><span class="text-emerald-400 font-semibold text-sm">${group.avgScore}%</span><td class="px-3 md:px-6 py-3 md:py-4"><button class="btn-premium px-3 py-1.5 rounded-lg text-xs font-semibold" onclick="openQiratModal('${escapeHtml(group.name)}')">View</button></tr>`).join('');
         }
         
         async function renderDepartmentView() {
@@ -757,6 +743,71 @@
             return ranked.findIndex(s => s.id === studentId) + 1;
         }
         
+        async function updateSingleQiratPanel(studentId, qiratIndex) {
+            const student = allStudents.find(s => s.id === studentId);
+            if (!student) return;
+            const qirats = getQiratNames(student);
+            if (qiratIndex >= qirats.length) return;
+            const q = qirats[qiratIndex];
+            const scores = getStudentExamScores(studentId, q);
+            const assessments = getAssessmentsForQirat(q);
+            const avg = calculateAverage(scores, assessments);
+            const totalPoints = calculateTotalPoints(scores, assessments);
+            const totalPossible = calculateTotalPossible(assessments);
+            const totalPercentPossible = totalPossible > 0 ? Math.round((totalPoints / totalPossible) * 100) : 0;
+            const qiratGlobalRank = calculateQiratGlobalRank(studentId, q);
+            const qiratDeptRank = calculateQiratRankInDepartment(studentId, q);
+            const studentsInQirat = allStudents.filter(s => getQiratNames(s).includes(q));
+            const studentsInDeptQirat = studentsInQirat.filter(s => s.department === student.department);
+            
+            // Update header stats
+            const headerDiv = document.getElementById(`qirat-header-${qiratIndex}`);
+            if (headerDiv) {
+                const statsContainer = headerDiv.querySelector('.flex.flex-wrap.justify-between');
+                if (statsContainer) {
+                    statsContainer.innerHTML = `<h4 class="font-semibold text-indigo-400 text-sm"><i class="fas fa-book-quran mr-1"></i> ${escapeHtml(q)}</h4>
+                        <div class="flex gap-1 flex-wrap">
+                            <span class="qirat-stat-item">🌍 #${qiratGlobalRank}/${studentsInQirat.length}</span>
+                            <span class="qirat-stat-item">🏢 #${qiratDeptRank}/${studentsInDeptQirat.length}</span>
+                            <span class="qirat-stat-item">📊 ${avg !== null ? avg+'%' : '-'}</span>
+                        </div>
+                        <i id="qirat-icon-${qiratIndex}" class="fas fa-chevron-down text-slate-400 transition-transform rotate-icon text-sm"></i>`;
+                }
+            }
+            
+            // Update dropdown content
+            const dropdownContent = document.getElementById(`qirat-dropdown-${qiratIndex}`);
+            if (dropdownContent) {
+                let assessmentRows = '';
+                for (let a = 0; a < assessments.length; a++) {
+                    const ass = assessments[a];
+                    const score = scores[`assessment${a+1}`];
+                    const percent = calculatePercentage(score, ass.outOf);
+                    assessmentRows += `<tr><td class="py-2 text-left text-xs">${escapeHtml(ass.name)}</span></td><td class="py-2 text-center">${isEditMode ? `<input type="number" class="score-input editable" data-student="${studentId}" data-qirat="${q}" data-assessment="${a+1}" value="${score !== null ? score : ''}" step="0.5" min="0" max="${ass.outOf}" style="width:60px;" onchange="autoSaveScoreKeepOpen('${studentId}', '${q}', ${a+1}, this.value, ${qiratIndex})">` : `<span class="font-semibold text-sm">${score !== null ? score : '-'}</span>`}</span></td><td class="py-2 text-center text-xs">/${ass.outOf}</span></td><td class="py-2 text-center text-xs ${percent >= 70 ? 'text-emerald-400' : 'text-yellow-400'}">${percent !== null ? percent+'%' : '-'}</span></td></tr>`;
+                }
+                dropdownContent.innerHTML = `<div class="overflow-x-auto"><table class="assessment-table"><thead><tr><th class="text-left">Assessment</th><th>Score</th><th>Out Of</th><th>%</th></tr></thead><tbody>${assessmentRows}<tr class="bg-indigo-500/10"><td class="py-2 font-semibold text-left text-xs">Summary</span><td class="py-2 text-center font-bold text-purple-400 text-sm">${totalPoints}/${totalPossible}</span><td class="py-2 text-center"><td class="py-2 text-center font-bold text-indigo-400 text-sm">${avg !== null ? avg+'%' : '-'}</span></tr></tbody></td></div>`;
+            }
+            
+            // Update overall average in top stats
+            const overallAvg = calculateStudentOverallAvg(studentId);
+            const overallAvgElement = document.querySelector('#modalContent .grid .bg-slate-800\\/50:last-child .text-lg');
+            if (overallAvgElement) {
+                overallAvgElement.textContent = `${overallAvg !== null ? overallAvg+'%' : '-'}`;
+            }
+        }
+        
+        window.autoSaveScoreKeepOpen = async (studentId, qiratName, assessmentNum, value, qiratIndex) => {
+            const success = await saveExamScore(studentId, qiratName, `assessment${assessmentNum}`, value);
+            if (success) {
+                await loadExamScores();
+                await updateSingleQiratPanel(studentId, qiratIndex);
+                await renderCurrentView();
+                updateHeroStats();
+                renderCharts();
+                showToast('Score saved!');
+            }
+        };
+        
         window.toggleQiratDropdown = (index) => {
             const content = document.getElementById(`qirat-dropdown-${index}`);
             const icon = document.getElementById(`qirat-icon-${index}`);
@@ -765,14 +816,25 @@
                 content.classList.remove('show');
                 icon?.classList.remove('rotated');
                 header?.classList.remove('active');
+                currentOpenQiratIndex = null;
             } else {
+                if (currentOpenQiratIndex !== null) {
+                    const prevContent = document.getElementById(`qirat-dropdown-${currentOpenQiratIndex}`);
+                    const prevIcon = document.getElementById(`qirat-icon-${currentOpenQiratIndex}`);
+                    const prevHeader = document.getElementById(`qirat-header-${currentOpenQiratIndex}`);
+                    if (prevContent) prevContent.classList.remove('show');
+                    if (prevIcon) prevIcon.classList.remove('rotated');
+                    if (prevHeader) prevHeader.classList.remove('active');
+                }
                 content?.classList.add('show');
                 icon?.classList.add('rotated');
                 header?.classList.add('active');
+                currentOpenQiratIndex = index;
             }
         };
         
         window.openStudentModal = async (studentId) => {
+            currentStudentId = studentId;
             const student = allStudents.find(s => s.id === studentId);
             if (!student) return;
             const qirats = getQiratNames(student);
@@ -800,28 +862,59 @@
                     const ass = assessments[a];
                     const score = scores[`assessment${a+1}`];
                     const percent = calculatePercentage(score, ass.outOf);
-                    assessmentRows += `<tr><td class="py-2 text-left text-xs">${escapeHtml(ass.name)}</span></td><td class="py-2 text-center">${isEditMode ? `<input type="number" class="score-input editable" data-student="${studentId}" data-qirat="${q}" data-assessment="${a+1}" value="${score !== null ? score : ''}" step="0.5" min="0" max="${ass.outOf}" style="width:60px;" onchange="autoSaveScore('${studentId}', '${q}', ${a+1}, this.value)">` : `<span class="font-semibold text-sm">${score !== null ? score : '-'}</span>`}</span></td><td class="py-2 text-center text-xs">/${ass.outOf}</span></td><td class="py-2 text-center text-xs ${percent >= 70 ? 'text-emerald-400' : 'text-yellow-400'}">${percent !== null ? percent+'%' : '-'}</span></td></tr>`;
+                    assessmentRows += `<tr><td class="py-2 text-left text-xs">${escapeHtml(ass.name)}</span></td><td class="py-2 text-center">${isEditMode ? `<input type="number" class="score-input editable" data-student="${studentId}" data-qirat="${q}" data-assessment="${a+1}" value="${score !== null ? score : ''}" step="0.5" min="0" max="${ass.outOf}" style="width:60px;" onchange="autoSaveScoreKeepOpen('${studentId}', '${q}', ${a+1}, this.value, ${i})">` : `<span class="font-semibold text-sm">${score !== null ? score : '-'}</span>`}</span></td><td class="py-2 text-center text-xs">/${ass.outOf}</span></td><td class="py-2 text-center text-xs ${percent >= 70 ? 'text-emerald-400' : 'text-yellow-400'}">${percent !== null ? percent+'%' : '-'}</span></td></tr>`;
                 }
                 
-                qiratListHtml += `<div class="qirat-list-card"><div id="qirat-header-${i}" class="qirat-list-header" onclick="toggleQiratDropdown(${i})"><div class="flex-1"><div class="flex flex-wrap justify-between items-center gap-2"><h4 class="font-semibold text-indigo-400 text-sm"><i class="fas fa-book-quran mr-1"></i> ${escapeHtml(q)}</h4><div class="flex gap-1 flex-wrap"><span class="qirat-stat-item">🌍 #${qiratGlobalRank}/${studentsInQirat.length}</span><span class="qirat-stat-item">🏢 #${qiratDeptRank}/${studentsInDeptQirat.length}</span><span class="qirat-stat-item">📊 ${avg !== null ? avg+'%' : '-'}</span></div><i id="qirat-icon-${i}" class="fas fa-chevron-down text-slate-400 transition-transform rotate-icon text-sm"></i></div></div></div><div id="qirat-dropdown-${i}" class="qirat-dropdown-content"><div class="overflow-x-auto"><table class="assessment-table"><thead><tr><th class="text-left">Assessment</th><th>Score</th><th>Out Of</th><th>%</th></tr></thead><tbody>${assessmentRows}<tr class="bg-indigo-500/10"><td class="py-2 font-semibold text-left text-xs">Summary</span><td class="py-2 text-center font-bold text-purple-400 text-sm">${totalPoints}/${totalPossible}</span><td class="py-2 text-center"><td class="py-2 text-center font-bold text-indigo-400 text-sm">${avg !== null ? avg+'%' : '-'}</span></tr></tbody></table></div></div></div>`;
+                qiratListHtml += `<div class="qirat-list-card">
+                    <div id="qirat-header-${i}" class="qirat-list-header" onclick="toggleQiratDropdown(${i})">
+                        <div class="flex-1">
+                            <div class="flex flex-wrap justify-between items-center gap-2">
+                                <h4 class="font-semibold text-indigo-400 text-sm"><i class="fas fa-book-quran mr-1"></i> ${escapeHtml(q)}</h4>
+                                <div class="flex gap-1 flex-wrap">
+                                    <span class="qirat-stat-item">🌍 #${qiratGlobalRank}/${studentsInQirat.length}</span>
+                                    <span class="qirat-stat-item">🏢 #${qiratDeptRank}/${studentsInDeptQirat.length}</span>
+                                    <span class="qirat-stat-item">📊 ${avg !== null ? avg+'%' : '-'}</span>
+                                </div>
+                                <i id="qirat-icon-${i}" class="fas fa-chevron-down text-slate-400 transition-transform rotate-icon text-sm"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="qirat-dropdown-${i}" class="qirat-dropdown-content">
+                        <div class="overflow-x-auto">
+                            <table class="assessment-table">
+                                <thead>
+                                    <tr><th class="text-left">Assessment</th><th>Score</th><th>Out Of</th><th>%</th></tr>
+                                </thead>
+                                <tbody>
+                                    ${assessmentRows}
+                                    <tr class="bg-indigo-500/10">
+                                        <td class="py-2 font-semibold text-left text-xs">Summary</span>
+                                        <td class="py-2 text-center font-bold text-purple-400 text-sm">${totalPoints}/${totalPossible}</span>
+                                        <td class="py-2 text-center"></span>
+                                        <td class="py-2 text-center font-bold text-indigo-400 text-sm">${avg !== null ? avg+'%' : '-'}</span>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>`;
             }
             qiratListHtml += `</div>`;
             
             document.getElementById('modalTitle').innerHTML = `<i class="fas fa-user-graduate mr-2"></i> ${escapeHtml(student.full_name)}`;
-            document.getElementById('modalContent').innerHTML = `<div class="grid grid-cols-2 md:grid-cols-6 gap-2 md:gap-4 mb-4 md:mb-6"><div class="bg-slate-800/50 p-2 md:p-4 rounded-xl text-center"><p class="text-xs text-slate-400">Dept</p><p class="font-semibold text-xs md:text-sm">${escapeHtml(student.department)}</p></div><div class="bg-slate-800/50 p-2 md:p-4 rounded-xl text-center"><p class="text-xs text-slate-400">Batch</p><p class="font-semibold text-xs md:text-sm">${escapeHtml(student.batch)}</p></div><div class="bg-slate-800/50 p-2 md:p-4 rounded-xl text-center"><p class="text-xs text-slate-400">Gender</p><p class="font-semibold text-xs md:text-sm">${escapeHtml(student.gender)}</p></div><div class="bg-slate-800/50 p-2 md:p-4 rounded-xl text-center"><p class="text-xs text-slate-400">Global Rank</p><p class="text-lg md:text-2xl font-bold text-yellow-400">#${globalRank}</p></div><div class="bg-slate-800/50 p-2 md:p-4 rounded-xl text-center"><p class="text-xs text-slate-400">Dept Rank</p><p class="text-lg md:text-2xl font-bold text-purple-400">#${deptRank}</p></div><div class="bg-slate-800/50 p-2 md:p-4 rounded-xl text-center"><p class="text-xs text-slate-400">Overall Avg</p><p class="text-lg md:text-2xl font-bold text-indigo-400">${overallAvg !== null ? overallAvg+'%' : '-'}</p></div></div><h3 class="font-semibold mb-3 text-sm md:text-base">Qirat Performance <i class="fas fa-chevron-down text-xs"></i></h3>${qirats.length > 0 ? qiratListHtml : '<p class="text-slate-400 text-sm">No Qirats enrolled</p>'}${!isEditMode ? `<div class="mt-4 text-center text-slate-400 text-xs"><i class="fas fa-info-circle mr-1"></i> Enable Edit Mode to modify scores</div>` : `<div class="mt-4 text-center text-emerald-400 text-xs"><i class="fas fa-save mr-1"></i> Edit mode active - scores auto-save</div>`}`;
+            document.getElementById('modalContent').innerHTML = `<div class="grid grid-cols-2 md:grid-cols-6 gap-2 md:gap-4 mb-4 md:mb-6">
+                <div class="bg-slate-800/50 p-2 md:p-4 rounded-xl text-center"><p class="text-xs text-slate-400">Dept</p><p class="font-semibold text-xs md:text-sm">${escapeHtml(student.department)}</p></div>
+                <div class="bg-slate-800/50 p-2 md:p-4 rounded-xl text-center"><p class="text-xs text-slate-400">Batch</p><p class="font-semibold text-xs md:text-sm">${escapeHtml(student.batch)}</p></div>
+                <div class="bg-slate-800/50 p-2 md:p-4 rounded-xl text-center"><p class="text-xs text-slate-400">Gender</p><p class="font-semibold text-xs md:text-sm">${escapeHtml(student.gender)}</p></div>
+                <div class="bg-slate-800/50 p-2 md:p-4 rounded-xl text-center"><p class="text-xs text-slate-400">Global Rank</p><p class="text-lg md:text-2xl font-bold text-yellow-400">#${globalRank}</p></div>
+                <div class="bg-slate-800/50 p-2 md:p-4 rounded-xl text-center"><p class="text-xs text-slate-400">Dept Rank</p><p class="text-lg md:text-2xl font-bold text-purple-400">#${deptRank}</p></div>
+                <div class="bg-slate-800/50 p-2 md:p-4 rounded-xl text-center"><p class="text-xs text-slate-400">Overall Avg</p><p class="text-lg md:text-2xl font-bold text-indigo-400">${overallAvg !== null ? overallAvg+'%' : '-'}</p></div>
+            </div>
+            <h3 class="font-semibold mb-3 text-sm md:text-base">Qirat Performance <i class="fas fa-chevron-down text-xs"></i></h3>
+            ${qirats.length > 0 ? qiratListHtml : '<p class="text-slate-400 text-sm">No Qirats enrolled</p>'}
+            ${!isEditMode ? `<div class="mt-4 text-center text-slate-400 text-xs"><i class="fas fa-info-circle mr-1"></i> Enable Edit Mode to modify scores</div>` : `<div class="mt-4 text-center text-emerald-400 text-xs"><i class="fas fa-save mr-1"></i> Edit mode active - scores auto-save</div>`}`;
             document.getElementById('studentModal').classList.remove('hidden');
-        };
-        
-        window.autoSaveScore = async (studentId, qiratName, assessmentNum, value) => {
-            const success = await saveExamScore(studentId, qiratName, `assessment${assessmentNum}`, value);
-            if (success) {
-                await loadExamScores();
-                await openStudentModal(studentId);
-                await renderCurrentView();
-                updateHeroStats();
-                renderCharts();
-                showToast('Score saved!');
-            }
+            currentOpenQiratIndex = null;
         };
         
         let currentQiratData = null;
@@ -882,7 +975,6 @@
             applyDeptFilters();
         };
         
-        // Export Functions
         window.exportModalToCSV = (tableId) => { const table = document.getElementById(tableId); if (!table) { showToast('No table found', true); return; } const ws = XLSX.utils.table_to_sheet(table); const csv = XLSX.utils.sheet_to_csv(ws); const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `export_${Date.now()}.csv`; link.click(); showToast('CSV exported'); };
         window.exportModalToExcel = (tableId) => { const table = document.getElementById(tableId); if (!table) { showToast('No table found', true); return; } const ws = XLSX.utils.table_to_sheet(table); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Data'); XLSX.writeFile(wb, `export_${Date.now()}.xlsx`); showToast('Excel exported'); };
         window.exportModalToPDF = async (tableId, filename) => { const table = document.getElementById(tableId); if (!table) { showToast('No table found', true); return; } const { jsPDF } = window.jspdf; const doc = new jsPDF({ orientation: 'landscape' }); doc.setFontSize(16); doc.setTextColor(99, 102, 241); doc.text(`Report - ${filename}`, 14, 20); doc.setFontSize(10); doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 30); doc.autoTable({ html: table, startY: 40, styles: { fontSize: 8 } }); doc.save(`${filename}_${Date.now()}.pdf`); showToast('PDF exported'); };
@@ -944,6 +1036,9 @@
             const btn = document.getElementById('editModeBtn');
             if (isEditMode) { btn.innerHTML = '<i class="fas fa-save mr-1"></i> Save'; btn.classList.add('bg-emerald-600'); btn.classList.remove('bg-slate-700'); showToast('Edit mode ON - scores auto-save'); }
             else { btn.innerHTML = '<i class="fas fa-edit mr-1"></i> Edit'; btn.classList.remove('bg-emerald-600'); btn.classList.add('bg-slate-700'); }
+            if (currentStudentId) {
+                openStudentModal(currentStudentId);
+            }
         };
         
         window.switchView = (view) => {
@@ -953,7 +1048,11 @@
             renderCurrentView();
         };
         
-        window.closeModal = (id) => { document.getElementById(id).classList.add('hidden'); };
+        window.closeModal = (id) => { 
+            document.getElementById(id).classList.add('hidden');
+            currentStudentId = null;
+            currentOpenQiratIndex = null;
+        };
         
         let isLightMode = false;
         window.toggleTheme = () => {
@@ -973,7 +1072,7 @@
         window.openQiratModal = openQiratModal;
         window.openDepartmentModal = openDepartmentModal;
         window.toggleQiratDropdown = toggleQiratDropdown;
-        window.autoSaveScore = autoSaveScore;
+        window.autoSaveScoreKeepOpen = autoSaveScoreKeepOpen;
         window.applyQiratFilters = applyQiratFilters;
         window.clearQiratFilters = clearQiratFilters;
         window.applyDeptFilters = applyDeptFilters;
