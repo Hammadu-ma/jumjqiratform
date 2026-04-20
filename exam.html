@@ -37,16 +37,17 @@
         body.light-mode .glass-card { background: rgba(255, 255, 255, 0.95); border-color: #e2e8f0; }
         body.light-mode .bg-slate-900 { background: #ffffff; }
         body.light-mode .bg-slate-800 { background: #f1f5f9; }
-        body.light-mode .bg-slate-800\\/50 { background: rgba(241, 245, 249, 0.8); }
+        body.light-mode .bg-slate-800\/50 { background: rgba(241, 245, 249, 0.8); }
         body.light-mode .border-slate-700 { border-color: #e2e8f0; }
         body.light-mode .text-slate-300, body.light-mode .text-slate-400 { color: #64748b; }
         body.light-mode .text-slate-500 { color: #475569; }
         body.light-mode .bg-slate-700 { background: #cbd5e1; color: #0f172a; }
-        body.light-mode .bg-slate-800\\/30 { background: rgba(241, 245, 249, 0.8); }
+        body.light-mode .bg-slate-800\/30 { background: rgba(241, 245, 249, 0.8); }
         body.light-mode .score-input { background: #ffffff; border-color: #cbd5e1; color: #0f172a; }
         body.light-mode .status-badge { background: rgba(16, 185, 129, 0.15); }
         body.light-mode .qirat-list-card { background: #f8fafc; border-color: #e2e8f0; }
         body.light-mode .filter-input { background: white; border-color: #cbd5e1; color: #0f172a; }
+        body.light-mode .hero-stats { background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); color: white; }
         
         .glass-card { 
             background: var(--glass-bg); 
@@ -54,6 +55,29 @@
             border: 1px solid var(--glass-border); 
             border-radius: 1.5rem; 
             transition: all 0.3s ease; 
+        }
+        
+        .hero-stats {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        body.light-mode .hero-stats {
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+        }
+        
+        .hero-stats::before {
+            content: "📊";
+            position: absolute;
+            bottom: -20px;
+            right: 10px;
+            font-size: 80px;
+            opacity: 0.1;
+            pointer-events: none;
         }
         
         .btn-premium { 
@@ -228,7 +252,6 @@
         
         body.light-mode .assessment-table td { border-bottom-color: #e2e8f0; }
         
-        /* Mobile Responsive Table */
         .responsive-table {
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
@@ -269,23 +292,49 @@
         .nav-item span { font-size: 0.6rem; font-weight: 500; }
         .nav-item.active { color: #6366f1; background: rgba(99, 102, 241, 0.15); }
         
+        /* Desktop Navigation */
+        .desktop-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+            padding: 0.75rem 1.5rem;
+        }
+        
+        body.light-mode .desktop-nav {
+            background: rgba(255, 255, 255, 0.95);
+        }
+        
+        .nav-link {
+            padding: 0.5rem 1rem;
+            border-radius: 0.75rem;
+            transition: all 0.2s;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #64748b;
+        }
+        
+        .nav-link:hover { background: rgba(99, 102, 241, 0.1); color: #6366f1; }
+        .nav-link.active { background: #6366f1; color: white; }
+        
         @media (max-width: 768px) {
-            body { padding-bottom: 70px; }
+            body { padding-bottom: 70px; padding-top: 60px; }
             .desktop-nav { display: none; }
             .bottom-nav { display: flex; }
             .view-btn { padding: 6px 12px; font-size: 0.7rem; }
-            .stats-row { gap: 12px; }
-            .hero-stat { padding: 8px 16px; min-width: 100px; }
-            .hero-stat .number { font-size: 1.3rem; }
-            .hero-stat .label { font-size: 0.6rem; }
-            .glass-card p-6 { padding: 16px; }
+            .hero-stats { padding: 1rem; }
+            .hero-stats .number { font-size: 1.3rem; }
+            .hero-stats .label { font-size: 0.6rem; }
         }
         
-        @media (min-width: 768px) {
+        @media (min-width: 769px) {
+            body { padding-top: 70px; }
             .bottom-nav { display: none; }
-            .desktop-nav { display: flex; }
-            .score-input { width: 70px; font-size: 0.75rem; }
-            .qirat-stat-item { font-size: 0.7rem; }
+            .desktop-nav { display: block; }
         }
         
         @media (max-width: 480px) {
@@ -294,22 +343,39 @@
             .modal-filter-bar { flex-direction: column; }
             .modal-filter-bar > div { width: 100%; }
             .filter-input { width: 100%; }
-            .assessment-table th, .assessment-table td { padding: 0.35rem; font-size: 0.65rem; }
         }
     </style>
 </head>
-<body class="p-3 md:p-8 pb-20 md:pb-8">
+<body>
 
     <!-- Desktop Navigation -->
-    
+    <div class="desktop-nav">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-chart-line text-indigo-400 text-xl"></i>
+                <span class="font-bold text-lg">Exam Analytics</span>
+            </div>
+            <div class="flex gap-1">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="analytics.html" class="nav-link">Analytics</a>
+                <a href="exam.html" class="nav-link active">Exams</a>
+                <a href="import.html" class="nav-link">Import</a>
+                <a href="settings.html" class="nav-link">Settings</a>
+            </div>
+        </div>
+    </div>
 
-    <!-- Header with extra top padding for desktop -->
-    
+    <!-- Header -->
+    <header class="max-w-7xl mx-auto mb-4 md:mb-6 flex flex-col md:flex-row md:items-center justify-between gap-3 px-3 md:px-0">
+        <div>
+            <h1 class="text-xl md:text-3xl font-bold tracking-tight bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">Exam Performance</h1>
+            <p class="text-slate-400 text-xs md:text-sm mt-1">Detailed analytics and score management</p>
+        </div>
         <div class="flex gap-2 items-center">
             <button onclick="toggleTheme()" class="theme-toggle p-2 rounded-full bg-slate-700 hover:bg-slate-600 transition-all">
                 <i id="themeIcon" class="fas fa-moon text-yellow-400 text-sm md:text-base"></i>
             </button>
-            <div class="flex gap-2 bg-slate-800/50 p-1 rounded-2xl border border-slate-700">
+            <div class="flex gap-1 md:gap-2 bg-slate-800/50 p-1 rounded-2xl border border-slate-700">
                 <button onclick="switchView('qirat')" class="view-btn active">By Qirat</button>
                 <button onclick="switchView('department')" class="view-btn text-slate-400">By Dept</button>
                 <button onclick="switchView('general')" class="view-btn text-slate-400">General</button>
@@ -317,22 +383,34 @@
         </div>
     </header>
 
-    
-        <!-- Charts Row -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
-            <div class="glass-card p-4 md:p-6">
-                <h3 class="text-base md:text-lg font-semibold mb-3 md:mb-4"><i class="fas fa-chart-line text-indigo-400 mr-2"></i> Performance Trend</h3>
-                <canvas id="trendChart" height="180" class="w-full"></canvas>
-            </div>
-            <div class="glass-card p-4 md:p-6">
-                <h3 class="text-base md:text-lg font-semibold mb-3 md:mb-4"><i class="fas fa-chart-pie text-purple-400 mr-2"></i> Score Distribution</h3>
-                <canvas id="distChart" height="180" class="w-full"></canvas>
+    <main class="max-w-7xl mx-auto px-3 md:px-0">
+        <!-- Hero Stats Section -->
+        <div class="hero-stats">
+            <div class="hero-title text-lg md:text-xl font-bold mb-1">Exam Intelligence Dashboard</div>
+            <div class="hero-subtitle text-xs md:text-sm opacity-90 mb-3">Track student performance, manage assessments</div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3" id="heroStats">
+                <div class="bg-white/10 rounded-xl p-2 md:p-3"><div class="number text-xl md:text-2xl font-bold" id="heroTotal">0</div><div class="label text-xs">Students</div></div>
+                <div class="bg-white/10 rounded-xl p-2 md:p-3"><div class="number text-xl md:text-2xl font-bold" id="heroQirats">0</div><div class="label text-xs">Qirats</div></div>
+                <div class="bg-white/10 rounded-xl p-2 md:p-3"><div class="number text-xl md:text-2xl font-bold" id="heroExams">0</div><div class="label text-xs">Exam Records</div></div>
+                <div class="bg-white/10 rounded-xl p-2 md:p-3"><div class="number text-xl md:text-2xl font-bold" id="heroCompletion">0%</div><div class="label text-xs">Completion</div></div>
             </div>
         </div>
 
-        <!-- Filters Bar - Mobile Optimized -->
+        <!-- Charts Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-4 md:mb-6">
+            <div class="glass-card p-3 md:p-4">
+                <h3 class="text-sm md:text-lg font-semibold mb-2 md:mb-3"><i class="fas fa-chart-line text-indigo-400 mr-2"></i> Performance Trend</h3>
+                <canvas id="trendChart" height="150" class="w-full"></canvas>
+            </div>
+            <div class="glass-card p-3 md:p-4">
+                <h3 class="text-sm md:text-lg font-semibold mb-2 md:mb-3"><i class="fas fa-chart-pie text-purple-400 mr-2"></i> Score Distribution</h3>
+                <canvas id="distChart" height="150" class="w-full"></canvas>
+            </div>
+        </div>
+
+        <!-- Filters Bar -->
         <div class="glass-card p-3 md:p-4 mb-4 md:mb-6">
-            <div class="grid grid-cols-2 md:flex md:flex-wrap gap-2 md:gap-4">
+            <div class="grid grid-cols-2 md:flex md:flex-wrap gap-2 md:gap-3">
                 <div class="col-span-2 md:flex-1 min-w-[140px]">
                     <label class="text-xs text-slate-400 uppercase tracking-wider mb-1 block">Search</label>
                     <input type="text" id="searchInput" placeholder="Name / Phone..." class="w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-sm focus:outline-none focus:border-indigo-500">
@@ -364,7 +442,7 @@
 
         <!-- Main Table Section -->
         <div class="glass-card overflow-hidden">
-            <div class="p-3 md:p-6 border-b border-slate-700 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+            <div class="p-3 md:p-4 border-b border-slate-700 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
                 <h3 id="table-title" class="text-base md:text-xl font-semibold">Student Rankings by Qirat</h3>
                 <div class="flex gap-2 flex-wrap">
                     <button onclick="exportMainToCSV()" class="px-2 py-1 md:px-3 md:py-1.5 rounded-lg bg-slate-700 text-xs"><i class="fas fa-file-csv"></i> CSV</button>
@@ -376,13 +454,20 @@
             <div class="overflow-x-auto custom-scrollbar responsive-table">
                 <table class="w-full text-left text-xs md:text-sm" id="dataTable">
                     <thead class="bg-slate-800/50 text-slate-400 text-xs uppercase tracking-wider"><tr id="tableHeader"></tr></thead>
-                    <tbody id="tableBody" class="divide-y divide-slate-700/50"><tr><td colspan="10" class="text-center py-8"><div class="loading-spinner mx-auto"></div><p class="mt-4 text-slate-400 text-sm">Loading data...</p></td></tbody>
+                    <tbody id="tableBody" class="divide-y divide-slate-700/50"><tr><td colspan="10" class="text-center py-8"><div class="loading-spinner mx-auto"></div><p class="mt-4 text-slate-400 text-sm">Loading data...</p></td></tr></tbody>
                 </table>
             </div>
         </div>
     </main>
 
-    
+    <!-- Bottom Navigation for Mobile -->
+    <div class="bottom-nav">
+        <button class="nav-item" onclick="window.location.href='index.html'"><i class="fas fa-home"></i><span>Home</span></button>
+        <button class="nav-item" onclick="window.location.href='analytics.html'"><i class="fas fa-chart-line"></i><span>Analytics</span></button>
+        <button class="nav-item active" onclick="window.location.href='exam.html'"><i class="fas fa-graduation-cap"></i><span>Exams</span></button>
+        <button class="nav-item" onclick="window.location.href='import.html'"><i class="fas fa-upload"></i><span>Import</span></button>
+        <button class="nav-item" onclick="window.location.href='profile.html'"><i class="fas fa-user"></i><span>Profile</span></button>
+    </div>
 
     <!-- Modals -->
     <div id="studentModal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 md:p-4">
@@ -538,6 +623,19 @@
             } catch(e) { console.warn(e); }
         }
         
+        function updateHeroStats() {
+            const total = allStudents.length;
+            const allQirats = new Set(); allStudents.forEach(s => getQiratNames(s).forEach(q => allQirats.add(q)));
+            let examRecords = 0;
+            examScores.forEach(studentScores => { Object.values(studentScores).forEach(qScores => { if (Object.values(qScores).some(v => v !== null && v !== '')) examRecords++; }); });
+            const totalPossible = total * allQirats.size;
+            const completion = totalPossible > 0 ? Math.round((examRecords / totalPossible) * 100) : 0;
+            document.getElementById('heroTotal').textContent = total;
+            document.getElementById('heroQirats').textContent = allQirats.size;
+            document.getElementById('heroExams').textContent = examRecords;
+            document.getElementById('heroCompletion').textContent = completion;
+        }
+        
         async function loadData() {
             try {
                 const querySnapshot = await getDocs(collection(db, "registrations"));
@@ -546,7 +644,7 @@
                 await loadQiratAssessmentConfigs();
                 await loadExamScores();
                 populateFilters();
-                renderStats();
+                updateHeroStats();
                 renderCharts();
                 await renderCurrentView();
                 showToast("Data loaded successfully");
@@ -575,32 +673,6 @@
         function clearFilters() {
             document.getElementById('searchInput').value = ''; document.getElementById('genderFilter').value = ''; document.getElementById('deptFilter').value = ''; document.getElementById('batchFilter').value = ''; document.getElementById('qiratFilter').value = '';
             currentFilters = { search: '', gender: '', department: '', batch: '', qirat: '' }; renderCurrentView();
-        }
-        
-        function renderStats() {
-            const totalStudents = allStudents.length;
-            let totalScore = 0, scoreCount = 0;
-            examScores.forEach((studentScores, studentId) => {
-                const student = allStudents.find(s => s.id === studentId);
-                if (student) {
-                    getQiratNames(student).forEach(q => {
-                        const scores = studentScores[q];
-                        if (scores) {
-                            const assessments = getAssessmentsForQirat(q);
-                            const avg = calculateAverage(scores, assessments);
-                            if (avg !== null) { totalScore += avg; scoreCount++; }
-                        }
-                    });
-                }
-            });
-            const avgScore = scoreCount > 0 ? Math.round(totalScore / scoreCount) : 0;
-            const completedExams = scoreCount;
-            const allQirats = new Set(); allStudents.forEach(s => getQiratNames(s).forEach(q => allQirats.add(q)));
-            document.getElementById('general-stats').innerHTML = `
-                <div class="glass-card p-3 md:p-6"><div class="text-slate-400 text-xs mb-1">Total Students</div><div class="text-xl md:text-3xl font-bold">${totalStudents}</div></div>
-                <div class="glass-card p-3 md:p-6"><div class="text-slate-400 text-xs mb-1">Average Score</div><div class="text-xl md:text-3xl font-bold">${avgScore}%</div><div class="w-full bg-slate-700 h-1 rounded-full mt-2"><div class="bg-indigo-500 h-1 rounded-full" style="width: ${avgScore}%"></div></div></div>
-                <div class="glass-card p-3 md:p-6"><div class="text-slate-400 text-xs mb-1">Active Qirats</div><div class="text-xl md:text-3xl font-bold">${allQirats.size}</div></div>
-                <div class="glass-card p-3 md:p-6 border-indigo-500/30"><div class="text-slate-400 text-xs mb-1">Exam Records</div><div class="flex items-center gap-2"><span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span></span><span class="text-xl md:text-3xl font-semibold">${completedExams}</span></div></div>`;
         }
         
         function renderCharts() {
@@ -639,7 +711,7 @@
             const groups = Array.from(qiratMap.entries()).map(([name, students]) => { const validScores = students.filter(s => s.overallAvg); const avgScore = validScores.length ? Math.round(validScores.reduce((sum, s) => sum + s.overallAvg, 0) / validScores.length) : 0; return { name, students, avgScore, count: students.length }; }).sort((a,b) => b.count - a.count);
             document.getElementById('table-title').innerHTML = '<i class="fas fa-book-quran mr-2"></i> Qirat Groups';
             document.getElementById('tableHeader').innerHTML = `<th class="px-3 md:px-6 py-3 md:py-4">Rank</th><th class="px-3 md:px-6 py-3 md:py-4">Qirat</th><th class="px-3 md:px-6 py-3 md:py-4">Students</th><th class="px-3 md:px-6 py-3 md:py-4">Avg</th><th class="px-3 md:px-6 py-3 md:py-4">Actions</th>`;
-            document.getElementById('tableBody').innerHTML = groups.map((group, idx) => `<tr class="hover:bg-white/5 transition-colors fade-in"><td class="px-3 md:px-6 py-3 md:py-4 font-medium ${idx === 0 ? 'text-yellow-400' : ''}">#${idx + 1}<td class="px-3 md:px-6 py-3 md:py-4"><div class="flex items-center gap-2"><div class="h-8 w-8 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold text-sm">${group.name.charAt(0)}</div><div class="font-medium text-sm">${escapeHtml(group.name)}</div></div><td class="px-3 md:px-6 py-3 md:py-4"><span class="status-badge">${group.count}</span><td class="px-3 md:px-6 py-3 md:py-4"><span class="text-emerald-400 font-semibold text-sm">${group.avgScore}%</span><td class="px-3 md:px-6 py-3 md:py-4"><button class="btn-premium px-3 py-1.5 rounded-lg text-xs font-semibold" onclick="openQiratModal('${escapeHtml(group.name)}')">View</button></tr>`).join('');
+            document.getElementById('tableBody').innerHTML = groups.map((group, idx) => `<tr class="hover:bg-white/5 transition-colors fade-in"><td class="px-3 md:px-6 py-3 md:py-4 font-medium ${idx === 0 ? 'text-yellow-400' : ''}">#${idx + 1}<td class="px-3 md:px-6 py-3 md:py-4"><div class="flex items-center gap-2"><div class="h-8 w-8 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold text-sm">${group.name.charAt(0)}</div><div class="font-medium text-sm">${escapeHtml(group.name)}</div></div><td class="px-3 md:px-6 py-3 md:py-4"><span class="status-badge">${group.count}</span><td class="px-3 md:px-6 py-3 md:py-4"><span class="text-emerald-400 font-semibold text-sm">${group.avgScore}%</span><td class="px-3 md:px-6 py-3 md:py-4"><button class="btn-premium px-3 py-1.5 rounded-lg text-xs font-semibold" onclick="openQiratModal('${escapeHtml(group.name)}')">View</button><tr>`).join('');
         }
         
         async function renderDepartmentView() {
@@ -728,10 +800,10 @@
                     const ass = assessments[a];
                     const score = scores[`assessment${a+1}`];
                     const percent = calculatePercentage(score, ass.outOf);
-                    assessmentRows += `<tr><td class="py-2 text-left text-xs">${escapeHtml(ass.name)}</td><td class="py-2 text-center">${isEditMode ? `<input type="number" class="score-input editable" data-student="${studentId}" data-qirat="${q}" data-assessment="${a+1}" value="${score !== null ? score : ''}" step="0.5" min="0" max="${ass.outOf}" style="width:60px;" onchange="autoSaveScore('${studentId}', '${q}', ${a+1}, this.value)">` : `<span class="font-semibold text-sm">${score !== null ? score : '-'}</span>`}</td><td class="py-2 text-center text-xs">/${ass.outOf}</td><td class="py-2 text-center text-xs ${percent >= 70 ? 'text-emerald-400' : 'text-yellow-400'}">${percent !== null ? percent+'%' : '-'}</td></tr>`;
+                    assessmentRows += `<tr><td class="py-2 text-left text-xs">${escapeHtml(ass.name)}</span></td><td class="py-2 text-center">${isEditMode ? `<input type="number" class="score-input editable" data-student="${studentId}" data-qirat="${q}" data-assessment="${a+1}" value="${score !== null ? score : ''}" step="0.5" min="0" max="${ass.outOf}" style="width:60px;" onchange="autoSaveScore('${studentId}', '${q}', ${a+1}, this.value)">` : `<span class="font-semibold text-sm">${score !== null ? score : '-'}</span>`}</span></td><td class="py-2 text-center text-xs">/${ass.outOf}</span></td><td class="py-2 text-center text-xs ${percent >= 70 ? 'text-emerald-400' : 'text-yellow-400'}">${percent !== null ? percent+'%' : '-'}</span></td></tr>`;
                 }
                 
-                qiratListHtml += `<div class="qirat-list-card"><div id="qirat-header-${i}" class="qirat-list-header" onclick="toggleQiratDropdown(${i})"><div class="flex-1"><div class="flex flex-wrap justify-between items-center gap-2"><h4 class="font-semibold text-indigo-400 text-sm"><i class="fas fa-book-quran mr-1"></i> ${escapeHtml(q)}</h4><div class="flex gap-1 flex-wrap"><span class="qirat-stat-item">🌍 #${qiratGlobalRank}/${studentsInQirat.length}</span><span class="qirat-stat-item">🏢 #${qiratDeptRank}/${studentsInDeptQirat.length}</span><span class="qirat-stat-item">📊 ${avg !== null ? avg+'%' : '-'}</span></div><i id="qirat-icon-${i}" class="fas fa-chevron-down text-slate-400 transition-transform rotate-icon text-sm"></i></div></div></div><div id="qirat-dropdown-${i}" class="qirat-dropdown-content"><div class="overflow-x-auto"><table class="assessment-table"><thead><tr><th class="text-left">Assessment</th><th>Score</th><th>Out Of</th><th>%</th></tr></thead><tbody>${assessmentRows}<tr class="bg-indigo-500/10"><td class="py-2 font-semibold text-left text-xs">Summary</td><td class="py-2 text-center font-bold text-purple-400 text-sm">${totalPoints}/${totalPossible}</td><td></td><td class="py-2 text-center font-bold text-indigo-400 text-sm">${avg !== null ? avg+'%' : '-'}</td></tr></tbody></table></div></div></div>`;
+                qiratListHtml += `<div class="qirat-list-card"><div id="qirat-header-${i}" class="qirat-list-header" onclick="toggleQiratDropdown(${i})"><div class="flex-1"><div class="flex flex-wrap justify-between items-center gap-2"><h4 class="font-semibold text-indigo-400 text-sm"><i class="fas fa-book-quran mr-1"></i> ${escapeHtml(q)}</h4><div class="flex gap-1 flex-wrap"><span class="qirat-stat-item">🌍 #${qiratGlobalRank}/${studentsInQirat.length}</span><span class="qirat-stat-item">🏢 #${qiratDeptRank}/${studentsInDeptQirat.length}</span><span class="qirat-stat-item">📊 ${avg !== null ? avg+'%' : '-'}</span></div><i id="qirat-icon-${i}" class="fas fa-chevron-down text-slate-400 transition-transform rotate-icon text-sm"></i></div></div></div><div id="qirat-dropdown-${i}" class="qirat-dropdown-content"><div class="overflow-x-auto"><table class="assessment-table"><thead><tr><th class="text-left">Assessment</th><th>Score</th><th>Out Of</th><th>%</th></tr></thead><tbody>${assessmentRows}<tr class="bg-indigo-500/10"><td class="py-2 font-semibold text-left text-xs">Summary</span><td class="py-2 text-center font-bold text-purple-400 text-sm">${totalPoints}/${totalPossible}</span><td class="py-2 text-center"><td class="py-2 text-center font-bold text-indigo-400 text-sm">${avg !== null ? avg+'%' : '-'}</span></tr></tbody></table></div></div></div>`;
             }
             qiratListHtml += `</div>`;
             
@@ -746,7 +818,7 @@
                 await loadExamScores();
                 await openStudentModal(studentId);
                 await renderCurrentView();
-                renderStats();
+                updateHeroStats();
                 renderCharts();
                 showToast('Score saved!');
             }
@@ -773,7 +845,7 @@
             const batch = document.getElementById('qiratBatchSelect')?.value || '';
             let filtered = currentQiratData.students.filter(s => (!search || s.full_name.toLowerCase().includes(search)) && (!gender || s.gender === gender) && (!dept || s.department === dept) && (!batch || s.batch === batch));
             const ranked = filtered.map(s => ({ student: s, avg: calculateStudentOverallAvg(s.id) })).sort((a,b) => (b.avg || 0) - (a.avg || 0));
-            const tableHtml = `<div class="overflow-x-auto"><table id="qiratModalTable" class="w-full text-xs md:text-sm"><thead class="text-slate-400 border-b border-slate-700"><tr><th class="py-2 text-left">Rank</th><th class="py-2 text-left">Student</th><th class="py-2 text-left hidden md:table-cell">Dept</th><th class="py-2 text-left hidden sm:table-cell">Batch</th><th class="py-2 text-left">Gender</th><th class="py-2 text-center">Avg</th><th class="py-2 text-right">Actions</th></tr></thead><tbody class="divide-y divide-slate-800">${ranked.map((item, idx) => `<tr><td class="py-2"><span class="px-2 py-0.5 rounded-full ${idx === 0 ? 'rank-1' : idx === 1 ? 'rank-2' : idx === 2 ? 'rank-3' : 'bg-slate-700'} text-xs font-bold">#${idx+1}</span></td><td class="py-2 font-medium">${escapeHtml(item.student.full_name)}</td><td class="py-2 hidden md:table-cell">${escapeHtml(item.student.department)}</td><td class="py-2 hidden sm:table-cell">${escapeHtml(item.student.batch)}</td><td class="py-2">${escapeHtml(item.student.gender)}</td><td class="py-2 text-center"><span class="text-emerald-400 font-semibold">${item.avg !== null ? item.avg+'%' : '-'}</span></td><td class="py-2 text-right"><button class="px-2 py-1 rounded-lg bg-indigo-600/30 text-xs" onclick="closeModal('qiratModal'); openStudentModal('${item.student.id}')">View</button></td></tr>`).join('')}</tbody></table></div><div class="mt-2 text-center text-slate-400 text-xs">${filtered.length} of ${currentQiratData.students.length}</div>`;
+            const tableHtml = `<div class="overflow-x-auto"><table id="qiratModalTable" class="w-full text-xs md:text-sm"><thead class="text-slate-400 border-b border-slate-700"><tr><th class="py-2 text-left">Rank</th><th class="py-2 text-left">Student</th><th class="py-2 text-left hidden md:table-cell">Dept</th><th class="py-2 text-left hidden sm:table-cell">Batch</th><th class="py-2 text-left">Gender</th><th class="py-2 text-center">Avg</th><th class="py-2 text-right">Actions</th></tr></thead><tbody class="divide-y divide-slate-800">${ranked.map((item, idx) => `<tr><td class="py-2"><span class="px-2 py-0.5 rounded-full ${idx === 0 ? 'rank-1' : idx === 1 ? 'rank-2' : idx === 2 ? 'rank-3' : 'bg-slate-700'} text-xs font-bold">#${idx+1}</span></td><td class="py-2 font-medium">${escapeHtml(item.student.full_name)}</span></td><td class="py-2 hidden md:table-cell">${escapeHtml(item.student.department)}</span></td><td class="py-2 hidden sm:table-cell">${escapeHtml(item.student.batch)}</span></td><td class="py-2">${escapeHtml(item.student.gender)}</span></td><td class="py-2 text-center"><span class="text-emerald-400 font-semibold">${item.avg !== null ? item.avg+'%' : '-'}</span></td><td class="py-2 text-right"><button class="px-2 py-1 rounded-lg bg-indigo-600/30 text-xs" onclick="closeModal('qiratModal'); openStudentModal('${item.student.id}')">View</button></td></tr>`).join('')}</tbody></table></div><div class="mt-2 text-center text-slate-400 text-xs">${filtered.length} of ${currentQiratData.students.length}</div>`;
             document.getElementById('qiratTableContainer').innerHTML = tableHtml;
         };
         
@@ -801,7 +873,7 @@
             const batch = document.getElementById('deptBatchSelect')?.value || '';
             let filtered = currentDeptData.students.filter(s => (!search || s.full_name.toLowerCase().includes(search)) && (!gender || s.gender === gender) && (!batch || s.batch === batch));
             const ranked = filtered.map(s => ({ student: s, avg: calculateStudentOverallAvg(s.id) })).sort((a,b) => (b.avg || 0) - (a.avg || 0));
-            const tableHtml = `<div class="overflow-x-auto"><table id="deptModalTable" class="w-full text-xs md:text-sm"><thead class="text-slate-400 border-b border-slate-700"><tr><th class="py-2 text-left">Rank</th><th class="py-2 text-left">Student</th><th class="py-2 text-left hidden sm:table-cell">Batch</th><th class="py-2 text-left">Gender</th><th class="py-2 text-center">Avg</th><th class="py-2 text-right">Actions</th></tr></thead><tbody class="divide-y divide-slate-800">${ranked.map((item, idx) => `<tr><td class="py-2"><span class="px-2 py-0.5 rounded-full ${idx === 0 ? 'rank-1' : idx === 1 ? 'rank-2' : idx === 2 ? 'rank-3' : 'bg-slate-700'} text-xs font-bold">#${idx+1}</span></td><td class="py-2 font-medium">${escapeHtml(item.student.full_name)}</td><td class="py-2 hidden sm:table-cell">${escapeHtml(item.student.batch)}</td><td class="py-2">${escapeHtml(item.student.gender)}</td><td class="py-2 text-center"><span class="text-emerald-400 font-semibold">${item.avg !== null ? item.avg+'%' : '-'}</span></td><td class="py-2 text-right"><button class="px-2 py-1 rounded-lg bg-indigo-600/30 text-xs" onclick="closeModal('departmentModal'); openStudentModal('${item.student.id}')">View</button></td></tr>`).join('')}</tbody></table></div><div class="mt-2 text-center text-slate-400 text-xs">${filtered.length} of ${currentDeptData.students.length}</div>`;
+            const tableHtml = `<div class="overflow-x-auto"><table id="deptModalTable" class="w-full text-xs md:text-sm"><thead class="text-slate-400 border-b border-slate-700"><tr><th class="py-2 text-left">Rank</th><th class="py-2 text-left">Student</th><th class="py-2 text-left hidden sm:table-cell">Batch</th><th class="py-2 text-left">Gender</th><th class="py-2 text-center">Avg</th><th class="py-2 text-right">Actions</th></tr></thead><tbody class="divide-y divide-slate-800">${ranked.map((item, idx) => `<tr><td class="py-2"><span class="px-2 py-0.5 rounded-full ${idx === 0 ? 'rank-1' : idx === 1 ? 'rank-2' : idx === 2 ? 'rank-3' : 'bg-slate-700'} text-xs font-bold">#${idx+1}</span></td><td class="py-2 font-medium">${escapeHtml(item.student.full_name)}</span></td><td class="py-2 hidden sm:table-cell">${escapeHtml(item.student.batch)}</span></td><td class="py-2">${escapeHtml(item.student.gender)}</span></td><td class="py-2 text-center"><span class="text-emerald-400 font-semibold">${item.avg !== null ? item.avg+'%' : '-'}</span></td><td class="py-2 text-right"><button class="px-2 py-1 rounded-lg bg-indigo-600/30 text-xs" onclick="closeModal('departmentModal'); openStudentModal('${item.student.id}')">View</button></td></tr>`).join('')}</tbody></table></div><div class="mt-2 text-center text-slate-400 text-xs">${filtered.length} of ${currentDeptData.students.length}</div>`;
             document.getElementById('deptTableContainer').innerHTML = tableHtml;
         };
         
@@ -860,7 +932,9 @@
             for (let i = 0; i < Object.keys(tempMap).length; i++) { if (tempMap[i].name && tempMap[i].outOf) assessments.push({ name: tempMap[i].name, outOf: tempMap[i].outOf }); }
             await saveQiratAssessmentConfig(qirat, { assessments });
             await loadExamScores();
-            renderStats(); renderCharts(); await renderCurrentView();
+            updateHeroStats();
+            renderCharts(); 
+            await renderCurrentView();
             showToast(`Saved ${qirat}`);
             openSettingsModal();
         };
