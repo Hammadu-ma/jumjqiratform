@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Student Dashboard | Academic Performance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary: #10b981;
+            --primary-dark: #059669;
+            --primary-light: #d1fae5;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e6f7f0 100%);
+            min-height: 100vh;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .gradient-header {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+        
+        .qirat-list-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 1rem;
+            margin-bottom: 1rem;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .qirat-list-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary);
+        }
+        
+        .qirat-list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: #f8fafc;
+            transition: all 0.2s;
+        }
+        
+        .qirat-list-header.active {
+            background: var(--primary-light);
+        }
+        
+        .qirat-stat-item {
+            background: rgba(16, 185, 129, 0.1);
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            color: var(--primary-dark);
+        }
+        
+        .qirat-dropdown-content {
+            display: none;
+            padding: 1rem;
+            border-top: 1px solid #e2e8f0;
+            background: white;
+        }
+        
+        .qirat-dropdown-content.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .rotate-icon { transition: transform 0.3s ease; }
+        .rotate-icon.rotated { transform: rotate(180deg); }
+        
+        .assessment-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+        
+        .assessment-table th,
+        .assessment-table td {
+            padding: 0.75rem;
+            text-align: center;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .assessment-table th {
+            background: #f1f5f9;
+            font-weight: 600;
+            color: #0f172a;
+        }
+        
+        .rank-badge {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #78350f;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+            background: #1f2937;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(100%); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        @media (max-width: 768px) {
+            .assessment-table th,
+            .assessment-table td {
+                padding: 0.5rem;
+                font-size: 0.7rem;
+            }
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <div class="glass-card p-6 mb-6 gradient-header text-white">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-bold" id="studentName">Student Dashboard</h1>
+                    <p class="text-white/80 mt-1">Your Academic Performance Summary</p>
+                </div>
+                <button onclick="logout()" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-xl transition">
+                    <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                </button>
+            </div>
+        </div>
+        
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6" id="statsContainer">
+            <div class="glass-card p-4 text-center">
+                <div class="text-3xl font-bold text-emerald-600" id="totalQirats">0</div>
+                <div class="text-sm text-gray-500 mt-1">Total Qirats</div>
+            </div>
+            <div class="glass-card p-4 text-center">
+                <div class="text-3xl font-bold text-emerald-600" id="avgScore">0%</div>
+                <div class="text-sm text-gray-500 mt-1">Average Score</div>
+            </div>
+            <div class="glass-card p-4 text-center">
+                <div class="text-3xl font-bold text-emerald-600" id="globalRank">-</div>
+                <div class="text-sm text-gray-500 mt-1">Global Rank</div>
+            </div>
+            <div class="glass-card p-4 text-center">
+                <div class="text-3xl font-bold text-emerald-600" id="deptRank">-</div>
+                <div class="text-sm text-gray-500 mt-1">Department Rank</div>
+            </div>
+        </div>
+        
+        <!-- Performance Chart -->
+        <div class="glass-card p-6 mb-6">
+            <h3 class="text-lg font-semibold mb-4"><i class="fas fa-chart-line text-emerald-500 mr-2"></i> Your Performance Trend</h3>
+            <canvas id="performanceChart" height="200"></canvas>
+        </div>
+        
+        <!-- Qirat Performance Section -->
+        <div class="glass-card p-6">
+            <h3 class="text-lg font-semibold mb-4"><i class="fas fa-book-quran text-emerald-500 mr-2"></i> Your Qirat Performance</h3>
+            <div id="qiratListContainer" class="space-y-3">
+                <div class="text-center py-8 text-gray-500">Loading your data...</div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="toast" class="toast hidden"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyAR_g5y04YAGCrTvZCowrE7hw8h7k1du08",
+            authDomain: "jujm-qirat.firebaseapp.com",
+            projectId: "jujm-qirat",
+            storageBucket: "jujm-qirat.firebasestorage.app",
+            messagingSenderId: "253413984903",
+            appId: "1:253413984903:web:c1577e0fdef1711f960622"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        
+        let studentData = null;
+        let examScores = new Map();
+        let allStudents = [];
+        let qiratAssessmentConfigs = new Map();
+        let chart = null;
+        
+        const defaultAssessments = [
+            { name: "Quiz 1", outOf: 30 },
+            { name: "Mid Exam", outOf: 50 },
+            { name: "Assignment", outOf: 20 },
+            { name: "Final Exam", outOf: 100 }
+        ];
+        
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.innerHTML = `<i class="fas ${isError ? 'fa-exclamation-triangle' : 'fa-check-circle'} mr-2"></i> ${message}`;
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 3000);
+        }
+        
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
+        }
+        
+        function getQiratNames(student) {
+            return (student.schedules || []).map(s => s.qirat_name).filter(Boolean);
+        }
+        
+        function getAssessmentsForQirat(qiratName) {
+            const config = qiratAssessmentConfigs.get(qiratName);
+            return config?.assessments || defaultAssessments;
+        }
+        
+        function calculatePercentage(score, outOf) {
+            if (score === null || score === '' || !outOf) return null;
+            return Math.round((parseFloat(score) / outOf) * 100);
+        }
+        
+        function calculateTotalPoints(scores, assessments) {
+            let total = 0;
+            for (let i = 0; i < assessments.length; i++) {
+                const score = scores[`assessment${i + 1}`];
+                if (score !== null && score !== '' && !isNaN(score)) {
+                    total += parseFloat(score);
+                }
+            }
+            return total;
+        }
+        
+        function calculateTotalPossible(assessments) {
+            return assessments.reduce((sum, a) => sum + a.outOf, 0);
+        }
+        
+        function calculateAverage(scores, assessments) {
+            let totalPercent = 0, count = 0;
+            for (let i = 0; i < assessments.length; i++) {
+                const score = scores[`assessment${i + 1}`];
+                if (score !== null && score !== '' && !isNaN(score)) {
+                    const percent = calculatePercentage(parseFloat(score), assessments[i].outOf);
+                    if (percent !== null) {
+                        totalPercent += percent;
+                        count++;
+                    }
+                }
+            }
+            return count > 0 ? Math.round(totalPercent / count) : null;
+        }
+        
+        function calculateStudentOverallAvg(studentId) {
+            let total = 0, count = 0;
+            const student = allStudents.find(s => s.id === studentId);
+            if (student) {
+                getQiratNames(student).forEach(q => {
+                    const scores = examScores.get(studentId)?.[q] || {};
+                    const assessments = getAssessmentsForQirat(q);
+                    const avg = calculateAverage(scores, assessments);
+                    if (avg !== null) {
+                        total += avg;
+                        count++;
+                    }
+                });
+            }
+            return count > 0 ? Math.round(total / count) : null;
+        }
+        
+        function calculateGlobalRank(studentId) {
+            const allAvgs = allStudents.map(s => ({
+                id: s.id,
+                avg: calculateStudentOverallAvg(s.id)
+            })).sort((a, b) => (b.avg || 0) - (a.avg || 0));
+            const rank = allAvgs.findIndex(s => s.id === studentId) + 1;
+            return rank > 0 ? rank : allAvgs.length;
+        }
+        
+        function calculateDepartmentRank(studentId) {
+            const student = allStudents.find(s => s.id === studentId);
+            if (!student) return null;
+            const deptStudents = allStudents.filter(s => s.department === student.department);
+            const deptAvgs = deptStudents.map(s => ({
+                id: s.id,
+                avg: calculateStudentOverallAvg(s.id)
+            })).sort((a, b) => (b.avg || 0) - (a.avg || 0));
+            const rank = deptAvgs.findIndex(s => s.id === studentId) + 1;
+            return rank > 0 ? rank : deptAvgs.length;
+        }
+        
+        function calculateQiratGlobalRank(studentId, qiratName) {
+            const studentsInQirat = allStudents.filter(s => getQiratNames(s).includes(qiratName));
+            const assessments = getAssessmentsForQirat(qiratName);
+            const ranked = studentsInQirat.map(s => ({
+                id: s.id,
+                avg: calculateAverage(examScores.get(s.id)?.[qiratName] || {}, assessments)
+            })).sort((a, b) => (b.avg || 0) - (a.avg || 0));
+            const rank = ranked.findIndex(s => s.id === studentId) + 1;
+            return rank > 0 ? rank : studentsInQirat.length;
+        }
+        
+        function calculateQiratDepartmentRank(studentId, qiratName) {
+            const student = allStudents.find(s => s.id === studentId);
+            if (!student) return null;
+            const deptStudents = allStudents.filter(s =>
+                s.department === student.department && getQiratNames(s).includes(qiratName)
+            );
+            const assessments = getAssessmentsForQirat(qiratName);
+            const ranked = deptStudents.map(s => ({
+                id: s.id,
+                avg: calculateAverage(examScores.get(s.id)?.[qiratName] || {}, assessments)
+            })).sort((a, b) => (b.avg || 0) - (a.avg || 0));
+            const rank = ranked.findIndex(s => s.id === studentId) + 1;
+            return rank > 0 ? rank : deptStudents.length;
+        }
+        
+        async function loadQiratAssessmentConfigs() {
+            try {
+                const configSnapshot = await getDocs(collection(db, "qiratAssessmentConfigs"));
+                qiratAssessmentConfigs.clear();
+                configSnapshot.forEach(doc => {
+                    qiratAssessmentConfigs.set(doc.id, doc.data());
+                });
+            } catch (e) {
+                console.warn(e);
+            }
+        }
+        
+        async function loadExamScores() {
+            try {
+                const snapshot = await getDocs(collection(db, "examScores"));
+                examScores.clear();
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    if (data.scores) {
+                        examScores.set(docSnap.id, data.scores);
+                    }
+                });
+            } catch (e) {
+                console.warn(e);
+            }
+        }
+        
+        async function loadAllStudents() {
+            try {
+                const querySnapshot = await getDocs(collection(db, "registrations"));
+                allStudents = [];
+                querySnapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    allStudents.push({
+                        id: docSnap.id,
+                        full_name: data.full_name || 'N/A',
+                        gender: data.gender || 'Not Specified',
+                        phone: data.phone || '',
+                        department: data.department || 'Other',
+                        batch: data.batch || 'General',
+                        schedules: data.schedules || []
+                    });
+                });
+            } catch (e) {
+                console.error(e);
+            }
+        }
+        
+        async function loadStudentData() {
+            const studentId = localStorage.getItem('studentId');
+            if (!studentId) {
+                window.location.href = 'student-login.html';
+                return;
+            }
+            
+            try {
+                const studentDoc = await getDoc(doc(db, "registrations", studentId));
+                if (studentDoc.exists()) {
+                    studentData = {
+                        id: studentDoc.id,
+                        ...studentDoc.data()
+                    };
+                    document.getElementById('studentName').textContent = `Welcome, ${studentData.full_name || studentData.first_name || 'Student'}`;
+                } else {
+                    showToast('Student record not found', true);
+                    logout();
+                }
+            } catch (e) {
+                console.error(e);
+                showToast('Error loading student data', true);
+            }
+        }
+        
+        function updateStats() {
+            const studentId = localStorage.getItem('studentId');
+            const qirats = getQiratNames(studentData);
+            const overallAvg = calculateStudentOverallAvg(studentId);
+            const globalRank = calculateGlobalRank(studentId);
+            const deptRank = calculateDepartmentRank(studentId);
+            
+            document.getElementById('totalQirats').textContent = qirats.length;
+            document.getElementById('avgScore').textContent = (overallAvg !== null ? overallAvg : 0) + '%';
+            document.getElementById('globalRank').textContent = `#${globalRank}`;
+            document.getElementById('deptRank').textContent = `#${deptRank}`;
+        }
+        
+        function renderPerformanceChart() {
+            const studentId = localStorage.getItem('studentId');
+            const qirats = getQiratNames(studentData);
+            const labels = [];
+            const scores = [];
+            
+            for (const q of qirats) {
+                const scoresData = examScores.get(studentId)?.[q] || {};
+                const assessments = getAssessmentsForQirat(q);
+                const avg = calculateAverage(scoresData, assessments);
+                labels.push(q.length > 15 ? q.substring(0, 12) + '...' : q);
+                scores.push(avg !== null ? avg : 0);
+            }
+            
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Average Score (%)',
+                        data: scores,
+                        backgroundColor: 'rgba(16, 185, 129, 0.6)',
+                        borderColor: '#10b981',
+                        borderWidth: 1,
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            grid: { color: 'rgba(0,0,0,0.05)' }
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        }
+        
+        window.toggleQiratDropdown = (index) => {
+            const content = document.getElementById(`qirat-dropdown-${index}`);
+            const icon = document.getElementById(`qirat-icon-${index}`);
+            const header = document.getElementById(`qirat-header-${index}`);
+            
+            if (content?.classList.contains('show')) {
+                content.classList.remove('show');
+                icon?.classList.remove('rotated');
+                header?.classList.remove('active');
+            } else {
+                content?.classList.add('show');
+                icon?.classList.add('rotated');
+                header?.classList.add('active');
+            }
+        };
+        
+        function renderQiratList() {
+            const studentId = localStorage.getItem('studentId');
+            const qirats = getQiratNames(studentData);
+            const container = document.getElementById('qiratListContainer');
+            
+            if (qirats.length === 0) {
+                container.innerHTML = '<div class="text-center py-8 text-gray-500">No Qirats enrolled yet</div>';
+                return;
+            }
+            
+            let html = '';
+            for (let i = 0; i < qirats.length; i++) {
+                const q = qirats[i];
+                const scores = examScores.get(studentId)?.[q] || {};
+                const assessments = getAssessmentsForQirat(q);
+                const avg = calculateAverage(scores, assessments);
+                const totalPoints = calculateTotalPoints(scores, assessments);
+                const totalPossible = calculateTotalPossible(assessments);
+                const qiratGlobalRank = calculateQiratGlobalRank(studentId, q);
+                const qiratDeptRank = calculateQiratDepartmentRank(studentId, q);
+                const studentsInQirat = allStudents.filter(s => getQiratNames(s).includes(q));
+                const studentsInDeptQirat = studentsInQirat.filter(s => s.department === studentData.department);
+                
+                let assessmentRows = '';
+                for (let a = 0; a < assessments.length; a++) {
+                    const ass = assessments[a];
+                    const score = scores[`assessment${a + 1}`];
+                    const percent = calculatePercentage(score, ass.outOf);
+                    assessmentRows += `
+                        <tr>
+                            <td class="py-2 text-left">${escapeHtml(ass.name)}</td>
+                            <td class="py-2 text-center">
+                                <span class="font-semibold">${score !== null ? score : '-'}</span>
+                            </td>
+                            <td class="py-2 text-center">/${ass.outOf}</td>
+                            <td class="py-2 text-center ${percent >= 70 ? 'text-emerald-600' : 'text-yellow-600'}">
+                                ${percent !== null ? percent + '%' : '-'}
+                            </td>
+                        </tr>
+                    `;
+                }
+                
+                html += `
+                    <div class="qirat-list-card">
+                        <div id="qirat-header-${i}" class="qirat-list-header" onclick="toggleQiratDropdown(${i})">
+                            <div class="flex-1">
+                                <div class="flex flex-wrap justify-between items-center gap-2">
+                                    <h4 class="font-semibold text-emerald-700">
+                                        <i class="fas fa-book-quran mr-2"></i> ${escapeHtml(q)}
+                                    </h4>
+                                    <div class="flex gap-2 flex-wrap">
+                                        <span class="qirat-stat-item">🌍 Global Rank: #${qiratGlobalRank}/${studentsInQirat.length}</span>
+                                        <span class="qirat-stat-item">🏢 Dept Rank: #${qiratDeptRank}/${studentsInDeptQirat.length}</span>
+                                        <span class="qirat-stat-item">📊 Avg: ${avg !== null ? avg + '%' : '-'}</span>
+                                    </div>
+                                    <i id="qirat-icon-${i}" class="fas fa-chevron-down text-gray-400 transition-transform rotate-icon"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="qirat-dropdown-${i}" class="qirat-dropdown-content">
+                            <div class="overflow-x-auto">
+                                <table class="assessment-table">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-left">Assessment</th>
+                                            <th class="text-center">Your Score</th>
+                                            <th class="text-center">Out Of</th>
+                                            <th class="text-center">Percentage</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${assessmentRows}
+                                        <tr class="bg-emerald-50">
+                                            <td class="py-2 font-semibold text-left">Summary</td>
+                                            <td class="py-2 text-center font-bold text-emerald-600">${totalPoints}/${totalPossible}</td>
+                                            <td class="py-2 text-center"></td>
+                                            <td class="py-2 text-center font-bold text-emerald-600">${avg !== null ? avg + '%' : '-'}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = html;
+        }
+        
+        window.logout = () => {
+            localStorage.removeItem('studentLoggedIn');
+            localStorage.removeItem('studentId');
+            localStorage.removeItem('studentFirstName');
+            localStorage.removeItem('studentFullName');
+            localStorage.removeItem('studentEmail');
+            window.location.href = 'student-login.html';
+        };
+        
+        async function init() {
+            // Check login status
+            if (localStorage.getItem('studentLoggedIn') !== 'true') {
+                window.location.href = 'student-login.html';
+                return;
+            }
+            
+            await loadAllStudents();
+            await loadQiratAssessmentConfigs();
+            await loadExamScores();
+            await loadStudentData();
+            
+            if (studentData) {
+                updateStats();
+                renderQiratList();
+                renderPerformanceChart();
+            }
+        }
+        
+        window.toggleQiratDropdown = toggleQiratDropdown;
+        init();
+    </script>
+</body>
+</html>
