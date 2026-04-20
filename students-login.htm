@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Student Portal | Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+        
+        .input-field {
+            transition: all 0.3s ease;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            left: 20px;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+            background: #1f2937;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 50px;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(100%); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center p-4">
+    <div class="w-full max-w-md">
+        <div class="text-center mb-8">
+            <i class="fas fa-graduation-cap text-6xl text-white mb-4"></i>
+            <h1 class="text-3xl font-bold text-white">Student Portal</h1>
+            <p class="text-white/80 mt-2">Login to view your academic performance</p>
+        </div>
+        
+        <div class="glass-card p-8">
+            <div class="mb-6">
+                <label class="block text-gray-700 text-sm font-bold mb-2">
+                    <i class="fas fa-user mr-2"></i>First Name
+                </label>
+                <input type="text" id="firstName" placeholder="Enter your first name" 
+                       class="input-field w-full px-4 py-3 rounded-xl">
+            </div>
+            
+            <div class="mb-6">
+                <label class="block text-gray-700 text-sm font-bold mb-2">
+                    <i class="fas fa-lock mr-2"></i>Password
+                </label>
+                <input type="password" id="password" placeholder="Enter your password" 
+                       class="input-field w-full px-4 py-3 rounded-xl">
+            </div>
+            
+            <button onclick="login()" class="btn-primary w-full py-3 rounded-xl text-white font-semibold">
+                <i class="fas fa-sign-in-alt mr-2"></i>Login
+            </button>
+            
+            <div class="mt-6 text-center text-sm text-gray-500">
+                <p>Contact your administrator for login credentials</p>
+            </div>
+        </div>
+    </div>
+    
+    <div id="toast" class="toast hidden"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyAR_g5y04YAGCrTvZCowrE7hw8h7k1du08",
+            authDomain: "jujm-qirat.firebaseapp.com",
+            projectId: "jujm-qirat",
+            storageBucket: "jujm-qirat.firebasestorage.app",
+            messagingSenderId: "253413984903",
+            appId: "1:253413984903:web:c1577e0fdef1711f960622"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.innerHTML = `<i class="fas ${isError ? 'fa-exclamation-triangle' : 'fa-check-circle'} mr-2"></i> ${message}`;
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 3000);
+        }
+        
+        window.login = async () => {
+            const firstName = document.getElementById('firstName').value.trim();
+            const password = document.getElementById('password').value.trim();
+            
+            if (!firstName || !password) {
+                showToast('Please enter both first name and password', true);
+                return;
+            }
+            
+            try {
+                const studentsRef = collection(db, "studentCredentials");
+                const q = query(studentsRef, where("firstName", "==", firstName));
+                const querySnapshot = await getDocs(q);
+                
+                let found = false;
+                querySnapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (data.password === password) {
+                        found = true;
+                        localStorage.setItem('studentLoggedIn', 'true');
+                        localStorage.setItem('studentId', doc.id);
+                        localStorage.setItem('studentFirstName', data.firstName);
+                        localStorage.setItem('studentFullName', data.fullName);
+                        localStorage.setItem('studentEmail', data.email || '');
+                        window.location.href = 'student-dashboard.html';
+                    }
+                });
+                
+                if (!found) {
+                    showToast('Invalid first name or password', true);
+                }
+            } catch (error) {
+                console.error(error);
+                showToast('Login failed. Please try again.', true);
+            }
+        };
+        
+        // Check if already logged in
+        if (localStorage.getItem('studentLoggedIn') === 'true') {
+            window.location.href = 'student-dashboard.html';
+        }
+    </script>
+</body>
+</html>
