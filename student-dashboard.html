@@ -164,7 +164,7 @@
                     <p class="text-white/80 mt-1" id="studentInfo">Loading your information...</p>
                 </div>
                 <div class="flex gap-3">
-                    <button onclick="window.location.href='student-login.html'" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-xl transition">
+                    <button onclick="refreshDashboard()" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-xl transition">
                         <i class="fas fa-sync-alt mr-2"></i>Refresh
                     </button>
                     <button onclick="logout()" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-xl transition">
@@ -382,6 +382,7 @@
                         examScores.set(docSnap.id, data.scores);
                     }
                 });
+                console.log("Loaded exam scores for", examScores.size, "students");
             } catch (e) {
                 console.warn(e);
             }
@@ -403,6 +404,7 @@
                         schedules: data.schedules || []
                     });
                 });
+                console.log("Loaded", allStudents.length, "students from registrations");
             } catch (e) {
                 console.error(e);
             }
@@ -410,36 +412,68 @@
         
         async function loadStudentData() {
             const studentId = localStorage.getItem('studentId');
+            console.log("Looking for student with ID:", studentId);
+            
             if (!studentId) {
+                console.log("No student ID found in localStorage");
                 window.location.href = 'student-login.html';
                 return;
             }
             
             try {
+                // First try to get from registrations collection
                 const studentDoc = await getDoc(doc(db, "registrations", studentId));
+                
                 if (studentDoc.exists()) {
                     studentData = {
                         id: studentDoc.id,
                         ...studentDoc.data()
                     };
-                    const fullName = localStorage.getItem('studentFullName') || studentData.full_name || 'Student';
-                    const department = studentData.department || localStorage.getItem('studentDepartment') || 'Not Specified';
-                    const batch = studentData.batch || localStorage.getItem('studentBatch') || 'General';
-                    
-                    document.getElementById('studentName').textContent = `Welcome, ${fullName}`;
-                    document.getElementById('studentInfo').innerHTML = `<i class="fas fa-building mr-1"></i>${department} | <i class="fas fa-calendar mr-1"></i>${batch}`;
+                    console.log("Found student in registrations:", studentData.full_name);
                 } else {
-                    showToast('Student record not found', true);
-                    logout();
+                    // If not found, try to find by matching name from localStorage
+                    const storedName = localStorage.getItem('studentFullName');
+                    console.log("Not found in registrations, searching by name:", storedName);
+                    
+                    // Search through all students
+                    for (const student of allStudents) {
+                        if (student.full_name === storedName || student.full_name.toLowerCase().includes(storedName?.toLowerCase())) {
+                            studentData = student;
+                            console.log("Found student by name match:", studentData.full_name);
+                            // Update localStorage with correct ID
+                            localStorage.setItem('studentId', student.id);
+                            break;
+                        }
+                    }
+                    
+                    if (!studentData) {
+                        console.error("Student not found in registrations");
+                        showToast('Student record not found. Please contact administrator.', true);
+                        return false;
+                    }
                 }
+                
+                // Update header with student info
+                const fullName = localStorage.getItem('studentFullName') || studentData.full_name || 'Student';
+                const department = studentData.department || localStorage.getItem('studentDepartment') || 'Not Specified';
+                const batch = studentData.batch || localStorage.getItem('studentBatch') || 'General';
+                
+                document.getElementById('studentName').textContent = `Welcome, ${fullName}`;
+                document.getElementById('studentInfo').innerHTML = `<i class="fas fa-building mr-1"></i>${department} | <i class="fas fa-calendar mr-1"></i>${batch}`;
+                
+                return true;
+                
             } catch (e) {
-                console.error(e);
-                showToast('Error loading student data', true);
+                console.error("Error loading student data:", e);
+                showToast('Error loading your data. Please refresh.', true);
+                return false;
             }
         }
         
         function updateStats() {
             const studentId = localStorage.getItem('studentId');
+            if (!studentData) return;
+            
             const qirats = getQiratNames(studentData);
             const overallAvg = calculateStudentOverallAvg(studentId);
             const globalRank = calculateGlobalRank(studentId);
@@ -453,6 +487,8 @@
         
         function renderPerformanceChart() {
             const studentId = localStorage.getItem('studentId');
+            if (!studentData) return;
+            
             const qirats = getQiratNames(studentData);
             const labels = [];
             const scores = [];
@@ -467,39 +503,42 @@
             
             const ctx = document.getElementById('performanceChart').getContext('2d');
             if (chart) chart.destroy();
-            chart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Average Score (%)',
-                        data: scores,
-                        backgroundColor: 'rgba(16, 185, 129, 0.6)',
-                        borderColor: '#10b981',
-                        borderWidth: 1,
-                        borderRadius: 8
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 100,
-                            grid: { color: 'rgba(0,0,0,0.05)' },
-                            title: { display: true, text: 'Score Percentage (%)' }
-                        },
-                        x: {
-                            ticks: { rotation: labels.length > 4 ? 45 : 0 }
-                        }
+            
+            if (labels.length > 0) {
+                chart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Average Score (%)',
+                            data: scores,
+                            backgroundColor: 'rgba(16, 185, 129, 0.6)',
+                            borderColor: '#10b981',
+                            borderWidth: 1,
+                            borderRadius: 8
+                        }]
                     },
-                    plugins: {
-                        legend: { position: 'bottom' },
-                        tooltip: { callbacks: { label: (ctx) => `${ctx.raw}%` } }
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100,
+                                grid: { color: 'rgba(0,0,0,0.05)' },
+                                title: { display: true, text: 'Score Percentage (%)' }
+                            },
+                            x: {
+                                ticks: { rotation: labels.length > 4 ? 45 : 0 }
+                            }
+                        },
+                        plugins: {
+                            legend: { position: 'bottom' },
+                            tooltip: { callbacks: { label: (ctx) => `${ctx.raw}%` } }
+                        }
                     }
-                }
-            });
+                });
+            }
         }
         
         window.toggleQiratDropdown = (index) => {
@@ -520,6 +559,8 @@
         
         function renderQiratList() {
             const studentId = localStorage.getItem('studentId');
+            if (!studentData) return;
+            
             const qirats = getQiratNames(studentData);
             const container = document.getElementById('qiratListContainer');
             
@@ -547,12 +588,11 @@
                     const ass = assessments[a];
                     const score = scores[`assessment${a + 1}`];
                     const percent = calculatePercentage(score, ass.outOf);
-                    const statusClass = percent !== null ? (percent >= 70 ? 'status-passing' : (percent >= 50 ? 'status-warning' : '')) : '';
                     assessmentRows += `
                         <tr>
                             <td class="py-2 text-left">${escapeHtml(ass.name)}</span></td>
                             <td class="py-2 text-center">
-                                <span class="font-semibold ${statusClass}">${score !== null ? score : '-'}</span>
+                                <span class="font-semibold">${score !== null ? score : '-'}</span>
                             </span></td>
                             <td class="py-2 text-center">/${ass.outOf}</span></td>
                             <td class="py-2 text-center ${percent !== null && percent >= 70 ? 'text-emerald-600 font-semibold' : (percent !== null && percent >= 50 ? 'text-orange-600' : 'text-gray-500')}">
@@ -613,16 +653,24 @@
             container.innerHTML = html;
         }
         
+        window.refreshDashboard = async () => {
+            showToast('Refreshing your data...');
+            await loadAllStudents();
+            await loadQiratAssessmentConfigs();
+            await loadExamScores();
+            const success = await loadStudentData();
+            if (success && studentData) {
+                updateStats();
+                renderQiratList();
+                renderPerformanceChart();
+                showToast('Dashboard refreshed!');
+            } else {
+                showToast('Error refreshing data', true);
+            }
+        };
+        
         window.logout = () => {
-            localStorage.removeItem('studentLoggedIn');
-            localStorage.removeItem('studentId');
-            localStorage.removeItem('studentFirstName');
-            localStorage.removeItem('studentFullName');
-            localStorage.removeItem('studentDepartment');
-            localStorage.removeItem('studentBatch');
-            localStorage.removeItem('studentEmail');
-            localStorage.removeItem('studentPhone');
-            localStorage.removeItem('studentLoginTime');
+            localStorage.clear();
             window.location.href = 'student-login.html';
         };
         
@@ -633,15 +681,27 @@
                 return;
             }
             
+            console.log("Initializing dashboard...");
+            console.log("LocalStorage data:", {
+                studentId: localStorage.getItem('studentId'),
+                studentFullName: localStorage.getItem('studentFullName'),
+                studentFirstName: localStorage.getItem('studentFirstName')
+            });
+            
             await loadAllStudents();
             await loadQiratAssessmentConfigs();
             await loadExamScores();
-            await loadStudentData();
             
-            if (studentData) {
+            const success = await loadStudentData();
+            
+            if (success && studentData) {
                 updateStats();
                 renderQiratList();
                 renderPerformanceChart();
+                showToast(`Welcome back, ${studentData.full_name || localStorage.getItem('studentFullName')}!`);
+            } else {
+                console.error("Failed to load student data");
+                document.getElementById('qiratListContainer').innerHTML = '<div class="text-center py-8 text-red-500">Unable to load your data. Please contact administrator.</div>';
             }
         }
         
