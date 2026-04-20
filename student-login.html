@@ -16,7 +16,7 @@
         }
         
         .glass-card {
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(10px);
             border-radius: 2rem;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
@@ -56,46 +56,80 @@
             border-radius: 50px;
             text-align: center;
             font-size: 0.85rem;
+            max-width: 400px;
+            margin: 0 auto;
         }
         
         @keyframes slideIn {
             from { opacity: 0; transform: translateY(100%); }
             to { opacity: 1; transform: translateY(0); }
         }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @media (min-width: 768px) {
+            .toast {
+                right: 20px;
+                left: auto;
+            }
+        }
     </style>
 </head>
 <body class="flex items-center justify-center p-4">
     <div class="w-full max-w-md">
+        <!-- Logo and Title -->
         <div class="text-center mb-8">
-            <i class="fas fa-graduation-cap text-6xl text-white mb-4"></i>
+            <div class="bg-white/20 inline-flex p-4 rounded-full mb-4">
+                <i class="fas fa-graduation-cap text-5xl text-white"></i>
+            </div>
             <h1 class="text-3xl font-bold text-white">Student Portal</h1>
-            <p class="text-white/80 mt-2">Login to view your academic performance</p>
+            <p class="text-white/80 mt-2">Access your academic performance dashboard</p>
         </div>
         
+        <!-- Login Card -->
         <div class="glass-card p-8">
             <div class="mb-6">
                 <label class="block text-gray-700 text-sm font-bold mb-2">
-                    <i class="fas fa-user mr-2"></i>First Name
+                    <i class="fas fa-user mr-2 text-emerald-600"></i>First Name
                 </label>
-                <input type="text" id="firstName" placeholder="Enter your first name" 
-                       class="input-field w-full px-4 py-3 rounded-xl">
+                <input type="text" id="firstName" placeholder="Enter your first name as registered" 
+                       class="input-field w-full px-4 py-3 rounded-xl text-gray-700">
+                <p class="text-xs text-gray-500 mt-1">Use the name you registered with (e.g., "Aisha")</p>
             </div>
             
             <div class="mb-6">
                 <label class="block text-gray-700 text-sm font-bold mb-2">
-                    <i class="fas fa-lock mr-2"></i>Password
+                    <i class="fas fa-lock mr-2 text-emerald-600"></i>Password
                 </label>
                 <input type="password" id="password" placeholder="Enter your password" 
-                       class="input-field w-full px-4 py-3 rounded-xl">
+                       class="input-field w-full px-4 py-3 rounded-xl text-gray-700">
+                <p class="text-xs text-gray-500 mt-1">Password provided by your administrator</p>
             </div>
             
-            <button onclick="login()" class="btn-primary w-full py-3 rounded-xl text-white font-semibold">
+            <button onclick="login()" id="loginBtn" class="btn-primary w-full py-3 rounded-xl text-white font-semibold">
                 <i class="fas fa-sign-in-alt mr-2"></i>Login
             </button>
             
             <div class="mt-6 text-center text-sm text-gray-500">
-                <p>Contact your administrator for login credentials</p>
+                <p>Having trouble logging in? Contact your academic administrator.</p>
             </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="text-center mt-6 text-white/60 text-xs">
+            <p>© 2024 Academic Performance System. All rights reserved.</p>
         </div>
     </div>
     
@@ -103,7 +137,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, query, where, getDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         
         const firebaseConfig = {
             apiKey: "AIzaSyAR_g5y04YAGCrTvZCowrE7hw8h7k1du08",
@@ -117,11 +151,104 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         
+        let loginAttempts = 0;
+        let lastAttemptTime = 0;
+        
         function showToast(message, isError = false) {
             const toast = document.getElementById('toast');
             toast.innerHTML = `<i class="fas ${isError ? 'fa-exclamation-triangle' : 'fa-check-circle'} mr-2"></i> ${message}`;
             toast.classList.remove('hidden');
-            setTimeout(() => toast.classList.add('hidden'), 3000);
+            setTimeout(() => toast.classList.add('hidden'), 4000);
+        }
+        
+        function setLoading(isLoading) {
+            const btn = document.getElementById('loginBtn');
+            if (isLoading) {
+                btn.innerHTML = '<span class="loading-spinner mr-2"></span> Verifying...';
+                btn.disabled = true;
+            } else {
+                btn.innerHTML = '<i class="fas fa-sign-in-alt mr-2"></i>Login';
+                btn.disabled = false;
+            }
+        }
+        
+        // Rate limiting
+        function checkRateLimit() {
+            const now = Date.now();
+            if (loginAttempts >= 5) {
+                if (now - lastAttemptTime < 300000) { // 5 minutes
+                    const remaining = Math.ceil((300000 - (now - lastAttemptTime)) / 60000);
+                    showToast(`Too many attempts. Please wait ${remaining} minute(s).`, true);
+                    return false;
+                } else {
+                    loginAttempts = 0;
+                }
+            }
+            return true;
+        }
+        
+        async function findStudentByName(firstName) {
+            try {
+                // First, try to find by first_name field
+                const credentialsQuery = query(collection(db, "studentCredentials"), where("firstName", "==", firstName));
+                const credSnapshot = await getDocs(credentialsQuery);
+                
+                if (!credSnapshot.empty) {
+                    const credDoc = credSnapshot.docs[0];
+                    const credData = credDoc.data();
+                    return {
+                        found: true,
+                        studentId: credDoc.id,
+                        studentData: credData,
+                        source: 'credentials'
+                    };
+                }
+                
+                // If not found, try to find in registrations by full_name or first name match
+                const registrationsSnapshot = await getDocs(collection(db, "registrations"));
+                let matchedStudent = null;
+                let matchedId = null;
+                
+                registrationsSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    const fullName = (data.full_name || '').toLowerCase();
+                    const firstNameLower = firstName.toLowerCase();
+                    
+                    // Check if full name starts with the first name
+                    if (fullName.startsWith(firstNameLower) || fullName.split(' ')[0] === firstNameLower) {
+                        matchedStudent = data;
+                        matchedId = doc.id;
+                    }
+                });
+                
+                if (matchedStudent) {
+                    return {
+                        found: true,
+                        studentId: matchedId,
+                        studentData: matchedStudent,
+                        source: 'registration'
+                    };
+                }
+                
+                return { found: false };
+            } catch (error) {
+                console.error("Search error:", error);
+                return { found: false, error: true };
+            }
+        }
+        
+        async function verifyPassword(studentId, enteredPassword) {
+            try {
+                const credDoc = await getDoc(doc(db, "studentCredentials", studentId));
+                if (credDoc.exists()) {
+                    const storedPassword = credDoc.data().password;
+                    return storedPassword === enteredPassword;
+                }
+                return false;
+            } catch (error) {
+                console.error("Password verification error:", error);
+                return false;
+            }
         }
         
         window.login = async () => {
@@ -133,38 +260,99 @@
                 return;
             }
             
+            if (!checkRateLimit()) return;
+            
+            setLoading(true);
+            loginAttempts++;
+            lastAttemptTime = Date.now();
+            
             try {
-                const studentsRef = collection(db, "studentCredentials");
-                const q = query(studentsRef, where("firstName", "==", firstName));
-                const querySnapshot = await getDocs(q);
+                // Find student by first name
+                const result = await findStudentByName(firstName);
                 
-                let found = false;
-                querySnapshot.forEach(doc => {
-                    const data = doc.data();
-                    if (data.password === password) {
-                        found = true;
-                        localStorage.setItem('studentLoggedIn', 'true');
-                        localStorage.setItem('studentId', doc.id);
-                        localStorage.setItem('studentFirstName', data.firstName);
-                        localStorage.setItem('studentFullName', data.fullName);
-                        localStorage.setItem('studentEmail', data.email || '');
-                        window.location.href = 'student-dashboard.html';
-                    }
-                });
-                
-                if (!found) {
-                    showToast('Invalid first name or password', true);
+                if (!result.found) {
+                    setLoading(false);
+                    showToast('Invalid first name. Please check with your administrator.', true);
+                    return;
                 }
+                
+                if (result.error) {
+                    setLoading(false);
+                    showToast('Login service error. Please try again.', true);
+                    return;
+                }
+                
+                // Verify password
+                const isValid = await verifyPassword(result.studentId, password);
+                
+                if (!isValid) {
+                    setLoading(false);
+                    showToast('Invalid password. Please try again.', true);
+                    return;
+                }
+                
+                // Login successful - store session
+                const studentInfo = {
+                    id: result.studentId,
+                    firstName: firstName,
+                    fullName: result.studentData.full_name || result.studentData.fullName || firstName,
+                    department: result.studentData.department || 'Not Specified',
+                    batch: result.studentData.batch || 'General',
+                    email: result.studentData.email || '',
+                    phone: result.studentData.phone || '',
+                    loginTime: new Date().toISOString()
+                };
+                
+                localStorage.setItem('studentLoggedIn', 'true');
+                localStorage.setItem('studentId', studentInfo.id);
+                localStorage.setItem('studentFirstName', studentInfo.firstName);
+                localStorage.setItem('studentFullName', studentInfo.fullName);
+                localStorage.setItem('studentDepartment', studentInfo.department);
+                localStorage.setItem('studentBatch', studentInfo.batch);
+                localStorage.setItem('studentEmail', studentInfo.email);
+                localStorage.setItem('studentPhone', studentInfo.phone);
+                localStorage.setItem('studentLoginTime', studentInfo.loginTime);
+                
+                showToast(`Welcome back, ${studentInfo.fullName}! Redirecting...`);
+                
+                setTimeout(() => {
+                    window.location.href = 'student-dashboard.html';
+                }, 1000);
+                
             } catch (error) {
-                console.error(error);
-                showToast('Login failed. Please try again.', true);
+                console.error("Login error:", error);
+                setLoading(false);
+                showToast('Login failed. Please try again later.', true);
             }
         };
         
         // Check if already logged in
         if (localStorage.getItem('studentLoggedIn') === 'true') {
-            window.location.href = 'student-dashboard.html';
+            const loginTime = localStorage.getItem('studentLoginTime');
+            if (loginTime) {
+                const hoursSinceLogin = (Date.now() - new Date(loginTime)) / (1000 * 60 * 60);
+                if (hoursSinceLogin < 24) {
+                    window.location.href = 'student-dashboard.html';
+                } else {
+                    // Session expired
+                    localStorage.clear();
+                }
+            } else {
+                localStorage.clear();
+            }
         }
+        
+        // Enter key support
+        document.getElementById('password').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                login();
+            }
+        });
+        document.getElementById('firstName').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('password').focus();
+            }
+        });
     </script>
 </body>
 </html>
