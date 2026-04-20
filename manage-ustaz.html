@@ -2,20 +2,53 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Admin | Manage Ustaz Accounts</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Admin | Ustaz Management Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary: #10b981;
+            --primary-dark: #059669;
+            --primary-light: #d1fae5;
+            --secondary: #6366f1;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --dark: #0f172a;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e6f7f0 100%);
+            min-height: 100vh;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+        
         .glass-card {
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(16, 185, 129, 0.2);
             border-radius: 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
+        
+        .glass-card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
         .btn-primary {
             background: linear-gradient(135deg, #10b981, #059669);
+            transition: all 0.3s ease;
         }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
+        }
+        
         .toast {
             position: fixed;
             bottom: 20px;
@@ -26,66 +59,305 @@
             color: white;
             padding: 12px 24px;
             border-radius: 50px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
+        
         @keyframes slideIn {
             from { opacity: 0; transform: translateX(100%); }
             to { opacity: 1; transform: translateX(0); }
         }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            animation: modalFadeIn 0.3s ease;
+        }
+        
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.95) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        
+        .status-active {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status-inactive {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .search-input {
+            transition: all 0.3s ease;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+        
+        .stat-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-4px);
+        }
+        
+        .qirat-tag {
+            display: inline-block;
+            padding: 4px 10px;
+            margin: 2px;
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+        
+        @media (max-width: 768px) {
+            body { padding: 1rem; }
+            .stat-card { padding: 0.75rem; }
+            .stat-card .text-2xl { font-size: 1.3rem; }
+        }
     </style>
 </head>
-<body class="bg-gradient-to-br from-emerald-50 to-teal-50 p-4 md:p-8">
+<body class="p-4 md:p-8">
     <div class="max-w-7xl mx-auto">
+        <!-- Header -->
         <div class="glass-card p-6 mb-6">
             <div class="flex justify-between items-center flex-wrap gap-4">
                 <div>
-                    <h1 class="text-2xl md:text-3xl font-bold text-emerald-700">
-                        <i class="fas fa-chalkboard-user mr-2"></i>Manage Ustaz Accounts
+                    <h1 class="text-2xl md:text-3xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                        <i class="fas fa-chalkboard-user mr-2"></i>Ustaz Management Portal
                     </h1>
-                    <p class="text-gray-500 mt-1">Create and manage Ustaz login credentials with Qirat assignments</p>
+                    <p class="text-gray-500 mt-1">Manage teacher accounts, assignments, and access permissions</p>
                 </div>
-                <button onclick="window.location.href='index.html'" class="px-4 py-2 bg-gray-200 rounded-xl hover:bg-gray-300 transition">
-                    <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
+                <button onclick="window.location.href='index.html'" class="px-4 py-2 bg-gray-100 rounded-xl hover:bg-gray-200 transition flex items-center gap-2">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
                 </button>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div class="glass-card p-4 text-center stat-card">
+                <div class="text-emerald-500 text-2xl mb-2"><i class="fas fa-chalkboard-user"></i></div>
+                <div class="text-2xl font-bold text-gray-800" id="totalUstaz">0</div>
+                <div class="text-xs text-gray-500 mt-1">Total Ustaz</div>
+            </div>
+            <div class="glass-card p-4 text-center stat-card">
+                <div class="text-emerald-500 text-2xl mb-2"><i class="fas fa-book-quran"></i></div>
+                <div class="text-2xl font-bold text-gray-800" id="totalQirats">0</div>
+                <div class="text-xs text-gray-500 mt-1">Active Qirats</div>
+            </div>
+            <div class="glass-card p-4 text-center stat-card">
+                <div class="text-emerald-500 text-2xl mb-2"><i class="fas fa-users"></i></div>
+                <div class="text-2xl font-bold text-gray-800" id="totalAssignments">0</div>
+                <div class="text-xs text-gray-500 mt-1">Total Assignments</div>
+            </div>
+            <div class="glass-card p-4 text-center stat-card">
+                <div class="text-emerald-500 text-2xl mb-2"><i class="fas fa-chart-line"></i></div>
+                <div class="text-2xl font-bold text-gray-800" id="avgPerUstaz">0</div>
+                <div class="text-xs text-gray-500 mt-1">Avg Qirats/Ustaz</div>
             </div>
         </div>
 
         <!-- Create New Ustaz Account -->
         <div class="glass-card p-6 mb-6">
-            <h2 class="text-xl font-semibold mb-4"><i class="fas fa-user-plus text-emerald-500 mr-2"></i>Create New Ustaz Account</h2>
+            <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+                <i class="fas fa-user-plus text-emerald-500"></i>
+                Create New Ustaz Account
+                <span class="text-xs text-gray-400 font-normal ml-2">Fill the form below</span>
+            </h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                <input type="text" id="ustazName" placeholder="Ustaz Name (username)" class="px-4 py-2 border rounded-xl">
-                <input type="text" id="fullName" placeholder="Full Name" class="px-4 py-2 border rounded-xl">
-                <input type="password" id="password" placeholder="Password" class="px-4 py-2 border rounded-xl">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Ustaz Name *</label>
+                    <input type="text" id="ustazName" placeholder="e.g., ustaz_ahmed" class="w-full px-4 py-2 border rounded-xl focus:outline-none focus:border-emerald-500 transition">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                    <input type="text" id="fullName" placeholder="e.g., Ahmed Hassan" class="w-full px-4 py-2 border rounded-xl focus:outline-none focus:border-emerald-500 transition">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Password *</label>
+                    <div class="relative">
+                        <input type="password" id="password" placeholder="Enter password" class="w-full px-4 py-2 border rounded-xl focus:outline-none focus:border-emerald-500 transition pr-10">
+                        <button onclick="generatePassword()" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-emerald-600" title="Generate random password">
+                            <i class="fas fa-dice"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
             <div class="mb-4">
-                <label class="block text-sm font-medium mb-2">Assign Qirats (select multiple)</label>
-                <select id="assignedQirats" multiple class="w-full px-4 py-2 border rounded-xl h-32">
-                    <!-- Will be populated dynamically -->
-                </select>
-                <p class="text-xs text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple Qirats</p>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Assign Qirats (select multiple)</label>
+                <div class="border rounded-xl p-3 bg-gray-50 max-h-40 overflow-y-auto">
+                    <div id="qiratsCheckboxList" class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                        <!-- Checkboxes will be populated dynamically -->
+                    </div>
+                </div>
+                <p class="text-xs text-gray-500 mt-2">Click on multiple Qirats to assign to this Ustaz</p>
             </div>
-            <button onclick="createUstaz()" class="btn-primary px-6 py-2 rounded-xl text-white font-semibold">
-                <i class="fas fa-plus mr-2"></i>Create Ustaz Account
-            </button>
+            <div class="flex gap-3">
+                <button onclick="createUstaz()" class="btn-primary px-6 py-2 rounded-xl text-white font-semibold flex items-center gap-2">
+                    <i class="fas fa-plus"></i> Create Ustaz Account
+                </button>
+                <button onclick="clearForm()" class="px-6 py-2 rounded-xl bg-gray-200 hover:bg-gray-300 transition">
+                    <i class="fas fa-eraser"></i> Clear Form
+                </button>
+            </div>
+        </div>
+
+        <!-- Filters Bar -->
+        <div class="glass-card p-4 mb-6">
+            <div class="flex flex-wrap gap-4 items-end">
+                <div class="flex-1 min-w-[200px]">
+                    <label class="text-xs text-gray-500 uppercase tracking-wider mb-1 block">Search Ustaz</label>
+                    <input type="text" id="searchUstaz" placeholder="Name or username..." class="search-input w-full px-4 py-2 rounded-xl text-sm">
+                </div>
+                <div class="flex-1 min-w-[150px]">
+                    <label class="text-xs text-gray-500 uppercase tracking-wider mb-1 block">Filter by Qirat</label>
+                    <select id="filterQirat" class="search-input w-full px-4 py-2 rounded-xl text-sm bg-white">
+                        <option value="">All Qirats</option>
+                    </select>
+                </div>
+                <div>
+                    <button onclick="resetFilters()" class="px-4 py-2 bg-gray-200 rounded-xl text-sm hover:bg-gray-300 transition">
+                        <i class="fas fa-eraser"></i> Reset
+                    </button>
+                </div>
+            </div>
         </div>
 
         <!-- Ustaz List -->
-        <div class="glass-card p-6">
-            <h2 class="text-xl font-semibold mb-4"><i class="fas fa-users text-emerald-500 mr-2"></i>Ustaz Accounts</h2>
+        <div class="glass-card p-6 overflow-hidden">
+            <div class="flex justify-between items-center mb-4 flex-wrap gap-3">
+                <h2 class="text-xl font-semibold flex items-center gap-2">
+                    <i class="fas fa-users text-emerald-500"></i>
+                    Ustaz Accounts
+                    <span class="text-sm font-normal text-gray-500" id="ustazCount"></span>
+                </h2>
+                <div class="flex gap-2">
+                    <button onclick="exportToCSV()" class="px-3 py-1.5 bg-emerald-100 text-emerald-700 rounded-lg text-sm hover:bg-emerald-200 transition flex items-center gap-1">
+                        <i class="fas fa-file-csv"></i> Export CSV
+                    </button>
+                    <button onclick="exportToExcel()" class="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg text-sm hover:bg-blue-200 transition flex items-center gap-1">
+                        <i class="fas fa-file-excel"></i> Export Excel
+                    </button>
+                </div>
+            </div>
             <div class="overflow-x-auto">
                 <table class="w-full">
-                    <thead class="bg-gray-100">
+                    <thead class="bg-gray-50 rounded-xl">
                         <tr>
-                            <th class="px-4 py-3 text-left">Ustaz Name</th>
-                            <th class="px-4 py-3 text-left">Full Name</th>
-                            <th class="px-4 py-3 text-left">Assigned Qirats</th>
-                            <th class="px-4 py-3 text-center">Actions</th>
+                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">#</th>
+                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">Ustaz Name</th>
+                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">Full Name</th>
+                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">Assigned Qirats</th>
+                            <th class="px-4 py-3 text-center text-sm font-semibold text-gray-600">Status</th>
+                            <th class="px-4 py-3 text-center text-sm font-semibold text-gray-600">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="ustazTableBody">
-                        <tr><td colspan="4" class="text-center py-8 text-gray-500">Loading...</td></tr>
+                        <tr><td colspan="6" class="text-center py-8 text-gray-500">Loading...</td></tr>
                     </tbody>
                 </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Ustaz Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold">Edit Ustaz Account</h3>
+                <button onclick="closeEditModal()" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-1">Full Name</label>
+                <input type="text" id="editFullName" class="w-full px-4 py-2 border rounded-xl">
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-1">Assigned Qirats</label>
+                <div id="editQiratsList" class="border rounded-xl p-3 bg-gray-50 max-h-40 overflow-y-auto">
+                    <!-- Checkboxes will be populated -->
+                </div>
+            </div>
+            <div class="flex gap-3 justify-end">
+                <button onclick="closeEditModal()" class="px-4 py-2 bg-gray-200 rounded-lg">Cancel</button>
+                <button onclick="saveEditUstaz()" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <div class="text-center mb-4">
+                <i class="fas fa-exclamation-triangle text-red-500 text-5xl mb-3"></i>
+                <h3 class="text-xl font-bold">Confirm Delete</h3>
+                <p class="text-gray-500 mt-2">Are you sure you want to delete <strong id="deleteUstazName"></strong>'s account?</p>
+                <p class="text-xs text-red-500 mt-1">This action cannot be undone.</p>
+            </div>
+            <div class="flex gap-3 justify-center">
+                <button onclick="closeDeleteModal()" class="px-4 py-2 bg-gray-200 rounded-lg">Cancel</button>
+                <button onclick="confirmDeleteUstaz()" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">Delete Account</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reset Password Modal -->
+    <div id="resetModal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold">Reset Password</h3>
+                <button onclick="closeResetModal()" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <div class="mb-4">
+                <p class="mb-2">Ustaz: <strong id="resetUstazName"></strong></p>
+                <label class="block text-sm font-medium mb-1">New Password</label>
+                <div class="relative">
+                    <input type="text" id="newPassword" class="w-full px-4 py-2 border rounded-xl pr-10 font-mono">
+                    <button onclick="generateNewPassword()" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-emerald-600">
+                        <i class="fas fa-dice"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="flex gap-3 justify-end">
+                <button onclick="closeResetModal()" class="px-4 py-2 bg-gray-200 rounded-lg">Cancel</button>
+                <button onclick="confirmResetPassword()" class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700">Reset Password</button>
             </div>
         </div>
     </div>
@@ -95,7 +367,7 @@
     <script type="module">
         import { protectPage } from './auth.js';
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, doc, setDoc, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, doc, setDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         
         if (!protectPage('admin-login.html')) throw new Error('Redirecting');
         
@@ -111,7 +383,13 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         
+        let allUstaz = [];
         let allQirats = [];
+        let currentDeleteId = null;
+        let currentResetId = null;
+        let currentEditId = null;
+        let filterQirat = '';
+        let searchTerm = '';
         
         function showToast(message, isError = false) {
             const toast = document.getElementById('toast');
@@ -119,6 +397,35 @@
             toast.classList.remove('hidden');
             setTimeout(() => toast.classList.add('hidden'), 3000);
         }
+        
+        function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
+        
+        function generateRandomPassword(length = 8) {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789';
+            let password = '';
+            for (let i = 0; i < length; i++) {
+                password += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return password;
+        }
+        
+        window.generatePassword = () => {
+            const newPassword = generateRandomPassword();
+            document.getElementById('password').value = newPassword;
+            showToast('Password generated!');
+        };
+        
+        window.generateNewPassword = () => {
+            const newPassword = generateRandomPassword();
+            document.getElementById('newPassword').value = newPassword;
+        };
+        
+        window.clearForm = () => {
+            document.getElementById('ustazName').value = '';
+            document.getElementById('fullName').value = '';
+            document.getElementById('password').value = '';
+            document.querySelectorAll('#qiratsCheckboxList input[type="checkbox"]').forEach(cb => cb.checked = false);
+        };
         
         async function loadQirats() {
             try {
@@ -131,59 +438,111 @@
                     });
                 });
                 allQirats = Array.from(qiratSet).sort();
-                const select = document.getElementById('assignedQirats');
-                select.innerHTML = allQirats.map(q => `<option value="${q}">${q}</option>`).join('');
+                
+                // Populate checkboxes
+                const container = document.getElementById('qiratsCheckboxList');
+                container.innerHTML = allQirats.map(q => `
+                    <label class="flex items-center gap-2 p-1 hover:bg-gray-100 rounded cursor-pointer">
+                        <input type="checkbox" value="${escapeHtml(q)}" class="qirat-checkbox w-4 h-4">
+                        <span class="text-sm">${escapeHtml(q)}</span>
+                    </label>
+                `).join('');
+                
+                // Populate filter dropdown
+                const filterSelect = document.getElementById('filterQirat');
+                filterSelect.innerHTML = '<option value="">All Qirats</option>' + allQirats.map(q => `<option value="${escapeHtml(q)}">${escapeHtml(q)}</option>`).join('');
+                
+                document.getElementById('totalQirats').textContent = allQirats.length;
             } catch(e) { console.warn(e); }
         }
         
         async function loadUstazList() {
             try {
                 const snapshot = await getDocs(collection(db, "ustazCredentials"));
-                const ustazList = [];
+                allUstaz = [];
                 snapshot.forEach(doc => {
-                    ustazList.push({ id: doc.id, ...doc.data() });
+                    allUstaz.push({ id: doc.id, ...doc.data() });
                 });
-                renderUstazTable(ustazList);
+                updateStats();
+                renderUstazTable();
             } catch(e) { console.error(e); }
         }
         
-        function renderUstazTable(ustazList) {
+        function updateStats() {
+            const total = allUstaz.length;
+            let totalAssignments = 0;
+            allUstaz.forEach(u => totalAssignments += (u.assignedQirats || []).length);
+            const avgPerUstaz = total > 0 ? (totalAssignments / total).toFixed(1) : 0;
+            
+            document.getElementById('totalUstaz').textContent = total;
+            document.getElementById('totalAssignments').textContent = totalAssignments;
+            document.getElementById('avgPerUstaz').textContent = avgPerUstaz;
+        }
+        
+        function getFilteredUstaz() {
+            let filtered = [...allUstaz];
+            
+            if (searchTerm) {
+                filtered = filtered.filter(u => 
+                    u.ustazName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    (u.fullName || '').toLowerCase().includes(searchTerm.toLowerCase())
+                );
+            }
+            
+            if (filterQirat) {
+                filtered = filtered.filter(u => (u.assignedQirats || []).includes(filterQirat));
+            }
+            
+            return filtered;
+        }
+        
+        function renderUstazTable() {
+            const filtered = getFilteredUstaz();
             const tbody = document.getElementById('ustazTableBody');
-            if (ustazList.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" class="text-center py-8 text-gray-500">No Ustaz accounts found</td></tr>';
+            document.getElementById('ustazCount').textContent = `(${filtered.length} ustaz)`;
+            
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-gray-500">No Ustaz accounts found</td></tr>';
                 return;
             }
             
-            tbody.innerHTML = ustazList.map(ustaz => `
-                <tr class="border-b hover:bg-gray-50">
-                    <td class="px-4 py-3 font-medium">${escapeHtml(ustaz.ustazName)}</td>
-                    <td class="px-4 py-3">${escapeHtml(ustaz.fullName || ustaz.ustazName)}</td>
+            tbody.innerHTML = filtered.map((ustaz, idx) => `
+                <tr class="border-b hover:bg-gray-50 transition">
+                    <td class="px-4 py-3 text-gray-500">${idx + 1}</td>
+                    <td class="px-4 py-3 font-medium text-gray-800">${escapeHtml(ustaz.ustazName)}</td>
+                    <td class="px-4 py-3 text-gray-600">${escapeHtml(ustaz.fullName || ustaz.ustazName)}</td>
                     <td class="px-4 py-3">
                         <div class="flex flex-wrap gap-1">
-                            ${(ustaz.assignedQirats || []).map(q => `<span class="px-2 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs">${escapeHtml(q)}</span>`).join('')}
-                            ${(!ustaz.assignedQirats || ustaz.assignedQirats.length === 0) ? '<span class="text-gray-400">No qirats assigned</span>' : ''}
+                            ${(ustaz.assignedQirats || []).slice(0, 3).map(q => `<span class="qirat-tag text-xs">${escapeHtml(q)}</span>`).join('')}
+                            ${(ustaz.assignedQirats || []).length > 3 ? `<span class="text-xs text-gray-400">+${ustaz.assignedQirats.length - 3}</span>` : ''}
+                            ${(!ustaz.assignedQirats || ustaz.assignedQirats.length === 0) ? '<span class="text-gray-400 text-xs">No qirats assigned</span>' : ''}
                         </div>
                     </td>
                     <td class="px-4 py-3 text-center">
-                        <button onclick="resetPassword('${ustaz.id}', '${escapeHtml(ustaz.ustazName)}')" class="px-3 py-1 bg-yellow-500 text-white rounded-lg text-sm mr-2 hover:bg-yellow-600">
-                            <i class="fas fa-key"></i> Reset Password
-                        </button>
-                        <button onclick="deleteUstaz('${ustaz.id}', '${escapeHtml(ustaz.ustazName)}')" class="px-3 py-1 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600">
-                            <i class="fas fa-trash"></i> Delete
-                        </button>
+                        <span class="status-badge status-active"><i class="fas fa-check-circle mr-1"></i>Active</span>
+                    </td>
+                    <td class="px-4 py-3 text-center">
+                        <div class="flex justify-center gap-2">
+                            <button onclick="openEditModal('${ustaz.id}')" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="openResetModal('${ustaz.id}', '${escapeHtml(ustaz.ustazName)}')" class="p-2 text-yellow-600 hover:bg-yellow-50 rounded-lg transition" title="Reset Password">
+                                <i class="fas fa-key"></i>
+                            </button>
+                            <button onclick="openDeleteModal('${ustaz.id}', '${escapeHtml(ustaz.ustazName)}')" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
                     </td>
                 </tr>
             `).join('');
         }
         
-        function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
-        
         window.createUstaz = async () => {
             const ustazName = document.getElementById('ustazName').value.trim();
             const fullName = document.getElementById('fullName').value.trim();
             const password = document.getElementById('password').value.trim();
-            const assignedQiratsSelect = document.getElementById('assignedQirats');
-            const assignedQirats = Array.from(assignedQiratsSelect.selectedOptions).map(opt => opt.value);
+            const assignedQirats = Array.from(document.querySelectorAll('#qiratsCheckboxList input[type="checkbox"]:checked')).map(cb => cb.value);
             
             if (!ustazName || !password) {
                 showToast('Ustaz name and password are required', true);
@@ -197,43 +556,172 @@
                     fullName: fullName || ustazName,
                     password: password,
                     assignedQirats: assignedQirats,
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
                 });
                 
-                showToast(`Ustaz account created for ${ustazName}`);
-                document.getElementById('ustazName').value = '';
-                document.getElementById('fullName').value = '';
-                document.getElementById('password').value = '';
-                loadUstazList();
+                showToast(`✅ Ustaz account created for ${ustazName}`);
+                clearForm();
+                await loadUstazList();
             } catch(e) {
                 showToast('Error creating account', true);
             }
         };
         
-        window.resetPassword = async (ustazId, ustazName) => {
-            const newPassword = prompt(`Enter new password for ${ustazName}:`);
-            if (newPassword && newPassword.trim()) {
-                try {
-                    await setDoc(doc(db, "ustazCredentials", ustazId), { password: newPassword.trim() }, { merge: true });
-                    showToast(`Password reset for ${ustazName}`);
-                } catch(e) {
-                    showToast('Error resetting password', true);
-                }
+        window.openEditModal = async (ustazId) => {
+            currentEditId = ustazId;
+            const ustaz = allUstaz.find(u => u.id === ustazId);
+            if (!ustaz) return;
+            
+            document.getElementById('editFullName').value = ustaz.fullName || ustaz.ustazName;
+            
+            const container = document.getElementById('editQiratsList');
+            container.innerHTML = allQirats.map(q => `
+                <label class="flex items-center gap-2 p-1 hover:bg-gray-100 rounded cursor-pointer">
+                    <input type="checkbox" value="${escapeHtml(q)}" class="edit-qirat-checkbox w-4 h-4" ${(ustaz.assignedQirats || []).includes(q) ? 'checked' : ''}>
+                    <span class="text-sm">${escapeHtml(q)}</span>
+                </label>
+            `).join('');
+            
+            document.getElementById('editModal').classList.add('active');
+        };
+        
+        window.saveEditUstaz = async () => {
+            if (!currentEditId) return;
+            
+            const fullName = document.getElementById('editFullName').value.trim();
+            const assignedQirats = Array.from(document.querySelectorAll('#editQiratsList input[type="checkbox"]:checked')).map(cb => cb.value);
+            
+            try {
+                await updateDoc(doc(db, "ustazCredentials", currentEditId), {
+                    fullName: fullName,
+                    assignedQirats: assignedQirats,
+                    updatedAt: new Date().toISOString()
+                });
+                
+                showToast('Ustaz account updated successfully');
+                closeEditModal();
+                await loadUstazList();
+            } catch(e) {
+                showToast('Error updating account', true);
             }
         };
         
-        window.deleteUstaz = async (ustazId, ustazName) => {
-            if (confirm(`Are you sure you want to delete ${ustazName}'s account?`)) {
-                try {
-                    await deleteDoc(doc(db, "ustazCredentials", ustazId));
-                    showToast(`Deleted account for ${ustazName}`);
-                    loadUstazList();
-                } catch(e) {
-                    showToast('Error deleting account', true);
-                }
+        window.closeEditModal = () => {
+            document.getElementById('editModal').classList.remove('active');
+            currentEditId = null;
+        };
+        
+        window.openResetModal = (ustazId, ustazName) => {
+            currentResetId = ustazId;
+            document.getElementById('resetUstazName').textContent = ustazName;
+            document.getElementById('newPassword').value = generateRandomPassword();
+            document.getElementById('resetModal').classList.add('active');
+        };
+        
+        window.confirmResetPassword = async () => {
+            const newPassword = document.getElementById('newPassword').value.trim();
+            if (!newPassword) {
+                showToast('Please enter a password', true);
+                return;
+            }
+            
+            try {
+                await updateDoc(doc(db, "ustazCredentials", currentResetId), {
+                    password: newPassword,
+                    updatedAt: new Date().toISOString()
+                });
+                showToast('Password reset successfully');
+                closeResetModal();
+            } catch(e) {
+                showToast('Error resetting password', true);
             }
         };
         
+        window.closeResetModal = () => {
+            document.getElementById('resetModal').classList.remove('active');
+            currentResetId = null;
+        };
+        
+        window.openDeleteModal = (ustazId, ustazName) => {
+            currentDeleteId = ustazId;
+            document.getElementById('deleteUstazName').textContent = ustazName;
+            document.getElementById('deleteModal').classList.add('active');
+        };
+        
+        window.confirmDeleteUstaz = async () => {
+            if (!currentDeleteId) return;
+            
+            try {
+                await deleteDoc(doc(db, "ustazCredentials", currentDeleteId));
+                showToast('Ustaz account deleted');
+                closeDeleteModal();
+                await loadUstazList();
+            } catch(e) {
+                showToast('Error deleting account', true);
+            }
+        };
+        
+        window.closeDeleteModal = () => {
+            document.getElementById('deleteModal').classList.remove('active');
+            currentDeleteId = null;
+        };
+        
+        window.resetFilters = () => {
+            document.getElementById('searchUstaz').value = '';
+            document.getElementById('filterQirat').value = '';
+            searchTerm = '';
+            filterQirat = '';
+            renderUstazTable();
+        };
+        
+        window.exportToCSV = () => {
+            const filtered = getFilteredUstaz();
+            const data = filtered.map(u => ({
+                'Ustaz Name': u.ustazName,
+                'Full Name': u.fullName || u.ustazName,
+                'Assigned Qirats': (u.assignedQirats || []).join(', '),
+                'Created At': u.createdAt ? new Date(u.createdAt).toLocaleDateString() : '-'
+            }));
+            
+            const ws = XLSX.utils.json_to_sheet(data);
+            const csv = XLSX.utils.sheet_to_csv(ws);
+            const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `ustaz_accounts_${new Date().toISOString().slice(0, 19)}.csv`;
+            link.click();
+            showToast('CSV exported');
+        };
+        
+        window.exportToExcel = () => {
+            const filtered = getFilteredUstaz();
+            const data = filtered.map(u => ({
+                'Ustaz Name': u.ustazName,
+                'Full Name': u.fullName || u.ustazName,
+                'Assigned Qirats': (u.assignedQirats || []).join(', '),
+                'Created At': u.createdAt ? new Date(u.createdAt).toLocaleDateString() : '-'
+            }));
+            
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'UstazAccounts');
+            XLSX.writeFile(wb, `ustaz_accounts_${new Date().toISOString().slice(0, 19)}.xlsx`);
+            showToast('Excel exported');
+        };
+        
+        // Event listeners for filters
+        document.getElementById('searchUstaz').addEventListener('input', (e) => {
+            searchTerm = e.target.value;
+            renderUstazTable();
+        });
+        
+        document.getElementById('filterQirat').addEventListener('change', (e) => {
+            filterQirat = e.target.value;
+            renderUstazTable();
+        });
+        
+        // Initialize
         loadQirats();
         loadUstazList();
     </script>
