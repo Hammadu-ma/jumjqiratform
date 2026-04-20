@@ -136,6 +136,15 @@
             to { opacity: 1; transform: translateX(0); }
         }
         
+        .status-badge {
+            padding: 2px 8px;
+            border-radius: 9999px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .status-passing { background: #d1fae5; color: #065f46; }
+        .status-warning { background: #fed7aa; color: #9b3412; }
+        
         @media (max-width: 768px) {
             .assessment-table th,
             .assessment-table td {
@@ -149,14 +158,19 @@
     <div class="max-w-6xl mx-auto">
         <!-- Header -->
         <div class="glass-card p-6 mb-6 gradient-header text-white">
-            <div class="flex justify-between items-center">
+            <div class="flex justify-between items-center flex-wrap gap-4">
                 <div>
                     <h1 class="text-2xl md:text-3xl font-bold" id="studentName">Student Dashboard</h1>
-                    <p class="text-white/80 mt-1">Your Academic Performance Summary</p>
+                    <p class="text-white/80 mt-1" id="studentInfo">Loading your information...</p>
                 </div>
-                <button onclick="logout()" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-xl transition">
-                    <i class="fas fa-sign-out-alt mr-2"></i>Logout
-                </button>
+                <div class="flex gap-3">
+                    <button onclick="window.location.href='student-login.html'" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-xl transition">
+                        <i class="fas fa-sync-alt mr-2"></i>Refresh
+                    </button>
+                    <button onclick="logout()" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-xl transition">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                    </button>
+                </div>
             </div>
         </div>
         
@@ -303,7 +317,7 @@
             const allAvgs = allStudents.map(s => ({
                 id: s.id,
                 avg: calculateStudentOverallAvg(s.id)
-            })).sort((a, b) => (b.avg || 0) - (a.avg || 0));
+            })).filter(a => a.avg !== null).sort((a, b) => (b.avg || 0) - (a.avg || 0));
             const rank = allAvgs.findIndex(s => s.id === studentId) + 1;
             return rank > 0 ? rank : allAvgs.length;
         }
@@ -315,7 +329,7 @@
             const deptAvgs = deptStudents.map(s => ({
                 id: s.id,
                 avg: calculateStudentOverallAvg(s.id)
-            })).sort((a, b) => (b.avg || 0) - (a.avg || 0));
+            })).filter(a => a.avg !== null).sort((a, b) => (b.avg || 0) - (a.avg || 0));
             const rank = deptAvgs.findIndex(s => s.id === studentId) + 1;
             return rank > 0 ? rank : deptAvgs.length;
         }
@@ -326,7 +340,7 @@
             const ranked = studentsInQirat.map(s => ({
                 id: s.id,
                 avg: calculateAverage(examScores.get(s.id)?.[qiratName] || {}, assessments)
-            })).sort((a, b) => (b.avg || 0) - (a.avg || 0));
+            })).filter(a => a.avg !== null).sort((a, b) => (b.avg || 0) - (a.avg || 0));
             const rank = ranked.findIndex(s => s.id === studentId) + 1;
             return rank > 0 ? rank : studentsInQirat.length;
         }
@@ -341,7 +355,7 @@
             const ranked = deptStudents.map(s => ({
                 id: s.id,
                 avg: calculateAverage(examScores.get(s.id)?.[qiratName] || {}, assessments)
-            })).sort((a, b) => (b.avg || 0) - (a.avg || 0));
+            })).filter(a => a.avg !== null).sort((a, b) => (b.avg || 0) - (a.avg || 0));
             const rank = ranked.findIndex(s => s.id === studentId) + 1;
             return rank > 0 ? rank : deptStudents.length;
         }
@@ -408,7 +422,12 @@
                         id: studentDoc.id,
                         ...studentDoc.data()
                     };
-                    document.getElementById('studentName').textContent = `Welcome, ${studentData.full_name || studentData.first_name || 'Student'}`;
+                    const fullName = localStorage.getItem('studentFullName') || studentData.full_name || 'Student';
+                    const department = studentData.department || localStorage.getItem('studentDepartment') || 'Not Specified';
+                    const batch = studentData.batch || localStorage.getItem('studentBatch') || 'General';
+                    
+                    document.getElementById('studentName').textContent = `Welcome, ${fullName}`;
+                    document.getElementById('studentInfo').innerHTML = `<i class="fas fa-building mr-1"></i>${department} | <i class="fas fa-calendar mr-1"></i>${batch}`;
                 } else {
                     showToast('Student record not found', true);
                     logout();
@@ -428,8 +447,8 @@
             
             document.getElementById('totalQirats').textContent = qirats.length;
             document.getElementById('avgScore').textContent = (overallAvg !== null ? overallAvg : 0) + '%';
-            document.getElementById('globalRank').textContent = `#${globalRank}`;
-            document.getElementById('deptRank').textContent = `#${deptRank}`;
+            document.getElementById('globalRank').textContent = globalRank > 0 ? `#${globalRank}` : '-';
+            document.getElementById('deptRank').textContent = deptRank > 0 ? `#${deptRank}` : '-';
         }
         
         function renderPerformanceChart() {
@@ -468,11 +487,16 @@
                         y: {
                             beginAtZero: true,
                             max: 100,
-                            grid: { color: 'rgba(0,0,0,0.05)' }
+                            grid: { color: 'rgba(0,0,0,0.05)' },
+                            title: { display: true, text: 'Score Percentage (%)' }
+                        },
+                        x: {
+                            ticks: { rotation: labels.length > 4 ? 45 : 0 }
                         }
                     },
                     plugins: {
-                        legend: { position: 'bottom' }
+                        legend: { position: 'bottom' },
+                        tooltip: { callbacks: { label: (ctx) => `${ctx.raw}%` } }
                     }
                 }
             });
@@ -512,6 +536,7 @@
                 const avg = calculateAverage(scores, assessments);
                 const totalPoints = calculateTotalPoints(scores, assessments);
                 const totalPossible = calculateTotalPossible(assessments);
+                const totalPercent = totalPossible > 0 ? Math.round((totalPoints / totalPossible) * 100) : 0;
                 const qiratGlobalRank = calculateQiratGlobalRank(studentId, q);
                 const qiratDeptRank = calculateQiratDepartmentRank(studentId, q);
                 const studentsInQirat = allStudents.filter(s => getQiratNames(s).includes(q));
@@ -522,16 +547,17 @@
                     const ass = assessments[a];
                     const score = scores[`assessment${a + 1}`];
                     const percent = calculatePercentage(score, ass.outOf);
+                    const statusClass = percent !== null ? (percent >= 70 ? 'status-passing' : (percent >= 50 ? 'status-warning' : '')) : '';
                     assessmentRows += `
                         <tr>
-                            <td class="py-2 text-left">${escapeHtml(ass.name)}</td>
+                            <td class="py-2 text-left">${escapeHtml(ass.name)}</span></td>
                             <td class="py-2 text-center">
-                                <span class="font-semibold">${score !== null ? score : '-'}</span>
-                            </td>
-                            <td class="py-2 text-center">/${ass.outOf}</td>
-                            <td class="py-2 text-center ${percent >= 70 ? 'text-emerald-600' : 'text-yellow-600'}">
+                                <span class="font-semibold ${statusClass}">${score !== null ? score : '-'}</span>
+                            </span></td>
+                            <td class="py-2 text-center">/${ass.outOf}</span></td>
+                            <td class="py-2 text-center ${percent !== null && percent >= 70 ? 'text-emerald-600 font-semibold' : (percent !== null && percent >= 50 ? 'text-orange-600' : 'text-gray-500')}">
                                 ${percent !== null ? percent + '%' : '-'}
-                            </td>
+                            </span></td>
                         </tr>
                     `;
                 }
@@ -548,6 +574,7 @@
                                         <span class="qirat-stat-item">🌍 Global Rank: #${qiratGlobalRank}/${studentsInQirat.length}</span>
                                         <span class="qirat-stat-item">🏢 Dept Rank: #${qiratDeptRank}/${studentsInDeptQirat.length}</span>
                                         <span class="qirat-stat-item">📊 Avg: ${avg !== null ? avg + '%' : '-'}</span>
+                                        <span class="qirat-stat-item">📝 Total: ${totalPoints}/${totalPossible} (${totalPercent}%)</span>
                                     </div>
                                     <i id="qirat-icon-${i}" class="fas fa-chevron-down text-gray-400 transition-transform rotate-icon"></i>
                                 </div>
@@ -567,13 +594,16 @@
                                     <tbody>
                                         ${assessmentRows}
                                         <tr class="bg-emerald-50">
-                                            <td class="py-2 font-semibold text-left">Summary</td>
-                                            <td class="py-2 text-center font-bold text-emerald-600">${totalPoints}/${totalPossible}</td>
-                                            <td class="py-2 text-center"></td>
-                                            <td class="py-2 text-center font-bold text-emerald-600">${avg !== null ? avg + '%' : '-'}</td>
+                                            <td class="py-2 font-semibold text-left">Summary</span>
+                                            <td class="py-2 text-center font-bold text-emerald-600">${totalPoints}/${totalPossible}</span>
+                                            <td class="py-2 text-center"></span>
+                                            <td class="py-2 text-center font-bold text-emerald-600">${avg !== null ? avg + '%' : '-'}</span>
                                         </tr>
                                     </tbody>
                                 </table>
+                            </div>
+                            <div class="mt-3 text-center text-xs text-gray-500">
+                                <i class="fas fa-chart-line mr-1"></i> Performance: ${avg !== null ? (avg >= 85 ? 'Excellent! 🎉' : (avg >= 70 ? 'Good job! 👍' : (avg >= 50 ? 'Keep improving! 📚' : 'Needs attention 📖'))) : 'No data available'}
                             </div>
                         </div>
                     </div>
@@ -588,7 +618,11 @@
             localStorage.removeItem('studentId');
             localStorage.removeItem('studentFirstName');
             localStorage.removeItem('studentFullName');
+            localStorage.removeItem('studentDepartment');
+            localStorage.removeItem('studentBatch');
             localStorage.removeItem('studentEmail');
+            localStorage.removeItem('studentPhone');
+            localStorage.removeItem('studentLoginTime');
             window.location.href = 'student-login.html';
         };
         
