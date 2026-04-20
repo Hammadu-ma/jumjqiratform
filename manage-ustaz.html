@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Admin | Manage Ustaz Accounts</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 1.5rem;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+            background: #1f2937;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(100%); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-emerald-50 to-teal-50 p-4 md:p-8">
+    <div class="max-w-7xl mx-auto">
+        <div class="glass-card p-6 mb-6">
+            <div class="flex justify-between items-center flex-wrap gap-4">
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-bold text-emerald-700">
+                        <i class="fas fa-chalkboard-user mr-2"></i>Manage Ustaz Accounts
+                    </h1>
+                    <p class="text-gray-500 mt-1">Create and manage Ustaz login credentials with Qirat assignments</p>
+                </div>
+                <button onclick="window.location.href='index.html'" class="px-4 py-2 bg-gray-200 rounded-xl hover:bg-gray-300 transition">
+                    <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
+                </button>
+            </div>
+        </div>
+
+        <!-- Create New Ustaz Account -->
+        <div class="glass-card p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4"><i class="fas fa-user-plus text-emerald-500 mr-2"></i>Create New Ustaz Account</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <input type="text" id="ustazName" placeholder="Ustaz Name (username)" class="px-4 py-2 border rounded-xl">
+                <input type="text" id="fullName" placeholder="Full Name" class="px-4 py-2 border rounded-xl">
+                <input type="password" id="password" placeholder="Password" class="px-4 py-2 border rounded-xl">
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-2">Assign Qirats (select multiple)</label>
+                <select id="assignedQirats" multiple class="w-full px-4 py-2 border rounded-xl h-32">
+                    <!-- Will be populated dynamically -->
+                </select>
+                <p class="text-xs text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple Qirats</p>
+            </div>
+            <button onclick="createUstaz()" class="btn-primary px-6 py-2 rounded-xl text-white font-semibold">
+                <i class="fas fa-plus mr-2"></i>Create Ustaz Account
+            </button>
+        </div>
+
+        <!-- Ustaz List -->
+        <div class="glass-card p-6">
+            <h2 class="text-xl font-semibold mb-4"><i class="fas fa-users text-emerald-500 mr-2"></i>Ustaz Accounts</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="px-4 py-3 text-left">Ustaz Name</th>
+                            <th class="px-4 py-3 text-left">Full Name</th>
+                            <th class="px-4 py-3 text-left">Assigned Qirats</th>
+                            <th class="px-4 py-3 text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ustazTableBody">
+                        <tr><td colspan="4" class="text-center py-8 text-gray-500">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast hidden"></div>
+
+    <script type="module">
+        import { protectPage } from './auth.js';
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, doc, setDoc, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        
+        if (!protectPage('admin-login.html')) throw new Error('Redirecting');
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyAR_g5y04YAGCrTvZCowrE7hw8h7k1du08",
+            authDomain: "jujm-qirat.firebaseapp.com",
+            projectId: "jujm-qirat",
+            storageBucket: "jujm-qirat.firebasestorage.app",
+            messagingSenderId: "253413984903",
+            appId: "1:253413984903:web:c1577e0fdef1711f960622"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        
+        let allQirats = [];
+        
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.innerHTML = `<i class="fas ${isError ? 'fa-exclamation-triangle' : 'fa-check-circle'} mr-2"></i> ${message}`;
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 3000);
+        }
+        
+        async function loadQirats() {
+            try {
+                const snapshot = await getDocs(collection(db, "registrations"));
+                const qiratSet = new Set();
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    (data.schedules || []).forEach(s => {
+                        if (s.qirat_name) qiratSet.add(s.qirat_name);
+                    });
+                });
+                allQirats = Array.from(qiratSet).sort();
+                const select = document.getElementById('assignedQirats');
+                select.innerHTML = allQirats.map(q => `<option value="${q}">${q}</option>`).join('');
+            } catch(e) { console.warn(e); }
+        }
+        
+        async function loadUstazList() {
+            try {
+                const snapshot = await getDocs(collection(db, "ustazCredentials"));
+                const ustazList = [];
+                snapshot.forEach(doc => {
+                    ustazList.push({ id: doc.id, ...doc.data() });
+                });
+                renderUstazTable(ustazList);
+            } catch(e) { console.error(e); }
+        }
+        
+        function renderUstazTable(ustazList) {
+            const tbody = document.getElementById('ustazTableBody');
+            if (ustazList.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center py-8 text-gray-500">No Ustaz accounts found</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = ustazList.map(ustaz => `
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="px-4 py-3 font-medium">${escapeHtml(ustaz.ustazName)}</td>
+                    <td class="px-4 py-3">${escapeHtml(ustaz.fullName || ustaz.ustazName)}</td>
+                    <td class="px-4 py-3">
+                        <div class="flex flex-wrap gap-1">
+                            ${(ustaz.assignedQirats || []).map(q => `<span class="px-2 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs">${escapeHtml(q)}</span>`).join('')}
+                            ${(!ustaz.assignedQirats || ustaz.assignedQirats.length === 0) ? '<span class="text-gray-400">No qirats assigned</span>' : ''}
+                        </div>
+                    </td>
+                    <td class="px-4 py-3 text-center">
+                        <button onclick="resetPassword('${ustaz.id}', '${escapeHtml(ustaz.ustazName)}')" class="px-3 py-1 bg-yellow-500 text-white rounded-lg text-sm mr-2 hover:bg-yellow-600">
+                            <i class="fas fa-key"></i> Reset Password
+                        </button>
+                        <button onclick="deleteUstaz('${ustaz.id}', '${escapeHtml(ustaz.ustazName)}')" class="px-3 py-1 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
+        
+        window.createUstaz = async () => {
+            const ustazName = document.getElementById('ustazName').value.trim();
+            const fullName = document.getElementById('fullName').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const assignedQiratsSelect = document.getElementById('assignedQirats');
+            const assignedQirats = Array.from(assignedQiratsSelect.selectedOptions).map(opt => opt.value);
+            
+            if (!ustazName || !password) {
+                showToast('Ustaz name and password are required', true);
+                return;
+            }
+            
+            try {
+                const ustazId = `ustaz_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
+                await setDoc(doc(db, "ustazCredentials", ustazId), {
+                    ustazName: ustazName,
+                    fullName: fullName || ustazName,
+                    password: password,
+                    assignedQirats: assignedQirats,
+                    createdAt: new Date().toISOString()
+                });
+                
+                showToast(`Ustaz account created for ${ustazName}`);
+                document.getElementById('ustazName').value = '';
+                document.getElementById('fullName').value = '';
+                document.getElementById('password').value = '';
+                loadUstazList();
+            } catch(e) {
+                showToast('Error creating account', true);
+            }
+        };
+        
+        window.resetPassword = async (ustazId, ustazName) => {
+            const newPassword = prompt(`Enter new password for ${ustazName}:`);
+            if (newPassword && newPassword.trim()) {
+                try {
+                    await setDoc(doc(db, "ustazCredentials", ustazId), { password: newPassword.trim() }, { merge: true });
+                    showToast(`Password reset for ${ustazName}`);
+                } catch(e) {
+                    showToast('Error resetting password', true);
+                }
+            }
+        };
+        
+        window.deleteUstaz = async (ustazId, ustazName) => {
+            if (confirm(`Are you sure you want to delete ${ustazName}'s account?`)) {
+                try {
+                    await deleteDoc(doc(db, "ustazCredentials", ustazId));
+                    showToast(`Deleted account for ${ustazName}`);
+                    loadUstazList();
+                } catch(e) {
+                    showToast('Error deleting account', true);
+                }
+            }
+        };
+        
+        loadQirats();
+        loadUstazList();
+    </script>
+</body>
+</html>
