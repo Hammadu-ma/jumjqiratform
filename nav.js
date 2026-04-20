@@ -13,6 +13,7 @@ export const NAVIGATION_ITEMS = [
     { path: 'index.html', name: 'Home', icon: 'fa-home', mobileOnly: false, role: 'all' },
     { path: 'groups.html', name: 'Groups', icon: 'fa-layer-group', mobileOnly: false, role: 'all' },
     { path: 'tables.html', name: 'Tables', icon: 'fa-table', mobileOnly: false, role: 'all' },
+    { path: 'password.html', name: 'password, icon: 'fa-key', mobileOnly: false, role: 'all' },
     { path: 'exam.html', name: 'Exam', icon: 'fa-book', mobileOnly: false, role: 'all' },
     { path: 'analytics.html', name: 'Analytics', icon: 'fa-chart-line', mobileOnly: false, role: 'all' },
     { path: 'manage-ustaz.html', name: 'Ustazes', icon: 'fa-chart-line', mobileOnly: false, role: 'all' },
