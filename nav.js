@@ -15,6 +15,7 @@ export const NAVIGATION_ITEMS = [
     { path: 'tables.html', name: 'Tables', icon: 'fa-table', mobileOnly: false, role: 'all' },
     { path: 'exam.html', name: 'Exam', icon: 'fa-book', mobileOnly: false, role: 'all' },
     { path: 'analytics.html', name: 'Analytics', icon: 'fa-chart-line', mobileOnly: false, role: 'all' },
+    { path: 'manage-ustaz.html', name: 'Ustazes', icon: 'fa-chart-line', mobileOnly: false, role: 'all' },
     { path: 'import.html', name: 'Import', icon: 'fa-upload', mobileOnly: false, role: 'all' },
     { path: 'secret-keys.html', name: 'Keys', icon: 'fa-key', mobileOnly: false, role: 'super-admin' },
     { path: 'admin-management.html', name: 'Admins', icon: 'fa-user-shield', mobileOnly: false, role: 'super-admin' }
