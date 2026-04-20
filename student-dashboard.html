@@ -11,229 +11,124 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         :root {
-            --primary: #10b981;
-            --primary-dark: #059669;
-            --primary-light: #d1fae5;
-            --primary-glow: rgba(16, 185, 129, 0.2);
-            --secondary: #6366f1;
-            --accent: #f59e0b;
-            --danger: #ef4444;
-            --dark: #0f172a;
-            --card-bg: rgba(255, 255, 255, 0.98);
-            --text-primary: #0f172a;
-            --text-secondary: #475569;
-            --text-muted: #64748b;
-            --border: #e2e8f0;
-            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+            --glass-bg: rgba(255, 255, 255, 0.07);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --accent-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            --primary-glow: rgba(99, 102, 241, 0.3);
         }
         
-        body {
-            background: linear-gradient(135deg, #f0f9ff 0%, #e6f7f0 100%);
-            min-height: 100vh;
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        body { 
+            background: #0f172a; 
+            color: #f1f5f9; 
+            font-family: 'Inter', system-ui, -apple-system, sans-serif; 
+            min-height: 100vh; 
+            transition: all 0.3s ease; 
+            overflow-x: hidden;
         }
         
-        /* Glass Card - Same as exam modal */
-        .glass-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--border);
-            border-radius: 1.5rem;
-            transition: all 0.3s ease;
-            box-shadow: var(--shadow-sm);
+        body.light-mode { 
+            background: linear-gradient(135deg, #f0f9ff 0%, #e6f7f0 100%); 
+            color: #0f172a; 
         }
         
-        .glass-card:hover {
-            box-shadow: var(--shadow-md);
+        body.light-mode .glass-card { background: rgba(255, 255, 255, 0.95); border-color: #e2e8f0; }
+        body.light-mode .bg-slate-900 { background: #ffffff; }
+        body.light-mode .bg-slate-800 { background: #f1f5f9; }
+        body.light-mode .bg-slate-800\/50 { background: rgba(241, 245, 249, 0.8); }
+        body.light-mode .border-slate-700 { border-color: #e2e8f0; }
+        body.light-mode .text-slate-300, body.light-mode .text-slate-400 { color: #64748b; }
+        body.light-mode .text-slate-500 { color: #475569; }
+        body.light-mode .bg-slate-700 { background: #cbd5e1; color: #0f172a; }
+        body.light-mode .bg-slate-800\/30 { background: rgba(241, 245, 249, 0.8); }
+        
+        .glass-card { 
+            background: var(--glass-bg); 
+            backdrop-filter: blur(12px); 
+            border: 1px solid var(--glass-border); 
+            border-radius: 1.5rem; 
+            transition: all 0.3s ease; 
         }
         
-        /* Gradient Header */
-        .gradient-header {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            border-radius: 1.5rem;
-            position: relative;
-            overflow: hidden;
+        .btn-premium { 
+            background: var(--accent-gradient); 
+            transition: all 0.3s ease; 
         }
         
-        .gradient-header::before {
-            content: "📚";
-            position: absolute;
-            bottom: -20px;
-            right: 20px;
-            font-size: 80px;
-            opacity: 0.1;
-            pointer-events: none;
+        .btn-premium:hover, .btn-premium:active { 
+            transform: translateY(-2px); 
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3); 
         }
         
-        /* Qirat List Card - Matching individual modal style */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
+        
+        .status-badge { 
+            padding: 2px 8px; 
+            border-radius: 9999px; 
+            font-size: 0.7rem; 
+            background: rgba(16, 185, 129, 0.1); 
+            color: #10b981; 
+            border: 1px solid rgba(16, 185, 129, 0.2); 
+            white-space: nowrap;
+        }
+        
         .qirat-list-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(99, 102, 241, 0.2);
             border-radius: 1rem;
             margin-bottom: 1rem;
             overflow: hidden;
             transition: all 0.3s ease;
-            cursor: pointer;
-            box-shadow: var(--shadow-sm);
         }
         
         .qirat-list-card:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
-            border-color: var(--primary);
+            border-color: rgba(99, 102, 241, 0.5);
+            transform: translateX(4px);
         }
         
         .qirat-list-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1rem 1.25rem;
-            background: #f8fafc;
+            padding: 1rem;
+            cursor: pointer;
+            background: rgba(0, 0, 0, 0.2);
             transition: all 0.2s;
-            border-bottom: 1px solid transparent;
+            flex-wrap: wrap;
+            gap: 8px;
         }
         
-        .qirat-list-header.active {
-            background: var(--primary-light);
-            border-bottom-color: var(--primary-light);
-        }
+        .qirat-list-header:hover { background: rgba(99, 102, 241, 0.1); }
+        .qirat-list-header.active { background: rgba(99, 102, 241, 0.15); }
         
         .qirat-stat-item {
-            background: rgba(16, 185, 129, 0.1);
-            padding: 0.2rem 0.75rem;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.2rem 0.6rem;
             border-radius: 20px;
-            font-size: 0.7rem;
-            color: var(--primary-dark);
-            font-weight: 500;
+            font-size: 0.65rem;
+            white-space: nowrap;
         }
         
         .qirat-dropdown-content {
             display: none;
-            padding: 1.25rem;
-            border-top: 1px solid var(--border);
-            background: white;
+            padding: 1rem;
+            border-top: 1px solid rgba(99, 102, 241, 0.2);
+            background: rgba(0, 0, 0, 0.15);
         }
         
-        .qirat-dropdown-content.show {
-            display: block;
-            animation: slideDown 0.3s ease;
-        }
-        
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .qirat-dropdown-content.show { display: block; animation: slideDown 0.3s ease; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
         
         .rotate-icon { transition: transform 0.3s ease; }
         .rotate-icon.rotated { transform: rotate(180deg); }
         
-        /* Assessment Table - Same as exam modal */
-        .assessment-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.8rem;
-        }
+        .assessment-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
+        .assessment-table th, .assessment-table td { padding: 0.75rem; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+        .assessment-table th { background: rgba(99, 102, 241, 0.2); font-weight: 600; }
         
-        .assessment-table th,
-        .assessment-table td {
-            padding: 0.75rem;
-            text-align: center;
-            border-bottom: 1px solid var(--border);
-        }
+        body.light-mode .assessment-table td { border-bottom-color: #e2e8f0; }
         
-        .assessment-table th {
-            background: #f8fafc;
-            font-weight: 600;
-            color: var(--text-primary);
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .assessment-table tr:last-child td {
-            border-bottom: none;
-        }
-        
-        /* Status Badges */
-        .status-badge {
-            padding: 2px 8px;
-            border-radius: 9999px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            display: inline-block;
-        }
-        
-        .status-passing { background: #d1fae5; color: #065f46; }
-        .status-warning { background: #fed7aa; color: #9b3412; }
-        .status-excellent { background: #c7d2fe; color: #3730a3; }
-        
-        /* Rank Badges */
-        .rank-badge {
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            color: #78350f;
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            display: inline-block;
-        }
-        
-        .rank-badge.global {
-            background: linear-gradient(135deg, #6366f1, #a855f7);
-            color: white;
-        }
-        
-        /* Stats Cards */
-        .stat-card {
-            background: var(--card-bg);
-            border-radius: 1rem;
-            padding: 1rem;
-            text-align: center;
-            border: 1px solid var(--border);
-            transition: all 0.3s ease;
-        }
-        
-        .stat-card:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-            border-color: var(--primary);
-        }
-        
-        .stat-value {
-            font-size: 1.8rem;
-            font-weight: 800;
-            color: var(--primary-dark);
-        }
-        
-        .stat-label {
-            font-size: 0.7rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-top: 0.25rem;
-        }
-        
-        /* Button Styles */
-        .btn-outline {
-            background: transparent;
-            border: 1px solid var(--border);
-            padding: 0.5rem 1rem;
-            border-radius: 2rem;
-            font-weight: 500;
-            transition: all 0.2s;
-            cursor: pointer;
-        }
-        
-        .btn-outline:hover {
-            background: var(--primary-light);
-            border-color: var(--primary);
-            color: var(--primary-dark);
-        }
-        
-        /* Toast */
         .toast {
             position: fixed;
             bottom: 20px;
@@ -244,7 +139,7 @@
             color: white;
             padding: 12px 24px;
             border-radius: 50px;
-            box-shadow: var(--shadow-lg);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
         
         @keyframes slideIn {
@@ -252,99 +147,169 @@
             to { opacity: 1; transform: translateX(0); }
         }
         
-        /* Score Highlight */
-        .score-highlight {
-            font-weight: 700;
-            color: var(--primary-dark);
+        .theme-toggle { cursor: pointer; transition: all 0.3s; }
+        .theme-toggle:hover, .theme-toggle:active { transform: rotate(15deg); }
+        
+        .desktop-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+            padding: 0.75rem 1.5rem;
         }
         
-        /* Progress Bar */
-        .progress-bar {
-            height: 6px;
-            background: var(--border);
-            border-radius: 10px;
-            overflow: hidden;
+        body.light-mode .desktop-nav {
+            background: rgba(255, 255, 255, 0.95);
         }
         
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
-            border-radius: 10px;
-            transition: width 0.5s;
+        .nav-link {
+            padding: 0.5rem 1rem;
+            border-radius: 0.75rem;
+            transition: all 0.2s;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #64748b;
         }
         
-        /* Responsive */
+        .nav-link:hover { background: rgba(99, 102, 241, 0.1); color: #6366f1; }
+        .nav-link.active { background: #6366f1; color: white; }
+        
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 10px 16px 20px;
+            border-top: 1px solid rgba(99, 102, 241, 0.2);
+            z-index: 200;
+            display: none;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 40px;
+            color: #64748b;
+            transition: all 0.2s;
+        }
+        
+        .nav-item i { font-size: 1.2rem; }
+        .nav-item span { font-size: 0.6rem; font-weight: 500; }
+        .nav-item.active { color: #6366f1; background: rgba(99, 102, 241, 0.15); }
+        
         @media (max-width: 768px) {
-            body { padding: 1rem; }
-            .assessment-table th,
-            .assessment-table td { padding: 0.5rem; font-size: 0.7rem; }
-            .qirat-list-header { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
-            .stat-value { font-size: 1.3rem; }
+            body { padding-bottom: 70px; padding-top: 60px; }
+            .desktop-nav { display: none; }
+            .bottom-nav { display: flex; }
+            .assessment-table th, .assessment-table td { padding: 0.5rem; font-size: 0.7rem; }
+            .qirat-list-header { flex-direction: column; align-items: flex-start; }
+        }
+        
+        @media (min-width: 769px) {
+            body { padding-top: 70px; }
+            .bottom-nav { display: none; }
+            .desktop-nav { display: block; }
         }
     </style>
 </head>
-<body class="p-4 md:p-8">
-    <div class="max-w-6xl mx-auto">
-        <!-- Header - Matching exam modal style -->
-        <div class="gradient-header p-6 mb-6 text-white">
-            <div class="flex justify-between items-center flex-wrap gap-4">
+<body>
+
+    <!-- Desktop Navigation -->
+    <div class="desktop-nav">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-graduation-cap text-indigo-400 text-xl"></i>
+                <span class="font-bold text-lg">Student Portal</span>
+            </div>
+            <div class="flex gap-1">
+                <a href="student-dashboard.html" class="nav-link active">Dashboard</a>
+                <a href="student-login.html" class="nav-link" onclick="logout()">Logout</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-6xl mx-auto px-3 md:px-0">
+        <!-- Student Header Card - Matching Individual Modal -->
+        <div class="glass-card p-6 mb-6">
+            <div class="flex justify-between items-start flex-wrap gap-4">
                 <div>
-                    <h1 class="text-2xl md:text-3xl font-bold">
-                        <i class="fas fa-user-graduate mr-3"></i>My Academic Dashboard
-                    </h1>
-                    <p class="text-white/80 mt-1 text-sm" id="studentInfo">Loading your information...</p>
+                    <h1 class="text-2xl md:text-3xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent" id="studentName">Student Dashboard</h1>
+                    <p class="text-slate-400 mt-1 text-sm" id="studentInfo">Loading your information...</p>
                 </div>
                 <div class="flex gap-3">
-                    <button onclick="refreshDashboard()" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-xl transition text-sm font-medium">
+                    <button onclick="toggleTheme()" class="theme-toggle p-2 rounded-full bg-slate-700 hover:bg-slate-600 transition-all">
+                        <i id="themeIcon" class="fas fa-moon text-yellow-400"></i>
+                    </button>
+                    <button onclick="refreshDashboard()" class="btn-premium px-4 py-2 rounded-xl text-sm font-semibold">
                         <i class="fas fa-sync-alt mr-2"></i>Refresh
                     </button>
-                    <button onclick="logout()" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-xl transition text-sm font-medium">
+                    <button onclick="logout()" class="px-4 py-2 rounded-xl text-sm font-semibold bg-slate-700 hover:bg-slate-600 transition-all">
                         <i class="fas fa-sign-out-alt mr-2"></i>Logout
                     </button>
                 </div>
             </div>
         </div>
-        
-        <!-- Stats Cards - Matching exam modal KPI style -->
+
+        <!-- Stats Cards - Same as Individual Modal -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6" id="statsContainer">
-            <div class="stat-card">
-                <div class="stat-value" id="totalQirats">0</div>
-                <div class="stat-label">Total Qirats</div>
+            <div class="glass-card p-4 text-center">
+                <div class="text-slate-400 text-xs uppercase mb-1">Total Qirats</div>
+                <div class="text-3xl font-bold text-indigo-400" id="totalQirats">0</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-value" id="avgScore">0%</div>
-                <div class="stat-label">Average Score</div>
-                <div class="progress-bar mt-2"><div class="progress-fill" id="avgProgressBar" style="width: 0%"></div></div>
+            <div class="glass-card p-4 text-center">
+                <div class="text-slate-400 text-xs uppercase mb-1">Average Score</div>
+                <div class="text-3xl font-bold text-emerald-400" id="avgScore">0%</div>
+                <div class="w-full bg-slate-700 h-1 rounded-full mt-2">
+                    <div class="bg-indigo-500 h-1 rounded-full" id="avgProgressBar" style="width: 0%"></div>
+                </div>
             </div>
-            <div class="stat-card">
-                <div class="stat-value" id="globalRank">-</div>
-                <div class="stat-label">Global Rank</div>
+            <div class="glass-card p-4 text-center">
+                <div class="text-slate-400 text-xs uppercase mb-1">Global Rank</div>
+                <div class="text-3xl font-bold text-yellow-400" id="globalRank">-</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-value" id="deptRank">-</div>
-                <div class="stat-label">Department Rank</div>
+            <div class="glass-card p-4 text-center">
+                <div class="text-slate-400 text-xs uppercase mb-1">Department Rank</div>
+                <div class="text-3xl font-bold text-purple-400" id="deptRank">-</div>
             </div>
         </div>
-        
-        <!-- Performance Chart - Glass card style -->
+
+        <!-- Performance Chart -->
         <div class="glass-card p-6 mb-6">
-            <h3 class="text-lg font-semibold mb-4 text-slate-700">
-                <i class="fas fa-chart-line text-emerald-500 mr-2"></i>Performance Trend
-            </h3>
+            <h3 class="text-lg font-semibold mb-4"><i class="fas fa-chart-line text-indigo-400 mr-2"></i> Performance Trend</h3>
             <canvas id="performanceChart" height="200"></canvas>
         </div>
-        
-        <!-- Qirat Performance Section -->
+
+        <!-- Qirat Performance Section - Matching Individual Modal Style -->
         <div class="glass-card p-6">
-            <h3 class="text-lg font-semibold mb-4 text-slate-700">
-                <i class="fas fa-book-quran text-emerald-500 mr-2"></i>Qirat Performance Details
-            </h3>
+            <h3 class="text-lg font-semibold mb-4"><i class="fas fa-book-quran text-indigo-400 mr-2"></i> Qirat Performance Details</h3>
             <div id="qiratListContainer" class="space-y-3">
-                <div class="text-center py-8 text-slate-500">Loading your data...</div>
+                <div class="text-center py-8 text-slate-400">Loading your data...</div>
             </div>
         </div>
     </div>
-    
+
+    <!-- Bottom Navigation for Mobile -->
+    <div class="bottom-nav">
+        <button class="nav-item active" onclick="window.location.href='student-dashboard.html'"><i class="fas fa-home"></i><span>Home</span></button>
+        <button class="nav-item" onclick="logout()"><i class="fas fa-sign-out-alt"></i><span>Logout</span></button>
+    </div>
+
     <div id="toast" class="toast hidden"></div>
 
     <script type="module">
@@ -368,6 +333,7 @@
         let allStudents = [];
         let qiratAssessmentConfigs = new Map();
         let chart = null;
+        let isLightMode = false;
         
         const defaultAssessments = [
             { name: "Quiz 1", outOf: 30 },
@@ -570,7 +536,8 @@
                 const department = studentData.department || localStorage.getItem('studentDepartment');
                 const batch = studentData.batch || localStorage.getItem('studentBatch');
                 
-                document.getElementById('studentInfo').innerHTML = `<i class="fas fa-building mr-1"></i>${department} | <i class="fas fa-calendar mr-1"></i>${batch} | <i class="fas fa-user mr-1"></i>${fullName}`;
+                document.getElementById('studentName').textContent = fullName;
+                document.getElementById('studentInfo').innerHTML = `<i class="fas fa-building mr-1"></i>${department} | <i class="fas fa-calendar mr-1"></i>${batch}`;
                 
                 return true;
             } catch (e) {
@@ -622,8 +589,8 @@
                         datasets: [{
                             label: 'Average Score (%)',
                             data: scores,
-                            backgroundColor: 'rgba(16, 185, 129, 0.6)',
-                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(99, 102, 241, 0.6)',
+                            borderColor: '#6366f1',
                             borderWidth: 1,
                             borderRadius: 8
                         }]
@@ -632,10 +599,10 @@
                         responsive: true,
                         maintainAspectRatio: true,
                         scales: {
-                            y: { beginAtZero: true, max: 100, grid: { color: 'rgba(0,0,0,0.05)' } },
-                            x: { ticks: { rotation: labels.length > 4 ? 45 : 0 } }
+                            y: { beginAtZero: true, max: 100, grid: { color: 'rgba(255,255,255,0.05)' } },
+                            x: { ticks: { rotation: labels.length > 4 ? 45 : 0, color: '#94a3b8' } }
                         },
-                        plugins: { legend: { position: 'bottom' } }
+                        plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8' } } }
                     }
                 });
             }
@@ -665,7 +632,7 @@
             const container = document.getElementById('qiratListContainer');
             
             if (qirats.length === 0) {
-                container.innerHTML = '<div class="text-center py-8 text-slate-500">No Qirats enrolled yet</div>';
+                container.innerHTML = '<div class="text-center py-8 text-slate-400">No Qirats enrolled yet</div>';
                 return;
             }
             
@@ -688,15 +655,16 @@
                     const ass = assessments[a];
                     const score = scores[`assessment${a + 1}`];
                     const percent = calculatePercentage(score, ass.outOf);
-                    const statusClass = percent !== null ? (percent >= 70 ? 'text-emerald-600' : (percent >= 50 ? 'text-orange-600' : 'text-gray-500')) : '';
                     assessmentRows += `
                         <tr>
-                            <td class="py-2 text-left">${escapeHtml(ass.name)}</td>
-                            <td class="py-2 text-center"><span class="font-semibold ${statusClass}">${score !== null ? score : '-'}</span></td>
-                            <td class="py-2 text-center text-slate-500">/${ass.outOf}</td>
-                            <td class="py-2 text-center ${percent !== null && percent >= 70 ? 'text-emerald-600 font-bold' : (percent !== null && percent >= 50 ? 'text-orange-600' : 'text-gray-500')}">
+                            <td class="py-2 text-left">${escapeHtml(ass.name)}</span></td>
+                            <td class="py-2 text-center">
+                                <span class="font-semibold ${percent !== null && percent >= 70 ? 'text-emerald-400' : ''}">${score !== null ? score : '-'}</span>
+                            </span></td>
+                            <td class="py-2 text-center text-slate-400">/${ass.outOf}</span></td>
+                            <td class="py-2 text-center ${percent !== null && percent >= 70 ? 'text-emerald-400' : percent !== null && percent >= 50 ? 'text-yellow-400' : 'text-slate-400'}">
                                 ${percent !== null ? percent + '%' : '-'}
-                            </td>
+                            </span></td>
                         </tr>
                     `;
                 }
@@ -706,7 +674,7 @@
                         <div id="qirat-header-${i}" class="qirat-list-header" onclick="toggleQiratDropdown(${i})">
                             <div class="flex-1">
                                 <div class="flex flex-wrap justify-between items-center gap-2">
-                                    <h4 class="font-semibold text-emerald-700 text-base">
+                                    <h4 class="font-semibold text-indigo-400 text-sm">
                                         <i class="fas fa-book-quran mr-2"></i> ${escapeHtml(q)}
                                     </h4>
                                     <div class="flex gap-2 flex-wrap">
@@ -715,7 +683,7 @@
                                         <span class="qirat-stat-item"><i class="fas fa-chart-line mr-1"></i> ${avg !== null ? avg + '%' : '-'}</span>
                                         <span class="qirat-stat-item"><i class="fas fa-tasks mr-1"></i> ${totalPoints}/${totalPossible}</span>
                                     </div>
-                                    <i id="qirat-icon-${i}" class="fas fa-chevron-down text-slate-400 transition-transform rotate-icon"></i>
+                                    <i id="qirat-icon-${i}" class="fas fa-chevron-down text-slate-400 transition-transform rotate-icon text-sm"></i>
                                 </div>
                             </div>
                         </div>
@@ -732,18 +700,18 @@
                                     </thead>
                                     <tbody>
                                         ${assessmentRows}
-                                        <tr class="bg-emerald-50">
-                                            <td class="py-2 font-semibold text-left">Summary</td>
-                                            <td class="py-2 text-center font-bold text-emerald-600">${totalPoints}/${totalPossible} (${totalPercent}%)</td>
-                                            <td class="py-2 text-center"></td>
-                                            <td class="py-2 text-center font-bold text-emerald-600">${avg !== null ? avg + '%' : '-'}</td>
+                                        <tr class="bg-indigo-500/10">
+                                            <td class="py-2 font-semibold text-left">Summary</span>
+                                            <td class="py-2 text-center font-bold text-purple-400">${totalPoints}/${totalPossible} (${totalPercent}%)</span>
+                                            <td class="py-2 text-center"></span>
+                                            <td class="py-2 text-center font-bold text-indigo-400">${avg !== null ? avg + '%' : '-'}</span>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
-                            <div class="mt-3 text-center text-xs text-slate-500 pt-2 border-t border-slate-100">
-                                <i class="fas fa-chart-line mr-1 text-emerald-500"></i> 
-                                ${avg !== null ? (avg >= 85 ? 'Excellent performance! Keep up the great work! 🎉' : (avg >= 70 ? 'Good job! You\'re doing well! 👍' : (avg >= 50 ? 'Keep pushing! You can improve! 📚' : 'Need more focus. Don\'t give up! 💪'))) : 'No assessment data available'}
+                            <div class="mt-3 text-center text-xs text-slate-400 pt-2 border-t border-slate-700">
+                                <i class="fas fa-chart-line mr-1 text-indigo-400"></i> 
+                                ${avg !== null ? (avg >= 85 ? 'Excellent performance! 🎉' : (avg >= 70 ? 'Good job! Keep it up! 👍' : (avg >= 50 ? 'Keep improving! You can do better! 📚' : 'Need more focus. Don\'t give up! 💪'))) : 'No assessment data available'}
                             </div>
                         </div>
                     </div>
@@ -772,6 +740,18 @@
         window.logout = () => {
             localStorage.clear();
             window.location.href = 'student-login.html';
+        };
+        
+        window.toggleTheme = () => {
+            isLightMode = !isLightMode;
+            const icon = document.getElementById('themeIcon');
+            if (isLightMode) {
+                document.body.classList.add('light-mode');
+                icon.className = 'fas fa-sun text-yellow-500';
+            } else {
+                document.body.classList.remove('light-mode');
+                icon.className = 'fas fa-moon text-yellow-400';
+            }
         };
         
         async function init() {
