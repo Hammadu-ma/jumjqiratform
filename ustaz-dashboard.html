@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>Ustaz Portal | Exam Management</title>
-    <meta name="firebase-webchannel-transport" content="xmlhttprequest">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -280,7 +279,6 @@
 <body class="p-4 md:p-6">
 
     <div class="max-w-7xl mx-auto">
-        <!-- Header -->
         <div class="glass-card p-4 md:p-6 mb-6">
             <div class="flex justify-between items-center flex-wrap gap-4">
                 <div>
@@ -303,7 +301,6 @@
             </div>
         </div>
 
-        <!-- Stats Cards -->
         <div class="hero-stats">
             <div class="hero-title text-lg md:text-xl font-bold mb-1">Exam Dashboard</div>
             <div class="hero-subtitle text-xs md:text-sm opacity-90 mb-3">Manage exams for your assigned Qirats</div>
@@ -315,7 +312,6 @@
             </div>
         </div>
 
-        <!-- Qirat Selector -->
         <div class="glass-card p-4 mb-6">
             <h3 class="text-sm font-semibold mb-3"><i class="fas fa-book-quran mr-2 text-indigo-400"></i>Your Assigned Qirats</h3>
             <div id="qiratTabs" class="flex flex-wrap gap-2">
@@ -323,13 +319,11 @@
             </div>
         </div>
 
-        <!-- Performance Chart -->
         <div class="glass-card p-4 mb-6">
             <h3 class="text-sm md:text-lg font-semibold mb-3"><i class="fas fa-chart-line text-indigo-400 mr-2"></i> Performance Trend</h3>
             <canvas id="performanceChart" height="200"></canvas>
         </div>
 
-        <!-- Filters Bar -->
         <div class="glass-card p-4 mb-6">
             <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
                 <div class="col-span-2">
@@ -359,7 +353,6 @@
             </div>
         </div>
 
-        <!-- Students Table -->
         <div class="glass-card overflow-hidden">
             <div class="p-4 border-b border-slate-700 flex justify-between items-center flex-wrap gap-3">
                 <h3 id="tableTitle" class="text-base md:text-lg font-semibold">Student List</h3>
@@ -401,7 +394,23 @@
         </div>
     </div>
 
-    <!-- Loading Overlay -->
+    <!-- Save Confirmation Modal -->
+    <div id="saveModal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 md:p-4">
+        <div class="glass-card w-full max-w-md overflow-hidden modal-enter flex flex-col bg-slate-900">
+            <div class="p-4 border-b border-slate-700 flex justify-between items-center">
+                <h2 class="text-xl font-bold">Save Changes</h2>
+                <button onclick="closeSaveModal()" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="p-6">
+                <p class="mb-4">Are you sure you want to save these changes?</p>
+                <div class="flex gap-3 justify-end">
+                    <button onclick="closeSaveModal()" class="px-4 py-2 rounded-lg bg-slate-700">Cancel</button>
+                    <button onclick="confirmSave()" id="confirmSaveBtn" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="loadingOverlay" class="page-loading hidden">
         <div class="spinner"></div>
         <div class="text-white text-lg">Saving scores...</div>
@@ -411,7 +420,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, doc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         
         const firebaseConfig = {
             apiKey: "AIzaSyAR_g5y04YAGCrTvZCowrE7hw8h7k1du08",
@@ -434,6 +443,8 @@
         let chart = null;
         let currentStudentId = null;
         let currentOpenQiratIndex = null;
+        let pendingScores = {}; // Store unsaved changes
+        let hasUnsavedChanges = false;
         
         const assessments = [
             { name: "Quiz 1", outOf: 30, key: "assessment1" },
@@ -522,25 +533,62 @@
                 examScores.clear();
                 snapshot.forEach(docSnap => {
                     const data = docSnap.data();
-                    if (data.scores) examScores.set(docSnap.id, data.scores);
+                    if (data.scores) {
+                        examScores.set(docSnap.id, data.scores);
+                    }
                 });
-            } catch(e) { console.warn(e); }
+                console.log("Loaded scores for", examScores.size, "students");
+            } catch(e) { console.error("Error loading scores:", e); }
         }
         
-        async function saveExamScore(studentId, qiratName, assessmentKey, value) {
-            try {
-                let currentScores = examScores.get(studentId) || {};
-                let qiratScores = currentScores[qiratName] || {};
-                qiratScores[assessmentKey] = value ? parseFloat(value) : null;
-                currentScores[qiratName] = qiratScores;
-                examScores.set(studentId, currentScores);
-                const examRef = doc(db, "examScores", studentId);
-                await setDoc(examRef, { scores: Object.fromEntries(examScores) }, { merge: true });
-                return true;
-            } catch(e) { 
-                console.error(e);
-                return false;
+        async function saveAllScores() {
+            showLoading(true);
+            let success = true;
+            
+            for (const [studentId, studentScores] of Object.entries(pendingScores)) {
+                try {
+                    let currentScores = examScores.get(studentId) || {};
+                    let qiratScores = currentScores[currentQirat] || {};
+                    
+                    for (const [assessmentKey, value] of Object.entries(studentScores)) {
+                        qiratScores[assessmentKey] = value ? parseFloat(value) : null;
+                    }
+                    
+                    currentScores[currentQirat] = qiratScores;
+                    examScores.set(studentId, currentScores);
+                    
+                    const examRef = doc(db, "examScores", studentId);
+                    await setDoc(examRef, { scores: currentScores }, { merge: true });
+                } catch(e) {
+                    console.error("Save error:", e);
+                    success = false;
+                }
             }
+            
+            if (success) {
+                pendingScores = {};
+                hasUnsavedChanges = false;
+                await loadExamScores();
+                updateStats();
+                renderChart();
+                renderStudentsTable();
+                if (currentStudentId) {
+                    await openStudentModal(currentStudentId);
+                }
+                showToast('All scores saved successfully!');
+            } else {
+                showToast('Error saving some scores', true);
+            }
+            showLoading(false);
+            closeSaveModal();
+        }
+        
+        function trackScoreChange(studentId, assessmentKey, value) {
+            if (!pendingScores[studentId]) {
+                pendingScores[studentId] = {};
+            }
+            pendingScores[studentId][assessmentKey] = value;
+            hasUnsavedChanges = true;
         }
         
         async function loadUstazData() {
@@ -578,6 +626,14 @@
         }
         
         window.selectQirat = (qirat) => {
+            if (hasUnsavedChanges) {
+                if (confirm('You have unsaved changes. Switch Qirat without saving?')) {
+                    pendingScores = {};
+                    hasUnsavedChanges = false;
+                } else {
+                    return;
+                }
+            }
             currentQirat = qirat;
             renderQiratTabs();
             updateStats();
@@ -767,7 +823,7 @@
                         <td class="py-2 text-left text-xs">${escapeHtml(ass.name)}</span></td>
                         <td class="py-2 text-center">
                             ${isEditMode ? 
-                                `<input type="number" class="score-input editable" data-student="${studentId}" data-qirat="${q}" data-assessment="${a+1}" value="${score !== null ? score : ''}" step="0.5" min="0" max="${ass.outOf}" style="width:70px;" onchange="autoSaveScore('${studentId}', '${q}', ${a+1}, this.value, ${i})">` : 
+                                `<input type="number" class="score-input editable" data-student="${studentId}" data-qirat="${q}" data-assessment="${a+1}" value="${score !== null ? score : ''}" step="0.5" min="0" max="${ass.outOf}" style="width:70px;" onchange="trackScoreChange('${studentId}', '${ass.key}', this.value)">` : 
                                 `<span class="font-semibold text-sm">${score !== null ? score : '-'}</span>`
                             }
                         </span></td>
@@ -827,27 +883,24 @@
                 </div>
                 <h3 class="font-semibold mb-3 text-sm md:text-base">Qirat Performance <i class="fas fa-chevron-down text-xs"></i></h3>
                 ${qirats.length > 0 ? qiratListHtml : '<p class="text-slate-400 text-sm">No Qirats enrolled</p>'}
-                ${!isEditMode ? `<div class="mt-4 text-center text-slate-400 text-xs"><i class="fas fa-info-circle mr-1"></i> Enable Edit Mode to modify scores</div>` : `<div class="mt-4 text-center text-emerald-400 text-xs"><i class="fas fa-save mr-1"></i> Edit mode active - scores auto-save</div>`}
+                ${isEditMode ? `<div class="mt-4 flex justify-end"><button onclick="openSaveModal()" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500"><i class="fas fa-save mr-2"></i>Save All Changes</button></div>` : `<div class="mt-4 text-center text-slate-400 text-xs"><i class="fas fa-info-circle mr-1"></i> Enable Edit Mode to modify scores</div>`}
             `;
             document.getElementById('studentModal').classList.remove('hidden');
             currentOpenQiratIndex = null;
         };
         
-        window.autoSaveScore = async (studentId, qiratName, assessmentNum, value, qiratIndex) => {
-            showLoading(true);
-            const success = await saveExamScore(studentId, qiratName, `assessment${assessmentNum}`, value);
-            if (success) {
-                await loadExamScores();
-                await openStudentModal(studentId);
-                updateStats();
-                renderChart();
-                renderStudentsTable();
-                showToast('Score saved successfully!');
-            } else {
-                showToast('Error saving score', true);
+        window.trackScoreChange = trackScoreChange;
+        window.openSaveModal = () => {
+            if (Object.keys(pendingScores).length === 0) {
+                showToast('No changes to save', true);
+                return;
             }
-            showLoading(false);
+            document.getElementById('saveModal').classList.remove('hidden');
         };
+        window.closeSaveModal = () => {
+            document.getElementById('saveModal').classList.add('hidden');
+        };
+        window.confirmSave = saveAllScores;
         
         function clearFilters() {
             document.getElementById('searchInput').value = '';
@@ -924,21 +977,65 @@
             showToast('PDF exported');
         };
         
-        window.exportToWord = () => {
+                window.exportToWord = () => {
             const data = getExportData();
             if (data.length === 0) { showToast('No data to export', true); return; }
-            let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${currentQirat} Exam Report</title><style>body{font-family:Arial;} table{border-collapse:collapse;width:100%;} th,td{border:1px solid #ddd;padding:8px;} th{background:#6366f1;color:white;}</style></head><body>
-            <h1>${currentQirat} - Student Exam Report</h1>
-            <p>Generated: ${new Date().toLocaleString()}</p>
-            <table border="1"><thead><tr><th>Student Name</th><th>Department</th><th>Batch</th><th>Gender</th><th>Quiz 1</th><th>Mid Exam</th><th>Assignment</th><th>Final Exam</th><th>Average Score</th></tr></thead><tbody>
-            ${data.map(d => `<tr><td>${d['Student Name']}</td><td>${d['Department']}</td><td>${d['Batch']}</td><td>${d['Gender']}</td><td>${d['Quiz 1']}</td><td>${d['Mid Exam']}</td><td>${d['Assignment']}</td><td>${d['Final Exam']}</td><td>${d['Average Score']}</td></tr>`).join('')}
-            </tbody></table></body></html>`;
+            let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${currentQirat} Exam Report</title><style>
+                body{font-family:Arial, sans-serif; margin:40px; background:#f5f5f5;}
+                h1{color:#6366f1; border-bottom:2px solid #6366f1; padding-bottom:10px;}
+                .header{background:linear-gradient(135deg, #6366f1, #a855f7); color:white; padding:20px; border-radius:10px; margin-bottom:20px;}
+                table{border-collapse:collapse; width:100%; background:white; box-shadow:0 2px 4px rgba(0,0,0,0.1);}
+                th,td{border:1px solid #ddd; padding:10px; text-align:left;}
+                th{background:#6366f1; color:white; text-align:center;}
+                td{text-align:center;}
+                .footer{margin-top:20px; text-align:center; color:#666; font-size:12px;}
+            </style></head><body>
+            <div class="header">
+                <h1>📚 ${currentQirat} - Student Exam Report</h1>
+                <p><strong>Generated:</strong> ${new Date().toLocaleString()} | <strong>Ustaz:</strong> ${localStorage.getItem('ustazFullName') || 'Ustaz'}</p>
+                <p><strong>Total Students:</strong> ${data.length} | <strong>Average Score:</strong> ${Math.round(data.reduce((sum, d) => sum + (parseInt(d['Average Score']) || 0), 0) / data.length) || 0}%</p>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Student Name</th>
+                        <th>Department</th>
+                        <th>Batch</th>
+                        <th>Gender</th>
+                        <th>Quiz 1</th>
+                        <th>Mid Exam</th>
+                        <th>Assignment</th>
+                        <th>Final Exam</th>
+                        <th>Average Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${data.map((d, idx) => `<tr>
+                        <td>${idx + 1}</td>
+                        <td>${d['Student Name']}</td>
+                        <td>${d['Department']}</td>
+                        <td>${d['Batch']}</td>
+                        <td>${d['Gender']}</td>
+                        <td>${d['Quiz 1']}</td>
+                        <td>${d['Mid Exam']}</td>
+                        <td>${d['Assignment']}</td>
+                        <td>${d['Final Exam']}</td>
+                        <td><strong>${d['Average Score']}</strong></td>
+                    </tr>`).join('')}
+                </tbody>
+            </table>
+            <div class="footer">
+                <p>This report is system-generated. For any queries, please contact the academic administration.</p>
+            </div>
+            </body></html>`;
             const blob = new Blob([html], { type: 'application/msword' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = `${currentQirat}_report.doc`;
+            link.download = `${currentQirat}_report_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.doc`;
             link.click();
-            showToast('Word exported');
+            URL.revokeObjectURL(link.href);
+            showToast('Word document exported');
         };
         
         window.exportData = () => window.exportToExcel();
@@ -947,14 +1044,20 @@
             isEditMode = !isEditMode;
             const btn = document.getElementById('editModeBtn');
             if (isEditMode) {
-                btn.innerHTML = '<i class="fas fa-save mr-1"></i> Save Mode';
+                btn.innerHTML = '<i class="fas fa-pen mr-1"></i> Edit Mode ON';
                 btn.classList.add('bg-emerald-600');
                 btn.classList.remove('bg-slate-700');
-                showToast('Edit mode ON - scores auto-save');
+                showToast('Edit mode enabled - click on scores to edit, then click Save');
             } else {
-                btn.innerHTML = '<i class="fas fa-edit mr-1"></i> Edit Mode';
+                btn.innerHTML = '<i class="fas fa-eye mr-1"></i> View Mode';
                 btn.classList.remove('bg-emerald-600');
                 btn.classList.add('bg-slate-700');
+                // Clear pending changes when exiting edit mode
+                pendingScores = {};
+                hasUnsavedChanges = false;
+            }
+            if (currentStudentId && document.getElementById('studentModal').classList.contains('active')) {
+                openStudentModal(currentStudentId);
             }
         };
         
@@ -971,6 +1074,9 @@
             document.getElementById(id).classList.add('hidden');
             currentStudentId = null;
             currentOpenQiratIndex = null;
+            // Clear pending changes when closing modal without saving
+            pendingScores = {};
+            hasUnsavedChanges = false;
         };
         
         let isLightMode = false;
@@ -986,6 +1092,7 @@
             }
         };
         
+        // Event listeners for filters
         document.getElementById('searchInput').addEventListener('input', (e) => { currentFilters.search = e.target.value; updateStats(); renderChart(); renderStudentsTable(); });
         document.getElementById('genderFilter').addEventListener('change', (e) => { currentFilters.gender = e.target.value; updateStats(); renderChart(); renderStudentsTable(); });
         document.getElementById('deptFilter').addEventListener('change', (e) => { currentFilters.department = e.target.value; updateStats(); renderChart(); renderStudentsTable(); });
@@ -994,14 +1101,19 @@
         window.clearFilters = clearFilters;
         window.openStudentModal = openStudentModal;
         window.toggleQiratDropdown = toggleQiratDropdown;
-        window.autoSaveScore = autoSaveScore;
+        window.trackScoreChange = trackScoreChange;
+        window.openSaveModal = openSaveModal;
+        window.closeSaveModal = closeSaveModal;
+        window.confirmSave = confirmSave;
         
         async function init() {
+            // Check if ustaz is logged in
             if (localStorage.getItem('ustazLoggedIn') !== 'true') {
                 window.location.href = 'ustaz-login.html';
                 return;
             }
             
+            // Load all data
             await loadExamScores();
             await loadStudents();
             const success = await loadUstazData();
@@ -1010,9 +1122,13 @@
                 updateStats();
                 renderChart();
                 renderStudentsTable();
+                showToast(`Welcome ${localStorage.getItem('ustazFullName') || 'Ustaz'}! You have access to ${assignedQirats.length} Qirat(s).`);
+            } else if (assignedQirats.length === 0) {
+                document.getElementById('studentsTableBody').innerHTML = '<tr><td colspan="7" class="text-center py-8 text-slate-400">No Qirats assigned to you. Please contact administrator.</td></tr>';
             }
         }
         
+        // Start the application
         init();
     </script>
 </body>
