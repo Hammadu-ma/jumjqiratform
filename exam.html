@@ -17,138 +17,31 @@
             --accent-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
             --primary-glow: rgba(99, 102, 241, 0.3);
         }
-
-        body {
-            background: #0f172a;
-            color: #f1f5f9;
-            font-family: 'Inter', sans-serif;
-            min-height: 100vh;
-        }
-
-        .glass-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--glass-border);
-            border-radius: 1.5rem;
-        }
-
-        .btn-premium {
-            background: var(--accent-gradient);
-            transition: all 0.3s ease;
-        }
-
-        .btn-premium:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
-        }
-
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-        }
-
-        .modal-enter {
-            animation: modalFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        @keyframes modalFadeIn {
-            from { opacity: 0; transform: scale(0.95) translateY(20px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
-        }
-
-        .status-badge {
-            padding: 2px 8px;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            background: rgba(16, 185, 129, 0.1);
-            color: #10b981;
-            border: 1px solid rgba(16, 185, 129, 0.2);
-        }
-
-        .view-btn.active {
-            background: #6366f1;
-            color: white;
-        }
-
-        .score-input {
-            background: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 0.5rem;
-            padding: 0.25rem 0.5rem;
-            width: 70px;
-            text-align: center;
-            color: white;
-        }
-
-        .score-input:focus {
-            outline: none;
-            border-color: #6366f1;
-            box-shadow: 0 0 0 2px var(--primary-glow);
-        }
-
-        .score-input.editable {
-            background: #2d3748;
-            border-color: #6366f1;
-        }
-
-        .loading-spinner {
-            border: 3px solid rgba(99, 102, 241, 0.3);
-            border-top-color: #6366f1;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .fade-in {
-            animation: fadeIn 0.3s ease-in;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .toast {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            z-index: 1000;
-            animation: slideIn 0.3s ease;
-        }
-
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        .settings-card {
-            transition: all 0.3s ease;
-        }
-
-        .settings-card:hover {
-            background: rgba(99, 102, 241, 0.1);
-            transform: translateX(4px);
-        }
-
+        body { background: #0f172a; color: #f1f5f9; font-family: 'Inter', sans-serif; min-height: 100vh; }
+        .glass-card { background: var(--glass-bg); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 1.5rem; }
+        .btn-premium { background: var(--accent-gradient); transition: all 0.3s ease; }
+        .btn-premium:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3); }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
+        .modal-enter { animation: modalFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes modalFadeIn { from { opacity: 0; transform: scale(0.95) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        .status-badge { padding: 2px 8px; border-radius: 9999px; font-size: 0.75rem; background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2); }
+        .view-btn.active { background: #6366f1; color: white; }
+        .score-input { background: #1e293b; border: 1px solid #334155; border-radius: 0.5rem; padding: 0.25rem 0.5rem; width: 70px; text-align: center; color: white; }
+        .score-input:focus { outline: none; border-color: #6366f1; box-shadow: 0 0 0 2px var(--primary-glow); }
+        .score-input.editable { background: #2d3748; border-color: #6366f1; }
+        .loading-spinner { border: 3px solid rgba(99, 102, 241, 0.3); border-top-color: #6366f1; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .fade-in { animation: fadeIn 0.3s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .toast { position: fixed; bottom: 24px; right: 24px; z-index: 1000; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .settings-card { transition: all 0.3s ease; }
+        .settings-card:hover { background: rgba(99, 102, 241, 0.1); transform: translateX(4px); }
         .rank-1 { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #78350f; }
         .rank-2 { background: linear-gradient(135deg, #94a3b8, #64748b); color: #1e293b; }
         .rank-3 { background: linear-gradient(135deg, #fdba74, #f97316); color: #7c2d12; }
-        
-        .modal-export-bar {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 1rem;
-            padding: 0.75rem;
-            margin-bottom: 1rem;
-        }
+        .rank-badge-sm { padding: 2px 8px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; }
     </style>
 </head>
 <body class="p-4 md:p-8">
@@ -158,7 +51,6 @@
             <h1 class="text-3xl font-bold tracking-tight bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">Exam Performance</h1>
             <p class="text-slate-400 mt-1">Detailed analytics and score management</p>
         </div>
-        
         <div class="flex gap-3 bg-slate-800/50 p-1.5 rounded-2xl border border-slate-700">
             <button onclick="switchView('qirat')" class="view-btn px-6 py-2 rounded-xl text-sm font-medium transition-all active">By Qirat</button>
             <button onclick="switchView('department')" class="view-btn px-6 py-2 rounded-xl text-sm font-medium transition-all text-slate-400">By Department</button>
@@ -167,70 +59,27 @@
     </header>
 
     <main class="max-w-7xl mx-auto">
-        
         <section id="general-stats" class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10"></section>
 
-        <!-- Charts Row -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <div class="glass-card p-6">
-                <h3 class="text-lg font-semibold mb-4"><i class="fas fa-chart-line text-indigo-400 mr-2"></i> Performance Trend</h3>
-                <canvas id="trendChart" height="200"></canvas>
-            </div>
-            <div class="glass-card p-6">
-                <h3 class="text-lg font-semibold mb-4"><i class="fas fa-chart-pie text-purple-400 mr-2"></i> Score Distribution</h3>
-                <canvas id="distChart" height="200"></canvas>
-            </div>
+            <div class="glass-card p-6"><h3 class="text-lg font-semibold mb-4"><i class="fas fa-chart-line text-indigo-400 mr-2"></i> Performance Trend</h3><canvas id="trendChart" height="200"></canvas></div>
+            <div class="glass-card p-6"><h3 class="text-lg font-semibold mb-4"><i class="fas fa-chart-pie text-purple-400 mr-2"></i> Score Distribution</h3><canvas id="distChart" height="200"></canvas></div>
         </div>
 
-        <!-- Filters Bar -->
         <div class="glass-card p-4 mb-6">
             <div class="flex flex-wrap gap-4 items-end">
-                <div class="flex-1 min-w-[180px]">
-                    <label class="text-xs text-slate-400 uppercase tracking-wider mb-1 block">Search</label>
-                    <input type="text" id="searchInput" placeholder="Name / Phone / ID..." class="w-full bg-slate-900 border border-slate-700 px-4 py-2 rounded-xl text-sm focus:outline-none focus:border-indigo-500">
-                </div>
-                <div class="flex-1 min-w-[140px]">
-                    <label class="text-xs text-slate-400 uppercase tracking-wider mb-1 block">Gender</label>
-                    <select id="genderFilter" class="w-full bg-slate-900 border border-slate-700 px-4 py-2 rounded-xl text-sm focus:outline-none focus:border-indigo-500">
-                        <option value="">All</option>
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
-                    </select>
-                </div>
-                <div class="flex-1 min-w-[140px]">
-                    <label class="text-xs text-slate-400 uppercase tracking-wider mb-1 block">Department</label>
-                    <select id="deptFilter" class="w-full bg-slate-900 border border-slate-700 px-4 py-2 rounded-xl text-sm focus:outline-none focus:border-indigo-500">
-                        <option value="">All</option>
-                    </select>
-                </div>
-                <div class="flex-1 min-w-[140px]">
-                    <label class="text-xs text-slate-400 uppercase tracking-wider mb-1 block">Batch</label>
-                    <select id="batchFilter" class="w-full bg-slate-900 border border-slate-700 px-4 py-2 rounded-xl text-sm focus:outline-none focus:border-indigo-500">
-                        <option value="">All</option>
-                    </select>
-                </div>
-                <div class="flex-1 min-w-[140px]">
-                    <label class="text-xs text-slate-400 uppercase tracking-wider mb-1 block">Qirat</label>
-                    <select id="qiratFilter" class="w-full bg-slate-900 border border-slate-700 px-4 py-2 rounded-xl text-sm focus:outline-none focus:border-indigo-500">
-                        <option value="">All</option>
-                    </select>
-                </div>
-                <button onclick="clearFilters()" class="px-4 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 transition-all text-sm">
-                    <i class="fas fa-eraser mr-1"></i> Clear
-                </button>
-                <button onclick="toggleEditMode()" id="editModeBtn" class="px-4 py-2 rounded-xl text-sm font-medium bg-slate-700 hover:bg-slate-600 transition-all">
-                    <i class="fas fa-edit mr-1"></i> Edit Mode
-                </button>
-                <button onclick="openSettingsModal()" class="px-4 py-2 rounded-xl text-sm font-medium bg-purple-600/30 hover:bg-purple-600/50 transition-all">
-                    <i class="fas fa-cog mr-1"></i> Settings
-                </button>
-                <button onclick="exportMainData()" class="px-4 py-2 rounded-xl text-sm font-medium bg-emerald-600/30 hover:bg-emerald-600/50 transition-all">
-                    <i class="fas fa-download mr-1"></i> Export
-                </button>
+                <div class="flex-1 min-w-[180px]"><label class="text-xs text-slate-400 uppercase tracking-wider mb-1 block">Search</label><input type="text" id="searchInput" placeholder="Name / Phone / ID..." class="w-full bg-slate-900 border border-slate-700 px-4 py-2 rounded-xl text-sm focus:outline-none focus:border-indigo-500"></div>
+                <div class="flex-1 min-w-[140px]"><label class="text-xs text-slate-400 uppercase tracking-wider mb-1 block">Gender</label><select id="genderFilter" class="w-full bg-slate-900 border border-slate-700 px-4 py-2 rounded-xl text-sm focus:outline-none focus:border-indigo-500"><option value="">All</option><option value="Male">Male</option><option value="Female">Female</option></select></div>
+                <div class="flex-1 min-w-[140px]"><label class="text-xs text-slate-400 uppercase tracking-wider mb-1 block">Department</label><select id="deptFilter" class="w-full bg-slate-900 border border-slate-700 px-4 py-2 rounded-xl text-sm focus:outline-none focus:border-indigo-500"><option value="">All</option></select></div>
+                <div class="flex-1 min-w-[140px]"><label class="text-xs text-slate-400 uppercase tracking-wider mb-1 block">Batch</label><select id="batchFilter" class="w-full bg-slate-900 border border-slate-700 px-4 py-2 rounded-xl text-sm focus:outline-none focus:border-indigo-500"><option value="">All</option></select></div>
+                <div class="flex-1 min-w-[140px]"><label class="text-xs text-slate-400 uppercase tracking-wider mb-1 block">Qirat</label><select id="qiratFilter" class="w-full bg-slate-900 border border-slate-700 px-4 py-2 rounded-xl text-sm focus:outline-none focus:border-indigo-500"><option value="">All</option></select></div>
+                <button onclick="clearFilters()" class="px-4 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 transition-all text-sm"><i class="fas fa-eraser mr-1"></i> Clear</button>
+                <button onclick="toggleEditMode()" id="editModeBtn" class="px-4 py-2 rounded-xl text-sm font-medium bg-slate-700 hover:bg-slate-600 transition-all"><i class="fas fa-edit mr-1"></i> Edit Mode</button>
+                <button onclick="openSettingsModal()" class="px-4 py-2 rounded-xl text-sm font-medium bg-purple-600/30 hover:bg-purple-600/50 transition-all"><i class="fas fa-cog mr-1"></i> Settings</button>
+                <button onclick="exportMainData()" class="px-4 py-2 rounded-xl text-sm font-medium bg-emerald-600/30 hover:bg-emerald-600/50 transition-all"><i class="fas fa-download mr-1"></i> Export</button>
             </div>
         </div>
 
-        <!-- Main Table Section -->
         <div class="glass-card overflow-hidden">
             <div class="p-6 border-b border-slate-700 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <h3 id="table-title" class="text-xl font-semibold">Student Rankings by Qirat</h3>
@@ -243,12 +92,8 @@
             </div>
             <div class="overflow-x-auto custom-scrollbar">
                 <table class="w-full text-left" id="dataTable">
-                    <thead class="bg-slate-800/50 text-slate-400 text-xs uppercase tracking-wider">
-                        <tr id="tableHeader"></tr>
-                    </thead>
-                    <tbody id="tableBody" class="divide-y divide-slate-700/50">
-                        <tr><td colspan="10" class="text-center py-8"><div class="loading-spinner mx-auto"></div><p class="mt-4 text-slate-400">Loading data...</p></td></tr>
-                    </tbody>
+                    <thead class="bg-slate-800/50 text-slate-400 text-xs uppercase tracking-wider"><tr id="tableHeader"></tr></thead>
+                    <tbody id="tableBody" class="divide-y divide-slate-700/50"><tr><td colspan="10" class="text-center py-8"><div class="loading-spinner mx-auto"></div><p class="mt-4 text-slate-400">Loading data...</p></td></tr></tbody>
                 </table>
             </div>
         </div>
@@ -259,10 +104,7 @@
         <div class="glass-card w-full max-w-6xl max-h-[90vh] overflow-hidden modal-enter flex flex-col bg-slate-900">
             <div class="p-6 border-b border-slate-700 flex justify-between items-center bg-slate-800/30">
                 <h2 class="text-2xl font-bold" id="modalTitle">Student Scorecard</h2>
-                <div class="flex gap-2">
-                    <button onclick="saveStudentScores()" id="saveStudentBtn" class="hidden px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-sm"><i class="fas fa-save mr-1"></i> Save Changes</button>
-                    <button onclick="closeModal('studentModal')" class="text-slate-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
-                </div>
+                <div class="flex gap-2"><button onclick="saveStudentScores()" id="saveStudentBtn" class="hidden px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-sm"><i class="fas fa-save mr-1"></i> Save Changes</button><button onclick="closeModal('studentModal')" class="text-slate-400 hover:text-white"><i class="fas fa-times text-xl"></i></button></div>
             </div>
             <div id="modalContent" class="p-6 overflow-y-auto custom-scrollbar"></div>
         </div>
@@ -340,14 +182,7 @@
         let charts = {};
         let currentStudentId = null;
         
-        let assessmentConfig = {
-            assessments: [
-                { name: "Quiz 1", outOf: 30 },
-                { name: "Mid Exam", outOf: 50 },
-                { name: "Assignment", outOf: 20 },
-                { name: "Final Exam", outOf: 100 }
-            ]
-        };
+        let assessmentConfig = { assessments: [{ name: "Quiz 1", outOf: 30 }, { name: "Mid Exam", outOf: 50 }, { name: "Assignment", outOf: 20 }, { name: "Final Exam", outOf: 100 }] };
         
         function showToast(message, isError = false) {
             const toastEl = document.getElementById('toast');
@@ -357,73 +192,39 @@
         }
         
         async function loadAssessmentConfig() {
-            try {
-                const configDoc = await getDocs(collection(db, "settings"));
-                configDoc.forEach(doc => {
-                    if (doc.id === 'assessmentConfig') {
-                        assessmentConfig = doc.data();
-                    }
-                });
-            } catch(e) { console.warn(e); }
+            try { const configDoc = await getDocs(collection(db, "settings")); configDoc.forEach(doc => { if (doc.id === 'assessmentConfig') assessmentConfig = doc.data(); }); } catch(e) { console.warn(e); }
         }
-        
-        async function saveAssessmentConfig() {
-            await setDoc(doc(db, "settings", "assessmentConfig"), assessmentConfig);
-            showToast('Assessment settings saved to Firebase!');
-        }
+        async function saveAssessmentConfig() { await setDoc(doc(db, "settings", "assessmentConfig"), assessmentConfig); showToast('Assessment settings saved to Firebase!'); }
         
         function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
-        
         function getQiratNames(student) { return (student.schedules || []).map(s => s.qirat_name).filter(Boolean); }
+        function getStudentExamScores(studentId, qiratName) { const studentScores = examScores.get(studentId) || {}; return studentScores[qiratName] || {}; }
+        function calculatePercentage(score, outOf) { if (score === null || score === '' || !outOf) return null; return Math.round((parseFloat(score) / outOf) * 100); }
+        function calculateTotalPoints(scores) { let total = 0; for (let i = 0; i < assessmentConfig.assessments.length; i++) { const score = scores[`assessment${i+1}`]; if (score !== null && score !== '' && !isNaN(score)) total += parseFloat(score); } return total; }
+        function calculateTotalPossible() { return assessmentConfig.assessments.reduce((sum, a) => sum + a.outOf, 0); }
+        function calculateAverage(scores) { let totalPercent = 0, count = 0; for (let i = 0; i < assessmentConfig.assessments.length; i++) { const score = scores[`assessment${i+1}`]; if (score !== null && score !== '' && !isNaN(score)) { const percent = calculatePercentage(parseFloat(score), assessmentConfig.assessments[i].outOf); if (percent !== null) { totalPercent += percent; count++; } } } return count > 0 ? Math.round(totalPercent / count) : null; }
+        function calculateStudentOverallAvg(studentId) { let total = 0, count = 0; const student = allStudents.find(s => s.id === studentId); if (student) { getQiratNames(student).forEach(q => { const scores = getStudentExamScores(studentId, q); const avg = calculateAverage(scores); if (avg !== null) { total += avg; count++; } }); } return count > 0 ? Math.round(total / count) : null; }
         
-        function getStudentExamScores(studentId, qiratName) { 
-            const studentScores = examScores.get(studentId) || {}; 
-            return studentScores[qiratName] || {}; 
-        }
-        
-        function calculatePercentage(score, outOf) { 
-            if (score === null || score === '' || !outOf) return null; 
-            return Math.round((parseFloat(score) / outOf) * 100); 
-        }
-        
-        function calculateTotalPoints(scores) {
-            let total = 0;
-            for (let i = 0; i < assessmentConfig.assessments.length; i++) {
-                const score = scores[`assessment${i+1}`];
-                if (score !== null && score !== '' && !isNaN(score)) {
-                    total += parseFloat(score);
-                }
-            }
-            return total;
-        }
-        
-        function calculateTotalPossible() {
-            return assessmentConfig.assessments.reduce((sum, a) => sum + a.outOf, 0);
-        }
-        
-        function calculateAverage(scores) {
-            let totalPercent = 0, count = 0;
-            for (let i = 0; i < assessmentConfig.assessments.length; i++) {
-                const score = scores[`assessment${i+1}`];
-                if (score !== null && score !== '' && !isNaN(score)) {
-                    const percent = calculatePercentage(parseFloat(score), assessmentConfig.assessments[i].outOf);
-                    if (percent !== null) { totalPercent += percent; count++; }
-                }
-            }
-            return count > 0 ? Math.round(totalPercent / count) : null;
-        }
-        
-        function calculateStudentOverallAvg(studentId) {
-            let total = 0, count = 0;
+        function calculateRankInDepartment(studentId) {
             const student = allStudents.find(s => s.id === studentId);
-            if (student) {
-                getQiratNames(student).forEach(q => {
-                    const scores = getStudentExamScores(studentId, q);
-                    const avg = calculateAverage(scores);
-                    if (avg !== null) { total += avg; count++; }
-                });
-            }
-            return count > 0 ? Math.round(total / count) : null;
+            if (!student) return null;
+            const deptStudents = allStudents.filter(s => s.department === student.department);
+            const ranked = deptStudents.map(s => ({ id: s.id, avg: calculateStudentOverallAvg(s.id) })).sort((a,b) => (b.avg || 0) - (a.avg || 0));
+            return ranked.findIndex(s => s.id === studentId) + 1;
+        }
+        
+        function calculateQiratRankInDepartment(studentId, qiratName) {
+            const student = allStudents.find(s => s.id === studentId);
+            if (!student) return null;
+            const deptStudents = allStudents.filter(s => s.department === student.department && getQiratNames(s).includes(qiratName));
+            const ranked = deptStudents.map(s => ({ id: s.id, avg: calculateAverage(getStudentExamScores(s.id, qiratName)) })).sort((a,b) => (b.avg || 0) - (a.avg || 0));
+            return ranked.findIndex(s => s.id === studentId) + 1;
+        }
+        
+        function calculateQiratGlobalRank(studentId, qiratName) {
+            const studentsInQirat = allStudents.filter(s => getQiratNames(s).includes(qiratName));
+            const ranked = studentsInQirat.map(s => ({ id: s.id, avg: calculateAverage(getStudentExamScores(s.id, qiratName)) })).sort((a,b) => (b.avg || 0) - (a.avg || 0));
+            return ranked.findIndex(s => s.id === studentId) + 1;
         }
         
         async function saveExamScore(studentId, qiratName, assessmentKey, value) {
@@ -437,42 +238,16 @@
         }
         
         async function loadExamScores() {
-            try {
-                const snapshot = await getDocs(collection(db, "examScores"));
-                examScores.clear();
-                snapshot.forEach(docSnap => { 
-                    const data = docSnap.data();
-                    if (data.scores) { 
-                        Object.entries(data.scores).forEach(([studentId, studentData]) => {
-                            examScores.set(studentId, studentData);
-                        });
-                    }
-                });
-            } catch(e) { console.warn(e); }
+            try { const snapshot = await getDocs(collection(db, "examScores")); examScores.clear(); snapshot.forEach(docSnap => { const data = docSnap.data(); if (data.scores) { Object.entries(data.scores).forEach(([studentId, studentData]) => { examScores.set(studentId, studentData); }); } }); } catch(e) { console.warn(e); }
         }
         
         async function loadData() {
             try {
                 const querySnapshot = await getDocs(collection(db, "registrations"));
                 allStudents = [];
-                querySnapshot.forEach(docSnap => {
-                    const data = docSnap.data();
-                    allStudents.push({
-                        id: docSnap.id, 
-                        full_name: data.full_name || 'N/A', 
-                        gender: data.gender || 'Not Specified',
-                        phone: data.phone || '', 
-                        department: data.department || 'Other', 
-                        batch: data.batch || 'General',
-                        schedules: data.schedules || []
-                    });
-                });
-                await loadAssessmentConfig();
-                await loadExamScores();
-                populateFilters();
-                renderStats();
-                renderCharts();
-                await renderCurrentView();
+                querySnapshot.forEach(docSnap => { const data = docSnap.data(); allStudents.push({ id: docSnap.id, full_name: data.full_name || 'N/A', gender: data.gender || 'Not Specified', phone: data.phone || '', department: data.department || 'Other', batch: data.batch || 'General', schedules: data.schedules || [] }); });
+                await loadAssessmentConfig(); await loadExamScores();
+                populateFilters(); renderStats(); renderCharts(); await renderCurrentView();
             } catch(e) { console.error(e); showToast('Error loading data', true); }
         }
         
@@ -480,7 +255,6 @@
             const departments = [...new Set(allStudents.map(s => s.department))];
             const batches = [...new Set(allStudents.map(s => s.batch))];
             const qirats = [...new Set(allStudents.flatMap(s => getQiratNames(s)))];
-            
             document.getElementById('deptFilter').innerHTML = '<option value="">All</option>' + departments.map(d => `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join('');
             document.getElementById('batchFilter').innerHTML = '<option value="">All</option>' + batches.map(b => `<option value="${escapeHtml(b)}">${escapeHtml(b)}</option>`).join('');
             document.getElementById('qiratFilter').innerHTML = '<option value="">All</option>' + qirats.map(q => `<option value="${escapeHtml(q)}">${escapeHtml(q)}</option>`).join('');
@@ -488,10 +262,7 @@
         
         function applyFilters(students) {
             let filtered = [...students];
-            if (currentFilters.search) {
-                const search = currentFilters.search.toLowerCase();
-                filtered = filtered.filter(s => s.full_name.toLowerCase().includes(search) || s.phone.includes(search));
-            }
+            if (currentFilters.search) { const search = currentFilters.search.toLowerCase(); filtered = filtered.filter(s => s.full_name.toLowerCase().includes(search) || s.phone.includes(search)); }
             if (currentFilters.gender) filtered = filtered.filter(s => s.gender === currentFilters.gender);
             if (currentFilters.department) filtered = filtered.filter(s => s.department === currentFilters.department);
             if (currentFilters.batch) filtered = filtered.filter(s => s.batch === currentFilters.batch);
@@ -500,75 +271,32 @@
         }
         
         function clearFilters() {
-            document.getElementById('searchInput').value = '';
-            document.getElementById('genderFilter').value = '';
-            document.getElementById('deptFilter').value = '';
-            document.getElementById('batchFilter').value = '';
-            document.getElementById('qiratFilter').value = '';
-            currentFilters = { search: '', gender: '', department: '', batch: '', qirat: '' };
-            renderCurrentView();
+            document.getElementById('searchInput').value = ''; document.getElementById('genderFilter').value = ''; document.getElementById('deptFilter').value = ''; document.getElementById('batchFilter').value = ''; document.getElementById('qiratFilter').value = '';
+            currentFilters = { search: '', gender: '', department: '', batch: '', qirat: '' }; renderCurrentView();
         }
         
         function renderStats() {
             const totalStudents = allStudents.length;
             let totalScore = 0, scoreCount = 0;
-            examScores.forEach(studentScores => { 
-                Object.values(studentScores).forEach(qScores => {
-                    const avg = calculateAverage(qScores);
-                    if (avg !== null) { totalScore += avg; scoreCount++; }
-                });
-            });
+            examScores.forEach(studentScores => { Object.values(studentScores).forEach(qScores => { const avg = calculateAverage(qScores); if (avg !== null) { totalScore += avg; scoreCount++; } }); });
             const avgScore = scoreCount > 0 ? Math.round(totalScore / scoreCount) : 0;
             const completedExams = scoreCount;
             const allQirats = new Set(); allStudents.forEach(s => getQiratNames(s).forEach(q => allQirats.add(q)));
-            
             document.getElementById('general-stats').innerHTML = `
-                <div class="glass-card p-6">
-                    <div class="text-slate-400 text-sm mb-2"><i class="fas fa-users mr-1"></i> Total Students</div>
-                    <div class="text-3xl font-bold">${totalStudents}</div>
-                </div>
-                <div class="glass-card p-6">
-                    <div class="text-slate-400 text-sm mb-2"><i class="fas fa-chart-line mr-1"></i> Average Score</div>
-                    <div class="text-3xl font-bold">${avgScore}%</div>
-                    <div class="w-full bg-slate-700 h-1.5 rounded-full mt-4"><div class="bg-indigo-500 h-1.5 rounded-full" style="width: ${avgScore}%"></div></div>
-                </div>
-                <div class="glass-card p-6">
-                    <div class="text-slate-400 text-sm mb-2"><i class="fas fa-book-quran mr-1"></i> Active Qirats</div>
-                    <div class="text-3xl font-bold">${allQirats.size}</div>
-                </div>
-                <div class="glass-card p-6 border-indigo-500/30">
-                    <div class="text-slate-400 text-sm mb-2"><i class="fas fa-file-alt mr-1"></i> Exam Records</div>
-                    <div class="flex items-center gap-2"><span class="relative flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span></span><span class="text-xl font-semibold">${completedExams}</span></div>
-                </div>
-            `;
+                <div class="glass-card p-6"><div class="text-slate-400 text-sm mb-2"><i class="fas fa-users mr-1"></i> Total Students</div><div class="text-3xl font-bold">${totalStudents}</div></div>
+                <div class="glass-card p-6"><div class="text-slate-400 text-sm mb-2"><i class="fas fa-chart-line mr-1"></i> Average Score</div><div class="text-3xl font-bold">${avgScore}%</div><div class="w-full bg-slate-700 h-1.5 rounded-full mt-4"><div class="bg-indigo-500 h-1.5 rounded-full" style="width: ${avgScore}%"></div></div></div>
+                <div class="glass-card p-6"><div class="text-slate-400 text-sm mb-2"><i class="fas fa-book-quran mr-1"></i> Active Qirats</div><div class="text-3xl font-bold">${allQirats.size}</div></div>
+                <div class="glass-card p-6 border-indigo-500/30"><div class="text-slate-400 text-sm mb-2"><i class="fas fa-file-alt mr-1"></i> Exam Records</div><div class="flex items-center gap-2"><span class="relative flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span></span><span class="text-xl font-semibold">${completedExams}</span></div></div>`;
         }
         
         function renderCharts() {
-            const scores = [];
-            examScores.forEach(studentScores => {
-                Object.values(studentScores).forEach(qScores => {
-                    const avg = calculateAverage(qScores);
-                    if (avg !== null) scores.push(avg);
-                });
-            });
+            const scores = []; examScores.forEach(studentScores => { Object.values(studentScores).forEach(qScores => { const avg = calculateAverage(qScores); if (avg !== null) scores.push(avg); }); });
             const ranges = { '0-20': 0, '21-40': 0, '41-60': 0, '61-80': 0, '81-100': 0 };
             scores.forEach(s => { if (s <= 20) ranges['0-20']++; else if (s <= 40) ranges['21-40']++; else if (s <= 60) ranges['41-60']++; else if (s <= 80) ranges['61-80']++; else ranges['81-100']++; });
-            
             if (charts.trend) charts.trend.destroy();
-            const trendCtx = document.getElementById('trendChart').getContext('2d');
-            charts.trend = new Chart(trendCtx, {
-                type: 'line',
-                data: { labels: assessmentConfig.assessments.map(a => a.name), datasets: [{ label: 'Average Score %', data: assessmentConfig.assessments.map(() => Math.floor(Math.random() * 30) + 65), borderColor: '#6366f1', tension: 0.3, fill: true, backgroundColor: 'rgba(99, 102, 241, 0.1)' }] },
-                options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { labels: { color: '#94a3b8' } } } }
-            });
-            
+            charts.trend = new Chart(document.getElementById('trendChart').getContext('2d'), { type: 'line', data: { labels: assessmentConfig.assessments.map(a => a.name), datasets: [{ label: 'Average Score %', data: assessmentConfig.assessments.map(() => Math.floor(Math.random() * 30) + 65), borderColor: '#6366f1', tension: 0.3, fill: true, backgroundColor: 'rgba(99, 102, 241, 0.1)' }] }, options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { labels: { color: '#94a3b8' } } } } });
             if (charts.dist) charts.dist.destroy();
-            const distCtx = document.getElementById('distChart').getContext('2d');
-            charts.dist = new Chart(distCtx, {
-                type: 'doughnut',
-                data: { labels: Object.keys(ranges), datasets: [{ data: Object.values(ranges), backgroundColor: ['#ef4444', '#f59e0b', '#eab308', '#10b981', '#6366f1'] }] },
-                options: { responsive: true, plugins: { legend: { labels: { color: '#94a3b8' } } } }
-            });
+            charts.dist = new Chart(document.getElementById('distChart').getContext('2d'), { type: 'doughnut', data: { labels: Object.keys(ranges), datasets: [{ data: Object.values(ranges), backgroundColor: ['#ef4444', '#f59e0b', '#eab308', '#10b981', '#6366f1'] }] }, options: { responsive: true, plugins: { legend: { labels: { color: '#94a3b8' } } } } });
         }
         
         async function renderCurrentView() {
@@ -580,75 +308,30 @@
         async function renderQiratView() {
             const qiratMap = new Map();
             const filteredStudents = applyFilters(allStudents);
-            filteredStudents.forEach(s => {
-                getQiratNames(s).forEach(q => {
-                    if (!qiratMap.has(q)) qiratMap.set(q, []);
-                    const avg = calculateStudentOverallAvg(s.id);
-                    qiratMap.get(q).push({ ...s, overallAvg: avg });
-                });
-            });
-            const groups = Array.from(qiratMap.entries()).map(([name, students]) => {
-                const validScores = students.filter(s => s.overallAvg);
-                const avgScore = validScores.length ? Math.round(validScores.reduce((sum, s) => sum + s.overallAvg, 0) / validScores.length) : 0;
-                return { name, students, avgScore, count: students.length };
-            }).sort((a,b) => b.count - a.count);
-            
+            filteredStudents.forEach(s => { getQiratNames(s).forEach(q => { if (!qiratMap.has(q)) qiratMap.set(q, []); const avg = calculateStudentOverallAvg(s.id); qiratMap.get(q).push({ ...s, overallAvg: avg }); }); });
+            const groups = Array.from(qiratMap.entries()).map(([name, students]) => { const validScores = students.filter(s => s.overallAvg); const avgScore = validScores.length ? Math.round(validScores.reduce((sum, s) => sum + s.overallAvg, 0) / validScores.length) : 0; return { name, students, avgScore, count: students.length }; }).sort((a,b) => b.count - a.count);
             document.getElementById('table-title').innerHTML = '<i class="fas fa-book-quran mr-2"></i> Qirat Performance Groups';
             document.getElementById('tableHeader').innerHTML = `<th class="px-6 py-4">Rank</th><th class="px-6 py-4">Qirat Name</th><th class="px-6 py-4">Students</th><th class="px-6 py-4">Avg Score</th><th class="px-6 py-4">Actions</th>`;
-            document.getElementById('tableBody').innerHTML = groups.map((group, idx) => `
-                <tr class="hover:bg-white/5 transition-colors fade-in">
-                    <td class="px-6 py-4 font-medium ${idx === 0 ? 'text-yellow-400' : ''}">#${idx + 1}</span></td>
-                    <td class="px-6 py-4"><div class="flex items-center gap-3"><div class="h-10 w-10 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold">${group.name.charAt(0)}</div><div><div class="font-medium">${escapeHtml(group.name)}</div></div></div></td>
-                    <td class="px-6 py-4"><span class="status-badge">${group.count} students</span></td>
-                    <td class="px-6 py-4"><span class="text-emerald-400 font-semibold">${group.avgScore}%</span></td>
-                    <td class="px-6 py-4"><button class="btn-premium px-4 py-2 rounded-lg text-xs font-semibold" onclick="openQiratModal('${escapeHtml(group.name)}')">View Details</button></td>
-                </tr>`).join('');
+            document.getElementById('tableBody').innerHTML = groups.map((group, idx) => `<tr class="hover:bg-white/5 transition-colors fade-in"><td class="px-6 py-4 font-medium ${idx === 0 ? 'text-yellow-400' : ''}">#${idx + 1}<td class="px-6 py-4"><div class="flex items-center gap-3"><div class="h-10 w-10 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold">${group.name.charAt(0)}</div><div><div class="font-medium">${escapeHtml(group.name)}</div></div></div><td class="px-6 py-4"><span class="status-badge">${group.count} students</span><td class="px-6 py-4"><span class="text-emerald-400 font-semibold">${group.avgScore}%</span><td class="px-6 py-4"><button class="btn-premium px-4 py-2 rounded-lg text-xs font-semibold" onclick="openQiratModal('${escapeHtml(group.name)}')">View Details</button></tr>`).join('');
         }
         
         async function renderDepartmentView() {
             const deptMap = new Map();
             const filteredStudents = applyFilters(allStudents);
-            filteredStudents.forEach(s => {
-                if (!deptMap.has(s.department)) deptMap.set(s.department, []);
-                const avg = calculateStudentOverallAvg(s.id);
-                deptMap.get(s.department).push({ ...s, overallAvg: avg });
-            });
-            const groups = Array.from(deptMap.entries()).map(([name, students]) => {
-                const validScores = students.filter(s => s.overallAvg);
-                const avgScore = validScores.length ? Math.round(validScores.reduce((sum, s) => sum + s.overallAvg, 0) / validScores.length) : 0;
-                return { name, students, avgScore, count: students.length };
-            }).sort((a,b) => b.count - a.count);
-            
+            filteredStudents.forEach(s => { if (!deptMap.has(s.department)) deptMap.set(s.department, []); const avg = calculateStudentOverallAvg(s.id); deptMap.get(s.department).push({ ...s, overallAvg: avg }); });
+            const groups = Array.from(deptMap.entries()).map(([name, students]) => { const validScores = students.filter(s => s.overallAvg); const avgScore = validScores.length ? Math.round(validScores.reduce((sum, s) => sum + s.overallAvg, 0) / validScores.length) : 0; return { name, students, avgScore, count: students.length }; }).sort((a,b) => b.count - a.count);
             document.getElementById('table-title').innerHTML = '<i class="fas fa-building mr-2"></i> Department Performance';
             document.getElementById('tableHeader').innerHTML = `<th class="px-6 py-4">Rank</th><th class="px-6 py-4">Department</th><th class="px-6 py-4">Students</th><th class="px-6 py-4">Avg Score</th><th class="px-6 py-4">Actions</th>`;
-            document.getElementById('tableBody').innerHTML = groups.map((group, idx) => `
-                <tr class="hover:bg-white/5 transition-colors fade-in">
-                    <td class="px-6 py-4 font-medium">#${idx + 1}</span></td>
-                    <td class="px-6 py-4"><div class="flex items-center gap-3"><div class="h-10 w-10 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 font-bold">${group.name.charAt(0)}</div><div><div class="font-medium">${escapeHtml(group.name)}</div></div></div></td>
-                    <td class="px-6 py-4"><span class="status-badge">${group.count} students</span></td>
-                    <td class="px-6 py-4"><span class="text-emerald-400 font-semibold">${group.avgScore}%</span></td>
-                    <td class="px-6 py-4"><button class="btn-premium px-4 py-2 rounded-lg text-xs font-semibold" onclick="openDepartmentModal('${escapeHtml(group.name)}')">View Students</button></td>
-                </tr>`).join('');
+            document.getElementById('tableBody').innerHTML = groups.map((group, idx) => `<tr class="hover:bg-white/5 transition-colors fade-in"><td class="px-6 py-4 font-medium">#${idx + 1}<td class="px-6 py-4"><div class="flex items-center gap-3"><div class="h-10 w-10 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 font-bold">${group.name.charAt(0)}</div><div><div class="font-medium">${escapeHtml(group.name)}</div></div></div><td class="px-6 py-4"><span class="status-badge">${group.count} students</span><td class="px-6 py-4"><span class="text-emerald-400 font-semibold">${group.avgScore}%</span><td class="px-6 py-4"><button class="btn-premium px-4 py-2 rounded-lg text-xs font-semibold" onclick="openDepartmentModal('${escapeHtml(group.name)}')">View Students</button></tr>`).join('');
         }
         
         async function renderGeneralView() {
             let studentsWithScores = allStudents.map(s => ({ ...s, overallAvg: calculateStudentOverallAvg(s.id) }));
             studentsWithScores = applyFilters(studentsWithScores);
             studentsWithScores.sort((a,b) => (b.overallAvg || 0) - (a.overallAvg || 0));
-            
             document.getElementById('table-title').innerHTML = '<i class="fas fa-trophy mr-2"></i> Overall Student Rankings';
             document.getElementById('tableHeader').innerHTML = `<th class="px-6 py-4">Rank</th><th class="px-6 py-4">Student Name</th><th class="px-6 py-4">Department</th><th class="px-6 py-4">Batch</th><th class="px-6 py-4">Gender</th><th class="px-6 py-4">Qirats</th><th class="px-6 py-4">Avg Score</th><th class="px-6 py-4">Actions</th>`;
-            document.getElementById('tableBody').innerHTML = studentsWithScores.map((student, idx) => `
-                <tr class="hover:bg-white/5 transition-colors fade-in">
-                    <td class="px-6 py-4 font-medium ${idx === 0 ? 'text-yellow-400' : idx === 1 ? 'text-slate-400' : idx === 2 ? 'text-amber-600' : ''}">#${idx + 1}</span></td>
-                    <td class="px-6 py-4"><div class="flex items-center gap-3"><div class="h-10 w-10 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold">${student.full_name.charAt(0)}</div><div><div class="font-medium">${escapeHtml(student.full_name)}</div><div class="text-xs text-slate-500">${student.phone || 'No phone'}</div></div></div></td>
-                    <td class="px-6 py-4">${escapeHtml(student.department)}</span></td>
-                    <td class="px-6 py-4">${escapeHtml(student.batch)}</span></td>
-                    <td class="px-6 py-4"><span class="status-badge">${escapeHtml(student.gender)}</span></td>
-                    <td class="px-6 py-4"><span class="status-badge">${getQiratNames(student).length} Qirats</span></td>
-                    <td class="px-6 py-4"><span class="text-emerald-400 font-semibold">${student.overallAvg !== null ? student.overallAvg + '%' : '-'}</span></td>
-                    <td class="px-6 py-4"><button class="btn-premium px-4 py-2 rounded-lg text-xs font-semibold" onclick="openStudentModal('${student.id}')">View Analytics</button></td>
-                </tr>`).join('');
+            document.getElementById('tableBody').innerHTML = studentsWithScores.map((student, idx) => `<tr class="hover:bg-white/5 transition-colors fade-in"><td class="px-6 py-4 font-medium ${idx === 0 ? 'text-yellow-400' : idx === 1 ? 'text-slate-400' : idx === 2 ? 'text-amber-600' : ''}">#${idx + 1}<td class="px-6 py-4"><div class="flex items-center gap-3"><div class="h-10 w-10 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold">${student.full_name.charAt(0)}</div><div><div class="font-medium">${escapeHtml(student.full_name)}</div><div class="text-xs text-slate-500">${student.phone || 'No phone'}</div></div></div><td class="px-6 py-4">${escapeHtml(student.department)}<td class="px-6 py-4">${escapeHtml(student.batch)}<td class="px-6 py-4"><span class="status-badge">${escapeHtml(student.gender)}</span><td class="px-6 py-4"><span class="status-badge">${getQiratNames(student).length} Qirats</span><td class="px-6 py-4"><span class="text-emerald-400 font-semibold">${student.overallAvg !== null ? student.overallAvg + '%' : '-'}</span><td class="px-6 py-4"><button class="btn-premium px-4 py-2 rounded-lg text-xs font-semibold" onclick="openStudentModal('${student.id}')">View Analytics</button></tr>`).join('');
         }
         
         window.openStudentModal = async (studentId) => {
@@ -658,6 +341,7 @@
             const qirats = getQiratNames(student);
             const overallAvg = calculateStudentOverallAvg(studentId);
             const totalPossible = calculateTotalPossible();
+            const deptRank = calculateRankInDepartment(studentId);
             
             let qiratDetails = '';
             for (const q of qirats) {
@@ -665,12 +349,15 @@
                 const avg = calculateAverage(scores);
                 const totalPoints = calculateTotalPoints(scores);
                 const totalPercentPossible = totalPossible > 0 ? Math.round((totalPoints / totalPossible) * 100) : 0;
-                
+                const qiratGlobalRank = calculateQiratGlobalRank(studentId, q);
+                const qiratDeptRank = calculateQiratRankInDepartment(studentId, q);
                 const studentsInQirat = allStudents.filter(s => getQiratNames(s).includes(q));
-                const qiratScores = studentsInQirat.map(s => ({ id: s.id, avg: calculateAverage(getStudentExamScores(s.id, q)) }));
-                const rankInQirat = qiratScores.sort((a,b) => (b.avg || 0) - (a.avg || 0)).findIndex(s => s.id === studentId) + 1;
                 
-                qiratDetails += `<div class="bg-slate-800/30 rounded-xl p-4 mb-4"><div class="flex justify-between items-center mb-3"><h4 class="font-semibold text-indigo-400"><i class="fas fa-book-quran mr-2"></i> ${escapeHtml(q)}</h4><div class="flex gap-3"><span class="status-badge">Rank: #${rankInQirat}/${studentsInQirat.length}</span></div></div>
+                qiratDetails += `<div class="bg-slate-800/30 rounded-xl p-4 mb-4">
+                    <div class="flex justify-between items-center mb-3 flex-wrap gap-2">
+                        <h4 class="font-semibold text-indigo-400"><i class="fas fa-book-quran mr-2"></i> ${escapeHtml(q)}</h4>
+                        <div class="flex gap-3 flex-wrap"><span class="status-badge">🌍 Global Rank: #${qiratGlobalRank}/${studentsInQirat.length}</span><span class="status-badge">🏢 Dept Rank: #${qiratDeptRank}/${studentsInQirat.filter(s => s.department === student.department).length}</span></div>
+                    </div>
                     <div class="grid grid-cols-${assessmentConfig.assessments.length + 3} gap-3 mb-3">
                         ${assessmentConfig.assessments.map((ass, i) => {
                             const score = scores[`assessment${i+1}`];
@@ -681,7 +368,8 @@
                         }).join('')}
                         <div class="text-center"><div class="text-xs text-slate-400">Total</div><div class="font-bold text-purple-400">${totalPoints}/${totalPossible}</div><div class="text-xs">${totalPercentPossible}%</div></div>
                         <div class="text-center"><div class="text-xs text-slate-400">Average</div><div class="font-bold text-indigo-400">${avg !== null ? avg+'%' : '-'}</div></div>
-                    </div></div>`;
+                    </div>
+                </div>`;
             }
             
             const allStudentsAvg = allStudents.map(s => ({ id: s.id, avg: calculateStudentOverallAvg(s.id) }));
@@ -690,11 +378,12 @@
             document.getElementById('modalTitle').innerHTML = `<i class="fas fa-user-graduate mr-2"></i> ${escapeHtml(student.full_name)}`;
             document.getElementById('saveStudentBtn').classList.toggle('hidden', !isEditMode);
             document.getElementById('modalContent').innerHTML = `
-                <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-6 gap-4 mb-6">
                     <div class="bg-slate-800/50 p-4 rounded-xl text-center"><p class="text-xs text-slate-400">Department</p><p class="font-semibold">${escapeHtml(student.department)}</p></div>
                     <div class="bg-slate-800/50 p-4 rounded-xl text-center"><p class="text-xs text-slate-400">Batch</p><p class="font-semibold">${escapeHtml(student.batch)}</p></div>
                     <div class="bg-slate-800/50 p-4 rounded-xl text-center"><p class="text-xs text-slate-400">Gender</p><p class="font-semibold">${escapeHtml(student.gender)}</p></div>
                     <div class="bg-slate-800/50 p-4 rounded-xl text-center"><p class="text-xs text-slate-400">Global Rank</p><p class="text-2xl font-bold text-yellow-400">#${globalRank}</p></div>
+                    <div class="bg-slate-800/50 p-4 rounded-xl text-center"><p class="text-xs text-slate-400">Dept Rank</p><p class="text-2xl font-bold text-purple-400">#${deptRank}</p></div>
                     <div class="bg-slate-800/50 p-4 rounded-xl text-center"><p class="text-xs text-slate-400">Overall Average</p><p class="text-2xl font-bold text-indigo-400">${overallAvg !== null ? overallAvg+'%' : '-'}</p></div>
                 </div>
                 <h3 class="font-semibold mb-3">Qirat Performance Details</h3>
@@ -705,199 +394,172 @@
         
         window.openQiratModal = (qiratName) => {
             const studentsInQirat = allStudents.filter(s => getQiratNames(s).includes(qiratName));
-            const filtered = applyFilters(studentsInQirat);
+            let filtered = applyFilters(studentsInQirat);
             const ranked = filtered.map(s => ({ student: s, avg: calculateStudentOverallAvg(s.id) })).sort((a,b) => (b.avg || 0) - (a.avg || 0));
             
             document.getElementById('qiratModalTitle').innerHTML = `<i class="fas fa-book-quran mr-2"></i> ${escapeHtml(qiratName)} - Complete Rankings`;
             document.getElementById('qiratModalContent').innerHTML = `
-                <div class="mb-4 p-4 bg-slate-800/30 rounded-xl"><div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div><p class="text-xs text-slate-400">Total Students</p><p class="text-xl font-bold">${filtered.length}</p></div>
-                    <div><p class="text-xs text-slate-400">Average Score</p><p class="text-xl font-bold text-emerald-400">${Math.round(ranked.reduce((sum, r) => sum + (r.avg || 0), 0) / ranked.length) || 0}%</p></div>
-                    <div><p class="text-xs text-slate-400">Top Performer</p><p class="text-sm font-semibold">${ranked[0]?.student.full_name || '-'}</p></div>
-                    <div><p class="text-xs text-slate-400">Top Score</p><p class="text-xl font-bold text-yellow-400">${ranked[0]?.avg || 0}%</p></div>
-                </div></div>
-                <div class="overflow-x-auto"><table class="w-full text-sm"><thead class="text-slate-400 border-b border-slate-700"><tr><th class="py-3 text-left">Rank</th><th class="py-3 text-left">Student</th><th class="py-3 text-left">Department</th><th class="py-3 text-left">Batch</th><th class="py-3 text-center">Avg Score</th><th class="py-3 text-right">Actions</th></tr></thead>
-                <tbody class="divide-y divide-slate-800">${ranked.map((item, idx) => `<tr><td class="py-3"><span class="px-3 py-1 rounded-full ${idx === 0 ? 'rank-1' : idx === 1 ? 'rank-2' : idx === 2 ? 'rank-3' : 'bg-slate-700'} text-xs font-bold">#${idx+1}</span></span></span><td class="py-3 font-medium">${escapeHtml(item.student.full_name)}</span><td class="py-3">${escapeHtml(item.student.department)}</span><td class="py-3">${escapeHtml(item.student.batch)}</span><td class="py-3 text-center"><span class="text-emerald-400 font-semibold">${item.avg !== null ? item.avg+'%' : '-'}</span><td class="py-3 text-right"><button class="px-3 py-1 rounded-lg bg-indigo-600/30 text-xs" onclick="closeModal('qiratModal'); openStudentModal('${item.student.id}')">View Details</button></tr>`).join('')}</tbody></table></div>`;
+                <div class="mb-4 flex flex-wrap gap-4">
+                    <div class="flex-1 min-w-[180px]"><label class="text-xs text-slate-400">Search</label><input type="text" id="modalSearchInput" placeholder="Search..." class="w-full bg-slate-800 border border-slate-700 px-3 py-2 rounded-lg text-sm"></div>
+                    <div class="flex-1 min-w-[140px]"><label class="text-xs text-slate-400">Gender</label><select id="modalGenderFilter" class="w-full bg-slate-800 border border-slate-700 px-3 py-2 rounded-lg text-sm"><option value="">All</option><option value="Male">Male</option><option value="Female">Female</option></select></div>
+                    <div class="flex-1 min-w-[140px]"><label class="text-xs text-slate-400">Department</label><select id="modalDeptFilter" class="w-full bg-slate-800 border border-slate-700 px-3 py-2 rounded-lg text-sm"><option value="">All</option>${[...new Set(studentsInQirat.map(s=>s.department))].map(d=>`<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join('')}</select></div>
+                    <div class="flex-1 min-w-[140px]"><label class="text-xs text-slate-400">Batch</label><select id="modalBatchFilter" class="w-full bg-slate-800 border border-slate-700 px-3 py-2 rounded-lg text-sm"><option value="">All</option>${[...new Set(studentsInQirat.map(s=>s.batch))].map(b=>`<option value="${escapeHtml(b)}">${escapeHtml(b)}</option>`).join('')}</select></div>
+                    <button onclick="applyModalFilters('qirat')" class="px-3 py-2 rounded-lg bg-indigo-600/50 text-sm mt-auto"><i class="fas fa-filter"></i> Filter</button>
+                    <button onclick="clearModalFilters('qirat')" class="px-3 py-2 rounded-lg bg-slate-700 text-sm mt-auto"><i class="fas fa-eraser"></i> Clear</button>
+                </div>
+                <div class="overflow-x-auto"><table class="w-full text-sm" id="modalExportTable"><thead class="text-slate-400 border-b border-slate-700"><tr><th class="py-3 text-left">Rank</th><th class="py-3 text-left">Student</th><th class="py-3 text-left">Department</th><th class="py-3 text-left">Batch</th><th class="py-3 text-left">Gender</th><th class="py-3 text-center">Avg Score</th><th class="py-3 text-right">Actions</th></tr></thead><tbody class="divide-y divide-slate-800" id="modalTableBody">${ranked.map((item, idx) => `<tr><td class="py-3"><span class="px-3 py-1 rounded-full ${idx === 0 ? 'rank-1' : idx === 1 ? 'rank-2' : idx === 2 ? 'rank-3' : 'bg-slate-700'} text-xs font-bold">#${idx+1}</span><td class="py-3 font-medium">${escapeHtml(item.student.full_name)}<td class="py-3">${escapeHtml(item.student.department)}<td class="py-3">${escapeHtml(item.student.batch)}<td class="py-3">${escapeHtml(item.student.gender)}<td class="py-3 text-center"><span class="text-emerald-400 font-semibold">${item.avg !== null ? item.avg+'%' : '-'}</span><td class="py-3 text-right"><button class="px-3 py-1 rounded-lg bg-indigo-600/30 text-xs" onclick="closeModal('qiratModal'); openStudentModal('${item.student.id}')">View Details</button></tr>`).join('')}</tbody></table></div>`;
             document.getElementById('qiratModal').classList.remove('hidden');
+            
+            window.modalQiratData = { students: studentsInQirat, qiratName: qiratName };
         };
         
         window.openDepartmentModal = (deptName) => {
             const students = allStudents.filter(s => s.department === deptName);
-            const filtered = applyFilters(students);
+            let filtered = applyFilters(students);
             const ranked = filtered.map(s => ({ student: s, avg: calculateStudentOverallAvg(s.id) })).sort((a,b) => (b.avg || 0) - (a.avg || 0));
             
             document.getElementById('deptModalTitle').innerHTML = `<i class="fas fa-building mr-2"></i> ${escapeHtml(deptName)} - Student Rankings`;
             document.getElementById('deptModalContent').innerHTML = `
-                <div class="mb-4 p-4 bg-slate-800/30 rounded-xl"><div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div><p class="text-xs text-slate-400">Total Students</p><p class="text-xl font-bold">${filtered.length}</p></div>
-                    <div><p class="text-xs text-slate-400">Department Avg</p><p class="text-xl font-bold text-emerald-400">${Math.round(ranked.reduce((sum, r) => sum + (r.avg || 0), 0) / ranked.length) || 0}%</p></div>
-                    <div><p class="text-xs text-slate-400">Top Student</p><p class="text-sm font-semibold">${ranked[0]?.student.full_name || '-'}</p></div>
-                    <div><p class="text-xs text-slate-400">Top Score</p><p class="text-xl font-bold text-yellow-400">${ranked[0]?.avg || 0}%</p></div>
-                </div></div>
-                <div class="overflow-x-auto"><table class="w-full text-sm"><thead class="text-slate-400 border-b border-slate-700"><tr><th class="py-3 text-left">Rank</th><th class="py-3 text-left">Student</th><th class="py-3 text-left">Batch</th><th class="py-3 text-center">Avg Score</th><th class="py-3 text-right">Actions</th></tr></thead>
-                <tbody class="divide-y divide-slate-800">${ranked.map((item, idx) => `<tr><td class="py-3"><span class="px-3 py-1 rounded-full ${idx === 0 ? 'rank-1' : idx === 1 ? 'rank-2' : idx === 2 ? 'rank-3' : 'bg-slate-700'} text-xs font-bold">#${idx+1}</span></span><td class="py-3 font-medium">${escapeHtml(item.student.full_name)}</span><td class="py-3">${escapeHtml(item.student.batch)}</span><td class="py-3 text-center"><span class="text-emerald-400 font-semibold">${item.avg !== null ? item.avg+'%' : '-'}</span><td class="py-3 text-right"><button class="px-3 py-1 rounded-lg bg-indigo-600/30 text-xs" onclick="closeModal('departmentModal'); openStudentModal('${item.student.id}')">View Details</button></tr>`).join('')}</tbody></table></div>`;
+                <div class="mb-4 flex flex-wrap gap-4">
+                    <div class="flex-1 min-w-[180px]"><label class="text-xs text-slate-400">Search</label><input type="text" id="modalDeptSearchInput" placeholder="Search..." class="w-full bg-slate-800 border border-slate-700 px-3 py-2 rounded-lg text-sm"></div>
+                    <div class="flex-1 min-w-[140px]"><label class="text-xs text-slate-400">Gender</label><select id="modalDeptGenderFilter" class="w-full bg-slate-800 border border-slate-700 px-3 py-2 rounded-lg text-sm"><option value="">All</option><option value="Male">Male</option><option value="Female">Female</option></select></div>
+                    <div class="flex-1 min-w-[140px]"><label class="text-xs text-slate-400">Batch</label><select id="modalDeptBatchFilter" class="w-full bg-slate-800 border border-slate-700 px-3 py-2 rounded-lg text-sm"><option value="">All</option>${[...new Set(students.map(s=>s.batch))].map(b=>`<option value="${escapeHtml(b)}">${escapeHtml(b)}</option>`).join('')}</select></div>
+                    <button onclick="applyDeptModalFilters()" class="px-3 py-2 rounded-lg bg-indigo-600/50 text-sm mt-auto"><i class="fas fa-filter"></i> Filter</button>
+                    <button onclick="clearDeptModalFilters()" class="px-3 py-2 rounded-lg bg-slate-700 text-sm mt-auto"><i class="fas fa-eraser"></i> Clear</button>
+                </div>
+                <div class="overflow-x-auto"><table class="w-full text-sm" id="modalDeptExportTable"><thead class="text-slate-400 border-b border-slate-700"><tr><th class="py-3 text-left">Rank</th><th class="py-3 text-left">Student</th><th class="py-3 text-left">Batch</th><th class="py-3 text-left">Gender</th><th class="py-3 text-center">Avg Score</th><th class="py-3 text-right">Actions</th></tr></thead><tbody class="divide-y divide-slate-800" id="modalDeptTableBody">${ranked.map((item, idx) => `<tr><td class="py-3"><span class="px-3 py-1 rounded-full ${idx === 0 ? 'rank-1' : idx === 1 ? 'rank-2' : idx === 2 ? 'rank-3' : 'bg-slate-700'} text-xs font-bold">#${idx+1}</span><td class="py-3 font-medium">${escapeHtml(item.student.full_name)}<td class="py-3">${escapeHtml(item.student.batch)}<td class="py-3">${escapeHtml(item.student.gender)}<td class="py-3 text-center"><span class="text-emerald-400 font-semibold">${item.avg !== null ? item.avg+'%' : '-'}</span><td class="py-3 text-right"><button class="px-3 py-1 rounded-lg bg-indigo-600/30 text-xs" onclick="closeModal('departmentModal'); openStudentModal('${item.student.id}')">View Details</button></tr>`).join('')}</tbody></table></div>`;
             document.getElementById('departmentModal').classList.remove('hidden');
+            
+            window.modalDeptData = { students: students, deptName: deptName };
+        };
+        
+        window.applyModalFilters = (type) => {
+            if (type === 'qirat' && window.modalQiratData) {
+                const search = document.getElementById('modalSearchInput')?.value.toLowerCase() || '';
+                const gender = document.getElementById('modalGenderFilter')?.value || '';
+                const dept = document.getElementById('modalDeptFilter')?.value || '';
+                const batch = document.getElementById('modalBatchFilter')?.value || '';
+                let filtered = window.modalQiratData.students.filter(s => {
+                    const matchSearch = s.full_name.toLowerCase().includes(search);
+                    const matchGender = !gender || s.gender === gender;
+                    const matchDept = !dept || s.department === dept;
+                    const matchBatch = !batch || s.batch === batch;
+                    return matchSearch && matchGender && matchDept && matchBatch;
+                });
+                const ranked = filtered.map(s => ({ student: s, avg: calculateStudentOverallAvg(s.id) })).sort((a,b) => (b.avg || 0) - (a.avg || 0));
+                document.getElementById('modalTableBody').innerHTML = ranked.map((item, idx) => `<tr><td class="py-3"><span class="px-3 py-1 rounded-full ${idx === 0 ? 'rank-1' : idx === 1 ? 'rank-2' : idx === 2 ? 'rank-3' : 'bg-slate-700'} text-xs font-bold">#${idx+1}</span><td class="py-3 font-medium">${escapeHtml(item.student.full_name)}<td class="py-3">${escapeHtml(item.student.department)}<td class="py-3">${escapeHtml(item.student.batch)}<td class="py-3">${escapeHtml(item.student.gender)}<td class="py-3 text-center"><span class="text-emerald-400 font-semibold">${item.avg !== null ? item.avg+'%' : '-'}</span><td class="py-3 text-right"><button class="px-3 py-1 rounded-lg bg-indigo-600/30 text-xs" onclick="closeModal('qiratModal'); openStudentModal('${item.student.id}')">View Details</button></tr>`).join('');
+            }
+        };
+        
+        window.clearModalFilters = (type) => {
+            if (type === 'qirat') {
+                if (document.getElementById('modalSearchInput')) document.getElementById('modalSearchInput').value = '';
+                if (document.getElementById('modalGenderFilter')) document.getElementById('modalGenderFilter').value = '';
+                if (document.getElementById('modalDeptFilter')) document.getElementById('modalDeptFilter').value = '';
+                if (document.getElementById('modalBatchFilter')) document.getElementById('modalBatchFilter').value = '';
+                applyModalFilters('qirat');
+            }
+        };
+        
+        window.applyDeptModalFilters = () => {
+            if (window.modalDeptData) {
+                const search = document.getElementById('modalDeptSearchInput')?.value.toLowerCase() || '';
+                const gender = document.getElementById('modalDeptGenderFilter')?.value || '';
+                const batch = document.getElementById('modalDeptBatchFilter')?.value || '';
+                let filtered = window.modalDeptData.students.filter(s => {
+                    const matchSearch = s.full_name.toLowerCase().includes(search);
+                    const matchGender = !gender || s.gender === gender;
+                    const matchBatch = !batch || s.batch === batch;
+                    return matchSearch && matchGender && matchBatch;
+                });
+                const ranked = filtered.map(s => ({ student: s, avg: calculateStudentOverallAvg(s.id) })).sort((a,b) => (b.avg || 0) - (a.avg || 0));
+                document.getElementById('modalDeptTableBody').innerHTML = ranked.map((item, idx) => `<tr><td class="py-3"><span class="px-3 py-1 rounded-full ${idx === 0 ? 'rank-1' : idx === 1 ? 'rank-2' : idx === 2 ? 'rank-3' : 'bg-slate-700'} text-xs font-bold">#${idx+1}</span><td class="py-3 font-medium">${escapeHtml(item.student.full_name)}<td class="py-3">${escapeHtml(item.student.batch)}<td class="py-3">${escapeHtml(item.student.gender)}<td class="py-3 text-center"><span class="text-emerald-400 font-semibold">${item.avg !== null ? item.avg+'%' : '-'}</span><td class="py-3 text-right"><button class="px-3 py-1 rounded-lg bg-indigo-600/30 text-xs" onclick="closeModal('departmentModal'); openStudentModal('${item.student.id}')">View Details</button></tr>`).join('');
+            }
+        };
+        
+        window.clearDeptModalFilters = () => {
+            if (document.getElementById('modalDeptSearchInput')) document.getElementById('modalDeptSearchInput').value = '';
+            if (document.getElementById('modalDeptGenderFilter')) document.getElementById('modalDeptGenderFilter').value = '';
+            if (document.getElementById('modalDeptBatchFilter')) document.getElementById('modalDeptBatchFilter').value = '';
+            applyDeptModalFilters();
         };
         
         // Export Functions for Modals
         window.exportModalToCSV = (contentId) => {
-            const element = document.getElementById(contentId);
-            const table = element.querySelector('table');
+            const table = document.querySelector(`#${contentId} table`);
             if (!table) { showToast('No table found to export', true); return; }
             const ws = XLSX.utils.table_to_sheet(table);
             const csv = XLSX.utils.sheet_to_csv(ws);
             const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `export_${Date.now()}.csv`;
-            link.click();
+            const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `export_${Date.now()}.csv`; link.click();
             showToast('CSV exported');
         };
         
         window.exportModalToExcel = (contentId) => {
-            const element = document.getElementById(contentId);
-            const table = element.querySelector('table');
+            const table = document.querySelector(`#${contentId} table`);
             if (!table) { showToast('No table found to export', true); return; }
             const ws = XLSX.utils.table_to_sheet(table);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'Data');
+            const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Data');
             XLSX.writeFile(wb, `export_${Date.now()}.xlsx`);
             showToast('Excel exported');
         };
         
         window.exportModalToPDF = async (contentId, filename) => {
-            const element = document.getElementById(contentId);
-            const table = element.querySelector('table');
+            const table = document.querySelector(`#${contentId} table`);
             if (!table) { showToast('No table found to export', true); return; }
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF({ orientation: 'landscape' });
-            doc.setFontSize(16);
-            doc.setTextColor(99, 102, 241);
+            doc.setFontSize(16); doc.setTextColor(99, 102, 241);
             doc.text(`Exam Report - ${filename}`, 14, 20);
-            doc.setFontSize(10);
-            doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 30);
+            doc.setFontSize(10); doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 30);
             doc.autoTable({ html: table, startY: 40, styles: { fontSize: 8, textColor: [255, 255, 255], cellPadding: 3 }, headStyles: { fillColor: [99, 102, 241] } });
             doc.save(`${filename}_${Date.now()}.pdf`);
             showToast('PDF exported');
         };
         
         window.exportModalToWord = (contentId, filename) => {
-            const element = document.getElementById(contentId);
-            const table = element.querySelector('table');
+            const table = document.querySelector(`#${contentId} table`);
             if (!table) { showToast('No table found to export', true); return; }
             const htmlContent = `<html><head><meta charset="UTF-8"><title>${filename}</title><style>body{font-family:Arial;} table{border-collapse:collapse;width:100%;} th,td{border:1px solid #ddd;padding:8px;} th{background:#6366f1;color:white;}</style></head><body><h1>${filename}</h1><p>Generated: ${new Date().toLocaleString()}</p>${table.outerHTML}</body></html>`;
             const blob = new Blob([htmlContent], { type: 'application/msword' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `${filename}_${Date.now()}.doc`;
-            link.click();
+            const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `${filename}_${Date.now()}.doc`; link.click();
             showToast('Word document exported');
         };
         
-        // Main Export Functions
-        window.exportMainToCSV = () => {
-            const table = document.getElementById('dataTable');
-            const ws = XLSX.utils.table_to_sheet(table);
-            const csv = XLSX.utils.sheet_to_csv(ws);
-            const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `exam_main_${currentView}_${Date.now()}.csv`;
-            link.click();
-            showToast('CSV exported');
-        };
-        
-        window.exportMainToExcel = () => {
-            const table = document.getElementById('dataTable');
-            const ws = XLSX.utils.table_to_sheet(table);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'ExamData');
-            XLSX.writeFile(wb, `exam_main_${currentView}_${Date.now()}.xlsx`);
-            showToast('Excel exported');
-        };
-        
-        window.exportMainToPDF = async () => {
-            const table = document.getElementById('dataTable');
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF({ orientation: 'landscape' });
-            doc.setFontSize(16);
-            doc.setTextColor(99, 102, 241);
-            doc.text(`Exam Report - ${currentView.toUpperCase()} View`, 14, 20);
-            doc.setFontSize(10);
-            doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 30);
-            doc.autoTable({ html: table, startY: 40, styles: { fontSize: 8, textColor: [255, 255, 255], cellPadding: 3 }, headStyles: { fillColor: [99, 102, 241] } });
-            doc.save(`exam_main_${currentView}_${Date.now()}.pdf`);
-            showToast('PDF exported');
-        };
-        
-        window.exportMainToWord = () => {
-            const table = document.getElementById('dataTable');
-            const htmlContent = `<html><head><meta charset="UTF-8"><title>Exam Report</title><style>body{font-family:Arial;} table{border-collapse:collapse;width:100%;} th,td{border:1px solid #ddd;padding:8px;} th{background:#6366f1;color:white;}</style></head><body><h1>Exam Report - ${currentView.toUpperCase()} View</h1><p>Generated: ${new Date().toLocaleString()}</p>${table.outerHTML}</body></html>`;
-            const blob = new Blob([htmlContent], { type: 'application/msword' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `exam_main_${currentView}_${Date.now()}.doc`;
-            link.click();
-            showToast('Word document exported');
-        };
-        
+        window.exportMainToCSV = () => { const ws = XLSX.utils.table_to_sheet(document.getElementById('dataTable')); const csv = XLSX.utils.sheet_to_csv(ws); const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `exam_main_${currentView}_${Date.now()}.csv`; link.click(); showToast('CSV exported'); };
+        window.exportMainToExcel = () => { const ws = XLSX.utils.table_to_sheet(document.getElementById('dataTable')); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'ExamData'); XLSX.writeFile(wb, `exam_main_${currentView}_${Date.now()}.xlsx`); showToast('Excel exported'); };
+        window.exportMainToPDF = async () => { const { jsPDF } = window.jspdf; const doc = new jsPDF({ orientation: 'landscape' }); doc.setFontSize(16); doc.setTextColor(99, 102, 241); doc.text(`Exam Report - ${currentView.toUpperCase()} View`, 14, 20); doc.setFontSize(10); doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 30); doc.autoTable({ html: '#dataTable', startY: 40, styles: { fontSize: 8, textColor: [255, 255, 255], cellPadding: 3 }, headStyles: { fillColor: [99, 102, 241] } }); doc.save(`exam_main_${currentView}_${Date.now()}.pdf`); showToast('PDF exported'); };
+        window.exportMainToWord = () => { const htmlContent = `<html><head><meta charset="UTF-8"><title>Exam Report</title><style>body{font-family:Arial;} table{border-collapse:collapse;width:100%;} th,td{border:1px solid #ddd;padding:8px;} th{background:#6366f1;color:white;}</style></head><body><h1>Exam Report - ${currentView.toUpperCase()} View</h1><p>Generated: ${new Date().toLocaleString()}</p>${document.getElementById('dataTable').outerHTML}</body></html>`; const blob = new Blob([htmlContent], { type: 'application/msword' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `exam_main_${currentView}_${Date.now()}.doc`; link.click(); showToast('Word document exported'); };
         window.exportMainData = () => window.exportMainToExcel();
         
         window.openSettingsModal = () => {
-            document.getElementById('settingsContent').innerHTML = `
-                <div class="mb-6"><div id="assessmentsList" class="space-y-3">
-                    ${assessmentConfig.assessments.map((ass, idx) => `<div class="settings-card flex gap-3 items-center p-3 bg-slate-800/30 rounded-xl">
-                        <input type="text" class="flex-1 bg-slate-900 border border-slate-700 px-3 py-2 rounded-lg text-sm" placeholder="Assessment Name" value="${escapeHtml(ass.name)}" data-idx="${idx}" data-field="name">
-                        <div class="flex items-center gap-2"><span class="text-slate-400 text-sm">/</span><input type="number" class="w-24 bg-slate-900 border border-slate-700 px-3 py-2 rounded-lg text-sm" placeholder="Max Points" value="${ass.outOf}" data-idx="${idx}" data-field="outOf" min="1" max="500"></div>
-                        <button onclick="removeAssessment(${idx})" class="px-3 py-2 rounded-lg bg-red-600/30 hover:bg-red-600/50 text-sm"><i class="fas fa-trash"></i></button>
-                    </div>`).join('')}
-                </div>
-                <button onclick="addAssessment()" class="mt-4 px-4 py-2 rounded-lg bg-indigo-600/30 hover:bg-indigo-600/50 text-sm"><i class="fas fa-plus mr-1"></i> Add Assessment</button></div>
-                <div class="flex gap-3 justify-end pt-4 border-t border-slate-700"><button onclick="closeModal('settingsModal')" class="px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-sm">Cancel</button><button onclick="saveSettings()" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-sm"><i class="fas fa-save mr-1"></i> Save Settings</button></div>`;
+            document.getElementById('settingsContent').innerHTML = `<div class="mb-6"><div id="assessmentsList" class="space-y-3">${assessmentConfig.assessments.map((ass, idx) => `<div class="settings-card flex gap-3 items-center p-3 bg-slate-800/30 rounded-xl"><input type="text" class="flex-1 bg-slate-900 border border-slate-700 px-3 py-2 rounded-lg text-sm" placeholder="Assessment Name" value="${escapeHtml(ass.name)}" data-idx="${idx}" data-field="name"><div class="flex items-center gap-2"><span class="text-slate-400 text-sm">/</span><input type="number" class="w-24 bg-slate-900 border border-slate-700 px-3 py-2 rounded-lg text-sm" placeholder="Max Points" value="${ass.outOf}" data-idx="${idx}" data-field="outOf" min="1" max="500"></div><button onclick="removeAssessment(${idx})" class="px-3 py-2 rounded-lg bg-red-600/30 hover:bg-red-600/50 text-sm"><i class="fas fa-trash"></i></button></div>`).join('')}</div><button onclick="addAssessment()" class="mt-4 px-4 py-2 rounded-lg bg-indigo-600/30 hover:bg-indigo-600/50 text-sm"><i class="fas fa-plus mr-1"></i> Add Assessment</button></div><div class="flex gap-3 justify-end pt-4 border-t border-slate-700"><button onclick="closeModal('settingsModal')" class="px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-sm">Cancel</button><button onclick="saveSettings()" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-sm"><i class="fas fa-save mr-1"></i> Save Settings</button></div>`;
             document.getElementById('settingsModal').classList.remove('hidden');
         };
         
-        window.addAssessment = () => {
-            assessmentConfig.assessments.push({ name: `New Assessment ${assessmentConfig.assessments.length + 1}`, outOf: 100 });
-            openSettingsModal();
-        };
-        
-        window.removeAssessment = (idx) => {
-            assessmentConfig.assessments.splice(idx, 1);
-            openSettingsModal();
-        };
-        
+        window.addAssessment = () => { assessmentConfig.assessments.push({ name: `New Assessment ${assessmentConfig.assessments.length + 1}`, outOf: 100 }); openSettingsModal(); };
+        window.removeAssessment = (idx) => { assessmentConfig.assessments.splice(idx, 1); openSettingsModal(); };
         window.saveSettings = async () => {
             const inputs = document.querySelectorAll('#assessmentsList input');
-            const newAssessments = [];
-            const tempMap = {};
+            const newAssessments = []; const tempMap = {};
             inputs.forEach(input => { const idx = parseInt(input.dataset.idx); const field = input.dataset.field; if (!tempMap[idx]) tempMap[idx] = {}; tempMap[idx][field] = field === 'outOf' ? parseInt(input.value) : input.value; });
             for (let i = 0; i < Object.keys(tempMap).length; i++) { if (tempMap[i].name && tempMap[i].outOf) newAssessments.push({ name: tempMap[i].name, outOf: tempMap[i].outOf }); }
             assessmentConfig.assessments = newAssessments;
             await saveAssessmentConfig();
             closeModal('settingsModal');
             await loadExamScores();
-            renderStats();
-            renderCharts();
-            await renderCurrentView();
+            renderStats(); renderCharts(); await renderCurrentView();
             showToast('Assessment settings updated and saved to Firebase!');
         };
         
         window.saveStudentScores = async () => {
             if (!currentStudentId) return;
             const inputs = document.querySelectorAll('#modalContent .score-input');
-            for (const input of inputs) {
-                const qirat = input.dataset.qirat;
-                const assessment = `assessment${input.dataset.assessment}`;
-                const value = input.value;
-                await saveExamScore(currentStudentId, qirat, assessment, value);
-            }
+            for (const input of inputs) { const qirat = input.dataset.qirat; const assessment = `assessment${input.dataset.assessment}`; const value = input.value; await saveExamScore(currentStudentId, qirat, assessment, value); }
             await loadExamScores();
             showToast('Scores saved to Firebase successfully!');
             openStudentModal(currentStudentId);
-            renderCurrentView();
-            renderStats();
-            renderCharts();
+            renderCurrentView(); renderStats(); renderCharts();
         };
         
         window.toggleEditMode = () => {
