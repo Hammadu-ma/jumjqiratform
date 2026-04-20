@@ -64,6 +64,7 @@
         .filter-input { background: #1e293b; border: 1px solid #334155; border-radius: 0.5rem; padding: 0.5rem 0.75rem; font-size: 0.75rem; color: white; }
         .filter-input:focus { outline: none; border-color: #6366f1; }
         body.light-mode .filter-input { background: white; border-color: #cbd5e1; color: #0f172a; }
+        .modal-filter-bar { background: rgba(0, 0, 0, 0.3); border-radius: 1rem; padding: 0.75rem; margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: flex-end; }
     </style>
 </head>
 <body class="p-4 md:p-8">
@@ -120,7 +121,7 @@
             <div class="overflow-x-auto custom-scrollbar">
                 <table class="w-full text-left" id="dataTable">
                     <thead class="bg-slate-800/50 text-slate-400 text-xs uppercase tracking-wider"><tr id="tableHeader"></tr></thead>
-                    <tbody id="tableBody" class="divide-y divide-slate-700/50"><tr><td colspan="10" class="text-center py-8"><div class="loading-spinner mx-auto"></div><p class="mt-4 text-slate-400">Loading data...</p></td></tr></tbody>
+                    <tbody id="tableBody" class="divide-y divide-slate-700/50"><tr><td colspan="10" class="text-center py-8"><div class="loading-spinner mx-auto"></div><p class="mt-4 text-slate-400">Loading data...</p></tr></tbody>
                 </table>
             </div>
         </div>
@@ -143,11 +144,10 @@
             <div class="p-6 border-b border-slate-700 flex justify-between items-center bg-slate-800/30 flex-wrap gap-2">
                 <h2 class="text-2xl font-bold" id="qiratModalTitle">Qirat Performance</h2>
                 <div class="flex gap-2 flex-wrap">
-                    <div class="flex gap-1"><input type="text" id="qiratModalSearch" placeholder="Search..." class="filter-input w-32"><select id="qiratModalGender" class="filter-input"><option value="">Gender</option><option value="Male">Male</option><option value="Female">Female</option></select><select id="qiratModalDept" class="filter-input"><option value="">Dept</option></select><select id="qiratModalBatch" class="filter-input"><option value="">Batch</option></select><button onclick="applyQiratModalFilters()" class="px-2 py-1 rounded bg-indigo-600 text-xs"><i class="fas fa-filter"></i></button><button onclick="clearQiratModalFilters()" class="px-2 py-1 rounded bg-slate-600 text-xs"><i class="fas fa-eraser"></i></button></div>
-                    <button onclick="exportModalToCSV('qiratModalTable')" class="px-3 py-1.5 rounded-lg bg-slate-700 text-xs"><i class="fas fa-file-csv"></i></button>
-                    <button onclick="exportModalToExcel('qiratModalTable')" class="px-3 py-1.5 rounded-lg bg-slate-700 text-xs"><i class="fas fa-file-excel"></i></button>
-                    <button onclick="exportModalToPDF('qiratModalTable', 'qirat_report')" class="px-3 py-1.5 rounded-lg bg-slate-700 text-xs"><i class="fas fa-file-pdf"></i></button>
-                    <button onclick="exportModalToWord('qiratModalTable', 'qirat_report')" class="px-3 py-1.5 rounded-lg bg-slate-700 text-xs"><i class="fas fa-file-word"></i></button>
+                    <button onclick="exportModalToCSV('qiratModalTable')" class="px-3 py-1.5 rounded-lg bg-slate-700 text-xs"><i class="fas fa-file-csv"></i> CSV</button>
+                    <button onclick="exportModalToExcel('qiratModalTable')" class="px-3 py-1.5 rounded-lg bg-slate-700 text-xs"><i class="fas fa-file-excel"></i> Excel</button>
+                    <button onclick="exportModalToPDF('qiratModalTable', 'qirat_report')" class="px-3 py-1.5 rounded-lg bg-slate-700 text-xs"><i class="fas fa-file-pdf"></i> PDF</button>
+                    <button onclick="exportModalToWord('qiratModalTable', 'qirat_report')" class="px-3 py-1.5 rounded-lg bg-slate-700 text-xs"><i class="fas fa-file-word"></i> Word</button>
                     <button onclick="closeModal('qiratModal')" class="text-slate-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
                 </div>
             </div>
@@ -161,11 +161,10 @@
             <div class="p-6 border-b border-slate-700 flex justify-between items-center bg-slate-800/30 flex-wrap gap-2">
                 <h2 class="text-2xl font-bold" id="deptModalTitle">Department Performance</h2>
                 <div class="flex gap-2 flex-wrap">
-                    <div class="flex gap-1"><input type="text" id="deptModalSearch" placeholder="Search..." class="filter-input w-32"><select id="deptModalGender" class="filter-input"><option value="">Gender</option><option value="Male">Male</option><option value="Female">Female</option></select><select id="deptModalBatch" class="filter-input"><option value="">Batch</option></select><button onclick="applyDeptModalFilters()" class="px-2 py-1 rounded bg-indigo-600 text-xs"><i class="fas fa-filter"></i></button><button onclick="clearDeptModalFilters()" class="px-2 py-1 rounded bg-slate-600 text-xs"><i class="fas fa-eraser"></i></button></div>
-                    <button onclick="exportModalToCSV('deptModalTable')" class="px-3 py-1.5 rounded-lg bg-slate-700 text-xs"><i class="fas fa-file-csv"></i></button>
-                    <button onclick="exportModalToExcel('deptModalTable')" class="px-3 py-1.5 rounded-lg bg-slate-700 text-xs"><i class="fas fa-file-excel"></i></button>
-                    <button onclick="exportModalToPDF('deptModalTable', 'dept_report')" class="px-3 py-1.5 rounded-lg bg-slate-700 text-xs"><i class="fas fa-file-pdf"></i></button>
-                    <button onclick="exportModalToWord('deptModalTable', 'dept_report')" class="px-3 py-1.5 rounded-lg bg-slate-700 text-xs"><i class="fas fa-file-word"></i></button>
+                    <button onclick="exportModalToCSV('deptModalTable')" class="px-3 py-1.5 rounded-lg bg-slate-700 text-xs"><i class="fas fa-file-csv"></i> CSV</button>
+                    <button onclick="exportModalToExcel('deptModalTable')" class="px-3 py-1.5 rounded-lg bg-slate-700 text-xs"><i class="fas fa-file-excel"></i> Excel</button>
+                    <button onclick="exportModalToPDF('deptModalTable', 'dept_report')" class="px-3 py-1.5 rounded-lg bg-slate-700 text-xs"><i class="fas fa-file-pdf"></i> PDF</button>
+                    <button onclick="exportModalToWord('deptModalTable', 'dept_report')" class="px-3 py-1.5 rounded-lg bg-slate-700 text-xs"><i class="fas fa-file-word"></i> Word</button>
                     <button onclick="closeModal('departmentModal')" class="text-slate-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
                 </div>
             </div>
@@ -518,70 +517,154 @@
             }
         };
         
+        // QIRAT MODAL WITH WORKING FILTERS
+        let currentQiratData = null;
+        
         window.openQiratModal = (qiratName) => {
-            let studentsInQirat = allStudents.filter(s => getQiratNames(s).includes(qiratName));
+            const studentsInQirat = allStudents.filter(s => getQiratNames(s).includes(qiratName));
             const departments = [...new Set(studentsInQirat.map(s => s.department))];
             const batches = [...new Set(studentsInQirat.map(s => s.batch))];
-            document.getElementById('qiratModalDept').innerHTML = '<option value="">All Depts</option>' + departments.map(d => `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join('');
-            document.getElementById('qiratModalBatch').innerHTML = '<option value="">All Batches</option>' + batches.map(b => `<option value="${escapeHtml(b)}">${escapeHtml(b)}</option>`).join('');
-            window.currentQiratData = { name: qiratName, students: studentsInQirat };
-            applyQiratModalFilters();
-        };
-        
-        function applyQiratModalFilters() {
-            if (!window.currentQiratData) return;
-            const search = document.getElementById('qiratModalSearch')?.value.toLowerCase() || '';
-            const gender = document.getElementById('qiratModalGender')?.value || '';
-            const dept = document.getElementById('qiratModalDept')?.value || '';
-            const batch = document.getElementById('qiratModalBatch')?.value || '';
-            let filtered = window.currentQiratData.students.filter(s => {
-                return (!search || s.full_name.toLowerCase().includes(search)) && (!gender || s.gender === gender) && (!dept || s.department === dept) && (!batch || s.batch === batch);
-            });
-            const ranked = filtered.map(s => ({ student: s, avg: calculateStudentOverallAvg(s.id) })).sort((a,b) => (b.avg || 0) - (a.avg || 0));
-            document.getElementById('qiratModalTitle').innerHTML = `<i class="fas fa-book-quran mr-2"></i> ${escapeHtml(window.currentQiratData.name)} - Rankings (${filtered.length} students)`;
-            document.getElementById('qiratModalContent').innerHTML = `
-                <div class="overflow-x-auto"><table id="qiratModalTable" class="w-full text-sm"><thead class="text-slate-400 border-b border-slate-700"><tr><th class="py-3 text-left">Rank</th><th class="py-3 text-left">Student</th><th class="py-3 text-left">Department</th><th class="py-3 text-left">Batch</th><th class="py-3 text-left">Gender</th><th class="py-3 text-center">Avg Score</th><th class="py-3 text-right">Actions</th></tr></thead><tbody class="divide-y divide-slate-800">${ranked.map((item, idx) => `<tr><td class="py-3"><span class="px-3 py-1 rounded-full ${idx === 0 ? 'rank-1' : idx === 1 ? 'rank-2' : idx === 2 ? 'rank-3' : 'bg-slate-700'} text-xs font-bold">#${idx+1}</span><td class="py-3 font-medium">${escapeHtml(item.student.full_name)}<td class="py-3">${escapeHtml(item.student.department)}<td class="py-3">${escapeHtml(item.student.batch)}<td class="py-3">${escapeHtml(item.student.gender)}<td class="py-3 text-center"><span class="text-emerald-400 font-semibold">${item.avg !== null ? item.avg+'%' : '-'}</span><td class="py-3 text-right"><button class="px-3 py-1 rounded-lg bg-indigo-600/30 text-xs" onclick="closeModal('qiratModal'); openStudentModal('${item.student.id}')">View</button></tr>`).join('')}</tbody></table></div>`;
+            
+            currentQiratData = { name: qiratName, students: studentsInQirat };
+            
+            const filterHtml = `
+                <div class="modal-filter-bar">
+                    <div><input type="text" id="qiratSearchInput" placeholder="Search name..." class="filter-input w-40" value=""></div>
+                    <div><select id="qiratGenderSelect" class="filter-input"><option value="">All Genders</option><option value="Male">Male</option><option value="Female">Female</option></select></div>
+                    <div><select id="qiratDeptSelect" class="filter-input"><option value="">All Depts</option>${departments.map(d => `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join('')}</select></div>
+                    <div><select id="qiratBatchSelect" class="filter-input"><option value="">All Batches</option>${batches.map(b => `<option value="${escapeHtml(b)}">${escapeHtml(b)}</option>`).join('')}</select></div>
+                    <div><button onclick="applyQiratFilters()" class="px-3 py-1.5 rounded-lg bg-indigo-600 text-xs"><i class="fas fa-search"></i> Filter</button></div>
+                    <div><button onclick="clearQiratFilters()" class="px-3 py-1.5 rounded-lg bg-slate-600 text-xs"><i class="fas fa-eraser"></i> Clear</button></div>
+                </div>
+                <div id="qiratTableContainer"></div>
+            `;
+            
+            document.getElementById('qiratModalTitle').innerHTML = `<i class="fas fa-book-quran mr-2"></i> ${escapeHtml(qiratName)} - Student Rankings`;
+            document.getElementById('qiratModalContent').innerHTML = filterHtml;
             document.getElementById('qiratModal').classList.remove('hidden');
-        }
-        
-        window.applyQiratModalFilters = applyQiratModalFilters;
-        window.clearQiratModalFilters = () => {
-            document.getElementById('qiratModalSearch').value = '';
-            document.getElementById('qiratModalGender').value = '';
-            document.getElementById('qiratModalDept').value = '';
-            document.getElementById('qiratModalBatch').value = '';
-            applyQiratModalFilters();
+            
+            applyQiratFilters();
         };
+        
+        window.applyQiratFilters = () => {
+            if (!currentQiratData) return;
+            const search = document.getElementById('qiratSearchInput')?.value.toLowerCase() || '';
+            const gender = document.getElementById('qiratGenderSelect')?.value || '';
+            const dept = document.getElementById('qiratDeptSelect')?.value || '';
+            const batch = document.getElementById('qiratBatchSelect')?.value || '';
+            
+            let filtered = currentQiratData.students.filter(s => {
+                const matchSearch = s.full_name.toLowerCase().includes(search);
+                const matchGender = !gender || s.gender === gender;
+                const matchDept = !dept || s.department === dept;
+                const matchBatch = !batch || s.batch === batch;
+                return matchSearch && matchGender && matchDept && matchBatch;
+            });
+            
+            const ranked = filtered.map(s => ({ student: s, avg: calculateStudentOverallAvg(s.id) })).sort((a,b) => (b.avg || 0) - (a.avg || 0));
+            
+            const tableHtml = `
+                <div class="overflow-x-auto">
+                    <table id="qiratModalTable" class="w-full text-sm">
+                        <thead class="text-slate-400 border-b border-slate-700">
+                            <tr><th class="py-3 text-left">Rank</th><th class="py-3 text-left">Student</th><th class="py-3 text-left">Department</th><th class="py-3 text-left">Batch</th><th class="py-3 text-left">Gender</th><th class="py-3 text-center">Avg Score</th><th class="py-3 text-right">Actions</th></tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800">
+                            ${ranked.map((item, idx) => `<tr>
+                                <td class="py-3"><span class="px-3 py-1 rounded-full ${idx === 0 ? 'rank-1' : idx === 1 ? 'rank-2' : idx === 2 ? 'rank-3' : 'bg-slate-700'} text-xs font-bold">#${idx+1}</span></td>
+                                <td class="py-3 font-medium">${escapeHtml(item.student.full_name)}</span></td>
+                                <td class="py-3">${escapeHtml(item.student.department)}</span></td>
+                                <td class="py-3">${escapeHtml(item.student.batch)}</span></td>
+                                <td class="py-3">${escapeHtml(item.student.gender)}</span></td>
+                                <td class="py-3 text-center"><span class="text-emerald-400 font-semibold">${item.avg !== null ? item.avg+'%' : '-'}</span></td>
+                                <td class="py-3 text-right"><button class="px-3 py-1 rounded-lg bg-indigo-600/30 text-xs" onclick="closeModal('qiratModal'); openStudentModal('${item.student.id}')">View</button></td>
+                            </tr>`).join('')}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-3 text-center text-slate-400 text-xs">Showing ${filtered.length} of ${currentQiratData.students.length} students</div>
+            `;
+            document.getElementById('qiratTableContainer').innerHTML = tableHtml;
+        };
+        
+        window.clearQiratFilters = () => {
+            if (document.getElementById('qiratSearchInput')) document.getElementById('qiratSearchInput').value = '';
+            if (document.getElementById('qiratGenderSelect')) document.getElementById('qiratGenderSelect').value = '';
+            if (document.getElementById('qiratDeptSelect')) document.getElementById('qiratDeptSelect').value = '';
+            if (document.getElementById('qiratBatchSelect')) document.getElementById('qiratBatchSelect').value = '';
+            applyQiratFilters();
+        };
+        
+        // DEPARTMENT MODAL WITH WORKING FILTERS
+        let currentDeptData = null;
         
         window.openDepartmentModal = (deptName) => {
-            let students = allStudents.filter(s => s.department === deptName);
+            const students = allStudents.filter(s => s.department === deptName);
             const batches = [...new Set(students.map(s => s.batch))];
-            document.getElementById('deptModalBatch').innerHTML = '<option value="">All Batches</option>' + batches.map(b => `<option value="${escapeHtml(b)}">${escapeHtml(b)}</option>`).join('');
-            window.currentDeptData = { name: deptName, students: students };
-            applyDeptModalFilters();
+            
+            currentDeptData = { name: deptName, students: students };
+            
+            const filterHtml = `
+                <div class="modal-filter-bar">
+                    <div><input type="text" id="deptSearchInput" placeholder="Search name..." class="filter-input w-40" value=""></div>
+                    <div><select id="deptGenderSelect" class="filter-input"><option value="">All Genders</option><option value="Male">Male</option><option value="Female">Female</option></select></div>
+                    <div><select id="deptBatchSelect" class="filter-input"><option value="">All Batches</option>${batches.map(b => `<option value="${escapeHtml(b)}">${escapeHtml(b)}</option>`).join('')}</select></div>
+                    <div><button onclick="applyDeptFilters()" class="px-3 py-1.5 rounded-lg bg-indigo-600 text-xs"><i class="fas fa-search"></i> Filter</button></div>
+                    <div><button onclick="clearDeptFilters()" class="px-3 py-1.5 rounded-lg bg-slate-600 text-xs"><i class="fas fa-eraser"></i> Clear</button></div>
+                </div>
+                <div id="deptTableContainer"></div>
+            `;
+            
+            document.getElementById('deptModalTitle').innerHTML = `<i class="fas fa-building mr-2"></i> ${escapeHtml(deptName)} - Student Rankings`;
+            document.getElementById('deptModalContent').innerHTML = filterHtml;
+            document.getElementById('departmentModal').classList.remove('hidden');
+            
+            applyDeptFilters();
         };
         
-        function applyDeptModalFilters() {
-            if (!window.currentDeptData) return;
-            const search = document.getElementById('deptModalSearch')?.value.toLowerCase() || '';
-            const gender = document.getElementById('deptModalGender')?.value || '';
-            const batch = document.getElementById('deptModalBatch')?.value || '';
-            let filtered = window.currentDeptData.students.filter(s => {
-                return (!search || s.full_name.toLowerCase().includes(search)) && (!gender || s.gender === gender) && (!batch || s.batch === batch);
+        window.applyDeptFilters = () => {
+            if (!currentDeptData) return;
+            const search = document.getElementById('deptSearchInput')?.value.toLowerCase() || '';
+            const gender = document.getElementById('deptGenderSelect')?.value || '';
+            const batch = document.getElementById('deptBatchSelect')?.value || '';
+            
+            let filtered = currentDeptData.students.filter(s => {
+                const matchSearch = s.full_name.toLowerCase().includes(search);
+                const matchGender = !gender || s.gender === gender;
+                const matchBatch = !batch || s.batch === batch;
+                return matchSearch && matchGender && matchBatch;
             });
+            
             const ranked = filtered.map(s => ({ student: s, avg: calculateStudentOverallAvg(s.id) })).sort((a,b) => (b.avg || 0) - (a.avg || 0));
-            document.getElementById('deptModalTitle').innerHTML = `<i class="fas fa-building mr-2"></i> ${escapeHtml(window.currentDeptData.name)} - Rankings (${filtered.length} students)`;
-            document.getElementById('deptModalContent').innerHTML = `
-                <div class="overflow-x-auto"><table id="deptModalTable" class="w-full text-sm"><thead class="text-slate-400 border-b border-slate-700"><tr><th class="py-3 text-left">Rank</th><th class="py-3 text-left">Student</th><th class="py-3 text-left">Batch</th><th class="py-3 text-left">Gender</th><th class="py-3 text-center">Avg Score</th><th class="py-3 text-right">Actions</th></tr></thead><tbody class="divide-y divide-slate-800">${ranked.map((item, idx) => `<tr><td class="py-3"><span class="px-3 py-1 rounded-full ${idx === 0 ? 'rank-1' : idx === 1 ? 'rank-2' : idx === 2 ? 'rank-3' : 'bg-slate-700'} text-xs font-bold">#${idx+1}</span><td class="py-3 font-medium">${escapeHtml(item.student.full_name)}<td class="py-3">${escapeHtml(item.student.batch)}<td class="py-3">${escapeHtml(item.student.gender)}<td class="py-3 text-center"><span class="text-emerald-400 font-semibold">${item.avg !== null ? item.avg+'%' : '-'}</span><td class="py-3 text-right"><button class="px-3 py-1 rounded-lg bg-indigo-600/30 text-xs" onclick="closeModal('departmentModal'); openStudentModal('${item.student.id}')">View</button></tr>`).join('')}</tbody></table></div>`;
-            document.getElementById('departmentModal').classList.remove('hidden');
-        }
+            
+            const tableHtml = `
+                <div class="overflow-x-auto">
+                    <table id="deptModalTable" class="w-full text-sm">
+                        <thead class="text-slate-400 border-b border-slate-700">
+                            <tr><th class="py-3 text-left">Rank</th><th class="py-3 text-left">Student</th><th class="py-3 text-left">Batch</th><th class="py-3 text-left">Gender</th><th class="py-3 text-center">Avg Score</th><th class="py-3 text-right">Actions</th></tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800">
+                            ${ranked.map((item, idx) => `<tr>
+                                <td class="py-3"><span class="px-3 py-1 rounded-full ${idx === 0 ? 'rank-1' : idx === 1 ? 'rank-2' : idx === 2 ? 'rank-3' : 'bg-slate-700'} text-xs font-bold">#${idx+1}</span></td>
+                                <td class="py-3 font-medium">${escapeHtml(item.student.full_name)}</span></td>
+                                <td class="py-3">${escapeHtml(item.student.batch)}</span></td>
+                                <td class="py-3">${escapeHtml(item.student.gender)}</span></td>
+                                <td class="py-3 text-center"><span class="text-emerald-400 font-semibold">${item.avg !== null ? item.avg+'%' : '-'}</span></td>
+                                <td class="py-3 text-right"><button class="px-3 py-1 rounded-lg bg-indigo-600/30 text-xs" onclick="closeModal('departmentModal'); openStudentModal('${item.student.id}')">View</button></td>
+                            </tr>`).join('')}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-3 text-center text-slate-400 text-xs">Showing ${filtered.length} of ${currentDeptData.students.length} students</div>
+            `;
+            document.getElementById('deptTableContainer').innerHTML = tableHtml;
+        };
         
-        window.applyDeptModalFilters = applyDeptModalFilters;
-        window.clearDeptModalFilters = () => {
-            document.getElementById('deptModalSearch').value = '';
-            document.getElementById('deptModalGender').value = '';
-            document.getElementById('deptModalBatch').value = '';
-            applyDeptModalFilters();
+        window.clearDeptFilters = () => {
+            if (document.getElementById('deptSearchInput')) document.getElementById('deptSearchInput').value = '';
+            if (document.getElementById('deptGenderSelect')) document.getElementById('deptGenderSelect').value = '';
+            if (document.getElementById('deptBatchSelect')) document.getElementById('deptBatchSelect').value = '';
+            applyDeptFilters();
         };
         
         // Export Functions
@@ -676,6 +759,10 @@
         window.openDepartmentModal = openDepartmentModal;
         window.showQiratDetail = showQiratDetail;
         window.autoSaveScore = autoSaveScore;
+        window.applyQiratFilters = applyQiratFilters;
+        window.clearQiratFilters = clearQiratFilters;
+        window.applyDeptFilters = applyDeptFilters;
+        window.clearDeptFilters = clearDeptFilters;
         
         loadData();
     </script>
