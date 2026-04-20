@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>Ustaz Portal | Exam Management</title>
+    <meta name="firebase-webchannel-transport" content="xmlhttprequest">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -154,6 +155,7 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
             text-align: center;
             font-size: 0.85rem;
+            max-width: 400px;
         }
         
         @keyframes slideIn { from { opacity: 0; transform: translateX(100%); } to { opacity: 1; transform: translateX(0); } }
@@ -266,20 +268,16 @@
         .rotate-icon.rotated { transform: rotate(180deg); }
         
         @media (max-width: 768px) {
-            body { padding: 1rem; padding-bottom: 70px; padding-top: 60px; }
+            body { padding: 1rem; }
             .score-input { width: 55px; font-size: 0.65rem; }
             .qirat-tab { padding: 6px 12px; font-size: 0.7rem; }
             .hero-stats { padding: 1rem; }
             .hero-stats .number { font-size: 1.3rem; }
             .view-btn { padding: 6px 12px; font-size: 0.7rem; }
         }
-        
-        @media (min-width: 769px) {
-            body { padding: 1.5rem; }
-        }
     </style>
 </head>
-<body>
+<body class="p-4 md:p-6">
 
     <div class="max-w-7xl mx-auto">
         <!-- Header -->
@@ -392,7 +390,7 @@
         </div>
     </div>
 
-    <!-- Student Detail Modal (Same as exam.html) -->
+    <!-- Student Detail Modal -->
     <div id="studentModal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 md:p-4">
         <div class="glass-card w-full max-w-6xl max-h-[90vh] overflow-hidden modal-enter flex flex-col bg-slate-900">
             <div class="p-4 md:p-6 border-b border-slate-700 flex justify-between items-center bg-slate-800/30 flex-wrap gap-2">
@@ -437,7 +435,7 @@
         let currentStudentId = null;
         let currentOpenQiratIndex = null;
         
-        const defaultAssessments = [
+        const assessments = [
             { name: "Quiz 1", outOf: 30, key: "assessment1" },
             { name: "Mid Exam", outOf: 50, key: "assessment2" },
             { name: "Assignment", outOf: 20, key: "assessment3" },
@@ -468,23 +466,23 @@
         
         function calculateTotalPoints(scores) {
             let total = 0;
-            for (let i = 0; i < defaultAssessments.length; i++) {
-                const score = scores[defaultAssessments[i].key];
+            for (let i = 0; i < assessments.length; i++) {
+                const score = scores[assessments[i].key];
                 if (score !== null && score !== '' && !isNaN(score)) total += parseFloat(score);
             }
             return total;
         }
         
         function calculateTotalPossible() {
-            return defaultAssessments.reduce((sum, a) => sum + a.outOf, 0);
+            return assessments.reduce((sum, a) => sum + a.outOf, 0);
         }
         
         function calculateAverage(scores) {
             let totalPercent = 0, count = 0;
-            for (let i = 0; i < defaultAssessments.length; i++) {
-                const score = scores[defaultAssessments[i].key];
+            for (let i = 0; i < assessments.length; i++) {
+                const score = scores[assessments[i].key];
                 if (score !== null && score !== '' && !isNaN(score)) {
-                    const percent = calculatePercentage(parseFloat(score), defaultAssessments[i].outOf);
+                    const percent = calculatePercentage(parseFloat(score), assessments[i].outOf);
                     if (percent !== null) { totalPercent += percent; count++; }
                 }
             }
@@ -502,7 +500,8 @@
                 id: s.id,
                 avg: calculateAverage(examScores.get(s.id)?.[qiratName] || {})
             })).sort((a,b) => (b.avg || 0) - (a.avg || 0));
-            return ranked.findIndex(s => s.id === studentId) + 1;
+            const rank = ranked.findIndex(s => s.id === studentId) + 1;
+            return rank > 0 ? rank : studentsInQirat.length;
         }
         
         function calculateDepartmentRank(studentId, qiratName) {
@@ -513,7 +512,8 @@
                 id: s.id,
                 avg: calculateAverage(examScores.get(s.id)?.[qiratName] || {})
             })).sort((a,b) => (b.avg || 0) - (a.avg || 0));
-            return ranked.findIndex(s => s.id === studentId) + 1;
+            const rank = ranked.findIndex(s => s.id === studentId) + 1;
+            return rank > 0 ? rank : deptStudents.length;
         }
         
         async function loadExamScores() {
@@ -759,8 +759,8 @@
                 const studentsInDeptQirat = studentsInQirat.filter(s => s.department === student.department);
                 
                 let assessmentRows = '';
-                for (let a = 0; a < defaultAssessments.length; a++) {
-                    const ass = defaultAssessments[a];
+                for (let a = 0; a < assessments.length; a++) {
+                    const ass = assessments[a];
                     const score = scores[ass.key];
                     const percent = calculatePercentage(score, ass.outOf);
                     assessmentRows += `<tr>
@@ -843,6 +843,8 @@
                 renderChart();
                 renderStudentsTable();
                 showToast('Score saved successfully!');
+            } else {
+                showToast('Error saving score', true);
             }
             showLoading(false);
         };
