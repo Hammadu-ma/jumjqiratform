@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>Ustaz Portal | Exam Management</title>
+    <title>Academic Performance | Exam Analytics</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -45,6 +45,7 @@
         body.light-mode .bg-slate-800\/30 { background: rgba(241, 245, 249, 0.8); }
         body.light-mode .score-input { background: #ffffff; border-color: #cbd5e1; color: #0f172a; }
         body.light-mode .status-badge { background: rgba(16, 185, 129, 0.15); }
+        body.light-mode .qirat-list-card { background: #f8fafc; border-color: #e2e8f0; }
         body.light-mode .filter-input { background: white; border-color: #cbd5e1; color: #0f172a; }
         body.light-mode .hero-stats { background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); color: white; }
         
@@ -70,7 +71,7 @@
         }
         
         .hero-stats::before {
-            content: "📚";
+            content: "📊";
             position: absolute;
             bottom: -20px;
             right: 10px;
@@ -120,7 +121,7 @@
             border: 1px solid #334155; 
             border-radius: 0.5rem; 
             padding: 0.25rem 0.35rem; 
-            width: 70px; 
+            width: 60px; 
             text-align: center; 
             color: white; 
             font-size: 0.7rem;
@@ -140,11 +141,14 @@
         }
         
         @keyframes spin { to { transform: rotate(360deg); } }
+        .fade-in { animation: fadeIn 0.3s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
         .toast { 
             position: fixed; 
             bottom: 20px; 
             right: 20px; 
+            left: 20px;
             z-index: 1000; 
             animation: slideIn 0.3s ease; 
             background: #1f2937; 
@@ -154,72 +158,19 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
             text-align: center;
             font-size: 0.85rem;
-            max-width: 400px;
         }
         
-        @keyframes slideIn { from { opacity: 0; transform: translateX(100%); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(100%); } to { opacity: 1; transform: translateY(0); } }
+        
+        .settings-card { transition: all 0.3s ease; }
+        .settings-card:hover { background: rgba(99, 102, 241, 0.1); transform: translateX(4px); }
+        
+        .rank-1 { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #78350f; }
+        .rank-2 { background: linear-gradient(135deg, #94a3b8, #64748b); color: #1e293b; }
+        .rank-3 { background: linear-gradient(135deg, #fdba74, #f97316); color: #7c2d12; }
         
         .theme-toggle { cursor: pointer; transition: all 0.3s; }
         .theme-toggle:hover, .theme-toggle:active { transform: rotate(15deg); }
-        
-        .filter-input { 
-            background: #1e293b; 
-            border: 1px solid #334155; 
-            border-radius: 0.5rem; 
-            padding: 0.5rem 0.75rem; 
-            font-size: 0.75rem; 
-            color: white; 
-            width: 100%;
-        }
-        
-        .filter-input:focus { outline: none; border-color: #6366f1; }
-        
-        .responsive-table {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-        
-        .qirat-tab {
-            padding: 8px 20px;
-            border-radius: 40px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            transition: all 0.2s;
-            cursor: pointer;
-            background: rgba(99, 102, 241, 0.1);
-            border: 1px solid rgba(99, 102, 241, 0.2);
-        }
-        .qirat-tab:hover { background: rgba(99, 102, 241, 0.2); }
-        .qirat-tab.active { background: #6366f1; color: white; border-color: #6366f1; }
-        
-        .assessment-table { width: 100%; border-collapse: collapse; font-size: 0.7rem; }
-        .assessment-table th, .assessment-table td { padding: 0.5rem; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
-        .assessment-table th { background: rgba(99, 102, 241, 0.2); font-weight: 600; }
-        
-        .page-loading {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(8px);
-            z-index: 9999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            gap: 1rem;
-        }
-        
-        .page-loading .spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid rgba(99, 102, 241, 0.3);
-            border-top-color: #6366f1;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
         
         .qirat-list-card {
             background: rgba(15, 23, 42, 0.5);
@@ -266,124 +217,243 @@
         .rotate-icon { transition: transform 0.3s ease; }
         .rotate-icon.rotated { transform: rotate(180deg); }
         
+        .filter-input { 
+            background: #1e293b; 
+            border: 1px solid #334155; 
+            border-radius: 0.5rem; 
+            padding: 0.5rem 0.75rem; 
+            font-size: 0.75rem; 
+            color: white; 
+            width: 100%;
+        }
+        
+        .filter-input:focus { outline: none; border-color: #6366f1; }
+        
+        .modal-filter-bar { 
+            background: rgba(0, 0, 0, 0.3); 
+            border-radius: 1rem; 
+            padding: 0.75rem; 
+            margin-bottom: 1rem; 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 0.5rem; 
+            align-items: flex-end; 
+        }
+        
+        .assessment-table { width: 100%; border-collapse: collapse; font-size: 0.7rem; }
+        .assessment-table th, .assessment-table td { padding: 0.5rem; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+        .assessment-table th { background: rgba(99, 102, 241, 0.2); font-weight: 600; }
+        
+        body.light-mode .assessment-table td { border-bottom-color: #e2e8f0; }
+        
+        .responsive-table {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 10px 16px 20px;
+            border-top: 1px solid rgba(99, 102, 241, 0.2);
+            z-index: 200;
+            display: none;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 40px;
+            color: #64748b;
+            transition: all 0.2s;
+        }
+        
+        .nav-item i { font-size: 1.2rem; }
+        .nav-item span { font-size: 0.6rem; font-weight: 500; }
+        .nav-item.active { color: #6366f1; background: rgba(99, 102, 241, 0.15); }
+        
+        .desktop-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+            padding: 0.75rem 1.5rem;
+        }
+        
+        body.light-mode .desktop-nav {
+            background: rgba(255, 255, 255, 0.95);
+        }
+        
+        .nav-link {
+            padding: 0.5rem 1rem;
+            border-radius: 0.75rem;
+            transition: all 0.2s;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #64748b;
+        }
+        
+        .nav-link:hover { background: rgba(99, 102, 241, 0.1); color: #6366f1; }
+        .nav-link.active { background: #6366f1; color: white; }
+        
         @media (max-width: 768px) {
-            body { padding: 1rem; }
-            .score-input { width: 55px; font-size: 0.65rem; }
-            .qirat-tab { padding: 6px 12px; font-size: 0.7rem; }
+            body { padding-bottom: 70px; padding-top: 60px; }
+            .desktop-nav { display: none; }
+            .bottom-nav { display: flex; }
+            .view-btn { padding: 6px 12px; font-size: 0.7rem; }
             .hero-stats { padding: 1rem; }
             .hero-stats .number { font-size: 1.3rem; }
-            .view-btn { padding: 6px 12px; font-size: 0.7rem; }
+            .hero-stats .label { font-size: 0.6rem; }
+        }
+        
+        @media (min-width: 769px) {
+            body { padding-top: 70px; }
+            .bottom-nav { display: none; }
+            .desktop-nav { display: block; }
+        }
+        
+        @media (max-width: 480px) {
+            .qirat-stats-row { width: 100%; justify-content: flex-start; }
+            .qirat-list-header { flex-direction: column; align-items: flex-start; }
+            .modal-filter-bar { flex-direction: column; }
+            .modal-filter-bar > div { width: 100%; }
+            .filter-input { width: 100%; }
         }
     </style>
 </head>
-<body class="p-4 md:p-6">
+<body>
 
-    <div class="max-w-7xl mx-auto">
-        <div class="glass-card p-4 md:p-6 mb-6">
-            <div class="flex justify-between items-center flex-wrap gap-4">
-                <div>
-                    <h1 class="text-xl md:text-3xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
-                        <i class="fas fa-chalkboard-user mr-2"></i>Ustaz Exam Portal
-                    </h1>
-                    <p class="text-slate-400 text-xs md:text-sm mt-1" id="ustazInfo">Loading...</p>
-                </div>
-                <div class="flex gap-3">
-                    <button onclick="toggleTheme()" class="theme-toggle p-2 rounded-full bg-slate-700 hover:bg-slate-600 transition-all">
-                        <i id="themeIcon" class="fas fa-moon text-yellow-400"></i>
-                    </button>
-                    <button onclick="toggleEditMode()" id="editModeBtn" class="px-4 py-2 rounded-xl text-sm font-medium bg-slate-700 hover:bg-slate-600">
-                        <i class="fas fa-edit mr-1"></i> Edit Mode
-                    </button>
-                    <button onclick="logout()" class="px-4 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-sm">
-                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
-                    </button>
-                </div>
+    <div class="desktop-nav">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-chart-line text-indigo-400 text-xl"></i>
+                <span class="font-bold text-lg">Exam Analytics</span>
+            </div>
+            <div class="flex gap-1">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="analytics.html" class="nav-link">Analytics</a>
+                <a href="exam.html" class="nav-link active">Exams</a>
+                <a href="import.html" class="nav-link">Import</a>
+                <a href="settings.html" class="nav-link">Settings</a>
             </div>
         </div>
+    </div>
 
+    <header class="max-w-7xl mx-auto mb-4 md:mb-6 flex flex-col md:flex-row md:items-center justify-between gap-3 px-3 md:px-0">
+        <div>
+            <h1 class="text-xl md:text-3xl font-bold tracking-tight bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">Exam Performance</h1>
+            <p class="text-slate-400 text-xs md:text-sm mt-1">Detailed analytics and score management</p>
+        </div>
+        <div class="flex gap-2 items-center">
+            <button onclick="toggleTheme()" class="theme-toggle p-2 rounded-full bg-slate-700 hover:bg-slate-600 transition-all">
+                <i id="themeIcon" class="fas fa-moon text-yellow-400 text-sm md:text-base"></i>
+            </button>
+            <div class="flex gap-1 md:gap-2 bg-slate-800/50 p-1 rounded-2xl border border-slate-700">
+                <button onclick="switchView('qirat')" class="view-btn active">By Qirat</button>
+                <button onclick="switchView('department')" class="view-btn text-slate-400">By Dept</button>
+                <button onclick="switchView('general')" class="view-btn text-slate-400">General</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-3 md:px-0">
         <div class="hero-stats">
-            <div class="hero-title text-lg md:text-xl font-bold mb-1">Exam Dashboard</div>
-            <div class="hero-subtitle text-xs md:text-sm opacity-90 mb-3">Manage exams for your assigned Qirats</div>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                <div class="bg-white/10 rounded-xl p-2 md:p-3"><div class="number text-xl md:text-2xl font-bold" id="totalStudents">0</div><div class="label text-xs">My Students</div></div>
-                <div class="bg-white/10 rounded-xl p-2 md:p-3"><div class="number text-xl md:text-2xl font-bold" id="totalQirats">0</div><div class="label text-xs">My Qirats</div></div>
-                <div class="bg-white/10 rounded-xl p-2 md:p-3"><div class="number text-xl md:text-2xl font-bold" id="examRecords">0</div><div class="label text-xs">Exam Records</div></div>
-                <div class="bg-white/10 rounded-xl p-2 md:p-3"><div class="number text-xl md:text-2xl font-bold" id="avgScore">0%</div><div class="label text-xs">Avg Score</div></div>
+            <div class="hero-title text-lg md:text-xl font-bold mb-1">Exam Intelligence Dashboard</div>
+            <div class="hero-subtitle text-xs md:text-sm opacity-90 mb-3">Track student performance, manage assessments</div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3" id="heroStats">
+                <div class="bg-white/10 rounded-xl p-2 md:p-3"><div class="number text-xl md:text-2xl font-bold" id="heroTotal">0</div><div class="label text-xs">Students</div></div>
+                <div class="bg-white/10 rounded-xl p-2 md:p-3"><div class="number text-xl md:text-2xl font-bold" id="heroQirats">0</div><div class="label text-xs">Qirats</div></div>
+                <div class="bg-white/10 rounded-xl p-2 md:p-3"><div class="number text-xl md:text-2xl font-bold" id="heroExams">0</div><div class="label text-xs">Exam Records</div></div>
+                <div class="bg-white/10 rounded-xl p-2 md:p-3"><div class="number text-xl md:text-2xl font-bold" id="heroCompletion">0%</div><div class="label text-xs">Completion</div></div>
             </div>
         </div>
 
-        <div class="glass-card p-4 mb-6">
-            <h3 class="text-sm font-semibold mb-3"><i class="fas fa-book-quran mr-2 text-indigo-400"></i>Your Assigned Qirats</h3>
-            <div id="qiratTabs" class="flex flex-wrap gap-2">
-                <div class="text-slate-400">Loading assigned Qirats...</div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-4 md:mb-6">
+            <div class="glass-card p-3 md:p-4">
+                <h3 class="text-sm md:text-lg font-semibold mb-2 md:mb-3"><i class="fas fa-chart-line text-indigo-400 mr-2"></i> Performance Trend</h3>
+                <canvas id="trendChart" height="150" class="w-full"></canvas>
+            </div>
+            <div class="glass-card p-3 md:p-4">
+                <h3 class="text-sm md:text-lg font-semibold mb-2 md:mb-3"><i class="fas fa-chart-pie text-purple-400 mr-2"></i> Score Distribution</h3>
+                <canvas id="distChart" height="150" class="w-full"></canvas>
             </div>
         </div>
 
-        <div class="glass-card p-4 mb-6">
-            <h3 class="text-sm md:text-lg font-semibold mb-3"><i class="fas fa-chart-line text-indigo-400 mr-2"></i> Performance Trend</h3>
-            <canvas id="performanceChart" height="200"></canvas>
-        </div>
-
-        <div class="glass-card p-4 mb-6">
-            <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
-                <div class="col-span-2">
-                    <label class="text-xs text-slate-400 uppercase mb-1 block">Search Student</label>
-                    <input type="text" id="searchInput" placeholder="Name or Phone..." class="filter-input">
+        <div class="glass-card p-3 md:p-4 mb-4 md:mb-6">
+            <div class="grid grid-cols-2 md:flex md:flex-wrap gap-2 md:gap-3">
+                <div class="col-span-2 md:flex-1 min-w-[140px]">
+                    <label class="text-xs text-slate-400 uppercase tracking-wider mb-1 block">Search</label>
+                    <input type="text" id="searchInput" placeholder="Name / Phone..." class="w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-sm focus:outline-none focus:border-indigo-500">
                 </div>
-                <div>
-                    <label class="text-xs text-slate-400 uppercase mb-1 block">Gender</label>
-                    <select id="genderFilter" class="filter-input">
-                        <option value="">All</option>
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
-                    </select>
+                <div class="flex-1 min-w-[100px]">
+                    <label class="text-xs text-slate-400 uppercase tracking-wider mb-1 block">Gender</label>
+                    <select id="genderFilter" class="w-full bg-slate-900 border border-slate-700 px-2 py-2 rounded-xl text-sm"><option value="">All</option><option value="Male">Male</option><option value="Female">Female</option></select>
                 </div>
-                <div>
-                    <label class="text-xs text-slate-400 uppercase mb-1 block">Department</label>
-                    <select id="deptFilter" class="filter-input"><option value="">All</option></select>
+                <div class="flex-1 min-w-[100px]">
+                    <label class="text-xs text-slate-400 uppercase tracking-wider mb-1 block">Dept</label>
+                    <select id="deptFilter" class="w-full bg-slate-900 border border-slate-700 px-2 py-2 rounded-xl text-sm"><option value="">All</option></select>
                 </div>
-                <div>
-                    <label class="text-xs text-slate-400 uppercase mb-1 block">Batch</label>
-                    <select id="batchFilter" class="filter-input"><option value="">All</option></select>
+                <div class="flex-1 min-w-[100px]">
+                    <label class="text-xs text-slate-400 uppercase tracking-wider mb-1 block">Batch</label>
+                    <select id="batchFilter" class="w-full bg-slate-900 border border-slate-700 px-2 py-2 rounded-xl text-sm"><option value="">All</option></select>
                 </div>
-                <div class="flex gap-2">
-                    <button onclick="clearFilters()" class="px-3 py-2 rounded-xl bg-slate-700 text-sm flex-1"><i class="fas fa-eraser"></i> Clear</button>
-                    <button onclick="exportData()" class="px-3 py-2 rounded-xl bg-emerald-600/30 text-sm flex-1"><i class="fas fa-download"></i> Export</button>
+                <div class="flex-1 min-w-[100px]">
+                    <label class="text-xs text-slate-400 uppercase tracking-wider mb-1 block">Qirat</label>
+                    <select id="qiratFilter" class="w-full bg-slate-900 border border-slate-700 px-2 py-2 rounded-xl text-sm"><option value="">All</option></select>
+                </div>
+                <div class="flex gap-2 col-span-2 md:col-auto">
+                    <button onclick="clearFilters()" class="flex-1 px-3 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-sm"><i class="fas fa-eraser mr-1"></i> Clear</button>
+                    <button onclick="toggleEditMode()" id="editModeBtn" class="flex-1 px-3 py-2 rounded-xl text-sm bg-slate-700 hover:bg-slate-600"><i class="fas fa-edit mr-1"></i> Edit</button>
+                    <button onclick="openSettingsModal()" class="flex-1 px-3 py-2 rounded-xl text-sm bg-purple-600/30 hover:bg-purple-600/50"><i class="fas fa-cog"></i></button>
+                    <button onclick="exportMainData()" class="flex-1 px-3 py-2 rounded-xl text-sm bg-emerald-600/30 hover:bg-emerald-600/50"><i class="fas fa-download"></i></button>
                 </div>
             </div>
         </div>
 
         <div class="glass-card overflow-hidden">
-            <div class="p-4 border-b border-slate-700 flex justify-between items-center flex-wrap gap-3">
-                <h3 id="tableTitle" class="text-base md:text-lg font-semibold">Student List</h3>
-                <div class="flex gap-2">
-                    <button onclick="exportToCSV()" class="px-3 py-1.5 rounded-lg bg-slate-700 text-xs"><i class="fas fa-file-csv"></i> CSV</button>
-                    <button onclick="exportToExcel()" class="px-3 py-1.5 rounded-lg bg-slate-700 text-xs"><i class="fas fa-file-excel"></i> Excel</button>
-                    <button onclick="exportToPDF()" class="px-3 py-1.5 rounded-lg bg-slate-700 text-xs"><i class="fas fa-file-pdf"></i> PDF</button>
-                    <button onclick="exportToWord()" class="px-3 py-1.5 rounded-lg bg-slate-700 text-xs"><i class="fas fa-file-word"></i> Word</button>
+            <div class="p-3 md:p-4 border-b border-slate-700 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+                <h3 id="table-title" class="text-base md:text-xl font-semibold">Student Rankings by Qirat</h3>
+                <div class="flex gap-2 flex-wrap">
+                    <button onclick="exportMainToCSV()" class="px-2 py-1 md:px-3 md:py-1.5 rounded-lg bg-slate-700 text-xs"><i class="fas fa-file-csv"></i> CSV</button>
+                    <button onclick="exportMainToExcel()" class="px-2 py-1 md:px-3 md:py-1.5 rounded-lg bg-slate-700 text-xs"><i class="fas fa-file-excel"></i> Excel</button>
+                    <button onclick="exportMainToPDF()" class="px-2 py-1 md:px-3 md:py-1.5 rounded-lg bg-slate-700 text-xs"><i class="fas fa-file-pdf"></i> PDF</button>
+                    <button onclick="exportMainToWord()" class="px-2 py-1 md:px-3 md:py-1.5 rounded-lg bg-slate-700 text-xs"><i class="fas fa-file-word"></i> Word</button>
                 </div>
             </div>
-            <div class="overflow-x-auto responsive-table">
-                <table class="w-full text-left text-xs md:text-sm" id="studentsTable">
-                    <thead class="bg-slate-800/50 text-slate-400 text-xs uppercase">
-                        <tr>
-                            <th class="px-4 py-3">Rank</th>
-                            <th class="px-4 py-3">Student Name</th>
-                            <th class="px-4 py-3">Department</th>
-                            <th class="px-4 py-3">Batch</th>
-                            <th class="px-4 py-3">Gender</th>
-                            <th class="px-4 py-3">Avg Score</th>
-                            <th class="px-4 py-3">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="studentsTableBody" class="divide-y divide-slate-700/50">
-                        <tr><td colspan="7" class="text-center py-8"><div class="loading-spinner mx-auto"></div><p class="mt-4">Loading students...</p></td></tbody>
+            <div class="overflow-x-auto custom-scrollbar responsive-table">
+                <table class="w-full text-left text-xs md:text-sm" id="dataTable">
+                    <thead class="bg-slate-800/50 text-slate-400 text-xs uppercase tracking-wider"><tr id="tableHeader"><tr></thead>
+                    <tbody id="tableBody" class="divide-y divide-slate-700/50"><tr><td colspan="10" class="text-center py-8"><div class="loading-spinner mx-auto"></div><p class="mt-4 text-slate-400 text-sm">Loading data...</p></td></tbody>
                 </table>
             </div>
         </div>
+    </main>
+
+    <div class="bottom-nav">
+        <button class="nav-item" onclick="window.location.href='index.html'"><i class="fas fa-home"></i><span>Home</span></button>
+        <button class="nav-item" onclick="window.location.href='analytics.html'"><i class="fas fa-chart-line"></i><span>Analytics</span></button>
+        <button class="nav-item active" onclick="window.location.href='exam.html'"><i class="fas fa-graduation-cap"></i><span>Exams</span></button>
+        <button class="nav-item" onclick="window.location.href='import.html'"><i class="fas fa-upload"></i><span>Import</span></button>
+        <button class="nav-item" onclick="window.location.href='profile.html'"><i class="fas fa-user"></i><span>Profile</span></button>
     </div>
 
-    <!-- Student Detail Modal -->
     <div id="studentModal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 md:p-4">
         <div class="glass-card w-full max-w-6xl max-h-[90vh] overflow-hidden modal-enter flex flex-col bg-slate-900">
             <div class="p-4 md:p-6 border-b border-slate-700 flex justify-between items-center bg-slate-800/30 flex-wrap gap-2">
@@ -394,33 +464,58 @@
         </div>
     </div>
 
-    <!-- Save Confirmation Modal -->
-    <div id="saveModal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 md:p-4">
-        <div class="glass-card w-full max-w-md overflow-hidden modal-enter flex flex-col bg-slate-900">
-            <div class="p-4 border-b border-slate-700 flex justify-between items-center">
-                <h2 class="text-xl font-bold">Save Changes</h2>
-                <button onclick="closeSaveModal()" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="p-6">
-                <p class="mb-4">Are you sure you want to save these changes?</p>
-                <div class="flex gap-3 justify-end">
-                    <button onclick="closeSaveModal()" class="px-4 py-2 rounded-lg bg-slate-700">Cancel</button>
-                    <button onclick="confirmSave()" id="confirmSaveBtn" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500">Save Changes</button>
+    <div id="qiratModal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 md:p-4">
+        <div class="glass-card w-full max-w-7xl max-h-[90vh] overflow-hidden modal-enter flex flex-col bg-slate-900">
+            <div class="p-4 md:p-6 border-b border-slate-700 flex justify-between items-center bg-slate-800/30 flex-wrap gap-2">
+                <h2 class="text-xl md:text-2xl font-bold" id="qiratModalTitle">Qirat Performance</h2>
+                <div class="flex gap-1 md:gap-2 flex-wrap">
+                    <button onclick="exportModalToCSV('qiratModalTable')" class="px-2 py-1 md:px-3 rounded-lg bg-slate-700 text-xs"><i class="fas fa-file-csv"></i></button>
+                    <button onclick="exportModalToExcel('qiratModalTable')" class="px-2 py-1 md:px-3 rounded-lg bg-slate-700 text-xs"><i class="fas fa-file-excel"></i></button>
+                    <button onclick="exportModalToPDF('qiratModalTable', 'qirat_report')" class="px-2 py-1 md:px-3 rounded-lg bg-slate-700 text-xs"><i class="fas fa-file-pdf"></i></button>
+                    <button onclick="exportModalToWord('qiratModalTable', 'qirat_report')" class="px-2 py-1 md:px-3 rounded-lg bg-slate-700 text-xs"><i class="fas fa-file-word"></i></button>
+                    <button onclick="closeModal('qiratModal')" class="text-slate-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
                 </div>
             </div>
+            <div id="qiratModalContent" class="p-4 md:p-6 overflow-y-auto custom-scrollbar"></div>
         </div>
     </div>
 
-    <div id="loadingOverlay" class="page-loading hidden">
-        <div class="spinner"></div>
-        <div class="text-white text-lg">Saving scores...</div>
+    <div id="departmentModal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 md:p-4">
+        <div class="glass-card w-full max-w-7xl max-h-[90vh] overflow-hidden modal-enter flex flex-col bg-slate-900">
+            <div class="p-4 md:p-6 border-b border-slate-700 flex justify-between items-center bg-slate-800/30 flex-wrap gap-2">
+                <h2 class="text-xl md:text-2xl font-bold" id="deptModalTitle">Department Performance</h2>
+                <div class="flex gap-1 md:gap-2 flex-wrap">
+                    <button onclick="exportModalToCSV('deptModalTable')" class="px-2 py-1 md:px-3 rounded-lg bg-slate-700 text-xs"><i class="fas fa-file-csv"></i></button>
+                    <button onclick="exportModalToExcel('deptModalTable')" class="px-2 py-1 md:px-3 rounded-lg bg-slate-700 text-xs"><i class="fas fa-file-excel"></i></button>
+                    <button onclick="exportModalToPDF('deptModalTable', 'dept_report')" class="px-2 py-1 md:px-3 rounded-lg bg-slate-700 text-xs"><i class="fas fa-file-pdf"></i></button>
+                    <button onclick="exportModalToWord('deptModalTable', 'dept_report')" class="px-2 py-1 md:px-3 rounded-lg bg-slate-700 text-xs"><i class="fas fa-file-word"></i></button>
+                    <button onclick="closeModal('departmentModal')" class="text-slate-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
+                </div>
+            </div>
+            <div id="deptModalContent" class="p-4 md:p-6 overflow-y-auto custom-scrollbar"></div>
+        </div>
+    </div>
+
+    <div id="settingsModal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 md:p-4">
+        <div class="glass-card w-full max-w-4xl max-h-[85vh] overflow-hidden modal-enter flex flex-col bg-slate-900">
+            <div class="p-4 md:p-6 border-b border-slate-700 flex justify-between items-center bg-slate-800/30">
+                <h2 class="text-xl md:text-2xl font-bold"><i class="fas fa-cog mr-2"></i> Qirat Settings</h2>
+                <button onclick="closeModal('settingsModal')" class="text-slate-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <div id="settingsContent" class="p-4 md:p-6 overflow-y-auto custom-scrollbar"></div>
+        </div>
     </div>
 
     <div id="toast" class="toast hidden"></div>
 
     <script type="module">
+        import { protectPage, initAuthUI, setupAutoLogout } from './auth.js';
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, getDocs, doc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        
+        if (!protectPage('admin-login.html')) throw new Error('Redirecting');
+        initAuthUI();
+        setupAutoLogout(60);
         
         const firebaseConfig = {
             apiKey: "AIzaSyAR_g5y04YAGCrTvZCowrE7hw8h7k1du08",
@@ -430,344 +525,350 @@
             messagingSenderId: "253413984903",
             appId: "1:253413984903:web:c1577e0fdef1711f960622"
         };
-        
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         
         let allStudents = [];
         let examScores = new Map();
-        let assignedQirats = [];
-        let currentQirat = '';
+        let qiratAssessmentConfigs = new Map();
+        let currentView = 'qirat';
         let isEditMode = false;
-        let currentFilters = { search: '', gender: '', department: '', batch: '' };
-        let chart = null;
+        let currentFilters = { search: '', gender: '', department: '', batch: '', qirat: '' };
+        let charts = {};
         let currentStudentId = null;
         let currentOpenQiratIndex = null;
-        let pendingScores = {}; // Store unsaved changes
-        let hasUnsavedChanges = false;
         
-        const assessments = [
-            { name: "Quiz 1", outOf: 30, key: "assessment1" },
-            { name: "Mid Exam", outOf: 50, key: "assessment2" },
-            { name: "Assignment", outOf: 20, key: "assessment3" },
-            { name: "Final Exam", outOf: 100, key: "assessment4" }
-        ];
+        const defaultAssessments = [{ name: "Quiz 1", outOf: 30 }, { name: "Mid Exam", outOf: 50 }, { name: "Assignment", outOf: 20 }, { name: "Final Exam", outOf: 100 }];
         
         function showToast(message, isError = false) {
-            const toast = document.getElementById('toast');
-            toast.innerHTML = `<i class="fas ${isError ? 'fa-exclamation-triangle' : 'fa-check-circle'} mr-2"></i> ${message}`;
-            toast.classList.remove('hidden');
-            setTimeout(() => toast.classList.add('hidden'), 3000);
+            const toastEl = document.getElementById('toast');
+            toastEl.innerHTML = `<i class="fas ${isError ? 'fa-exclamation-triangle' : 'fa-check-circle'} mr-2"></i> ${message}`;
+            toastEl.classList.remove('hidden');
+            setTimeout(() => toastEl.classList.add('hidden'), 3000);
         }
         
-        function showLoading(show) {
-            const overlay = document.getElementById('loadingOverlay');
-            if (show) overlay.classList.remove('hidden');
-            else overlay.classList.add('hidden');
+        async function loadQiratAssessmentConfigs() {
+            try {
+                const configSnapshot = await getDocs(collection(db, "qiratAssessmentConfigs"));
+                qiratAssessmentConfigs.clear();
+                configSnapshot.forEach(doc => { qiratAssessmentConfigs.set(doc.id, doc.data()); });
+            } catch(e) { console.warn(e); }
+        }
+        
+        async function saveQiratAssessmentConfig(qiratName, config) {
+            await setDoc(doc(db, "qiratAssessmentConfigs", qiratName), config);
+            qiratAssessmentConfigs.set(qiratName, config);
+            showToast(`Settings saved for ${qiratName}`);
+        }
+        
+        function getAssessmentsForQirat(qiratName) {
+            const config = qiratAssessmentConfigs.get(qiratName);
+            return config?.assessments || defaultAssessments;
         }
         
         function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
-        
         function getQiratNames(student) { return (student.schedules || []).map(s => s.qirat_name).filter(Boolean); }
+        function getStudentExamScores(studentId, qiratName) { const studentScores = examScores.get(studentId) || {}; return studentScores[qiratName] || {}; }
+        function calculatePercentage(score, outOf) { if (score === null || score === '' || !outOf) return null; return Math.round((parseFloat(score) / outOf) * 100); }
+        function calculateTotalPoints(scores, assessments) { let total = 0; for (let i = 0; i < assessments.length; i++) { const score = scores[`assessment${i+1}`]; if (score !== null && score !== '' && !isNaN(score)) total += parseFloat(score); } return total; }
+        function calculateTotalPossible(assessments) { return assessments.reduce((sum, a) => sum + a.outOf, 0); }
+        function calculateAverage(scores, assessments) { let totalPercent = 0, count = 0; for (let i = 0; i < assessments.length; i++) { const score = scores[`assessment${i+1}`]; if (score !== null && score !== '' && !isNaN(score)) { const percent = calculatePercentage(parseFloat(score), assessments[i].outOf); if (percent !== null) { totalPercent += percent; count++; } } } return count > 0 ? Math.round(totalPercent / count) : null; }
         
-        function calculatePercentage(score, outOf) {
-            if (score === null || score === '' || !outOf) return null;
-            return Math.round((parseFloat(score) / outOf) * 100);
-        }
-        
-        function calculateTotalPoints(scores) {
-            let total = 0;
-            for (let i = 0; i < assessments.length; i++) {
-                const score = scores[assessments[i].key];
-                if (score !== null && score !== '' && !isNaN(score)) total += parseFloat(score);
-            }
-            return total;
-        }
-        
-        function calculateTotalPossible() {
-            return assessments.reduce((sum, a) => sum + a.outOf, 0);
-        }
-        
-        function calculateAverage(scores) {
-            let totalPercent = 0, count = 0;
-            for (let i = 0; i < assessments.length; i++) {
-                const score = scores[assessments[i].key];
-                if (score !== null && score !== '' && !isNaN(score)) {
-                    const percent = calculatePercentage(parseFloat(score), assessments[i].outOf);
-                    if (percent !== null) { totalPercent += percent; count++; }
-                }
-            }
-            return count > 0 ? Math.round(totalPercent / count) : null;
-        }
-        
-        function calculateStudentAvg(studentId) {
-            const scores = examScores.get(studentId)?.[currentQirat] || {};
-            return calculateAverage(scores);
-        }
-        
-        function calculateGlobalRank(studentId, qiratName) {
-            const studentsInQirat = allStudents.filter(s => getQiratNames(s).includes(qiratName));
-            const ranked = studentsInQirat.map(s => ({
-                id: s.id,
-                avg: calculateAverage(examScores.get(s.id)?.[qiratName] || {})
-            })).sort((a,b) => (b.avg || 0) - (a.avg || 0));
-            const rank = ranked.findIndex(s => s.id === studentId) + 1;
-            return rank > 0 ? rank : studentsInQirat.length;
-        }
-        
-        function calculateDepartmentRank(studentId, qiratName) {
+        function calculateStudentOverallAvg(studentId) {
+            let total = 0, count = 0;
             const student = allStudents.find(s => s.id === studentId);
-            if (!student) return null;
-            const deptStudents = allStudents.filter(s => s.department === student.department && getQiratNames(s).includes(qiratName));
-            const ranked = deptStudents.map(s => ({
-                id: s.id,
-                avg: calculateAverage(examScores.get(s.id)?.[qiratName] || {})
-            })).sort((a,b) => (b.avg || 0) - (a.avg || 0));
-            const rank = ranked.findIndex(s => s.id === studentId) + 1;
-            return rank > 0 ? rank : deptStudents.length;
+            if (student) {
+                getQiratNames(student).forEach(q => {
+                    const scores = getStudentExamScores(studentId, q);
+                    const assessments = getAssessmentsForQirat(q);
+                    const avg = calculateAverage(scores, assessments);
+                    if (avg !== null) { total += avg; count++; }
+                });
+            }
+            return count > 0 ? Math.round(total / count) : null;
+        }
+        
+        async function saveExamScore(studentId, qiratName, assessmentKey, value) {
+            try {
+                // Get current scores for this student
+                let currentScores = examScores.get(studentId) || {};
+                let qiratScores = currentScores[qiratName] || {};
+                
+                // Update the specific assessment
+                qiratScores[assessmentKey] = value ? parseFloat(value) : null;
+                currentScores[qiratName] = qiratScores;
+                
+                // Save to Map
+                examScores.set(studentId, currentScores);
+                
+                // Save to Firebase - store the entire student's scores object
+                const examRef = doc(db, "examScores", studentId);
+                await setDoc(examRef, { 
+                    studentId: studentId,
+                    scores: currentScores,
+                    lastUpdated: new Date().toISOString()
+                }, { merge: true });
+                
+                return true;
+            } catch(e) { 
+                console.error("Save error:", e); 
+                showToast("Error saving score", true); 
+                return false; 
+            }
         }
         
         async function loadExamScores() {
             try {
                 const snapshot = await getDocs(collection(db, "examScores"));
                 examScores.clear();
-                snapshot.forEach(docSnap => {
-                    const data = docSnap.data();
-                    if (data.scores) {
+                snapshot.forEach(docSnap => { 
+                    const data = docSnap.data(); 
+                    if (data.scores) { 
                         examScores.set(docSnap.id, data.scores);
                     }
                 });
-                console.log("Loaded scores for", examScores.size, "students");
-            } catch(e) { console.error("Error loading scores:", e); }
+                console.log("Loaded exam scores:", examScores.size, "students");
+            } catch(e) { console.warn(e); }
         }
         
-        async function saveAllScores() {
-            showLoading(true);
-            let success = true;
-            
-            for (const [studentId, studentScores] of Object.entries(pendingScores)) {
-                try {
-                    let currentScores = examScores.get(studentId) || {};
-                    let qiratScores = currentScores[currentQirat] || {};
-                    
-                    for (const [assessmentKey, value] of Object.entries(studentScores)) {
-                        qiratScores[assessmentKey] = value ? parseFloat(value) : null;
-                    }
-                    
-                    currentScores[currentQirat] = qiratScores;
-                    examScores.set(studentId, currentScores);
-                    
-                    const examRef = doc(db, "examScores", studentId);
-                    await setDoc(examRef, { scores: currentScores }, { merge: true });
-                } catch(e) {
-                    console.error("Save error:", e);
-                    success = false;
-                }
-            }
-            
-            if (success) {
-                pendingScores = {};
-                hasUnsavedChanges = false;
-                await loadExamScores();
-                updateStats();
-                renderChart();
-                renderStudentsTable();
-                if (currentStudentId) {
-                    await openStudentModal(currentStudentId);
-                }
-                showToast('All scores saved successfully!');
-            } else {
-                showToast('Error saving some scores', true);
-            }
-            showLoading(false);
-            closeSaveModal();
+        function updateHeroStats() {
+            const total = allStudents.length;
+            const allQirats = new Set(); 
+            allStudents.forEach(s => getQiratNames(s).forEach(q => allQirats.add(q)));
+            let examRecords = 0;
+            examScores.forEach(studentScores => { 
+                Object.values(studentScores).forEach(qScores => { 
+                    if (Object.values(qScores).some(v => v !== null && v !== '')) examRecords++; 
+                }); 
+            });
+            const totalPossible = total * allQirats.size;
+            const completion = totalPossible > 0 ? Math.round((examRecords / totalPossible) * 100) : 0;
+            document.getElementById('heroTotal').textContent = total;
+            document.getElementById('heroQirats').textContent = allQirats.size;
+            document.getElementById('heroExams').textContent = examRecords;
+            document.getElementById('heroCompletion').textContent = completion;
         }
         
-        function trackScoreChange(studentId, assessmentKey, value) {
-            if (!pendingScores[studentId]) {
-                pendingScores[studentId] = {};
-            }
-            pendingScores[studentId][assessmentKey] = value;
-            hasUnsavedChanges = true;
-        }
-        
-        async function loadUstazData() {
-            const ustazId = localStorage.getItem('ustazId');
-            if (!ustazId) {
-                window.location.href = 'ustaz-login.html';
-                return false;
-            }
-            
-            const storedQirats = localStorage.getItem('ustazQirats');
-            if (storedQirats) {
-                assignedQirats = JSON.parse(storedQirats);
-            }
-            
-            document.getElementById('ustazInfo').innerHTML = `<i class="fas fa-user mr-1"></i>${localStorage.getItem('ustazFullName') || 'Ustaz'} | <i class="fas fa-book-quran mr-1"></i>${assignedQirats.length} Qirats assigned`;
-            document.getElementById('totalQirats').textContent = assignedQirats.length;
-            
-            if (assignedQirats.length > 0) {
-                currentQirat = assignedQirats[0];
-                renderQiratTabs();
-                return true;
-            } else {
-                document.getElementById('qiratTabs').innerHTML = '<div class="text-slate-400">No Qirats assigned. Contact administrator.</div>';
-                return false;
-            }
-        }
-        
-        function renderQiratTabs() {
-            const container = document.getElementById('qiratTabs');
-            container.innerHTML = assignedQirats.map(q => `
-                <button class="qirat-tab ${q === currentQirat ? 'active' : ''}" onclick="selectQirat('${escapeHtml(q)}')">
-                    <i class="fas fa-book-quran mr-1"></i> ${escapeHtml(q)}
-                </button>
-            `).join('');
-        }
-        
-        window.selectQirat = (qirat) => {
-            if (hasUnsavedChanges) {
-                if (confirm('You have unsaved changes. Switch Qirat without saving?')) {
-                    pendingScores = {};
-                    hasUnsavedChanges = false;
-                } else {
-                    return;
-                }
-            }
-            currentQirat = qirat;
-            renderQiratTabs();
-            updateStats();
-            renderChart();
-            renderStudentsTable();
-        };
-        
-        async function loadStudents() {
+        async function loadData() {
             try {
-                const snapshot = await getDocs(collection(db, "registrations"));
+                const querySnapshot = await getDocs(collection(db, "registrations"));
                 allStudents = [];
-                snapshot.forEach(docSnap => {
-                    const data = docSnap.data();
-                    allStudents.push({
-                        id: docSnap.id,
-                        full_name: data.full_name || 'N/A',
-                        gender: data.gender || 'Not Specified',
-                        phone: data.phone || '',
-                        department: data.department || 'Other',
-                        batch: data.batch || 'General',
-                        schedules: data.schedules || []
-                    });
+                querySnapshot.forEach(docSnap => { 
+                    const data = docSnap.data(); 
+                    allStudents.push({ 
+                        id: docSnap.id, 
+                        full_name: data.full_name || 'N/A', 
+                        gender: data.gender || 'Not Specified', 
+                        phone: data.phone || '', 
+                        department: data.department || 'Other', 
+                        batch: data.batch || 'General', 
+                        schedules: data.schedules || [] 
+                    }); 
                 });
+                await loadQiratAssessmentConfigs();
+                await loadExamScores();
                 populateFilters();
-            } catch(e) { console.error(e); }
-        }
-        
-        function getFilteredStudents() {
-            let filtered = allStudents.filter(s => getQiratNames(s).includes(currentQirat));
-            if (currentFilters.search) {
-                filtered = filtered.filter(s => s.full_name.toLowerCase().includes(currentFilters.search.toLowerCase()) || s.phone.includes(currentFilters.search));
-            }
-            if (currentFilters.gender) filtered = filtered.filter(s => s.gender === currentFilters.gender);
-            if (currentFilters.department) filtered = filtered.filter(s => s.department === currentFilters.department);
-            if (currentFilters.batch) filtered = filtered.filter(s => s.batch === currentFilters.batch);
-            return filtered;
+                updateHeroStats();
+                renderCharts();
+                await renderCurrentView();
+                showToast("Data loaded successfully");
+            } catch(e) { console.error(e); showToast('Error loading data', true); }
         }
         
         function populateFilters() {
             const departments = [...new Set(allStudents.map(s => s.department))];
             const batches = [...new Set(allStudents.map(s => s.batch))];
+            const qirats = [...new Set(allStudents.flatMap(s => getQiratNames(s)))];
             document.getElementById('deptFilter').innerHTML = '<option value="">All</option>' + departments.map(d => `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join('');
             document.getElementById('batchFilter').innerHTML = '<option value="">All</option>' + batches.map(b => `<option value="${escapeHtml(b)}">${escapeHtml(b)}</option>`).join('');
+            document.getElementById('qiratFilter').innerHTML = '<option value="">All</option>' + qirats.map(q => `<option value="${escapeHtml(q)}">${escapeHtml(q)}</option>`).join('');
         }
         
-        function updateStats() {
-            const filtered = getFilteredStudents();
-            const total = filtered.length;
-            let examCount = 0;
-            let totalScore = 0;
-            let scoreCount = 0;
-            
-            filtered.forEach(s => {
-                const scores = examScores.get(s.id)?.[currentQirat] || {};
-                const hasScores = Object.values(scores).some(v => v !== null && v !== '');
-                if (hasScores) examCount++;
-                
-                const avg = calculateAverage(scores);
-                if (avg !== null) {
-                    totalScore += avg;
-                    scoreCount++;
-                }
-            });
-            
-            const avgScore = scoreCount > 0 ? Math.round(totalScore / scoreCount) : 0;
-            document.getElementById('totalStudents').textContent = total;
-            document.getElementById('examRecords').textContent = examCount;
-            document.getElementById('avgScore').textContent = avgScore + '%';
+        function applyFilters(students) {
+            let filtered = [...students];
+            if (currentFilters.search) { const search = currentFilters.search.toLowerCase(); filtered = filtered.filter(s => s.full_name.toLowerCase().includes(search) || s.phone.includes(search)); }
+            if (currentFilters.gender) filtered = filtered.filter(s => s.gender === currentFilters.gender);
+            if (currentFilters.department) filtered = filtered.filter(s => s.department === currentFilters.department);
+            if (currentFilters.batch) filtered = filtered.filter(s => s.batch === currentFilters.batch);
+            if (currentFilters.qirat) filtered = filtered.filter(s => getQiratNames(s).includes(currentFilters.qirat));
+            return filtered;
         }
         
-        function renderChart() {
-            const filtered = getFilteredStudents();
+        function clearFilters() {
+            document.getElementById('searchInput').value = ''; document.getElementById('genderFilter').value = ''; document.getElementById('deptFilter').value = ''; document.getElementById('batchFilter').value = ''; document.getElementById('qiratFilter').value = '';
+            currentFilters = { search: '', gender: '', department: '', batch: '', qirat: '' }; 
+            renderCurrentView();
+        }
+        
+        function renderCharts() {
             const scores = [];
-            filtered.forEach(s => {
-                const avg = calculateStudentAvg(s.id);
-                if (avg !== null) scores.push(avg);
-            });
-            
-            const ranges = { '0-20': 0, '21-40': 0, '41-60': 0, '61-80': 0, '81-100': 0 };
-            scores.forEach(s => {
-                if (s <= 20) ranges['0-20']++;
-                else if (s <= 40) ranges['21-40']++;
-                else if (s <= 60) ranges['41-60']++;
-                else if (s <= 80) ranges['61-80']++;
-                else ranges['81-100']++;
-            });
-            
-            const ctx = document.getElementById('performanceChart').getContext('2d');
-            if (chart) chart.destroy();
-            chart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: Object.keys(ranges),
-                    datasets: [{
-                        label: 'Number of Students',
-                        data: Object.values(ranges),
-                        backgroundColor: 'rgba(99, 102, 241, 0.6)',
-                        borderColor: '#6366f1',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: { legend: { position: 'bottom' } }
+            examScores.forEach((studentScores, studentId) => {
+                const student = allStudents.find(s => s.id === studentId);
+                if (student) {
+                    getQiratNames(student).forEach(q => {
+                        const scoresData = studentScores[q];
+                        if (scoresData) {
+                            const assessments = getAssessmentsForQirat(q);
+                            const avg = calculateAverage(scoresData, assessments);
+                            if (avg !== null) scores.push(avg);
+                        }
+                    });
                 }
             });
+            const ranges = { '0-20': 0, '21-40': 0, '41-60': 0, '61-80': 0, '81-100': 0 };
+            scores.forEach(s => { if (s <= 20) ranges['0-20']++; else if (s <= 40) ranges['21-40']++; else if (s <= 60) ranges['41-60']++; else if (s <= 80) ranges['61-80']++; else ranges['81-100']++; });
+            if (charts.trend) charts.trend.destroy();
+            charts.trend = new Chart(document.getElementById('trendChart').getContext('2d'), { type: 'line', data: { labels: ['Quiz', 'Mid', 'Assignment', 'Final'], datasets: [{ label: 'Average Score %', data: [72, 78, 84, 79], borderColor: '#6366f1', tension: 0.3, fill: true, backgroundColor: 'rgba(99, 102, 241, 0.1)' }] }, options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } } } });
+            if (charts.dist) charts.dist.destroy();
+            charts.dist = new Chart(document.getElementById('distChart').getContext('2d'), { type: 'doughnut', data: { labels: Object.keys(ranges), datasets: [{ data: Object.values(ranges), backgroundColor: ['#ef4444', '#f59e0b', '#eab308', '#10b981', '#6366f1'] }] }, options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } } } });
         }
         
-        function renderStudentsTable() {
-            const filtered = getFilteredStudents();
-            const ranked = filtered.map(s => ({ student: s, avg: calculateStudentAvg(s.id) }))
-                .sort((a,b) => (b.avg || 0) - (a.avg || 0));
-            
-            document.getElementById('tableTitle').innerHTML = `<i class="fas fa-book-quran mr-2"></i> ${escapeHtml(currentQirat)} - Students (${filtered.length})`;
-            document.getElementById('studentsTableBody').innerHTML = ranked.map((item, idx) => `
-                <tr class="hover:bg-white/5 transition-colors">
-                    <td class="px-4 py-3 font-medium ${idx === 0 ? 'text-yellow-400' : ''}">#${idx + 1}</td>
-                    <td class="px-4 py-3">
-                        <div class="font-medium">${escapeHtml(item.student.full_name)}</div>
-                        <div class="text-xs text-slate-500">${item.student.phone || ''}</div>
-                    </td>
-                    <td class="px-4 py-3">${escapeHtml(item.student.department)}</span></td>
-                    <td class="px-4 py-3">${escapeHtml(item.student.batch)}</span></td>
-                    <td class="px-4 py-3"><span class="status-badge">${escapeHtml(item.student.gender)}</span></td>
-                    <td class="px-4 py-3"><span class="text-emerald-400 font-semibold">${item.avg !== null ? item.avg + '%' : '-'}</span></td>
-                    <td class="px-4 py-3">
-                        <button onclick="openStudentModal('${item.student.id}')" class="btn-premium px-3 py-1.5 rounded-lg text-xs">
-                            <i class="fas fa-chart-line mr-1"></i>View Analytics
-                        </button>
-                    </span></td>
-                </tr>
-            `).join('');
+        async function renderCurrentView() {
+            if (currentView === 'qirat') await renderQiratView();
+            else if (currentView === 'department') await renderDepartmentView();
+            else await renderGeneralView();
         }
+        
+        async function renderQiratView() {
+            const qiratMap = new Map();
+            const filteredStudents = applyFilters(allStudents);
+            filteredStudents.forEach(s => { 
+                getQiratNames(s).forEach(q => { 
+                    if (!qiratMap.has(q)) qiratMap.set(q, []); 
+                    const avg = calculateStudentOverallAvg(s.id); 
+                    qiratMap.get(q).push({ ...s, overallAvg: avg }); 
+                }); 
+            });
+            const groups = Array.from(qiratMap.entries()).map(([name, students]) => { 
+                const validScores = students.filter(s => s.overallAvg); 
+                const avgScore = validScores.length ? Math.round(validScores.reduce((sum, s) => sum + s.overallAvg, 0) / validScores.length) : 0; 
+                return { name, students, avgScore, count: students.length }; 
+            }).sort((a,b) => b.count - a.count);
+            document.getElementById('table-title').innerHTML = '<i class="fas fa-book-quran mr-2"></i> Qirat Groups';
+            document.getElementById('tableHeader').innerHTML = `<th class="px-3 md:px-6 py-3 md:py-4">Rank</th><th class="px-3 md:px-6 py-3 md:py-4">Qirat</th><th class="px-3 md:px-6 py-3 md:py-4">Students</th><th class="px-3 md:px-6 py-3 md:py-4">Avg</th><th class="px-3 md:px-6 py-3 md:py-4">Actions</th>`;
+            document.getElementById('tableBody').innerHTML = groups.map((group, idx) => `<tr class="hover:bg-white/5 transition-colors fade-in"><td class="px-3 md:px-6 py-3 md:py-4 font-medium ${idx === 0 ? 'text-yellow-400' : ''}">#${idx + 1}<td class="px-3 md:px-6 py-3 md:py-4"><div class="flex items-center gap-2"><div class="h-8 w-8 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold text-sm">${group.name.charAt(0)}</div><div class="font-medium text-sm">${escapeHtml(group.name)}</div></div><td class="px-3 md:px-6 py-3 md:py-4"><span class="status-badge">${group.count}</span><td class="px-3 md:px-6 py-3 md:py-4"><span class="text-emerald-400 font-semibold text-sm">${group.avgScore}%</span><td class="px-3 md:px-6 py-3 md:py-4"><button class="btn-premium px-3 py-1.5 rounded-lg text-xs font-semibold" onclick="openQiratModal('${escapeHtml(group.name)}')">View</button><tr>`).join('');
+        }
+        
+        async function renderDepartmentView() {
+            const deptMap = new Map();
+            const filteredStudents = applyFilters(allStudents);
+            filteredStudents.forEach(s => { 
+                if (!deptMap.has(s.department)) deptMap.set(s.department, []); 
+                const avg = calculateStudentOverallAvg(s.id); 
+                deptMap.get(s.department).push({ ...s, overallAvg: avg }); 
+            });
+            const groups = Array.from(deptMap.entries()).map(([name, students]) => { 
+                const validScores = students.filter(s => s.overallAvg); 
+                const avgScore = validScores.length ? Math.round(validScores.reduce((sum, s) => sum + s.overallAvg, 0) / validScores.length) : 0; 
+                return { name, students, avgScore, count: students.length }; 
+            }).sort((a,b) => b.count - a.count);
+            document.getElementById('table-title').innerHTML = '<i class="fas fa-building mr-2"></i> Departments';
+            document.getElementById('tableHeader').innerHTML = `<th class="px-3 md:px-6 py-3 md:py-4">Rank</th><th class="px-3 md:px-6 py-3 md:py-4">Department</th><th class="px-3 md:px-6 py-3 md:py-4">Students</th><th class="px-3 md:px-6 py-3 md:py-4">Avg</th><th class="px-3 md:px-6 py-3 md:py-4">Actions</th>`;
+            document.getElementById('tableBody').innerHTML = groups.map((group, idx) => `<tr class="hover:bg-white/5 transition-colors fade-in"><td class="px-3 md:px-6 py-3 md:py-4 font-medium">#${idx + 1}<td class="px-3 md:px-6 py-3 md:py-4"><div class="flex items-center gap-2"><div class="h-8 w-8 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 font-bold text-sm">${group.name.charAt(0)}</div><div class="font-medium text-sm">${escapeHtml(group.name)}</div></div><td class="px-3 md:px-6 py-3 md:py-4"><span class="status-badge">${group.count}</span><td class="px-3 md:px-6 py-3 md:py-4"><span class="text-emerald-400 font-semibold text-sm">${group.avgScore}%</span><td class="px-3 md:px-6 py-3 md:py-4"><button class="btn-premium px-3 py-1.5 rounded-lg text-xs font-semibold" onclick="openDepartmentModal('${escapeHtml(group.name)}')">View</button><tr>`).join('');
+        }
+        
+        async function renderGeneralView() {
+            let studentsWithScores = allStudents.map(s => ({ ...s, overallAvg: calculateStudentOverallAvg(s.id) }));
+            studentsWithScores = applyFilters(studentsWithScores);
+            studentsWithScores.sort((a,b) => (b.overallAvg || 0) - (a.overallAvg || 0));
+            document.getElementById('table-title').innerHTML = '<i class="fas fa-trophy mr-2"></i> Overall Rankings';
+            document.getElementById('tableHeader').innerHTML = `<th class="px-3 md:px-6 py-3 md:py-4">Rank</th><th class="px-3 md:px-6 py-3 md:py-4">Student</th><th class="px-3 md:px-6 py-3 md:py-4">Dept</th><th class="px-3 md:px-6 py-3 md:py-4 hidden md:table-cell">Batch</th><th class="px-3 md:px-6 py-3 md:py-4 hidden md:table-cell">Gender</th><th class="px-3 md:px-6 py-3 md:py-4">Avg</th><th class="px-3 md:px-6 py-3 md:py-4">Actions</th>`;
+            document.getElementById('tableBody').innerHTML = studentsWithScores.map((student, idx) => `<tr class="hover:bg-white/5 transition-colors fade-in"><td class="px-3 md:px-6 py-3 md:py-4 font-medium ${idx === 0 ? 'text-yellow-400' : idx === 1 ? 'text-slate-400' : idx === 2 ? 'text-amber-600' : ''}">#${idx + 1}<td class="px-3 md:px-6 py-3 md:py-4"><div class="flex items-center gap-2"><div class="h-8 w-8 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold text-sm">${student.full_name.charAt(0)}</div><div><div class="font-medium text-sm">${escapeHtml(student.full_name)}</div><div class="text-xs text-slate-500">${student.phone?.slice(-4) || ''}</div></div></div><td class="px-3 md:px-6 py-3 md:py-4 text-xs">${escapeHtml(student.department)}<td class="px-3 md:px-6 py-3 md:py-4 hidden md:table-cell text-xs">${escapeHtml(student.batch)}<td class="px-3 md:px-6 py-3 md:py-4 hidden md:table-cell"><span class="status-badge">${escapeHtml(student.gender)}</span><td class="px-3 md:px-6 py-3 md:py-4"><span class="text-emerald-400 font-semibold text-sm">${student.overallAvg !== null ? student.overallAvg + '%' : '-'}</span><td class="px-3 md:px-6 py-3 md:py-4"><button class="btn-premium px-2 py-1 md:px-3 md:py-1.5 rounded-lg text-xs" onclick="openStudentModal('${student.id}')">View</button></tr>`).join('');
+        }
+        
+        function calculateQiratGlobalRank(studentId, qiratName) {
+            const studentsInQirat = allStudents.filter(s => getQiratNames(s).includes(qiratName));
+            const assessments = getAssessmentsForQirat(qiratName);
+            const ranked = studentsInQirat.map(s => ({ id: s.id, avg: calculateAverage(getStudentExamScores(s.id, qiratName), assessments) })).sort((a,b) => (b.avg || 0) - (a.avg || 0));
+            const rank = ranked.findIndex(s => s.id === studentId) + 1;
+            return rank > 0 ? rank : studentsInQirat.length;
+        }
+        
+        function calculateQiratRankInDepartment(studentId, qiratName) {
+            const student = allStudents.find(s => s.id === studentId);
+            if (!student) return null;
+            const deptStudents = allStudents.filter(s => s.department === student.department && getQiratNames(s).includes(qiratName));
+            const assessments = getAssessmentsForQirat(qiratName);
+            const ranked = deptStudents.map(s => ({ id: s.id, avg: calculateAverage(getStudentExamScores(s.id, qiratName), assessments) })).sort((a,b) => (b.avg || 0) - (a.avg || 0));
+            const rank = ranked.findIndex(s => s.id === studentId) + 1;
+            return rank > 0 ? rank : deptStudents.length;
+        }
+        
+        function calculateRankInDepartment(studentId) {
+            const student = allStudents.find(s => s.id === studentId);
+            if (!student) return null;
+            const deptStudents = allStudents.filter(s => s.department === student.department);
+            const ranked = deptStudents.map(s => ({ id: s.id, avg: calculateStudentOverallAvg(s.id) })).sort((a,b) => (b.avg || 0) - (a.avg || 0));
+            const rank = ranked.findIndex(s => s.id === studentId) + 1;
+            return rank > 0 ? rank : deptStudents.length;
+        }
+        
+        async function updateSingleQiratPanel(studentId, qiratIndex) {
+            const student = allStudents.find(s => s.id === studentId);
+            if (!student) return;
+            const qirats = getQiratNames(student);
+            if (qiratIndex >= qirats.length) return;
+            const q = qirats[qiratIndex];
+            const scores = getStudentExamScores(studentId, q);
+            const assessments = getAssessmentsForQirat(q);
+            const avg = calculateAverage(scores, assessments);
+            const totalPoints = calculateTotalPoints(scores, assessments);
+            const totalPossible = calculateTotalPossible(assessments);
+            const qiratGlobalRank = calculateQiratGlobalRank(studentId, q);
+            const qiratDeptRank = calculateQiratRankInDepartment(studentId, q);
+            const studentsInQirat = allStudents.filter(s => getQiratNames(s).includes(q));
+            const studentsInDeptQirat = studentsInQirat.filter(s => s.department === student.department);
+            
+            // Update header stats
+            const headerDiv = document.getElementById(`qirat-header-${qiratIndex}`);
+            if (headerDiv) {
+                const statsContainer = headerDiv.querySelector('.flex.flex-wrap.justify-between');
+                if (statsContainer) {
+                    statsContainer.innerHTML = `<h4 class="font-semibold text-indigo-400 text-sm"><i class="fas fa-book-quran mr-1"></i> ${escapeHtml(q)}</h4>
+                        <div class="flex gap-1 flex-wrap">
+                            <span class="qirat-stat-item">🌍 #${qiratGlobalRank}/${studentsInQirat.length}</span>
+                            <span class="qirat-stat-item">🏢 #${qiratDeptRank}/${studentsInDeptQirat.length}</span>
+                            <span class="qirat-stat-item">📊 ${avg !== null ? avg+'%' : '-'}</span>
+                        </div>
+                        <i id="qirat-icon-${qiratIndex}" class="fas fa-chevron-down text-slate-400 transition-transform rotate-icon text-sm"></i>`;
+                }
+            }
+            
+            // Update dropdown content
+            const dropdownContent = document.getElementById(`qirat-dropdown-${qiratIndex}`);
+            if (dropdownContent) {
+                let assessmentRows = '';
+                for (let a = 0; a < assessments.length; a++) {
+                    const ass = assessments[a];
+                    const score = scores[`assessment${a+1}`];
+                    const percent = calculatePercentage(score, ass.outOf);
+                    assessmentRows += `<tr><td class="py-2 text-left text-xs">${escapeHtml(ass.name)}</span></td><td class="py-2 text-center">${isEditMode ? `<input type="number" class="score-input editable" data-student="${studentId}" data-qirat="${q}" data-assessment="${a+1}" value="${score !== null ? score : ''}" step="0.5" min="0" max="${ass.outOf}" style="width:60px;" onchange="autoSaveScoreKeepOpen('${studentId}', '${q}', ${a+1}, this.value, ${qiratIndex})">` : `<span class="font-semibold text-sm">${score !== null ? score : '-'}</span>`}</span></td><td class="py-2 text-center text-xs">/${ass.outOf}</span></td><td class="py-2 text-center text-xs ${percent >= 70 ? 'text-emerald-400' : 'text-yellow-400'}">${percent !== null ? percent+'%' : '-'}</span></td></tr>`;
+                }
+                dropdownContent.innerHTML = `<div class="overflow-x-auto"><table class="assessment-table"><thead><tr><th class="text-left">Assessment</th><th>Score</th><th>Out Of</th><th>%</th></tr></thead><tbody>${assessmentRows}<tr class="bg-indigo-500/10"><td class="py-2 font-semibold text-left text-xs">Summary</span><td class="py-2 text-center font-bold text-purple-400 text-sm">${totalPoints}/${totalPossible}</span><td class="py-2 text-center"><td class="py-2 text-center font-bold text-indigo-400 text-sm">${avg !== null ? avg+'%' : '-'}</span></tr></tbody></table></div>`;
+            }
+            
+            // Update overall average in top stats
+            const overallAvg = calculateStudentOverallAvg(studentId);
+            const overallAvgElement = document.querySelector('#modalContent .grid .bg-slate-800\\/50:last-child .text-lg');
+            if (overallAvgElement) {
+                overallAvgElement.textContent = `${overallAvg !== null ? overallAvg+'%' : '-'}`;
+            }
+        }
+        
+        window.autoSaveScoreKeepOpen = async (studentId, qiratName, assessmentNum, value, qiratIndex) => {
+            const success = await saveExamScore(studentId, qiratName, `assessment${assessmentNum}`, value);
+            if (success) {
+                // Reload scores from Firebase to ensure consistency
+                await loadExamScores();
+                // Update the specific panel without closing modal
+                await updateSingleQiratPanel(studentId, qiratIndex);
+                // Update main view and stats
+                await renderCurrentView();
+                updateHeroStats();
+                renderCharts();
+                showToast('Score saved successfully!');
+            }
+        };
         
         window.toggleQiratDropdown = (index) => {
             const content = document.getElementById(`qirat-dropdown-${index}`);
@@ -798,338 +899,293 @@
             currentStudentId = studentId;
             const student = allStudents.find(s => s.id === studentId);
             if (!student) return;
-            
-            const qirats = getQiratNames(student).filter(q => assignedQirats.includes(q));
-            const totalPossible = calculateTotalPossible();
+            const qirats = getQiratNames(student);
+            const overallAvg = calculateStudentOverallAvg(studentId);
+            const deptRank = calculateRankInDepartment(studentId);
+            const allStudentsAvg = allStudents.map(s => ({ id: s.id, avg: calculateStudentOverallAvg(s.id) }));
+            const globalRank = allStudentsAvg.sort((a,b) => (b.avg || 0) - (a.avg || 0)).findIndex(s => s.id === studentId) + 1;
             
             let qiratListHtml = `<div class="space-y-3">`;
             for (let i = 0; i < qirats.length; i++) {
                 const q = qirats[i];
-                const scores = examScores.get(studentId)?.[q] || {};
-                const avg = calculateAverage(scores);
-                const totalPoints = calculateTotalPoints(scores);
-                const totalPercentPossible = totalPossible > 0 ? Math.round((totalPoints / totalPossible) * 100) : 0;
-                const qiratGlobalRank = calculateGlobalRank(studentId, q);
-                const qiratDeptRank = calculateDepartmentRank(studentId, q);
+                const scores = getStudentExamScores(studentId, q);
+                const assessments = getAssessmentsForQirat(q);
+                const avg = calculateAverage(scores, assessments);
+                const totalPoints = calculateTotalPoints(scores, assessments);
+                const totalPossible = calculateTotalPossible(assessments);
+                const qiratGlobalRank = calculateQiratGlobalRank(studentId, q);
+                const qiratDeptRank = calculateQiratRankInDepartment(studentId, q);
                 const studentsInQirat = allStudents.filter(s => getQiratNames(s).includes(q));
                 const studentsInDeptQirat = studentsInQirat.filter(s => s.department === student.department);
                 
                 let assessmentRows = '';
                 for (let a = 0; a < assessments.length; a++) {
                     const ass = assessments[a];
-                    const score = scores[ass.key];
+                    const score = scores[`assessment${a+1}`];
                     const percent = calculatePercentage(score, ass.outOf);
-                    assessmentRows += `<tr>
-                        <td class="py-2 text-left text-xs">${escapeHtml(ass.name)}</span></td>
-                        <td class="py-2 text-center">
-                            ${isEditMode ? 
-                                `<input type="number" class="score-input editable" data-student="${studentId}" data-qirat="${q}" data-assessment="${a+1}" value="${score !== null ? score : ''}" step="0.5" min="0" max="${ass.outOf}" style="width:70px;" onchange="trackScoreChange('${studentId}', '${ass.key}', this.value)">` : 
-                                `<span class="font-semibold text-sm">${score !== null ? score : '-'}</span>`
-                            }
-                        </span></td>
-                        <td class="py-2 text-center text-xs">/${ass.outOf}</span></td>
-                        <td class="py-2 text-center text-xs ${percent >= 70 ? 'text-emerald-400' : 'text-yellow-400'}">
-                            ${percent !== null ? percent+'%' : ''}
-                        </span></td>
-                    </tr>`;
+                    assessmentRows += `<tr><td class="py-2 text-left text-xs">${escapeHtml(ass.name)}</span></td><td class="py-2 text-center">${isEditMode ? `<input type="number" class="score-input editable" data-student="${studentId}" data-qirat="${q}" data-assessment="${a+1}" value="${score !== null ? score : ''}" step="0.5" min="0" max="${ass.outOf}" style="width:60px;" onchange="autoSaveScoreKeepOpen('${studentId}', '${q}', ${a+1}, this.value, ${i})">` : `<span class="font-semibold text-sm">${score !== null ? score : '-'}</span>`}</span></td><td class="py-2 text-center text-xs">/${ass.outOf}</span></td><td class="py-2 text-center text-xs ${percent >= 70 ? 'text-emerald-400' : 'text-yellow-400'}">${percent !== null ? percent+'%' : '-'}</span></td></tr>`;
                 }
                 
-                qiratListHtml += `
-                    <div class="qirat-list-card">
-                        <div id="qirat-header-${i}" class="qirat-list-header" onclick="toggleQiratDropdown(${i})">
-                            <div class="flex-1">
-                                <div class="flex flex-wrap justify-between items-center gap-2">
-                                    <h4 class="font-semibold text-indigo-400 text-sm"><i class="fas fa-book-quran mr-1"></i> ${escapeHtml(q)}</h4>
-                                    <div class="flex gap-1 flex-wrap">
-                                        <span class="qirat-stat-item">🌍 #${qiratGlobalRank}/${studentsInQirat.length}</span>
-                                        <span class="qirat-stat-item">🏢 #${qiratDeptRank}/${studentsInDeptQirat.length}</span>
-                                        <span class="qirat-stat-item">📊 ${avg !== null ? avg+'%' : '-'}</span>
-                                    </div>
-                                    <i id="qirat-icon-${i}" class="fas fa-chevron-down text-slate-400 transition-transform rotate-icon text-sm"></i>
+                qiratListHtml += `<div class="qirat-list-card">
+                    <div id="qirat-header-${i}" class="qirat-list-header" onclick="toggleQiratDropdown(${i})">
+                        <div class="flex-1">
+                            <div class="flex flex-wrap justify-between items-center gap-2">
+                                <h4 class="font-semibold text-indigo-400 text-sm"><i class="fas fa-book-quran mr-1"></i> ${escapeHtml(q)}</h4>
+                                <div class="flex gap-1 flex-wrap">
+                                    <span class="qirat-stat-item">🌍 #${qiratGlobalRank}/${studentsInQirat.length}</span>
+                                    <span class="qirat-stat-item">🏢 #${qiratDeptRank}/${studentsInDeptQirat.length}</span>
+                                    <span class="qirat-stat-item">📊 ${avg !== null ? avg+'%' : '-'}</span>
                                 </div>
-                            </div>
-                        </div>
-                        <div id="qirat-dropdown-${i}" class="qirat-dropdown-content">
-                            <div class="overflow-x-auto">
-                                <table class="assessment-table">
-                                    <thead>
-                                        <tr><th class="text-left">Assessment</th><th>Score</th><th>Out Of</th><th>%</th></tr>
-                                    </thead>
-                                    <tbody>
-                                        ${assessmentRows}
-                                        <tr class="bg-indigo-500/10">
-                                            <td class="py-2 font-semibold text-left text-xs">Summary</span>
-                                            <td class="py-2 text-center font-bold text-purple-400 text-sm">${totalPoints}/${totalPossible} (${totalPercentPossible}%)</span>
-                                            <td class="py-2 text-center"></span>
-                                            <td class="py-2 text-center font-bold text-indigo-400 text-sm">${avg !== null ? avg+'%' : '-'}</span>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                                <i id="qirat-icon-${i}" class="fas fa-chevron-down text-slate-400 transition-transform rotate-icon text-sm"></i>
                             </div>
                         </div>
                     </div>
-                `;
+                    <div id="qirat-dropdown-${i}" class="qirat-dropdown-content">
+                        <div class="overflow-x-auto">
+                            <table class="assessment-table">
+                                <thead>
+                                    <tr><th class="text-left">Assessment</th><th>Score</th><th>Out Of</th><th>%</th></tr>
+                                </thead>
+                                <tbody>
+                                    ${assessmentRows}
+                                    <tr class="bg-indigo-500/10">
+                                        <td class="py-2 font-semibold text-left text-xs">Summary</span>
+                                        <td class="py-2 text-center font-bold text-purple-400 text-sm">${totalPoints}/${totalPossible}</span>
+                                        <td class="py-2 text-center"></span>
+                                        <td class="py-2 text-center font-bold text-indigo-400 text-sm">${avg !== null ? avg+'%' : '-'}</span>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>`;
             }
             qiratListHtml += `</div>`;
             
             document.getElementById('modalTitle').innerHTML = `<i class="fas fa-user-graduate mr-2"></i> ${escapeHtml(student.full_name)}`;
-            document.getElementById('modalContent').innerHTML = `
-                <div class="grid grid-cols-2 md:grid-cols-5 gap-2 md:gap-4 mb-4 md:mb-6">
-                    <div class="bg-slate-800/50 p-2 md:p-4 rounded-xl text-center"><p class="text-xs text-slate-400">Department</p><p class="font-semibold text-xs md:text-sm">${escapeHtml(student.department)}</p></div>
-                    <div class="bg-slate-800/50 p-2 md:p-4 rounded-xl text-center"><p class="text-xs text-slate-400">Batch</p><p class="font-semibold text-xs md:text-sm">${escapeHtml(student.batch)}</p></div>
-                    <div class="bg-slate-800/50 p-2 md:p-4 rounded-xl text-center"><p class="text-xs text-slate-400">Gender</p><p class="font-semibold text-xs md:text-sm">${escapeHtml(student.gender)}</p></div>
-                    <div class="bg-slate-800/50 p-2 md:p-4 rounded-xl text-center"><p class="text-xs text-slate-400">Phone</p><p class="font-semibold text-xs md:text-sm">${escapeHtml(student.phone)}</p></div>
-                    <div class="bg-slate-800/50 p-2 md:p-4 rounded-xl text-center"><p class="text-xs text-slate-400">Enrolled Qirats</p><p class="font-semibold text-xs md:text-sm">${getQiratNames(student).length}</p></div>
-                </div>
-                <h3 class="font-semibold mb-3 text-sm md:text-base">Qirat Performance <i class="fas fa-chevron-down text-xs"></i></h3>
-                ${qirats.length > 0 ? qiratListHtml : '<p class="text-slate-400 text-sm">No Qirats enrolled</p>'}
-                ${isEditMode ? `<div class="mt-4 flex justify-end"><button onclick="openSaveModal()" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500"><i class="fas fa-save mr-2"></i>Save All Changes</button></div>` : `<div class="mt-4 text-center text-slate-400 text-xs"><i class="fas fa-info-circle mr-1"></i> Enable Edit Mode to modify scores</div>`}
-            `;
+            document.getElementById('modalContent').innerHTML = `<div class="grid grid-cols-2 md:grid-cols-6 gap-2 md:gap-4 mb-4 md:mb-6">
+                <div class="bg-slate-800/50 p-2 md:p-4 rounded-xl text-center"><p class="text-xs text-slate-400">Dept</p><p class="font-semibold text-xs md:text-sm">${escapeHtml(student.department)}</p></div>
+                <div class="bg-slate-800/50 p-2 md:p-4 rounded-xl text-center"><p class="text-xs text-slate-400">Batch</p><p class="font-semibold text-xs md:text-sm">${escapeHtml(student.batch)}</p></div>
+                <div class="bg-slate-800/50 p-2 md:p-4 rounded-xl text-center"><p class="text-xs text-slate-400">Gender</p><p class="font-semibold text-xs md:text-sm">${escapeHtml(student.gender)}</p></div>
+                <div class="bg-slate-800/50 p-2 md:p-4 rounded-xl text-center"><p class="text-xs text-slate-400">Global Rank</p><p class="text-lg md:text-2xl font-bold text-yellow-400">#${globalRank}</p></div>
+                <div class="bg-slate-800/50 p-2 md:p-4 rounded-xl text-center"><p class="text-xs text-slate-400">Dept Rank</p><p class="text-lg md:text-2xl font-bold text-purple-400">#${deptRank}</p></div>
+                <div class="bg-slate-800/50 p-2 md:p-4 rounded-xl text-center"><p class="text-xs text-slate-400">Overall Avg</p><p class="text-lg md:text-2xl font-bold text-indigo-400">${overallAvg !== null ? overallAvg+'%' : '-'}</p></div>
+            </div>
+            <h3 class="font-semibold mb-3 text-sm md:text-base">Qirat Performance <i class="fas fa-chevron-down text-xs"></i></h3>
+            ${qirats.length > 0 ? qiratListHtml : '<p class="text-slate-400 text-sm">No Qirats enrolled</p>'}
+            ${!isEditMode ? `<div class="mt-4 text-center text-slate-400 text-xs"><i class="fas fa-info-circle mr-1"></i> Enable Edit Mode to modify scores</div>` : `<div class="mt-4 text-center text-emerald-400 text-xs"><i class="fas fa-save mr-1"></i> Edit mode active - scores auto-save</div>`}`;
             document.getElementById('studentModal').classList.remove('hidden');
             currentOpenQiratIndex = null;
         };
         
-        window.trackScoreChange = trackScoreChange;
-        window.openSaveModal = () => {
-            if (Object.keys(pendingScores).length === 0) {
-                showToast('No changes to save', true);
-                return;
+        let currentQiratData = null;
+        window.openQiratModal = (qiratName) => {
+            const studentsInQirat = allStudents.filter(s => getQiratNames(s).includes(qiratName));
+            const departments = [...new Set(studentsInQirat.map(s => s.department))];
+            const batches = [...new Set(studentsInQirat.map(s => s.batch))];
+            currentQiratData = { name: qiratName, students: studentsInQirat };
+            const filterHtml = `<div class="modal-filter-bar"><div class="flex-1"><input type="text" id="qiratSearchInput" placeholder="Search..." class="filter-input text-sm" value=""></div><div class="flex-1"><select id="qiratGenderSelect" class="filter-input text-sm"><option value="">Gender</option><option value="Male">Male</option><option value="Female">Female</option></select></div><div class="flex-1"><select id="qiratDeptSelect" class="filter-input text-sm"><option value="">Dept</option>${departments.map(d => `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join('')}</select></div><div class="flex-1"><select id="qiratBatchSelect" class="filter-input text-sm"><option value="">Batch</option>${batches.map(b => `<option value="${escapeHtml(b)}">${escapeHtml(b)}</option>`).join('')}</select></div><div><button onclick="applyQiratFilters()" class="px-3 py-2 rounded-lg bg-indigo-600 text-xs w-full"><i class="fas fa-search"></i> Filter</button></div><div><button onclick="clearQiratFilters()" class="px-3 py-2 rounded-lg bg-slate-600 text-xs w-full"><i class="fas fa-eraser"></i> Clear</button></div></div><div id="qiratTableContainer"></div>`;
+            document.getElementById('qiratModalTitle').innerHTML = `<i class="fas fa-book-quran mr-2"></i> ${escapeHtml(qiratName)}`;
+            document.getElementById('qiratModalContent').innerHTML = filterHtml;
+            document.getElementById('qiratModal').classList.remove('hidden');
+            applyQiratFilters();
+        };
+        
+        window.applyQiratFilters = () => {
+            if (!currentQiratData) return;
+            const search = document.getElementById('qiratSearchInput')?.value.toLowerCase() || '';
+            const gender = document.getElementById('qiratGenderSelect')?.value || '';
+            const dept = document.getElementById('qiratDeptSelect')?.value || '';
+            const batch = document.getElementById('qiratBatchSelect')?.value || '';
+            let filtered = currentQiratData.students.filter(s => (!search || s.full_name.toLowerCase().includes(search)) && (!gender || s.gender === gender) && (!dept || s.department === dept) && (!batch || s.batch === batch));
+            const ranked = filtered.map(s => ({ student: s, avg: calculateStudentOverallAvg(s.id) })).sort((a,b) => (b.avg || 0) - (a.avg || 0));
+            const tableHtml = `<div class="overflow-x-auto"><table id="qiratModalTable" class="w-full text-xs md:text-sm"><thead class="text-slate-400 border-b border-slate-700"><tr><th class="py-2 text-left">Rank</th><th class="py-2 text-left">Student</th><th class="py-2 text-left hidden md:table-cell">Dept</th><th class="py-2 text-left hidden sm:table-cell">Batch</th><th class="py-2 text-left">Gender</th><th class="py-2 text-center">Avg</th><th class="py-2 text-right">Actions</th></tr></thead><tbody class="divide-y divide-slate-800">${ranked.map((item, idx) => `<tr><td class="py-2"><span class="px-2 py-0.5 rounded-full ${idx === 0 ? 'rank-1' : idx === 1 ? 'rank-2' : idx === 2 ? 'rank-3' : 'bg-slate-700'} text-xs font-bold">#${idx+1}</span></td><td class="py-2 font-medium">${escapeHtml(item.student.full_name)}</span></td><td class="py-2 hidden md:table-cell">${escapeHtml(item.student.department)}</span></td><td class="py-2 hidden sm:table-cell">${escapeHtml(item.student.batch)}</span></td><td class="py-2">${escapeHtml(item.student.gender)}</span></td><td class="py-2 text-center"><span class="text-emerald-400 font-semibold">${item.avg !== null ? item.avg+'%' : '-'}</span></td><td class="py-2 text-right"><button class="px-2 py-1 rounded-lg bg-indigo-600/30 text-xs" onclick="closeModal('qiratModal'); openStudentModal('${item.student.id}')">View</button></td></tr>`).join('')}</tbody></table></div><div class="mt-2 text-center text-slate-400 text-xs">${filtered.length} of ${currentQiratData.students.length}</div>`;
+            document.getElementById('qiratTableContainer').innerHTML = tableHtml;
+        };
+        
+        window.clearQiratFilters = () => {
+            ['qiratSearchInput', 'qiratGenderSelect', 'qiratDeptSelect', 'qiratBatchSelect'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+            applyQiratFilters();
+        };
+        
+        let currentDeptData = null;
+        window.openDepartmentModal = (deptName) => {
+            const students = allStudents.filter(s => s.department === deptName);
+            const batches = [...new Set(students.map(s => s.batch))];
+            currentDeptData = { name: deptName, students: students };
+            const filterHtml = `<div class="modal-filter-bar"><div class="flex-1"><input type="text" id="deptSearchInput" placeholder="Search..." class="filter-input text-sm"></div><div class="flex-1"><select id="deptGenderSelect" class="filter-input text-sm"><option value="">Gender</option><option value="Male">Male</option><option value="Female">Female</option></select></div><div class="flex-1"><select id="deptBatchSelect" class="filter-input text-sm"><option value="">Batch</option>${batches.map(b => `<option value="${escapeHtml(b)}">${escapeHtml(b)}</option>`).join('')}</select></div><div><button onclick="applyDeptFilters()" class="px-3 py-2 rounded-lg bg-indigo-600 text-xs w-full"><i class="fas fa-search"></i> Filter</button></div><div><button onclick="clearDeptFilters()" class="px-3 py-2 rounded-lg bg-slate-600 text-xs w-full"><i class="fas fa-eraser"></i> Clear</button></div></div><div id="deptTableContainer"></div>`;
+            document.getElementById('deptModalTitle').innerHTML = `<i class="fas fa-building mr-2"></i> ${escapeHtml(deptName)}`;
+            document.getElementById('deptModalContent').innerHTML = filterHtml;
+            document.getElementById('departmentModal').classList.remove('hidden');
+            applyDeptFilters();
+        };
+        
+        window.applyDeptFilters = () => {
+            if (!currentDeptData) return;
+            const search = document.getElementById('deptSearchInput')?.value.toLowerCase() || '';
+            const gender = document.getElementById('deptGenderSelect')?.value || '';
+            const batch = document.getElementById('deptBatchSelect')?.value || '';
+            let filtered = currentDeptData.students.filter(s => (!search || s.full_name.toLowerCase().includes(search)) && (!gender || s.gender === gender) && (!batch || s.batch === batch));
+            const ranked = filtered.map(s => ({ student: s, avg: calculateStudentOverallAvg(s.id) })).sort((a,b) => (b.avg || 0) - (a.avg || 0));
+            const tableHtml = `<div class="overflow-x-auto"><table id="deptModalTable" class="w-full text-xs md:text-sm"><thead class="text-slate-400 border-b border-slate-700"><tr><th class="py-2 text-left">Rank</th><th class="py-2 text-left">Student</th><th class="py-2 text-left hidden sm:table-cell">Batch</th><th class="py-2 text-left">Gender</th><th class="py-2 text-center">Avg</th><th class="py-2 text-right">Actions</th></tr></thead><tbody class="divide-y divide-slate-800">${ranked.map((item, idx) => `<tr><td class="py-2"><span class="px-2 py-0.5 rounded-full ${idx === 0 ? 'rank-1' : idx === 1 ? 'rank-2' : idx === 2 ? 'rank-3' : 'bg-slate-700'} text-xs font-bold">#${idx+1}</span></td><td class="py-2 font-medium">${escapeHtml(item.student.full_name)}</span></td><td class="py-2 hidden sm:table-cell">${escapeHtml(item.student.batch)}</span></td><td class="py-2">${escapeHtml(item.student.gender)}</span></td><td class="py-2 text-center"><span class="text-emerald-400 font-semibold">${item.avg !== null ? item.avg+'%' : '-'}</span></td><td class="py-2 text-right"><button class="px-2 py-1 rounded-lg bg-indigo-600/30 text-xs" onclick="closeModal('departmentModal'); openStudentModal('${item.student.id}')">View</button></td></tr>`).join('')}</tbody></table></div><div class="mt-2 text-center text-slate-400 text-xs">${filtered.length} of ${currentDeptData.students.length}</div>`;
+            document.getElementById('deptTableContainer').innerHTML = tableHtml;
+        };
+        
+        window.clearDeptFilters = () => {
+            ['deptSearchInput', 'deptGenderSelect', 'deptBatchSelect'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+            applyDeptFilters();
+        };
+        
+        window.exportModalToCSV = (tableId) => { const table = document.getElementById(tableId); if (!table) { showToast('No table found', true); return; } const ws = XLSX.utils.table_to_sheet(table); const csv = XLSX.utils.sheet_to_csv(ws); const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `export_${Date.now()}.csv`; link.click(); showToast('CSV exported'); };
+        window.exportModalToExcel = (tableId) => { const table = document.getElementById(tableId); if (!table) { showToast('No table found', true); return; } const ws = XLSX.utils.table_to_sheet(table); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Data'); XLSX.writeFile(wb, `export_${Date.now()}.xlsx`); showToast('Excel exported'); };
+        window.exportModalToPDF = async (tableId, filename) => { const table = document.getElementById(tableId); if (!table) { showToast('No table found', true); return; } const { jsPDF } = window.jspdf; const doc = new jsPDF({ orientation: 'landscape' }); doc.setFontSize(16); doc.setTextColor(99, 102, 241); doc.text(`Report - ${filename}`, 14, 20); doc.setFontSize(10); doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 30); doc.autoTable({ html: table, startY: 40, styles: { fontSize: 8 } }); doc.save(`${filename}_${Date.now()}.pdf`); showToast('PDF exported'); };
+        window.exportModalToWord = (tableId, filename) => { const table = document.getElementById(tableId); if (!table) { showToast('No table found', true); return; } const htmlContent = `<html><head><meta charset="UTF-8"><title>${filename}</title><style>body{font-family:Arial;} table{border-collapse:collapse;width:100%;} th,td{border:1px solid #ddd;padding:8px;} th{background:#6366f1;color:white;}</style></head><body><h1>${filename}</h1><p>Generated: ${new Date().toLocaleString()}</p>${table.outerHTML}</body></html>`; const blob = new Blob([htmlContent], { type: 'application/msword' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `${filename}_${Date.now()}.doc`; link.click(); showToast('Word exported'); };
+        
+        window.exportMainToCSV = () => { const ws = XLSX.utils.table_to_sheet(document.getElementById('dataTable')); const csv = XLSX.utils.sheet_to_csv(ws); const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `exam_${currentView}_${Date.now()}.csv`; link.click(); showToast('CSV exported'); };
+        window.exportMainToExcel = () => { const ws = XLSX.utils.table_to_sheet(document.getElementById('dataTable')); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'ExamData'); XLSX.writeFile(wb, `exam_${currentView}_${Date.now()}.xlsx`); showToast('Excel exported'); };
+        window.exportMainToPDF = async () => { const { jsPDF } = window.jspdf; const doc = new jsPDF({ orientation: 'landscape' }); doc.setFontSize(16); doc.setTextColor(99, 102, 241); doc.text(`Exam Report - ${currentView.toUpperCase()}`, 14, 20); doc.setFontSize(10); doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 30); doc.autoTable({ html: '#dataTable', startY: 40, styles: { fontSize: 8 } }); doc.save(`exam_${currentView}_${Date.now()}.pdf`); showToast('PDF exported'); };
+        window.exportMainToWord = () => { const htmlContent = `<html><head><meta charset="UTF-8"><title>Exam Report</title><style>body{font-family:Arial;} table{border-collapse:collapse;width:100%;} th,td{border:1px solid #ddd;padding:8px;} th{background:#6366f1;color:white;}</style></head><body><h1>Exam Report - ${currentView.toUpperCase()}</h1><p>Generated: ${new Date().toLocaleString()}</p>${document.getElementById('dataTable').outerHTML}</body></html>`; const blob = new Blob([htmlContent], { type: 'application/msword' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `exam_${currentView}_${Date.now()}.doc`; link.click(); showToast('Word exported'); };
+        window.exportMainData = () => window.exportMainToExcel();
+        
+        window.openSettingsModal = async () => {
+            const allQirats = [...new Set(allStudents.flatMap(s => getQiratNames(s)))];
+            let settingsHtml = `<div class="mb-4"><p class="text-sm text-slate-400 mb-4">Configure assessments for each Qirat</p>`;
+            for (const qirat of allQirats) {
+                const config = qiratAssessmentConfigs.get(qirat) || { assessments: JSON.parse(JSON.stringify(defaultAssessments)) };
+                settingsHtml += `<div class="mb-6 p-3 md:p-4 bg-slate-800/30 rounded-xl"><h3 class="font-semibold text-indigo-400 mb-3 text-sm"><i class="fas fa-book-quran mr-2"></i> ${escapeHtml(qirat)}</h3><div class="assessments-list space-y-2">`;
+                config.assessments.forEach((ass, idx) => {
+                    settingsHtml += `<div class="flex flex-wrap gap-2 items-center"><input type="text" class="flex-1 min-w-[120px] bg-slate-900 border border-slate-700 px-3 py-2 rounded-lg text-sm" placeholder="Name" value="${escapeHtml(ass.name)}" data-qirat="${qirat}" data-idx="${idx}" data-field="name"><div class="flex items-center gap-2"><span class="text-slate-400 text-sm">/</span><input type="number" class="w-20 bg-slate-900 border border-slate-700 px-2 py-2 rounded-lg text-sm" placeholder="Max" value="${ass.outOf}" data-qirat="${qirat}" data-idx="${idx}" data-field="outOf" min="1" max="500"></div><button onclick="removeQiratAssessment('${qirat}', ${idx})" class="px-3 py-2 rounded-lg bg-red-600/30 text-sm"><i class="fas fa-trash"></i></button></div>`;
+                });
+                settingsHtml += `</div><button onclick="addQiratAssessment('${qirat}')" class="mt-3 px-3 py-1.5 rounded-lg bg-indigo-600/30 text-sm"><i class="fas fa-plus mr-1"></i> Add</button><div class="mt-3"><button onclick="saveQiratSettings('${qirat}')" class="px-4 py-2 rounded-lg bg-emerald-600 text-sm w-full md:w-auto"><i class="fas fa-save mr-1"></i> Save ${escapeHtml(qirat)}</button></div></div>`;
             }
-            document.getElementById('saveModal').classList.remove('hidden');
+            settingsHtml += `</div><div class="flex justify-end pt-4 border-t border-slate-700"><button onclick="closeModal('settingsModal')" class="px-4 py-2 rounded-lg bg-slate-700 text-sm">Close</button></div>`;
+            document.getElementById('settingsContent').innerHTML = settingsHtml;
+            document.getElementById('settingsModal').classList.remove('hidden');
         };
-        window.closeSaveModal = () => {
-            document.getElementById('saveModal').classList.add('hidden');
-        };
-        window.confirmSave = saveAllScores;
         
-        function clearFilters() {
-            document.getElementById('searchInput').value = '';
-            document.getElementById('genderFilter').value = '';
-            document.getElementById('deptFilter').value = '';
-            document.getElementById('batchFilter').value = '';
-            currentFilters = { search: '', gender: '', department: '', batch: '' };
-            updateStats();
-            renderChart();
-            renderStudentsTable();
+        window.addQiratAssessment = (qirat) => {
+            const config = qiratAssessmentConfigs.get(qirat) || { assessments: JSON.parse(JSON.stringify(defaultAssessments)) };
+            config.assessments.push({ name: `New ${config.assessments.length + 1}`, outOf: 100 });
+            qiratAssessmentConfigs.set(qirat, config);
+            openSettingsModal();
+        };
+        
+        window.removeQiratAssessment = (qirat, idx) => {
+            const config = qiratAssessmentConfigs.get(qirat) || { assessments: JSON.parse(JSON.stringify(defaultAssessments)) };
+            config.assessments.splice(idx, 1);
+            qiratAssessmentConfigs.set(qirat, config);
+            openSettingsModal();
+        };
+        
+        window.saveQiratSettings = async (qirat) => {
+            const assessments = [];
+            const inputs = document.querySelectorAll(`[data-qirat="${qirat}"]`);
+            const tempMap = {};
+            inputs.forEach(input => { const idx = parseInt(input.dataset.idx); const field = input.dataset.field; if (!tempMap[idx]) tempMap[idx] = {}; tempMap[idx][field] = field === 'outOf' ? parseInt(input.value) : input.value; });
+            for (let i = 0; i < Object.keys(tempMap).length; i++) { if (tempMap[i].name && tempMap[i].outOf) assessments.push({ name: tempMap[i].name, outOf: tempMap[i].outOf }); }
+            await saveQiratAssessmentConfig(qirat, { assessments });
+            await loadExamScores();
+            updateHeroStats();
+            renderCharts(); 
+            await renderCurrentView();
+            showToast(`Saved ${qirat}`);
+            openSettingsModal();
+        };
+        async function refreshCurrentStudentModal() {
+    if (currentStudentId && document.getElementById('studentModal') && 
+        !document.getElementById('studentModal').classList.contains('hidden')) {
+        // Save current scroll position and open state
+        const wasOpen = currentOpenQiratIndex;
+        // Reopen the modal with fresh data
+        await openStudentModal(currentStudentId);
+        // Restore the open dropdown if needed
+        if (wasOpen !== null) {
+            setTimeout(() => toggleQiratDropdown(wasOpen), 100);
         }
-        
-        function getExportData() {
-            const filtered = getFilteredStudents();
-            return filtered.map(s => {
-                const scores = examScores.get(s.id)?.[currentQirat] || {};
-                const avg = calculateAverage(scores);
-                return {
-                    'Student Name': s.full_name,
-                    'Department': s.department,
-                    'Batch': s.batch,
-                    'Gender': s.gender,
-                    'Phone': s.phone,
-                    'Quiz 1': scores.assessment1 || '-',
-                    'Mid Exam': scores.assessment2 || '-',
-                    'Assignment': scores.assessment3 || '-',
-                    'Final Exam': scores.assessment4 || '-',
-                    'Average Score': avg !== null ? avg + '%' : '-'
-                };
-            });
-        }
-        
-        window.exportToCSV = () => {
-            const data = getExportData();
-            if (data.length === 0) { showToast('No data to export', true); return; }
-            const ws = XLSX.utils.json_to_sheet(data);
-            const csv = XLSX.utils.sheet_to_csv(ws);
-            const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `${currentQirat}_students.csv`;
-            link.click();
-            showToast('CSV exported');
-        };
-        
-        window.exportToExcel = () => {
-            const data = getExportData();
-            if (data.length === 0) { showToast('No data to export', true); return; }
-            const ws = XLSX.utils.json_to_sheet(data);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, currentQirat);
-            XLSX.writeFile(wb, `${currentQirat}_students.xlsx`);
-            showToast('Excel exported');
-        };
-        
-        window.exportToPDF = async () => {
-            const data = getExportData();
-            if (data.length === 0) { showToast('No data to export', true); return; }
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF({ orientation: 'landscape' });
-            doc.setFontSize(16);
-            doc.setTextColor(99, 102, 241);
-            doc.text(`${currentQirat} - Student Exam Report`, 14, 20);
-            doc.setFontSize(10);
-            doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 30);
-            doc.autoTable({
-                head: [['Student Name', 'Department', 'Batch', 'Gender', 'Quiz 1', 'Mid Exam', 'Assignment', 'Final Exam', 'Average Score']],
-                body: data.map(d => [d['Student Name'], d['Department'], d['Batch'], d['Gender'], d['Quiz 1'], d['Mid Exam'], d['Assignment'], d['Final Exam'], d['Average Score']]),
-                startY: 40,
-                styles: { fontSize: 8 },
-                headStyles: { fillColor: [99, 102, 241] }
-            });
-            doc.save(`${currentQirat}_report.pdf`);
-            showToast('PDF exported');
-        };
-        
-                window.exportToWord = () => {
-            const data = getExportData();
-            if (data.length === 0) { showToast('No data to export', true); return; }
-            let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${currentQirat} Exam Report</title><style>
-                body{font-family:Arial, sans-serif; margin:40px; background:#f5f5f5;}
-                h1{color:#6366f1; border-bottom:2px solid #6366f1; padding-bottom:10px;}
-                .header{background:linear-gradient(135deg, #6366f1, #a855f7); color:white; padding:20px; border-radius:10px; margin-bottom:20px;}
-                table{border-collapse:collapse; width:100%; background:white; box-shadow:0 2px 4px rgba(0,0,0,0.1);}
-                th,td{border:1px solid #ddd; padding:10px; text-align:left;}
-                th{background:#6366f1; color:white; text-align:center;}
-                td{text-align:center;}
-                .footer{margin-top:20px; text-align:center; color:#666; font-size:12px;}
-            </style></head><body>
-            <div class="header">
-                <h1>📚 ${currentQirat} - Student Exam Report</h1>
-                <p><strong>Generated:</strong> ${new Date().toLocaleString()} | <strong>Ustaz:</strong> ${localStorage.getItem('ustazFullName') || 'Ustaz'}</p>
-                <p><strong>Total Students:</strong> ${data.length} | <strong>Average Score:</strong> ${Math.round(data.reduce((sum, d) => sum + (parseInt(d['Average Score']) || 0), 0) / data.length) || 0}%</p>
-            </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Student Name</th>
-                        <th>Department</th>
-                        <th>Batch</th>
-                        <th>Gender</th>
-                        <th>Quiz 1</th>
-                        <th>Mid Exam</th>
-                        <th>Assignment</th>
-                        <th>Final Exam</th>
-                        <th>Average Score</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${data.map((d, idx) => `<tr>
-                        <td>${idx + 1}</td>
-                        <td>${d['Student Name']}</td>
-                        <td>${d['Department']}</td>
-                        <td>${d['Batch']}</td>
-                        <td>${d['Gender']}</td>
-                        <td>${d['Quiz 1']}</td>
-                        <td>${d['Mid Exam']}</td>
-                        <td>${d['Assignment']}</td>
-                        <td>${d['Final Exam']}</td>
-                        <td><strong>${d['Average Score']}</strong></td>
-                    </tr>`).join('')}
-                </tbody>
-            </table>
-            <div class="footer">
-                <p>This report is system-generated. For any queries, please contact the academic administration.</p>
-            </div>
-            </body></html>`;
-            const blob = new Blob([html], { type: 'application/msword' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `${currentQirat}_report_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.doc`;
-            link.click();
-            URL.revokeObjectURL(link.href);
-            showToast('Word document exported');
-        };
-        
-        window.exportData = () => window.exportToExcel();
-        
+    }
+}
+
+window.saveQiratSettings = async (qirat) => {
+    const assessments = [];
+    const inputs = document.querySelectorAll(`[data-qirat="${qirat}"]`);
+    const tempMap = {};
+    inputs.forEach(input => { 
+        const idx = parseInt(input.dataset.idx); 
+        const field = input.dataset.field; 
+        if (!tempMap[idx]) tempMap[idx] = {}; 
+        tempMap[idx][field] = field === 'outOf' ? parseInt(input.value) : input.value; 
+    });
+    for (let i = 0; i < Object.keys(tempMap).length; i++) { 
+        if (tempMap[i].name && tempMap[i].outOf) assessments.push({ name: tempMap[i].name, outOf: tempMap[i].outOf }); 
+    }
+    await saveQiratAssessmentConfig(qirat, { assessments });
+    await loadExamScores();
+    updateHeroStats();
+    renderCharts(); 
+    await renderCurrentView();
+    
+    // Refresh the student modal if it's open
+    await refreshCurrentStudentModal();
+    
+    showToast(`Saved ${qirat}`);
+    openSettingsModal();
+};
         window.toggleEditMode = () => {
             isEditMode = !isEditMode;
             const btn = document.getElementById('editModeBtn');
-            if (isEditMode) {
-                btn.innerHTML = '<i class="fas fa-pen mr-1"></i> Edit Mode ON';
-                btn.classList.add('bg-emerald-600');
-                btn.classList.remove('bg-slate-700');
-                showToast('Edit mode enabled - click on scores to edit, then click Save');
-            } else {
-                btn.innerHTML = '<i class="fas fa-eye mr-1"></i> View Mode';
-                btn.classList.remove('bg-emerald-600');
-                btn.classList.add('bg-slate-700');
-                // Clear pending changes when exiting edit mode
-                pendingScores = {};
-                hasUnsavedChanges = false;
+            if (isEditMode) { 
+                btn.innerHTML = '<i class="fas fa-save mr-1"></i> Save'; 
+                btn.classList.add('bg-emerald-600'); 
+                btn.classList.remove('bg-slate-700'); 
+                showToast('Edit mode ON - scores auto-save'); 
+            } else { 
+                btn.innerHTML = '<i class="fas fa-edit mr-1"></i> Edit'; 
+                btn.classList.remove('bg-emerald-600'); 
+                btn.classList.add('bg-slate-700'); 
             }
             if (currentStudentId && document.getElementById('studentModal').classList.contains('active')) {
                 openStudentModal(currentStudentId);
             }
         };
         
-        window.logout = () => {
-            localStorage.removeItem('ustazLoggedIn');
-            localStorage.removeItem('ustazId');
-            localStorage.removeItem('ustazName');
-            localStorage.removeItem('ustazFullName');
-            localStorage.removeItem('ustazQirats');
-            window.location.href = 'ustaz-login.html';
+        window.switchView = (view) => {
+            currentView = view;
+            document.querySelectorAll('.view-btn').forEach(btn => { btn.classList.remove('active', 'bg-indigo-600', 'text-white'); btn.classList.add('text-slate-400'); });
+            event.target.classList.add('active', 'bg-indigo-600', 'text-white');
+            renderCurrentView();
         };
         
-        window.closeModal = (id) => {
+        window.closeModal = (id) => { 
             document.getElementById(id).classList.add('hidden');
             currentStudentId = null;
             currentOpenQiratIndex = null;
-            // Clear pending changes when closing modal without saving
-            pendingScores = {};
-            hasUnsavedChanges = false;
         };
         
         let isLightMode = false;
         window.toggleTheme = () => {
             isLightMode = !isLightMode;
             const icon = document.getElementById('themeIcon');
-            if (isLightMode) {
-                document.body.classList.add('light-mode');
-                icon.className = 'fas fa-sun text-yellow-500';
-            } else {
-                document.body.classList.remove('light-mode');
-                icon.className = 'fas fa-moon text-yellow-400';
-            }
+            if (isLightMode) { document.body.classList.add('light-mode'); icon.className = 'fas fa-sun text-yellow-500'; }
+            else { document.body.classList.remove('light-mode'); icon.className = 'fas fa-moon text-yellow-400'; }
         };
         
-        // Event listeners for filters
-        document.getElementById('searchInput').addEventListener('input', (e) => { currentFilters.search = e.target.value; updateStats(); renderChart(); renderStudentsTable(); });
-        document.getElementById('genderFilter').addEventListener('change', (e) => { currentFilters.gender = e.target.value; updateStats(); renderChart(); renderStudentsTable(); });
-        document.getElementById('deptFilter').addEventListener('change', (e) => { currentFilters.department = e.target.value; updateStats(); renderChart(); renderStudentsTable(); });
-        document.getElementById('batchFilter').addEventListener('change', (e) => { currentFilters.batch = e.target.value; updateStats(); renderChart(); renderStudentsTable(); });
+        document.getElementById('searchInput').addEventListener('input', (e) => { currentFilters.search = e.target.value; renderCurrentView(); });
+        document.getElementById('genderFilter').addEventListener('change', (e) => { currentFilters.gender = e.target.value; renderCurrentView(); });
+        document.getElementById('deptFilter').addEventListener('change', (e) => { currentFilters.department = e.target.value; renderCurrentView(); });
+        document.getElementById('batchFilter').addEventListener('change', (e) => { currentFilters.batch = e.target.value; renderCurrentView(); });
+        document.getElementById('qiratFilter').addEventListener('change', (e) => { currentFilters.qirat = e.target.value; renderCurrentView(); });
         
-        window.clearFilters = clearFilters;
         window.openStudentModal = openStudentModal;
+        window.openQiratModal = openQiratModal;
+        window.openDepartmentModal = openDepartmentModal;
         window.toggleQiratDropdown = toggleQiratDropdown;
-        window.trackScoreChange = trackScoreChange;
-        window.openSaveModal = openSaveModal;
-        window.closeSaveModal = closeSaveModal;
-        window.confirmSave = confirmSave;
+        window.autoSaveScoreKeepOpen = autoSaveScoreKeepOpen;
+        window.applyQiratFilters = applyQiratFilters;
+        window.clearQiratFilters = clearQiratFilters;
+        window.applyDeptFilters = applyDeptFilters;
+        window.clearDeptFilters = clearDeptFilters;
         
-        async function init() {
-            // Check if ustaz is logged in
-            if (localStorage.getItem('ustazLoggedIn') !== 'true') {
-                window.location.href = 'ustaz-login.html';
-                return;
-            }
-            
-            // Load all data
-            await loadExamScores();
-            await loadStudents();
-            const success = await loadUstazData();
-            
-            if (success && assignedQirats.length > 0) {
-                updateStats();
-                renderChart();
-                renderStudentsTable();
-                showToast(`Welcome ${localStorage.getItem('ustazFullName') || 'Ustaz'}! You have access to ${assignedQirats.length} Qirat(s).`);
-            } else if (assignedQirats.length === 0) {
-                document.getElementById('studentsTableBody').innerHTML = '<tr><td colspan="7" class="text-center py-8 text-slate-400">No Qirats assigned to you. Please contact administrator.</td></tr>';
-            }
-        }
-        
-        // Start the application
-        init();
+        loadData();
     </script>
 </body>
 </html>
