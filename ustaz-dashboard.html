@@ -47,6 +47,8 @@
         body.light-mode .status-badge { background: rgba(16, 185, 129, 0.15); }
         body.light-mode .filter-input { background: white; border-color: #cbd5e1; color: #0f172a; }
         body.light-mode .hero-stats { background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); color: white; }
+        body.light-mode .qirat-list-card { background: #f8fafc; border-color: #e2e8f0; }
+        body.light-mode .qirat-stat-item { background: #e2e8f0; color: #1e293b; }
         
         .glass-card { 
             background: var(--glass-bg); 
@@ -320,7 +322,7 @@
         </div>
 
         <div class="glass-card p-4 mb-6">
-            <h3 class="text-sm md:text-lg font-semibold mb-3"><i class="fas fa-chart-line text-indigo-400 mr-2"></i> Performance Trend</h3>
+            <h3 class="text-sm md:text-lg font-semibold mb-3"><i class="fas fa-chart-line text-indigo-400 mr-2"></i> Score Distribution</h3>
             <canvas id="performanceChart" height="200"></canvas>
         </div>
 
@@ -377,7 +379,8 @@
                         </tr>
                     </thead>
                     <tbody id="studentsTableBody" class="divide-y divide-slate-700/50">
-                        <tr><td colspan="7" class="text-center py-8"><div class="loading-spinner mx-auto"></div><p class="mt-4">Loading students...</p></td></tbody>
+                        <tr><td colspan="7" class="text-center py-8"><div class="loading-spinner mx-auto"></div><p class="mt-4">Loading students...</p></tr>
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -420,7 +423,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, doc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         
         const firebaseConfig = {
             apiKey: "AIzaSyAR_g5y04YAGCrTvZCowrE7hw8h7k1du08",
@@ -436,6 +439,7 @@
         
         let allStudents = [];
         let examScores = new Map();
+        let qiratAssessmentConfigs = new Map();
         let assignedQirats = [];
         let currentQirat = '';
         let isEditMode = false;
@@ -443,27 +447,8 @@
         let chart = null;
         let currentStudentId = null;
         let currentOpenQiratIndex = null;
-        let pendingScores = {}; // Store unsaved changes
+        let pendingScores = {};
         let hasUnsavedChanges = false;
-        let qiratAssessmentConfigs = new Map();
-        
-        function getAssessmentsForQirat(qiratName) {
-    const config = qiratAssessmentConfigs.get(qiratName);
-    if (config?.assessments && config.assessments.length > 0) {
-        // Add key property to each assessment
-        return config.assessments.map((ass, idx) => ({
-            ...ass,
-            key: `assessment${idx + 1}`
-        }));
-    }
-    // Default fallback
-    return [
-        { name: "Quiz 1", outOf: 30, key: "assessment1" },
-        { name: "Mid Exam", outOf: 50, key: "assessment2" },
-        { name: "Assignment", outOf: 20, key: "assessment3" },
-        { name: "Final Exam", outOf: 100, key: "assessment4" }
-    ];
-}
         
         function showToast(message, isError = false) {
             const toast = document.getElementById('toast');
@@ -477,18 +462,7 @@
             if (show) overlay.classList.remove('hidden');
             else overlay.classList.add('hidden');
         }
-        async function loadQiratAssessmentConfigs() {
-    try {
-        const configSnapshot = await getDocs(collection(db, "qiratAssessmentConfigs"));
-        qiratAssessmentConfigs.clear();
-        configSnapshot.forEach(doc => {
-            qiratAssessmentConfigs.set(doc.id, doc.data());
-        });
-        console.log("Loaded assessment configs for", qiratAssessmentConfigs.size, "Qirats");
-    } catch(e) { 
-        console.warn("Error loading configs:", e); 
-    }
-}
+        
         function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
         
         function getQiratNames(student) { return (student.schedules || []).map(s => s.qirat_name).filter(Boolean); }
@@ -498,7 +472,23 @@
             return Math.round((parseFloat(score) / outOf) * 100);
         }
         
-        function calculateTotalPoints(scores) {
+        function getAssessmentsForQirat(qiratName) {
+            const config = qiratAssessmentConfigs.get(qiratName);
+            if (config?.assessments && config.assessments.length > 0) {
+                return config.assessments.map((ass, idx) => ({
+                    ...ass,
+                    key: `assessment${idx + 1}`
+                }));
+            }
+            return [
+                { name: "Quiz 1", outOf: 30, key: "assessment1" },
+                { name: "Mid Exam", outOf: 50, key: "assessment2" },
+                { name: "Assignment", outOf: 20, key: "assessment3" },
+                { name: "Final Exam", outOf: 100, key: "assessment4" }
+            ];
+        }
+        
+        function calculateTotalPoints(scores, assessments) {
             let total = 0;
             for (let i = 0; i < assessments.length; i++) {
                 const score = scores[assessments[i].key];
@@ -507,11 +497,11 @@
             return total;
         }
         
-        function calculateTotalPossible() {
+        function calculateTotalPossible(assessments) {
             return assessments.reduce((sum, a) => sum + a.outOf, 0);
         }
         
-        function calculateAverage(scores) {
+        function calculateAverage(scores, assessments) {
             let totalPercent = 0, count = 0;
             for (let i = 0; i < assessments.length; i++) {
                 const score = scores[assessments[i].key];
@@ -523,16 +513,18 @@
             return count > 0 ? Math.round(totalPercent / count) : null;
         }
         
-        function calculateStudentAvg(studentId) {
-            const scores = examScores.get(studentId)?.[currentQirat] || {};
-            return calculateAverage(scores);
+        function calculateStudentAvg(studentId, qiratName) {
+            const scores = examScores.get(studentId)?.[qiratName] || {};
+            const assessments = getAssessmentsForQirat(qiratName);
+            return calculateAverage(scores, assessments);
         }
         
         function calculateGlobalRank(studentId, qiratName) {
             const studentsInQirat = allStudents.filter(s => getQiratNames(s).includes(qiratName));
+            const assessments = getAssessmentsForQirat(qiratName);
             const ranked = studentsInQirat.map(s => ({
                 id: s.id,
-                avg: calculateAverage(examScores.get(s.id)?.[qiratName] || {})
+                avg: calculateAverage(examScores.get(s.id)?.[qiratName] || {}, assessments)
             })).sort((a,b) => (b.avg || 0) - (a.avg || 0));
             const rank = ranked.findIndex(s => s.id === studentId) + 1;
             return rank > 0 ? rank : studentsInQirat.length;
@@ -542,12 +534,24 @@
             const student = allStudents.find(s => s.id === studentId);
             if (!student) return null;
             const deptStudents = allStudents.filter(s => s.department === student.department && getQiratNames(s).includes(qiratName));
+            const assessments = getAssessmentsForQirat(qiratName);
             const ranked = deptStudents.map(s => ({
                 id: s.id,
-                avg: calculateAverage(examScores.get(s.id)?.[qiratName] || {})
+                avg: calculateAverage(examScores.get(s.id)?.[qiratName] || {}, assessments)
             })).sort((a,b) => (b.avg || 0) - (a.avg || 0));
             const rank = ranked.findIndex(s => s.id === studentId) + 1;
             return rank > 0 ? rank : deptStudents.length;
+        }
+        
+        async function loadQiratAssessmentConfigs() {
+            try {
+                const configSnapshot = await getDocs(collection(db, "qiratAssessmentConfigs"));
+                qiratAssessmentConfigs.clear();
+                configSnapshot.forEach(doc => {
+                    qiratAssessmentConfigs.set(doc.id, doc.data());
+                });
+                console.log("Loaded configs for", qiratAssessmentConfigs.size, "Qirats");
+            } catch(e) { console.warn(e); }
         }
         
         async function loadExamScores() {
@@ -560,8 +564,7 @@
                         examScores.set(docSnap.id, data.scores);
                     }
                 });
-                console.log("Loaded scores for", examScores.size, "students");
-            } catch(e) { console.error("Error loading scores:", e); }
+            } catch(e) { console.error(e); }
         }
         
         async function saveAllScores() {
@@ -583,7 +586,7 @@
                     const examRef = doc(db, "examScores", studentId);
                     await setDoc(examRef, { scores: currentScores }, { merge: true });
                 } catch(e) {
-                    console.error("Save error:", e);
+                    console.error(e);
                     success = false;
                 }
             }
@@ -595,7 +598,7 @@
                 updateStats();
                 renderChart();
                 renderStudentsTable();
-                if (currentStudentId) {
+                if (currentStudentId && document.getElementById('studentModal').classList.contains('active')) {
                     await openStudentModal(currentStudentId);
                 }
                 showToast('All scores saved successfully!');
@@ -607,9 +610,7 @@
         }
         
         function trackScoreChange(studentId, assessmentKey, value) {
-            if (!pendingScores[studentId]) {
-                pendingScores[studentId] = {};
-            }
+            if (!pendingScores[studentId]) pendingScores[studentId] = {};
             pendingScores[studentId][assessmentKey] = value;
             hasUnsavedChanges = true;
         }
@@ -649,14 +650,9 @@
         }
         
         window.selectQirat = (qirat) => {
-            if (hasUnsavedChanges) {
-                if (confirm('You have unsaved changes. Switch Qirat without saving?')) {
-                    pendingScores = {};
-                    hasUnsavedChanges = false;
-                } else {
-                    return;
-                }
-            }
+            if (hasUnsavedChanges && !confirm('You have unsaved changes. Switch Qirat without saving?')) return;
+            pendingScores = {};
+            hasUnsavedChanges = false;
             currentQirat = qirat;
             renderQiratTabs();
             updateStats();
@@ -686,9 +682,7 @@
         
         function getFilteredStudents() {
             let filtered = allStudents.filter(s => getQiratNames(s).includes(currentQirat));
-            if (currentFilters.search) {
-                filtered = filtered.filter(s => s.full_name.toLowerCase().includes(currentFilters.search.toLowerCase()) || s.phone.includes(currentFilters.search));
-            }
+            if (currentFilters.search) filtered = filtered.filter(s => s.full_name.toLowerCase().includes(currentFilters.search.toLowerCase()) || s.phone.includes(currentFilters.search));
             if (currentFilters.gender) filtered = filtered.filter(s => s.gender === currentFilters.gender);
             if (currentFilters.department) filtered = filtered.filter(s => s.department === currentFilters.department);
             if (currentFilters.batch) filtered = filtered.filter(s => s.batch === currentFilters.batch);
@@ -705,33 +699,28 @@
         function updateStats() {
             const filtered = getFilteredStudents();
             const total = filtered.length;
-            let examCount = 0;
-            let totalScore = 0;
-            let scoreCount = 0;
+            let examCount = 0, totalScore = 0, scoreCount = 0;
+            const assessments = getAssessmentsForQirat(currentQirat);
             
             filtered.forEach(s => {
                 const scores = examScores.get(s.id)?.[currentQirat] || {};
                 const hasScores = Object.values(scores).some(v => v !== null && v !== '');
                 if (hasScores) examCount++;
-                
-                const avg = calculateAverage(scores);
-                if (avg !== null) {
-                    totalScore += avg;
-                    scoreCount++;
-                }
+                const avg = calculateAverage(scores, assessments);
+                if (avg !== null) { totalScore += avg; scoreCount++; }
             });
             
-            const avgScore = scoreCount > 0 ? Math.round(totalScore / scoreCount) : 0;
             document.getElementById('totalStudents').textContent = total;
             document.getElementById('examRecords').textContent = examCount;
-            document.getElementById('avgScore').textContent = avgScore + '%';
+            document.getElementById('avgScore').textContent = scoreCount > 0 ? Math.round(totalScore / scoreCount) + '%' : '0%';
         }
         
         function renderChart() {
             const filtered = getFilteredStudents();
+            const assessments = getAssessmentsForQirat(currentQirat);
             const scores = [];
             filtered.forEach(s => {
-                const avg = calculateStudentAvg(s.id);
+                const avg = calculateAverage(examScores.get(s.id)?.[currentQirat] || {}, assessments);
                 if (avg !== null) scores.push(avg);
             });
             
@@ -758,36 +747,26 @@
                         borderWidth: 1
                     }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: { legend: { position: 'bottom' } }
-                }
+                options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom' } } }
             });
         }
         
         function renderStudentsTable() {
             const filtered = getFilteredStudents();
-            const ranked = filtered.map(s => ({ student: s, avg: calculateStudentAvg(s.id) }))
+            const assessments = getAssessmentsForQirat(currentQirat);
+            const ranked = filtered.map(s => ({ student: s, avg: calculateAverage(examScores.get(s.id)?.[currentQirat] || {}, assessments) }))
                 .sort((a,b) => (b.avg || 0) - (a.avg || 0));
             
             document.getElementById('tableTitle').innerHTML = `<i class="fas fa-book-quran mr-2"></i> ${escapeHtml(currentQirat)} - Students (${filtered.length})`;
             document.getElementById('studentsTableBody').innerHTML = ranked.map((item, idx) => `
                 <tr class="hover:bg-white/5 transition-colors">
                     <td class="px-4 py-3 font-medium ${idx === 0 ? 'text-yellow-400' : ''}">#${idx + 1}</td>
-                    <td class="px-4 py-3">
-                        <div class="font-medium">${escapeHtml(item.student.full_name)}</div>
-                        <div class="text-xs text-slate-500">${item.student.phone || ''}</div>
-                    </td>
+                    <td class="px-4 py-3"><div class="font-medium">${escapeHtml(item.student.full_name)}</div><div class="text-xs text-slate-500">${item.student.phone || ''}</div></span></td>
                     <td class="px-4 py-3">${escapeHtml(item.student.department)}</span></td>
                     <td class="px-4 py-3">${escapeHtml(item.student.batch)}</span></td>
-                    <td class="px-4 py-3"><span class="status-badge">${escapeHtml(item.student.gender)}</span></td>
-                    <td class="px-4 py-3"><span class="text-emerald-400 font-semibold">${item.avg !== null ? item.avg + '%' : '-'}</span></td>
-                    <td class="px-4 py-3">
-                        <button onclick="openStudentModal('${item.student.id}')" class="btn-premium px-3 py-1.5 rounded-lg text-xs">
-                            <i class="fas fa-chart-line mr-1"></i>View Analytics
-                        </button>
-                    </span></td>
+                    <td class="px-4 py-3"><span class="status-badge">${escapeHtml(item.student.gender)}</span></span></td>
+                    <td class="px-4 py-3"><span class="text-emerald-400 font-semibold">${item.avg !== null ? item.avg + '%' : '-'}</span></span></td>
+                    <td class="px-4 py-3"><button onclick="openStudentModal('${item.student.id}')" class="btn-premium px-3 py-1.5 rounded-lg text-xs"><i class="fas fa-chart-line mr-1"></i>View Analytics</button></span></td>
                 </tr>
             `).join('');
         }
@@ -823,14 +802,15 @@
             if (!student) return;
             
             const qirats = getQiratNames(student).filter(q => assignedQirats.includes(q));
-            const totalPossible = calculateTotalPossible();
             
             let qiratListHtml = `<div class="space-y-3">`;
             for (let i = 0; i < qirats.length; i++) {
                 const q = qirats[i];
                 const scores = examScores.get(studentId)?.[q] || {};
-                const avg = calculateAverage(scores);
-                const totalPoints = calculateTotalPoints(scores);
+                const assessments = getAssessmentsForQirat(q);
+                const totalPossible = calculateTotalPossible(assessments);
+                const avg = calculateAverage(scores, assessments);
+                const totalPoints = calculateTotalPoints(scores, assessments);
                 const totalPercentPossible = totalPossible > 0 ? Math.round((totalPoints / totalPossible) * 100) : 0;
                 const qiratGlobalRank = calculateGlobalRank(studentId, q);
                 const qiratDeptRank = calculateDepartmentRank(studentId, q);
@@ -845,50 +825,29 @@
                     assessmentRows += `<tr>
                         <td class="py-2 text-left text-xs">${escapeHtml(ass.name)}</span></td>
                         <td class="py-2 text-center">
-                            ${isEditMode ? 
-                                `<input type="number" class="score-input editable" data-student="${studentId}" data-qirat="${q}" data-assessment="${a+1}" value="${score !== null ? score : ''}" step="0.5" min="0" max="${ass.outOf}" style="width:70px;" onchange="trackScoreChange('${studentId}', '${ass.key}', this.value)">` : 
-                                `<span class="font-semibold text-sm">${score !== null ? score : '-'}</span>`
-                            }
+                            ${isEditMode ? `<input type="number" class="score-input editable" value="${score !== null ? score : ''}" step="0.5" min="0" max="${ass.outOf}" style="width:70px;" onchange="trackScoreChange('${studentId}', '${ass.key}', this.value)">` : `<span class="font-semibold text-sm">${score !== null ? score : '-'}</span>`}
                         </span></td>
                         <td class="py-2 text-center text-xs">/${ass.outOf}</span></td>
-                        <td class="py-2 text-center text-xs ${percent >= 70 ? 'text-emerald-400' : 'text-yellow-400'}">
-                            ${percent !== null ? percent+'%' : ''}
-                        </span></td>
+                        <td class="py-2 text-center text-xs ${percent >= 70 ? 'text-emerald-400' : 'text-yellow-400'}">${percent !== null ? percent+'%' : ''}</span></td>
                     </tr>`;
                 }
                 
                 qiratListHtml += `
                     <div class="qirat-list-card">
                         <div id="qirat-header-${i}" class="qirat-list-header" onclick="toggleQiratDropdown(${i})">
-                            <div class="flex-1">
-                                <div class="flex flex-wrap justify-between items-center gap-2">
-                                    <h4 class="font-semibold text-indigo-400 text-sm"><i class="fas fa-book-quran mr-1"></i> ${escapeHtml(q)}</h4>
-                                    <div class="flex gap-1 flex-wrap">
-                                        <span class="qirat-stat-item">🌍 #${qiratGlobalRank}/${studentsInQirat.length}</span>
-                                        <span class="qirat-stat-item">🏢 #${qiratDeptRank}/${studentsInDeptQirat.length}</span>
-                                        <span class="qirat-stat-item">📊 ${avg !== null ? avg+'%' : '-'}</span>
-                                    </div>
-                                    <i id="qirat-icon-${i}" class="fas fa-chevron-down text-slate-400 transition-transform rotate-icon text-sm"></i>
+                            <div class="flex-1"><div class="flex flex-wrap justify-between items-center gap-2">
+                                <h4 class="font-semibold text-indigo-400 text-sm"><i class="fas fa-book-quran mr-1"></i> ${escapeHtml(q)}</h4>
+                                <div class="flex gap-1 flex-wrap">
+                                    <span class="qirat-stat-item">🌍 #${qiratGlobalRank}/${studentsInQirat.length}</span>
+                                    <span class="qirat-stat-item">🏢 #${qiratDeptRank}/${studentsInDeptQirat.length}</span>
+                                    <span class="qirat-stat-item">📊 ${avg !== null ? avg+'%' : '-'}</span>
                                 </div>
-                            </div>
+                                <i id="qirat-icon-${i}" class="fas fa-chevron-down text-slate-400 transition-transform rotate-icon text-sm"></i>
+                            </div></div>
                         </div>
                         <div id="qirat-dropdown-${i}" class="qirat-dropdown-content">
-                            <div class="overflow-x-auto">
-                                <table class="assessment-table">
-                                    <thead>
-                                        <tr><th class="text-left">Assessment</th><th>Score</th><th>Out Of</th><th>%</th></tr>
-                                    </thead>
-                                    <tbody>
-                                        ${assessmentRows}
-                                        <tr class="bg-indigo-500/10">
-                                            <td class="py-2 font-semibold text-left text-xs">Summary</span>
-                                            <td class="py-2 text-center font-bold text-purple-400 text-sm">${totalPoints}/${totalPossible} (${totalPercentPossible}%)</span>
-                                            <td class="py-2 text-center"></span>
-                                            <td class="py-2 text-center font-bold text-indigo-400 text-sm">${avg !== null ? avg+'%' : '-'}</span>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                            <div class="overflow-x-auto"><table class="assessment-table"><thead><tr><th class="text-left">Assessment</th><th>Score</th><th>Out Of</th><th>%</th></tr></thead>
+                            <tbody>${assessmentRows}<tr class="bg-indigo-500/10"><td class="py-2 font-semibold text-left text-xs">Summary</span><td class="py-2 text-center font-bold text-purple-400 text-sm">${totalPoints}/${totalPossible} (${totalPercentPossible}%)</span><td class="py-2 text-center"></span><td class="py-2 text-center font-bold text-indigo-400 text-sm">${avg !== null ? avg+'%' : '-'}</span></tr></tbody></table></div>
                         </div>
                     </div>
                 `;
@@ -904,7 +863,7 @@
                     <div class="bg-slate-800/50 p-2 md:p-4 rounded-xl text-center"><p class="text-xs text-slate-400">Phone</p><p class="font-semibold text-xs md:text-sm">${escapeHtml(student.phone)}</p></div>
                     <div class="bg-slate-800/50 p-2 md:p-4 rounded-xl text-center"><p class="text-xs text-slate-400">Enrolled Qirats</p><p class="font-semibold text-xs md:text-sm">${getQiratNames(student).length}</p></div>
                 </div>
-                <h3 class="font-semibold mb-3 text-sm md:text-base">Qirat Performance <i class="fas fa-chevron-down text-xs"></i></h3>
+                <h3 class="font-semibold mb-3 text-sm md:text-base">Qirat Performance</h3>
                 ${qirats.length > 0 ? qiratListHtml : '<p class="text-slate-400 text-sm">No Qirats enrolled</p>'}
                 ${isEditMode ? `<div class="mt-4 flex justify-end"><button onclick="openSaveModal()" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500"><i class="fas fa-save mr-2"></i>Save All Changes</button></div>` : `<div class="mt-4 text-center text-slate-400 text-xs"><i class="fas fa-info-circle mr-1"></i> Enable Edit Mode to modify scores</div>`}
             `;
@@ -913,16 +872,8 @@
         };
         
         window.trackScoreChange = trackScoreChange;
-        window.openSaveModal = () => {
-            if (Object.keys(pendingScores).length === 0) {
-                showToast('No changes to save', true);
-                return;
-            }
-            document.getElementById('saveModal').classList.remove('hidden');
-        };
-        window.closeSaveModal = () => {
-            document.getElementById('saveModal').classList.add('hidden');
-        };
+        window.openSaveModal = () => { if (Object.keys(pendingScores).length === 0) { showToast('No changes to save', true); return; } document.getElementById('saveModal').classList.remove('hidden'); };
+        window.closeSaveModal = () => document.getElementById('saveModal').classList.add('hidden');
         window.confirmSave = saveAllScores;
         
         function clearFilters() {
@@ -938,184 +889,36 @@
         
         function getExportData() {
             const filtered = getFilteredStudents();
+            const assessments = getAssessmentsForQirat(currentQirat);
             return filtered.map(s => {
                 const scores = examScores.get(s.id)?.[currentQirat] || {};
-                const avg = calculateAverage(scores);
-                return {
-                    'Student Name': s.full_name,
-                    'Department': s.department,
-                    'Batch': s.batch,
-                    'Gender': s.gender,
-                    'Phone': s.phone,
-                    'Quiz 1': scores.assessment1 || '-',
-                    'Mid Exam': scores.assessment2 || '-',
-                    'Assignment': scores.assessment3 || '-',
-                    'Final Exam': scores.assessment4 || '-',
-                    'Average Score': avg !== null ? avg + '%' : '-'
-                };
+                const avg = calculateAverage(scores, assessments);
+                const exportRow = { 'Student Name': s.full_name, 'Department': s.department, 'Batch': s.batch, 'Gender': s.gender, 'Phone': s.phone, 'Average Score': avg !== null ? avg + '%' : '-' };
+                assessments.forEach(ass => { exportRow[ass.name] = scores[ass.key] || '-'; });
+                return exportRow;
             });
         }
         
-        window.exportToCSV = () => {
-            const data = getExportData();
-            if (data.length === 0) { showToast('No data to export', true); return; }
-            const ws = XLSX.utils.json_to_sheet(data);
-            const csv = XLSX.utils.sheet_to_csv(ws);
-            const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `${currentQirat}_students.csv`;
-            link.click();
-            showToast('CSV exported');
-        };
-        
-        window.exportToExcel = () => {
-            const data = getExportData();
-            if (data.length === 0) { showToast('No data to export', true); return; }
-            const ws = XLSX.utils.json_to_sheet(data);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, currentQirat);
-            XLSX.writeFile(wb, `${currentQirat}_students.xlsx`);
-            showToast('Excel exported');
-        };
-        
-        window.exportToPDF = async () => {
-            const data = getExportData();
-            if (data.length === 0) { showToast('No data to export', true); return; }
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF({ orientation: 'landscape' });
-            doc.setFontSize(16);
-            doc.setTextColor(99, 102, 241);
-            doc.text(`${currentQirat} - Student Exam Report`, 14, 20);
-            doc.setFontSize(10);
-            doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 30);
-            doc.autoTable({
-                head: [['Student Name', 'Department', 'Batch', 'Gender', 'Quiz 1', 'Mid Exam', 'Assignment', 'Final Exam', 'Average Score']],
-                body: data.map(d => [d['Student Name'], d['Department'], d['Batch'], d['Gender'], d['Quiz 1'], d['Mid Exam'], d['Assignment'], d['Final Exam'], d['Average Score']]),
-                startY: 40,
-                styles: { fontSize: 8 },
-                headStyles: { fillColor: [99, 102, 241] }
-            });
-            doc.save(`${currentQirat}_report.pdf`);
-            showToast('PDF exported');
-        };
-        
-                window.exportToWord = () => {
-            const data = getExportData();
-            if (data.length === 0) { showToast('No data to export', true); return; }
-            let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${currentQirat} Exam Report</title><style>
-                body{font-family:Arial, sans-serif; margin:40px; background:#f5f5f5;}
-                h1{color:#6366f1; border-bottom:2px solid #6366f1; padding-bottom:10px;}
-                .header{background:linear-gradient(135deg, #6366f1, #a855f7); color:white; padding:20px; border-radius:10px; margin-bottom:20px;}
-                table{border-collapse:collapse; width:100%; background:white; box-shadow:0 2px 4px rgba(0,0,0,0.1);}
-                th,td{border:1px solid #ddd; padding:10px; text-align:left;}
-                th{background:#6366f1; color:white; text-align:center;}
-                td{text-align:center;}
-                .footer{margin-top:20px; text-align:center; color:#666; font-size:12px;}
-            </style></head><body>
-            <div class="header">
-                <h1>📚 ${currentQirat} - Student Exam Report</h1>
-                <p><strong>Generated:</strong> ${new Date().toLocaleString()} | <strong>Ustaz:</strong> ${localStorage.getItem('ustazFullName') || 'Ustaz'}</p>
-                <p><strong>Total Students:</strong> ${data.length} | <strong>Average Score:</strong> ${Math.round(data.reduce((sum, d) => sum + (parseInt(d['Average Score']) || 0), 0) / data.length) || 0}%</p>
-            </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Student Name</th>
-                        <th>Department</th>
-                        <th>Batch</th>
-                        <th>Gender</th>
-                        <th>Quiz 1</th>
-                        <th>Mid Exam</th>
-                        <th>Assignment</th>
-                        <th>Final Exam</th>
-                        <th>Average Score</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${data.map((d, idx) => `<tr>
-                        <td>${idx + 1}</td>
-                        <td>${d['Student Name']}</td>
-                        <td>${d['Department']}</td>
-                        <td>${d['Batch']}</td>
-                        <td>${d['Gender']}</td>
-                        <td>${d['Quiz 1']}</td>
-                        <td>${d['Mid Exam']}</td>
-                        <td>${d['Assignment']}</td>
-                        <td>${d['Final Exam']}</td>
-                        <td><strong>${d['Average Score']}</strong></td>
-                    </tr>`).join('')}
-                </tbody>
-            </table>
-            <div class="footer">
-                <p>This report is system-generated. For any queries, please contact the academic administration.</p>
-            </div>
-            </body></html>`;
-            const blob = new Blob([html], { type: 'application/msword' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `${currentQirat}_report_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.doc`;
-            link.click();
-            URL.revokeObjectURL(link.href);
-            showToast('Word document exported');
-        };
-        
+        window.exportToCSV = () => { const data = getExportData(); if (!data.length) { showToast('No data to export', true); return; } const ws = XLSX.utils.json_to_sheet(data); const csv = XLSX.utils.sheet_to_csv(ws); const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `${currentQirat}_students.csv`; link.click(); showToast('CSV exported'); };
+        window.exportToExcel = () => { const data = getExportData(); if (!data.length) { showToast('No data to export', true); return; } const ws = XLSX.utils.json_to_sheet(data); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, currentQirat); XLSX.writeFile(wb, `${currentQirat}_students.xlsx`); showToast('Excel exported'); };
+        window.exportToPDF = async () => { const data = getExportData(); if (!data.length) { showToast('No data to export', true); return; } const { jsPDF } = window.jspdf; const doc = new jsPDF({ orientation: 'landscape' }); doc.setFontSize(16); doc.setTextColor(99, 102, 241); doc.text(`${currentQirat} - Student Exam Report`, 14, 20); doc.setFontSize(10); doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 30); const headers = ['Student Name', 'Department', 'Batch', 'Gender', ...getAssessmentsForQirat(currentQirat).map(a => a.name), 'Average Score']; const body = data.map(d => headers.map(h => d[h] || '')); doc.autoTable({ head: [headers], body: body, startY: 40, styles: { fontSize: 8 }, headStyles: { fillColor: [99, 102, 241] } }); doc.save(`${currentQirat}_report.pdf`); showToast('PDF exported'); };
+        window.exportToWord = () => { const data = getExportData(); if (!data.length) { showToast('No data to export', true); return; } const assessments = getAssessmentsForQirat(currentQirat); let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${currentQirat} Exam Report</title><style>body{font-family:Arial; margin:40px;} h1{color:#6366f1;} table{border-collapse:collapse; width:100%;} th,td{border:1px solid #ddd; padding:8px; text-align:center;} th{background:#6366f1; color:white;}</style></head><body><h1>${currentQirat} - Student Exam Report</h1><p>Generated: ${new Date().toLocaleString()}</p><table><thead><tr><th>#</th><th>Student Name</th><th>Dept</th><th>Batch</th><th>Gender</th>${assessments.map(a => `<th>${a.name}</th>`).join('')}<th>Avg</th></tr></thead><tbody>${data.map((d, idx) => `<tr><td>${idx+1}</td><td>${d['Student Name']}</td><td>${d['Department']}</td><td>${d['Batch']}</td><td>${d['Gender']}</td>${assessments.map(a => `<td>${d[a.name] || '-'}</td>`).join('')}<td><strong>${d['Average Score']}</strong></td></tr>`).join('')}</tbody></table></body></html>`; const blob = new Blob([html], { type: 'application/msword' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `${currentQirat}_report.doc`; link.click(); showToast('Word exported'); };
         window.exportData = () => window.exportToExcel();
         
         window.toggleEditMode = () => {
             isEditMode = !isEditMode;
             const btn = document.getElementById('editModeBtn');
-            if (isEditMode) {
-                btn.innerHTML = '<i class="fas fa-pen mr-1"></i> Edit Mode ON';
-                btn.classList.add('bg-emerald-600');
-                btn.classList.remove('bg-slate-700');
-                showToast('Edit mode enabled - click on scores to edit, then click Save');
-            } else {
-                btn.innerHTML = '<i class="fas fa-eye mr-1"></i> View Mode';
-                btn.classList.remove('bg-emerald-600');
-                btn.classList.add('bg-slate-700');
-                // Clear pending changes when exiting edit mode
-                pendingScores = {};
-                hasUnsavedChanges = false;
-            }
-            if (currentStudentId && document.getElementById('studentModal').classList.contains('active')) {
-                openStudentModal(currentStudentId);
-            }
+            if (isEditMode) { btn.innerHTML = '<i class="fas fa-pen mr-1"></i> Edit Mode ON'; btn.classList.add('bg-emerald-600'); btn.classList.remove('bg-slate-700'); showToast('Edit mode enabled - click on scores to edit, then click Save'); }
+            else { btn.innerHTML = '<i class="fas fa-eye mr-1"></i> View Mode'; btn.classList.remove('bg-emerald-600'); btn.classList.add('bg-slate-700'); pendingScores = {}; hasUnsavedChanges = false; }
+            if (currentStudentId && document.getElementById('studentModal').classList.contains('active')) openStudentModal(currentStudentId);
         };
         
-        window.logout = () => {
-            localStorage.removeItem('ustazLoggedIn');
-            localStorage.removeItem('ustazId');
-            localStorage.removeItem('ustazName');
-            localStorage.removeItem('ustazFullName');
-            localStorage.removeItem('ustazQirats');
-            window.location.href = 'ustaz-login.html';
-        };
-        
-        window.closeModal = (id) => {
-            document.getElementById(id).classList.add('hidden');
-            currentStudentId = null;
-            currentOpenQiratIndex = null;
-            // Clear pending changes when closing modal without saving
-            pendingScores = {};
-            hasUnsavedChanges = false;
-        };
+        window.logout = () => { localStorage.removeItem('ustazLoggedIn'); localStorage.removeItem('ustazId'); localStorage.removeItem('ustazName'); localStorage.removeItem('ustazFullName'); localStorage.removeItem('ustazQirats'); window.location.href = 'ustaz-login.html'; };
+        window.closeModal = (id) => { document.getElementById(id).classList.add('hidden'); currentStudentId = null; currentOpenQiratIndex = null; pendingScores = {}; hasUnsavedChanges = false; };
         
         let isLightMode = false;
-        window.toggleTheme = () => {
-            isLightMode = !isLightMode;
-            const icon = document.getElementById('themeIcon');
-            if (isLightMode) {
-                document.body.classList.add('light-mode');
-                icon.className = 'fas fa-sun text-yellow-500';
-            } else {
-                document.body.classList.remove('light-mode');
-                icon.className = 'fas fa-moon text-yellow-400';
-            }
-        };
+        window.toggleTheme = () => { isLightMode = !isLightMode; const icon = document.getElementById('themeIcon'); if (isLightMode) { document.body.classList.add('light-mode'); icon.className = 'fas fa-sun text-yellow-500'; } else { document.body.classList.remove('light-mode'); icon.className = 'fas fa-moon text-yellow-400'; } };
         
-        // Event listeners for filters
         document.getElementById('searchInput').addEventListener('input', (e) => { currentFilters.search = e.target.value; updateStats(); renderChart(); renderStudentsTable(); });
         document.getElementById('genderFilter').addEventListener('change', (e) => { currentFilters.gender = e.target.value; updateStats(); renderChart(); renderStudentsTable(); });
         document.getElementById('deptFilter').addEventListener('change', (e) => { currentFilters.department = e.target.value; updateStats(); renderChart(); renderStudentsTable(); });
@@ -1124,34 +927,17 @@
         window.clearFilters = clearFilters;
         window.openStudentModal = openStudentModal;
         window.toggleQiratDropdown = toggleQiratDropdown;
-        window.trackScoreChange = trackScoreChange;
-        window.openSaveModal = openSaveModal;
-        window.closeSaveModal = closeSaveModal;
-        window.confirmSave = confirmSave;
         
         async function init() {
-            // Check if ustaz is logged in
-            if (localStorage.getItem('ustazLoggedIn') !== 'true') {
-                window.location.href = 'ustaz-login.html';
-                return;
-            }
-            
-            // Load all data
+            if (localStorage.getItem('ustazLoggedIn') !== 'true') { window.location.href = 'ustaz-login.html'; return; }
+            await loadQiratAssessmentConfigs();
             await loadExamScores();
             await loadStudents();
             const success = await loadUstazData();
-            
-            if (success && assignedQirats.length > 0) {
-                updateStats();
-                renderChart();
-                renderStudentsTable();
-                showToast(`Welcome ${localStorage.getItem('ustazFullName') || 'Ustaz'}! You have access to ${assignedQirats.length} Qirat(s).`);
-            } else if (assignedQirats.length === 0) {
-                document.getElementById('studentsTableBody').innerHTML = '<tr><td colspan="7" class="text-center py-8 text-slate-400">No Qirats assigned to you. Please contact administrator.</td></tr>';
-            }
+            if (success && assignedQirats.length > 0) { updateStats(); renderChart(); renderStudentsTable(); showToast(`Welcome ${localStorage.getItem('ustazFullName') || 'Ustaz'}! You have access to ${assignedQirats.length} Qirat(s).`); }
+            else if (assignedQirats.length === 0) document.getElementById('studentsTableBody').innerHTML = '<tr><td colspan="7" class="text-center py-8 text-slate-400">No Qirats assigned to you. Please contact administrator.</td></tr>';
         }
         
-        // Start the application
         init();
     </script>
 </body>
