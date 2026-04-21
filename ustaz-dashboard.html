@@ -447,12 +447,23 @@
         let hasUnsavedChanges = false;
         let qiratAssessmentConfigs = new Map();
         
-        const assessments = [
-            { name: "Quiz 1", outOf: 30, key: "assessment1" },
-            { name: "Mid Exam", outOf: 50, key: "assessment2" },
-            { name: "Assignment", outOf: 20, key: "assessment3" },
-            { name: "Final Exam", outOf: 100, key: "assessment4" }
-        ];
+        function getAssessmentsForQirat(qiratName) {
+    const config = qiratAssessmentConfigs.get(qiratName);
+    if (config?.assessments && config.assessments.length > 0) {
+        // Add key property to each assessment
+        return config.assessments.map((ass, idx) => ({
+            ...ass,
+            key: `assessment${idx + 1}`
+        }));
+    }
+    // Default fallback
+    return [
+        { name: "Quiz 1", outOf: 30, key: "assessment1" },
+        { name: "Mid Exam", outOf: 50, key: "assessment2" },
+        { name: "Assignment", outOf: 20, key: "assessment3" },
+        { name: "Final Exam", outOf: 100, key: "assessment4" }
+    ];
+}
         
         function showToast(message, isError = false) {
             const toast = document.getElementById('toast');
