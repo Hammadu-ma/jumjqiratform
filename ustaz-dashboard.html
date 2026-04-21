@@ -1078,34 +1078,6 @@
         };
         
         window.saveQiratSettings = async (qirat) => {
-            const assessments = [];
-            const inputs = document.querySelectorAll(`[data-qirat="${qirat}"]`);
-            const tempMap = {};
-            inputs.forEach(input => { const idx = parseInt(input.dataset.idx); const field = input.dataset.field; if (!tempMap[idx]) tempMap[idx] = {}; tempMap[idx][field] = field === 'outOf' ? parseInt(input.value) : input.value; });
-            for (let i = 0; i < Object.keys(tempMap).length; i++) { if (tempMap[i].name && tempMap[i].outOf) assessments.push({ name: tempMap[i].name, outOf: tempMap[i].outOf }); }
-            await saveQiratAssessmentConfig(qirat, { assessments });
-            await loadExamScores();
-            updateHeroStats();
-            renderCharts(); 
-            await renderCurrentView();
-            showToast(`Saved ${qirat}`);
-            openSettingsModal();
-        };
-        async function refreshCurrentStudentModal() {
-    if (currentStudentId && document.getElementById('studentModal') && 
-        !document.getElementById('studentModal').classList.contains('hidden')) {
-        // Save current scroll position and open state
-        const wasOpen = currentOpenQiratIndex;
-        // Reopen the modal with fresh data
-        await openStudentModal(currentStudentId);
-        // Restore the open dropdown if needed
-        if (wasOpen !== null) {
-            setTimeout(() => toggleQiratDropdown(wasOpen), 100);
-        }
-    }
-}
-
-window.saveQiratSettings = async (qirat) => {
     const assessments = [];
     const inputs = document.querySelectorAll(`[data-qirat="${qirat}"]`);
     const tempMap = {};
@@ -1124,12 +1096,50 @@ window.saveQiratSettings = async (qirat) => {
     renderCharts(); 
     await renderCurrentView();
     
-    // Refresh the student modal if it's open
-    await refreshCurrentStudentModal();
+    // CRITICAL FIX: Close any open modals to force fresh data on reopen
+    closeModal('studentModal');
+    closeModal('qiratModal');
+    closeModal('departmentModal');
     
-    showToast(`Saved ${qirat}`);
-    openSettingsModal();
+    showToast(`Saved ${qirat} - Refresh completed`);
+    openSettingsModal(); // Reopen settings to show updated state
 };
+// Add this new function to force a complete data reload
+async function fullDataRefresh() {
+    await loadData(); // This reloads everything from Firebase
+    await renderCurrentView();
+    updateHeroStats();
+    renderCharts();
+    showToast("All data refreshed with new assessment settings");
+}
+
+window.saveQiratSettings = async (qirat) => {
+    const assessments = [];
+    const inputs = document.querySelectorAll(`[data-qirat="${qirat}"]`);
+    const tempMap = {};
+    inputs.forEach(input => { 
+        const idx = parseInt(input.dataset.idx); 
+        const field = input.dataset.field; 
+        if (!tempMap[idx]) tempMap[idx] = {}; 
+        tempMap[idx][field] = field === 'outOf' ? parseInt(input.value) : input.value; 
+    });
+    for (let i = 0; i < Object.keys(tempMap).length; i++) { 
+        if (tempMap[i].name && tempMap[i].outOf) assessments.push({ name: tempMap[i].name, outOf: tempMap[i].outOf }); 
+    }
+    await saveQiratAssessmentConfig(qirat, { assessments });
+    
+    // Close all open modals first
+    closeModal('studentModal');
+    closeModal('qiratModal');
+    closeModal('departmentModal');
+    closeModal('settingsModal');
+    
+    // Full refresh of all data
+    await fullDataRefresh();
+    
+    showToast(`Assessment settings saved for ${qirat}`);
+};
+        
         window.toggleEditMode = () => {
             isEditMode = !isEditMode;
             const btn = document.getElementById('editModeBtn');
