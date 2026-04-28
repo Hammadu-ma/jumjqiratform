@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>JUMJ Irshad | Groups View - Complete Suite</title>
+    <title>JUMJ Irshad | Groups View + Attendance Export</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -194,7 +194,64 @@
         .export-all-excel { background: #6366f1; color: white; }
         .export-all-word { background: #2b5797; color: white; }
         .export-all-pdf { background: #d32f2f; color: white; }
+        .export-attendance { background: #8b5cf6; color: white; }
         .export-btn:hover { transform: translateY(-2px); filter: brightness(1.05); }
+
+        .attendance-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            visibility: hidden;
+            opacity: 0;
+            transition: all 0.2s;
+        }
+        .attendance-modal.active {
+            visibility: visible;
+            opacity: 1;
+        }
+        .attendance-modal-content {
+            background: white;
+            border-radius: 32px;
+            padding: 32px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+        }
+        .attendance-modal-content h3 {
+            color: var(--primary-dark);
+            margin-bottom: 20px;
+        }
+        .attendance-input-group {
+            margin-bottom: 24px;
+            text-align: left;
+        }
+        .attendance-input-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+        .attendance-input-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+        .attendance-modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
 
         .groups-container {
             display: flex;
@@ -273,7 +330,7 @@
             flex-wrap: wrap;
         }
 
-        .group-export-item, .edit-student-btn {
+        .group-export-item, .edit-student-btn, .attendance-export-btn {
             background: white;
             border: 1px solid var(--border);
             padding: 6px 14px;
@@ -286,6 +343,8 @@
             gap: 6px;
             transition: all 0.2s;
         }
+        .attendance-export-btn { background: #f3e8ff; border-color: #8b5cf6; color: #6b21a5; }
+        .attendance-export-btn:hover { background: #8b5cf6; color: white; border-color: #8b5cf6; }
         .edit-student-btn { background: #fef3c7; border-color: #f59e0b; color: #b45309; }
         .edit-student-btn:hover { background: #f59e0b; color: white; border-color: #f59e0b; }
         .group-export-item:hover { background: var(--primary); color: white; border-color: var(--primary); }
@@ -420,7 +479,7 @@
 
 <div class="glass-header">
     <div class="header-content">
-        <div class="logo"><h1><i class="fas fa-layer-group"></i> Groups View + Editor</h1></div>
+        <div class="logo"><h1><i class="fas fa-layer-group"></i> Groups View + Attendance</h1></div>
     </div>
 </div>
 
@@ -456,6 +515,25 @@
 </div>
 
 <div id="toast" class="toast"></div>
+
+<!-- Attendance Modal -->
+<div id="attendanceModal" class="attendance-modal">
+    <div class="attendance-modal-content">
+        <h3><i class="fas fa-calendar-check"></i> Attendance Export</h3>
+        <div class="attendance-input-group">
+            <label>Number of Days</label>
+            <input type="number" id="attendanceDays" min="1" max="60" value="7" placeholder="Enter number of days">
+        </div>
+        <div class="attendance-input-group">
+            <label>Date Range / Notes (Optional)</label>
+            <input type="text" id="attendanceNotes" placeholder="e.g., Week 1 - January 2026">
+        </div>
+        <div class="attendance-modal-buttons">
+            <button class="btn-clear" onclick="closeAttendanceModal()">Cancel</button>
+            <button class="btn-primary" id="confirmAttendanceExport">Generate Attendance Sheet</button>
+        </div>
+    </div>
+</div>
 
 <div id="editModal" class="modal-overlay">
     <div class="modal-container">
@@ -498,7 +576,6 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     
-    // ========== OFFLINE OPTIMIZATION: CACHING ==========
     let allRegistrations = [];
     let filteredRegistrations = [];
     let currentGroupMode = 'qirat';
@@ -506,21 +583,18 @@
     let allUniqueQirats = [];
     let dataLoaded = false;
     let isLoading = false;
+    let currentAttendanceGroup = null;
     
-    // Save to localStorage cache
     function saveToCache() {
         try {
-            const cacheData = {
+            localStorage.setItem('groups_cache', JSON.stringify({
                 registrations: allRegistrations,
                 allQirats: allUniqueQirats,
-                timestamp: new Date().toISOString(),
-                version: '1.0'
-            };
-            localStorage.setItem('groups_cache', JSON.stringify(cacheData));
+                timestamp: new Date().toISOString()
+            }));
         } catch (e) { console.warn('Cache save failed:', e); }
     }
     
-    // Load from localStorage cache
     function loadFromCache() {
         try {
             const cached = localStorage.getItem('groups_cache');
@@ -530,7 +604,6 @@
                     allRegistrations = data.registrations;
                     allUniqueQirats = data.allQirats || [];
                     dataLoaded = true;
-                    console.log('Loaded from cache:', allRegistrations.length, 'students');
                     return true;
                 }
             }
@@ -550,6 +623,7 @@
     const exportAllWordBtn = document.getElementById('exportAllWordBtn');
     const exportAllPdfBtn = document.getElementById('exportAllPdfBtn');
     const toast = document.getElementById('toast');
+    const attendanceModal = document.getElementById('attendanceModal');
     
     function showToast(message, isError = false) {
         toast.textContent = message;
@@ -567,7 +641,6 @@
         return (student.schedules || []).map(s => s.qirat_name).filter(Boolean);
     }
     
-    // Export format WITHOUT Registration Date
     function formatStudentForExport(student, index) {
         return {
             'No.': index,
@@ -595,14 +668,9 @@
     
     async function loadDataFromFirestore(force = false) {
         if (isLoading) return;
-        if (dataLoaded && !force) {
-            console.log('Using cached data, not loading from Firestore');
-            return;
-        }
-        
+        if (dataLoaded && !force) return;
         isLoading = true;
         showToast('Loading data...');
-        
         try {
             const querySnapshot = await getDocs(collection(db, "registrations"));
             allRegistrations = [];
@@ -633,7 +701,6 @@
             populateFilters();
             applyFilters();
         } catch (error) {
-            console.error("Error loading from Firestore:", error);
             if (loadFromCache()) {
                 showToast('Using cached data (offline mode)', false);
                 populateFilters();
@@ -641,15 +708,7 @@
             } else {
                 groupsContainer.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-triangle"></i> Error: ${error.message}</div>`;
             }
-        } finally {
-            isLoading = false;
-        }
-    }
-    
-    async function refreshFromCloud() {
-        showToast('Refreshing from cloud...');
-        await loadDataFromFirestore(true);
-        showToast('Data refreshed from cloud');
+        } finally { isLoading = false; }
     }
     
     function populateFilters() {
@@ -668,9 +727,7 @@
         const selectedQirat = qiratFilter.value;
         
         filteredRegistrations = allRegistrations.filter(r => {
-            const matchSearch = r.full_name.toLowerCase().includes(search) || 
-                               r.phone.toLowerCase().includes(search) || 
-                               r.telegram.toLowerCase().includes(search);
+            const matchSearch = r.full_name.toLowerCase().includes(search) || r.phone.toLowerCase().includes(search) || r.telegram.toLowerCase().includes(search);
             const matchGender = !gender || r.gender === gender;
             const matchDept = !department || r.department === department;
             const matchBatch = !batch || r.batch === batch;
@@ -743,6 +800,7 @@
                         <button class="group-export-item" data-group-idx="${idx}" data-format="excel"><i class="fas fa-file-excel"></i> Excel</button>
                         <button class="group-export-item" data-group-idx="${idx}" data-format="pdf"><i class="fas fa-file-pdf"></i> PDF</button>
                         <button class="group-export-item" data-group-idx="${idx}" data-format="word"><i class="fas fa-file-word"></i> Word</button>
+                        <button class="attendance-export-btn" data-group-idx="${idx}" onclick="event.stopPropagation(); openAttendanceModal(${idx})"><i class="fas fa-calendar-check"></i> Attendance</button>
                     </div>
                     <i class="fas fa-chevron-down toggle-icon"></i>
                 </div>
@@ -793,55 +851,230 @@
         return icons[currentGroupMode] || 'fa-folder';
     }
     
-    window.openEditModal = function(student) {
-        document.getElementById('editStudentId').value = student.id;
-        document.getElementById('editName').value = student.name;
-        document.getElementById('editGender').value = student.gender;
-        document.getElementById('editPhone').value = student.phone;
-        document.getElementById('editTelegram').value = student.telegram || '';
-        document.getElementById('editDepartment').value = student.dept;
-        document.getElementById('editBatch').value = student.batch;
-        document.getElementById('editQirats').value = (student.qirats || []).join(', ');
-        document.getElementById('editModal').classList.add('active');
+    // ========== ATTENDANCE EXPORT SYSTEM ==========
+    function openAttendanceModal(groupIdx) {
+        currentAttendanceGroup = currentGroups[groupIdx];
+        attendanceModal.classList.add('active');
+    }
+    
+    window.closeAttendanceModal = function() {
+        attendanceModal.classList.remove('active');
     };
     
-    window.closeEditModal = function() {
-        document.getElementById('editModal').classList.remove('active');
-    };
-    
-    document.getElementById('editForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const id = document.getElementById('editStudentId').value;
-        const newName = document.getElementById('editName').value;
-        const newGender = document.getElementById('editGender').value;
-        const newPhone = document.getElementById('editPhone').value;
-        const newTelegram = document.getElementById('editTelegram').value;
-        const newDept = document.getElementById('editDepartment').value;
-        const newBatch = document.getElementById('editBatch').value;
-        const qiratsStr = document.getElementById('editQirats').value;
-        const qiratNames = qiratsStr.split(',').map(s => s.trim()).filter(s => s);
-        const newSchedules = qiratNames.map(q => ({ qirat_name: q }));
-        
-        try {
-            const studentRef = doc(db, "registrations", id);
-            await updateDoc(studentRef, {
-                full_name: newName,
-                gender: newGender,
-                phone: newPhone,
-                telegram: newTelegram,
-                department: newDept,
-                batch: newBatch,
-                schedules: newSchedules
-            });
-            showToast('Student updated successfully!');
-            closeEditModal();
-            await refreshFromCloud();
-        } catch (error) {
-            showToast('Update failed: ' + error.message, true);
+    document.getElementById('confirmAttendanceExport').addEventListener('click', () => {
+        const days = parseInt(document.getElementById('attendanceDays').value);
+        const notes = document.getElementById('attendanceNotes').value;
+        if (!currentAttendanceGroup || days < 1 || days > 60) {
+            showToast('Please enter valid number of days (1-60)', true);
+            return;
         }
+        exportAttendanceSheet(currentAttendanceGroup, days, notes);
+        closeAttendanceModal();
     });
     
-    // ========== BEAUTIFUL EXPORT FUNCTIONS (WITHOUT REGISTRATION DATE) ==========
+    function exportAttendanceSheet(group, days, notes) {
+        if (!group || group.members.length === 0) {
+            showToast('No students in this group', true);
+            return;
+        }
+        
+        const groupName = group.name;
+        const totalStudents = group.members.length;
+        const timestamp = new Date().toLocaleString();
+        
+        // Generate day columns
+        const dayColumns = [];
+        for (let i = 1; i <= days; i++) {
+            dayColumns.push(`Day ${i}`);
+        }
+        
+        // Build HTML for Word
+        let html = `<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Attendance Sheet - ${escapeHtml(groupName)}</title>
+            <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body { 
+                    font-family: 'Segoe UI', 'Arial', sans-serif; 
+                    margin: 30px; 
+                    background: white;
+                }
+                .header {
+                    text-align: center;
+                    margin-bottom: 30px;
+                    padding-bottom: 20px;
+                    border-bottom: 3px solid #10b981;
+                }
+                .header h1 {
+                    color: #10b981;
+                    font-size: 24px;
+                    margin-bottom: 8px;
+                }
+                .header .subtitle {
+                    color: #059669;
+                    font-size: 14px;
+                }
+                .header .meta {
+                    color: #64748b;
+                    font-size: 12px;
+                    margin-top: 10px;
+                }
+                .info-section {
+                    background: #f0fdf4;
+                    padding: 15px 20px;
+                    border-radius: 12px;
+                    margin-bottom: 25px;
+                    display: flex;
+                    justify-content: space-between;
+                    flex-wrap: wrap;
+                    gap: 15px;
+                }
+                .info-item {
+                    font-size: 13px;
+                }
+                .info-item strong {
+                    color: #059669;
+                }
+                .notes-section {
+                    background: #fef3c7;
+                    padding: 12px 20px;
+                    border-radius: 10px;
+                    margin-bottom: 25px;
+                    font-size: 12px;
+                    color: #92400e;
+                }
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    font-size: 11px;
+                    margin-top: 15px;
+                }
+                th, td {
+                    border: 1px solid #cbd5e1;
+                    padding: 10px 6px;
+                    text-align: center;
+                    vertical-align: middle;
+                }
+                th {
+                    background: #10b981;
+                    color: white;
+                    font-weight: bold;
+                    font-size: 12px;
+                    position: sticky;
+                    top: 0;
+                }
+                td:first-child, th:first-child {
+                    position: sticky;
+                    left: 0;
+                    background: #f8fafc;
+                    font-weight: 600;
+                }
+                th:first-child {
+                    background: #059669;
+                }
+                .checkbox-cell {
+                    width: 35px;
+                    text-align: center;
+                }
+                .checkbox-cell span {
+                    display: inline-block;
+                    width: 18px;
+                    height: 18px;
+                    border: 2px solid #cbd5e1;
+                    border-radius: 4px;
+                    background: white;
+                }
+                .footer {
+                    margin-top: 30px;
+                    text-align: center;
+                    font-size: 10px;
+                    color: #94a3b8;
+                    padding-top: 20px;
+                    border-top: 1px solid #e2e8f0;
+                }
+                .legend {
+                    margin-top: 20px;
+                    padding: 12px;
+                    background: #f8fafc;
+                    border-radius: 8px;
+                    font-size: 10px;
+                    display: flex;
+                    gap: 20px;
+                    flex-wrap: wrap;
+                }
+                @media print {
+                    body { margin: 0; padding: 15px; }
+                    .no-print { display: none; }
+                    th, td { border-color: #000; }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <h1>📋 ATTENDANCE SHEET</h1>
+                <div class="subtitle">${escapeHtml(groupName)}</div>
+                <div class="meta">Generated: ${timestamp} | Total Students: ${totalStudents}</div>
+            </div>
+            
+            <div class="info-section">
+                <div class="info-item"><strong>Group Name:</strong> ${escapeHtml(groupName)}</div>
+                <div class="info-item"><strong>Total Students:</strong> ${totalStudents}</div>
+                <div class="info-item"><strong>Attendance Period:</strong> ${days} Days</div>
+                <div class="info-item"><strong>Gender Split:</strong> ♂ ${group.stats.maleCount} | ♀ ${group.stats.femaleCount}</div>
+            </div>
+            
+            ${notes ? `<div class="notes-section"><strong>📝 Notes:</strong> ${escapeHtml(notes)}</div>` : ''}
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 40px;">No.</th>
+                        <th style="text-align: left; min-width: 180px;">Student Name</th>
+                        <th style="width: 80px;">Gender</th>
+                        <th style="text-align: left; min-width: 140px;">Department</th>
+                        <th style="text-align: left; min-width: 100px;">Batch</th>
+                        ${dayColumns.map(day => `<th class="checkbox-cell">${day}</th>`).join('')}
+                        <th style="width: 70px;">Present</th>
+                        <th style="width: 70px;">Absent</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${group.members.map((student, idx) => `
+                        <tr>
+                            <td>${idx + 1}</td>
+                            <td style="text-align: left;"><strong>${escapeHtml(student.full_name)}</strong></td>
+                            <td>${escapeHtml(student.gender)}</td>
+                            <td style="text-align: left;">${escapeHtml(student.department)}</td>
+                            <td style="text-align: left;">${escapeHtml(student.batch)}</td>
+                            ${dayColumns.map(() => `<td class="checkbox-cell"><span></span></td>`).join('')}
+                            <td><span style="display:inline-block; width:20px; height:20px; border:1px solid #10b981; border-radius:4px;"></span></td>
+                            <td><span style="display:inline-block; width:20px; height:20px; border:1px solid #ef4444; border-radius:4px;"></span></td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+            
+            <div class="legend">
+                <span>✅ <strong>Instructions:</strong> Check (✓) for Present, Leave blank or mark (✗) for Absent</span>
+                <span>📅 Each column represents one day of attendance</span>
+                <span>📝 Use the "Present" and "Absent" columns to track totals</span>
+            </div>
+            
+            <div class="footer">
+                <p>JUMJ Irshad - Attendance Sheet | Print and mark attendance | ${new Date().toLocaleDateString()}</p>
+            </div>
+        </body>
+        </html>`;
+        
+        const blob = new Blob([html], { type: 'application/msword' });
+        const filename = `Attendance_${groupName.replace(/[^a-z0-9]/gi, '_')}_${days}days.doc`;
+        downloadBlob(blob, filename);
+        showToast(`Attendance sheet for "${groupName}" exported with ${days} days`);
+    }
+    
+    // ========== REGULAR EXPORT FUNCTIONS ==========
     function exportSingleGroup(group, format) {
         if (!group || group.members.length === 0) { showToast('No students', true); return; }
         const exportData = group.members.map((m, idx) => formatStudentForExport(m, idx + 1));
@@ -910,62 +1143,10 @@
     }
     
     function exportToWord(data, groupName, totalCount, stats) {
-        let html = `<!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <title>${groupName} - Group Report</title>
-            <style>
-                body { font-family: 'Arial', sans-serif; margin: 40px; }
-                h1 { color: #10b981; border-bottom: 2px solid #10b981; padding-bottom: 10px; }
-                .subtitle { color: #059669; margin: 10px 0; }
-                .kpi-box { background: #f0fdf4; padding: 15px; border-radius: 12px; margin: 20px 0; }
-                .kpi-box h3 { color: #059669; margin-bottom: 10px; }
-                table { border-collapse: collapse; width: 100%; margin-top: 20px; }
-                th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-                th { background: #10b981; color: white; }
-                tr:nth-child(even) { background: #f9fafb; }
-            </style>
-        </head>
-        <body>
-            <h1>📊 JUMJ Irshad - Group Report</h1>
-            <div class="subtitle">Group: ${escapeHtml(groupName)}</div>
-            <p>Generated: ${new Date().toLocaleString()} | Total Students: ${totalCount}</p>
-            
-            <div class="kpi-box">
-                <h3>Summary KPIs</h3>
-                <p><strong>Gender Split:</strong> Male ${stats.maleCount} | Female ${stats.femaleCount}</p>
-                <p><strong>Departments:</strong> ${stats.uniqueDepts} departments represented</p>
-                <p><strong>Multi-Qirat Students:</strong> ${stats.multiQiratCount}</p>
-                <p><strong>New Students (30 days):</strong> ${stats.recentWeek}</p>
-            </div>
-            
-            <h3>Student List</h3>
-            <table>
-                <thead>
-                    <tr><th>No.</th><th>Name</th><th>Gender</th><th>Phone</th><th>Department</th><th>Batch</th><th>Qirats</th></tr>
-                </thead>
-                <tbody>
-                    ${data.map(row => `
-                        <tr>
-                            <td>${escapeHtml(String(row['No.']))}</td>
-                            <td>${escapeHtml(row.Name)}</td>
-                            <td>${escapeHtml(row.Gender)}</td>
-                            <td>${escapeHtml(row.Phone)}</td>
-                            <td>${escapeHtml(row.Department)}</td>
-                            <td>${escapeHtml(row.Batch)}</td>
-                            <td>${escapeHtml(row['Qirats Enrolled'])}</td>
-                        </tr>
-                    `).join('')}
-                </tbody>
-            </table>
-        </body>
-        </html>`;
-        
+        let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${groupName} - Group Report</title><style>body{font-family:'Arial',sans-serif;margin:40px;}h1{color:#10b981;border-bottom:2px solid #10b981;}table{border-collapse:collapse;width:100%;margin-top:20px;}th,td{border:1px solid #ddd;padding:8px;}th{background:#10b981;color:white;}</style></head><body><h1>📊 JUMJ Irshad - Group Report</h1><p>Group: ${escapeHtml(groupName)} | Generated: ${new Date().toLocaleString()} | Total: ${totalCount}</p><h3>Summary KPIs</h3><p>Gender: Male ${stats.maleCount} | Female ${stats.femaleCount} | Departments: ${stats.uniqueDepts} | Multi-Qirat: ${stats.multiQiratCount}</p></td><thead><tr><th>No.</th><th>Name</th><th>Gender</th><th>Phone</th><th>Department</th><th>Batch</th><th>Qirats</th></tr></thead><tbody>${data.map(row => `<tr>}<td>${escapeHtml(String(row['No.']))}</td><td>${escapeHtml(row.Name)}</td><td>${escapeHtml(row.Gender)}</td><td>${escapeHtml(row.Phone)}</td><td>${escapeHtml(row.Department)}</td><td>${escapeHtml(row.Batch)}</td><td>${escapeHtml(row['Qirats Enrolled'])}</td></tr>`).join('')}</tbody></table></body></html>`;
         downloadBlob(new Blob([html], { type: 'application/msword' }), `${groupName.replace(/[^a-z0-9]/gi, '_')}_report.doc`);
     }
     
-    // ========== MASTER EXPORTS (WITH NUMBER COLUMN, NO REGISTRATION DATE) ==========
     function exportAllGroupsToExcel() {
         if (currentGroups.length === 0) { showToast('No groups to export', true); return; }
         const wb = XLSX.utils.book_new();
@@ -982,38 +1163,17 @@
     
     function exportAllGroupsToWord() {
         if (currentGroups.length === 0) { showToast('No groups', true); return; }
-        let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>JUMJ_All_Groups</title>
-        <style>
-            body { font-family: 'Segoe UI', Arial, sans-serif; margin: 40px; }
-            h1 { color: #10b981; border-bottom: 3px solid #10b981; padding-bottom: 10px; }
-            h2 { background: #f1f5f9; padding: 12px 16px; border-radius: 16px; margin-top: 30px; color: #0f172a; border-left: 5px solid #10b981; }
-            .group-summary { background: #f0fdf4; padding: 12px 20px; border-radius: 20px; margin: 10px 0 20px 0; display: flex; gap: 20px; flex-wrap: wrap; }
-            .kpi-badge { background: white; padding: 6px 14px; border-radius: 40px; font-size: 0.8rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-            table { width: 100%; border-collapse: collapse; margin: 15px 0; }
-            th, td { border: 1px solid #cbd5e1; padding: 8px 10px; text-align: left; font-size: 0.75rem; }
-            th { background: #10b981; color: white; }
-            .footer { margin-top: 40px; text-align: center; font-size: 0.7rem; color: #64748b; }
-        </style></head><body>
-        <h1>📊 JUMJ Irshad - Complete Groups Report</h1>
-        <p><strong>Grouping Mode:</strong> ${currentGroupMode.toUpperCase()} | <strong>Generated:</strong> ${new Date().toLocaleString()} | <strong>Total Groups:</strong> ${currentGroups.length}</p>`;
-        
+        let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>All Groups Report</title><style>body{font-family:Arial;margin:40px;}h1{color:#10b981;}h2{background:#f1f5f9;padding:10px;margin-top:30px;}table{border-collapse:collapse;width:100%;margin:15px 0;}th,td{border:1px solid #ddd;padding:8px;}th{background:#10b981;color:white;}</style></head><body><h1>📊 JUMJ Irshad - All Groups Report</h1><p>Generated: ${new Date().toLocaleString()} | Total Groups: ${currentGroups.length}</p>`;
         currentGroups.forEach(group => {
             const s = group.stats;
-            html += `<h2>📁 ${escapeHtml(group.name)} <span style="font-size:0.8rem;">(${group.memberCount} students)</span></h2>
-            <div class="group-summary">
-                <span class="kpi-badge">👥 Male: ${s.maleCount} | Female: ${s.femaleCount}</span>
-                <span class="kpi-badge">🏢 Departments: ${s.uniqueDepts}</span>
-                <span class="kpi-badge">🔄 Multi-Qirat: ${s.multiQiratCount}</span>
-                <span class="kpi-badge">🆕 New (30d): ${s.recentWeek}</span>
-            </div>
-            <table><thead><tr><th>No.</th><th>Name</th><th>Gender</th><th>Phone</th><th>Dept</th><th>Batch</th><th>Qirats</th></tr></thead><tbody>`;
+            html += `<h2>📁 ${escapeHtml(group.name)} (${group.memberCount} students)</h2><div style="background:#f0fdf4;padding:10px;margin-bottom:15px;"><span>Male: ${s.maleCount} | Female: ${s.femaleCount} | Depts: ${s.uniqueDepts} | Multi-Qirat: ${s.multiQiratCount}</span></div><table><thead><tr><th>No.</th><th>Name</th><th>Gender</th><th>Phone</th><th>Dept</th><th>Batch</th><th>Qirats</th></tr></thead><tbody>`;
             group.members.forEach((m, idx) => {
                 html += `<tr><td>${idx + 1}</td><td>${escapeHtml(m.full_name)}</td><td>${escapeHtml(m.gender)}</td><td>${escapeHtml(m.phone)}</td><td>${escapeHtml(m.department)}</td><td>${escapeHtml(m.batch)}</td><td>${escapeHtml(getQiratNames(m).join(', ') || '-')}</td></tr>`;
             });
             html += `</tbody></table><br>`;
         });
         html += `<div class="footer">© JUMJ Irshad • Exported on ${new Date().toLocaleString()}</div></body></html>`;
-        downloadBlob(new Blob([html], { type: 'application/msword' }), `JUMJ_AllGroups_${currentGroupMode}_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.doc`);
+        downloadBlob(new Blob([html], { type: 'application/msword' }), `All_Groups_${currentGroupMode}_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.doc`);
         showToast(`Exported all ${currentGroups.length} groups to Word`);
     }
     
@@ -1022,7 +1182,7 @@
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
         let yPos = 20;
-        doc.setFontSize(20); doc.setTextColor(16, 185, 129);
+        doc.setFontSize(20); doc.setTextColor(16,185,129);
         doc.text(`JUMJ Irshad - Complete Groups Export`, 14, yPos); yPos += 10;
         doc.setFontSize(11); doc.setTextColor(0,0,0);
         doc.text(`Group Mode: ${currentGroupMode.toUpperCase()} | Generated: ${new Date().toLocaleString()} | Total Groups: ${currentGroups.length}`, 14, yPos); yPos += 10;
@@ -1030,7 +1190,7 @@
         for (let i = 0; i < currentGroups.length; i++) {
             const group = currentGroups[i];
             if (yPos > 180) { doc.addPage(); yPos = 20; }
-            doc.setFontSize(14); doc.setTextColor(16, 185, 129);
+            doc.setFontSize(14); doc.setTextColor(16,185,129);
             doc.text(`${group.name} (${group.memberCount} students)`, 14, yPos); yPos += 7;
             doc.setFontSize(9); doc.setTextColor(80,80,80);
             const s = group.stats;
@@ -1042,7 +1202,7 @@
                 body: tableData,
                 startY: yPos,
                 theme: 'striped',
-                headStyles: { fillColor: [16, 185, 129], textColor: [255,255,255], fontStyle: 'bold' },
+                headStyles: { fillColor: [16,185,129], textColor: [255,255,255], fontStyle: 'bold' },
                 styles: { fontSize: 7, cellPadding: 2 },
                 margin: { left: 14, right: 14 }
             });
@@ -1068,6 +1228,54 @@
         if (content) { content.classList.toggle('show'); if(icon) { icon.classList.toggle('fa-chevron-down'); icon.classList.toggle('fa-chevron-up'); } }
     };
     
+    window.openEditModal = function(student) {
+        document.getElementById('editStudentId').value = student.id;
+        document.getElementById('editName').value = student.name;
+        document.getElementById('editGender').value = student.gender;
+        document.getElementById('editPhone').value = student.phone;
+        document.getElementById('editTelegram').value = student.telegram || '';
+        document.getElementById('editDepartment').value = student.dept;
+        document.getElementById('editBatch').value = student.batch;
+        document.getElementById('editQirats').value = (student.qirats || []).join(', ');
+        document.getElementById('editModal').classList.add('active');
+    };
+    
+    window.closeEditModal = function() {
+        document.getElementById('editModal').classList.remove('active');
+    };
+    
+    document.getElementById('editForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('editStudentId').value;
+        const newName = document.getElementById('editName').value;
+        const newGender = document.getElementById('editGender').value;
+        const newPhone = document.getElementById('editPhone').value;
+        const newTelegram = document.getElementById('editTelegram').value;
+        const newDept = document.getElementById('editDepartment').value;
+        const newBatch = document.getElementById('editBatch').value;
+        const qiratsStr = document.getElementById('editQirats').value;
+        const qiratNames = qiratsStr.split(',').map(s => s.trim()).filter(s => s);
+        const newSchedules = qiratNames.map(q => ({ qirat_name: q }));
+        
+        try {
+            const studentRef = doc(db, "registrations", id);
+            await updateDoc(studentRef, {
+                full_name: newName,
+                gender: newGender,
+                phone: newPhone,
+                telegram: newTelegram,
+                department: newDept,
+                batch: newBatch,
+                schedules: newSchedules
+            });
+            showToast('Student updated successfully!');
+            closeEditModal();
+            await loadDataFromFirestore(true);
+        } catch (error) {
+            showToast('Update failed: ' + error.message, true);
+        }
+    });
+    
     searchInput.addEventListener('input', applyFilters);
     genderFilter.addEventListener('change', applyFilters);
     deptFilter.addEventListener('change', applyFilters);
@@ -1090,7 +1298,6 @@
     initNavigation();
     if (admin?.role === 'super-admin') setTimeout(() => refreshNavigation(), 100);
     
-    // Try cache first, then Firestore
     if (!loadFromCache()) {
         loadDataFromFirestore();
     } else {
