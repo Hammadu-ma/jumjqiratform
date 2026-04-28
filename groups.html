@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>JUMJ Irshad | Groups View - Complete Suite</title>
+    <title>JUMJ Irshad | Smart Groups - Refresh-Aware Cache</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -68,6 +68,29 @@
             align-items: center;
             gap: 10px;
         }
+
+        .refresh-badge {
+            background: #f1f5f9;
+            padding: 4px 12px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .manual-refresh {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 30px;
+            padding: 6px 16px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .manual-refresh:hover { background: var(--primary-light); border-color: var(--primary); }
 
         .main-container {
             max-width: 1400px;
@@ -421,6 +444,10 @@
 <div class="glass-header">
     <div class="header-content">
         <div class="logo"><h1><i class="fas fa-layer-group"></i> Groups View + Editor</h1></div>
+        <div style="display: flex; gap: 12px; align-items: center;">
+            <div class="refresh-badge" id="cacheStatus"><i class="fas fa-database"></i> Loading...</div>
+            <button class="manual-refresh" id="forceRefreshBtn"><i class="fas fa-sync-alt"></i> Refresh Cloud</button>
+        </div>
     </div>
 </div>
 
@@ -498,7 +525,30 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     
-    // ========== OFFLINE OPTIMIZATION: CACHING ==========
+    // ========== DETECT PAGE REFRESH ==========
+    let isPageRefresh = false;
+    
+    // Method 1: Check navigation type
+    if (performance.navigation && performance.navigation.type === 1) {
+        isPageRefresh = true;
+    }
+    
+    // Method 2: Using pageshow event for modern browsers
+    window.addEventListener('pageshow', (event) => {
+        if (event.persisted || performance.getEntriesByType('navigation')[0]?.type === 'reload') {
+            isPageRefresh = true;
+            console.log('Page refresh detected - will fetch fresh data');
+            // Force fresh load on refresh
+            sessionStorage.setItem('page_refreshed', 'true');
+        }
+    });
+    
+    // Check session storage for refresh flag
+    if (sessionStorage.getItem('page_refreshed') === 'true') {
+        isPageRefresh = true;
+        sessionStorage.removeItem('page_refreshed');
+    }
+    
     let allRegistrations = [];
     let filteredRegistrations = [];
     let currentGroupMode = 'qirat';
@@ -507,36 +557,14 @@
     let dataLoaded = false;
     let isLoading = false;
     
-    // Save to localStorage cache
-    function saveToCache() {
-        try {
-            const cacheData = {
-                registrations: allRegistrations,
-                allQirats: allUniqueQirats,
-                timestamp: new Date().toISOString(),
-                version: '1.0'
-            };
-            localStorage.setItem('groups_cache', JSON.stringify(cacheData));
-        } catch (e) { console.warn('Cache save failed:', e); }
-    }
-    
-    // Load from localStorage cache
-    function loadFromCache() {
-        try {
-            const cached = localStorage.getItem('groups_cache');
-            if (cached) {
-                const data = JSON.parse(cached);
-                if (data.registrations && data.registrations.length > 0) {
-                    allRegistrations = data.registrations;
-                    allUniqueQirats = data.allQirats || [];
-                    dataLoaded = true;
-                    console.log('Loaded from cache:', allRegistrations.length, 'students');
-                    return true;
-                }
-            }
-        } catch (e) { console.warn('Cache load failed:', e); }
-        return false;
-    }
+    // Sticky filter state
+    let stickyFilters = {
+        search: '',
+        gender: '',
+        department: '',
+        batch: '',
+        qirat: ''
+    };
     
     const searchInput = document.getElementById('searchInput');
     const genderFilter = document.getElementById('genderFilter');
@@ -550,6 +578,8 @@
     const exportAllWordBtn = document.getElementById('exportAllWordBtn');
     const exportAllPdfBtn = document.getElementById('exportAllPdfBtn');
     const toast = document.getElementById('toast');
+    const forceRefreshBtn = document.getElementById('forceRefreshBtn');
+    const cacheStatusSpan = document.getElementById('cacheStatus');
     
     function showToast(message, isError = false) {
         toast.textContent = message;
@@ -558,16 +588,50 @@
         setTimeout(() => { toast.style.display = 'none'; }, 3000);
     }
     
-    function escapeHtml(str) {
-        if (!str) return '';
-        return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m]));
+    function saveStickyFilters() {
+        const filtersToStore = {
+            search: searchInput.value,
+            gender: genderFilter.value,
+            department: deptFilter.value,
+            batch: batchFilter.value,
+            qirat: qiratFilter.value
+        };
+        localStorage.setItem('groups_sticky_filters', JSON.stringify(filtersToStore));
     }
     
-    function getQiratNames(student) {
-        return (student.schedules || []).map(s => s.qirat_name).filter(Boolean);
+    function loadStickyFilters() {
+        const saved = localStorage.getItem('groups_sticky_filters');
+        if (saved) {
+            try {
+                const filters = JSON.parse(saved);
+                stickyFilters = filters;
+                searchInput.value = filters.search || '';
+                genderFilter.value = filters.gender || '';
+                deptFilter.value = filters.department || '';
+                batchFilter.value = filters.batch || '';
+                qiratFilter.value = filters.qirat || '';
+            } catch(e) {}
+        }
     }
     
-    // Export format WITHOUT Registration Date
+    function saveGroupMode() {
+        localStorage.setItem('groups_mode_pref', currentGroupMode);
+    }
+    
+    function loadGroupMode() {
+        const saved = localStorage.getItem('groups_mode_pref');
+        if (saved && ['qirat', 'department', 'batch', 'gender'].includes(saved)) {
+            currentGroupMode = saved;
+            document.querySelectorAll('.group-mode-btn').forEach(btn => {
+                if (btn.dataset.mode === saved) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+        }
+    }
+    
+    function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
+    function getQiratNames(student) { return (student.schedules || []).map(s => s.qirat_name).filter(Boolean); }
+    
     function formatStudentForExport(student, index) {
         return {
             'No.': index,
@@ -593,15 +657,54 @@
         return { maleCount, femaleCount, uniqueDepts, multiQiratCount, recentWeek };
     }
     
+    function saveToCache() {
+        try {
+            const cacheData = {
+                registrations: allRegistrations,
+                allQirats: allUniqueQirats,
+                timestamp: new Date().toISOString(),
+                version: '2.0'
+            };
+            localStorage.setItem('groups_v2_cache', JSON.stringify(cacheData));
+            cacheStatusSpan.innerHTML = '<i class="fas fa-check-circle"></i> Cached';
+        } catch (e) { console.warn('Cache save failed:', e); }
+    }
+    
+    function loadFromCache() {
+        try {
+            const cached = localStorage.getItem('groups_v2_cache');
+            if (cached) {
+                const data = JSON.parse(cached);
+                if (data.registrations && data.registrations.length > 0) {
+                    allRegistrations = data.registrations;
+                    allUniqueQirats = data.allQirats || [];
+                    dataLoaded = true;
+                    cacheStatusSpan.innerHTML = '<i class="fas fa-database"></i> Cached (from previous session)';
+                    console.log('Loaded from cache:', allRegistrations.length);
+                    return true;
+                }
+            }
+        } catch (e) { console.warn('Cache load error:', e); }
+        return false;
+    }
+    
     async function loadDataFromFirestore(force = false) {
         if (isLoading) return;
+        
+        // On page refresh, ALWAYS fetch fresh data
+        if (isPageRefresh && !force) {
+            console.log('Page refresh detected - fetching fresh data from cloud');
+            force = true;
+            isPageRefresh = false; // Reset after handling
+        }
+        
         if (dataLoaded && !force) {
-            console.log('Using cached data, not loading from Firestore');
+            console.log('Using loaded data, skipping Firestore fetch');
             return;
         }
         
         isLoading = true;
-        showToast('Loading data...');
+        showToast(force ? 'Fetching fresh data from cloud...' : 'Loading data...');
         
         try {
             const querySnapshot = await getDocs(collection(db, "registrations"));
@@ -629,25 +732,30 @@
             allUniqueQirats = Array.from(qiratSet).sort();
             dataLoaded = true;
             saveToCache();
-            showToast(`Loaded ${allRegistrations.length} students`);
-            populateFilters();
-            applyFilters();
+            showToast(`✅ Loaded ${allRegistrations.length} students from cloud`);
+            cacheStatusSpan.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Fresh from Cloud';
+            setTimeout(() => {
+                cacheStatusSpan.innerHTML = '<i class="fas fa-check-circle"></i> Cached';
+            }, 2000);
+            return true;
         } catch (error) {
-            console.error("Error loading from Firestore:", error);
-            if (loadFromCache()) {
-                showToast('Using cached data (offline mode)', false);
-                populateFilters();
-                applyFilters();
-            } else {
+            console.error("Firestore error:", error);
+            if (!loadFromCache()) {
                 groupsContainer.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-triangle"></i> Error: ${error.message}</div>`;
+                showToast('Failed to load data', true);
+            } else {
+                showToast('Using cached data (offline mode)', false);
             }
+            return false;
         } finally {
             isLoading = false;
+            populateFilters();
+            applyFilters();
         }
     }
     
     async function refreshFromCloud() {
-        showToast('Refreshing from cloud...');
+        dataLoaded = false; // force fresh load
         await loadDataFromFirestore(true);
         showToast('Data refreshed from cloud');
     }
@@ -658,6 +766,13 @@
         deptFilter.innerHTML = '<option value="">All Departments</option>' + departments.map(d => `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join('');
         batchFilter.innerHTML = '<option value="">All Batches</option>' + batches.map(b => `<option value="${escapeHtml(b)}">${escapeHtml(b)}</option>`).join('');
         qiratFilter.innerHTML = '<option value="">All Qirats</option>' + allUniqueQirats.map(q => `<option value="${escapeHtml(q)}">${escapeHtml(q)}</option>`).join('');
+        
+        // Restore sticky filters
+        genderFilter.value = stickyFilters.gender || '';
+        deptFilter.value = stickyFilters.department || '';
+        batchFilter.value = stickyFilters.batch || '';
+        qiratFilter.value = stickyFilters.qirat || '';
+        searchInput.value = stickyFilters.search || '';
     }
     
     function applyFilters() {
@@ -666,6 +781,9 @@
         const department = deptFilter.value;
         const batch = batchFilter.value;
         const selectedQirat = qiratFilter.value;
+        
+        stickyFilters = { search, gender, department, batch, qirat: selectedQirat };
+        saveStickyFilters();
         
         filteredRegistrations = allRegistrations.filter(r => {
             const matchSearch = r.full_name.toLowerCase().includes(search) || 
@@ -715,6 +833,18 @@
             .sort((a, b) => b.memberCount - a.memberCount);
         renderGroups();
     }
+    
+    function getGroupIcon() {
+        const icons = { qirat: 'fa-book-quran', department: 'fa-building', batch: 'fa-graduation-cap', gender: 'fa-venus-mars' };
+        return icons[currentGroupMode] || 'fa-folder';
+    }
+    
+    window.toggleGroup = function(idx) {
+        const content = document.getElementById(`groupContent-${idx}`);
+        const card = document.querySelector(`.group-card[data-group-idx="${idx}"]`);
+        const icon = card?.querySelector('.toggle-icon');
+        if (content) { content.classList.toggle('show'); if(icon) { icon.classList.toggle('fa-chevron-down'); icon.classList.toggle('fa-chevron-up'); } }
+    };
     
     function renderGroups() {
         if (currentGroups.length === 0) {
@@ -788,11 +918,6 @@
         });
     }
     
-    function getGroupIcon() {
-        const icons = { qirat: 'fa-book-quran', department: 'fa-building', batch: 'fa-graduation-cap', gender: 'fa-venus-mars' };
-        return icons[currentGroupMode] || 'fa-folder';
-    }
-    
     window.openEditModal = function(student) {
         document.getElementById('editStudentId').value = student.id;
         document.getElementById('editName').value = student.name;
@@ -841,14 +966,13 @@
         }
     });
     
-    // ========== BEAUTIFUL EXPORT FUNCTIONS (WITHOUT REGISTRATION DATE) ==========
+    // Export functions (same as before)
     function exportSingleGroup(group, format) {
         if (!group || group.members.length === 0) { showToast('No students', true); return; }
         const exportData = group.members.map((m, idx) => formatStudentForExport(m, idx + 1));
         const groupName = group.name.replace(/[^a-z0-9]/gi, '_').slice(0, 30);
-        const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
         
-        if (format === 'csv') exportToCSV(exportData, `${groupName}_${timestamp}`);
+        if (format === 'csv') exportToCSV(exportData, groupName);
         else if (format === 'excel') exportToExcel(exportData, groupName);
         else if (format === 'pdf') exportToPDF(exportData, group.name, group.members.length, group.stats);
         else if (format === 'word') exportToWord(exportData, group.name, group.members.length, group.stats);
@@ -873,106 +997,43 @@
     async function exportToPDF(data, groupName, totalCount, stats) {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-        
         doc.setFontSize(18);
         doc.setTextColor(16, 185, 129);
         doc.text(`JUMJ Irshad - Group Report`, 14, 20);
-        
         doc.setFontSize(14);
         doc.setTextColor(0, 0, 0);
         doc.text(`Group: ${groupName}`, 14, 32);
-        
         doc.setFontSize(9);
         doc.setTextColor(100, 100, 100);
         doc.text(`Generated: ${new Date().toLocaleString()} | Total Students: ${totalCount}`, 14, 40);
-        
-        doc.setFontSize(10);
-        doc.setTextColor(0, 0, 0);
-        doc.text(`Summary KPIs:`, 14, 52);
-        doc.setFontSize(9);
-        doc.text(`• Gender Split: Male ${stats.maleCount} | Female ${stats.femaleCount}`, 14, 60);
-        doc.text(`• Departments Represented: ${stats.uniqueDepts}`, 14, 67);
-        doc.text(`• Multi-Qirat Students: ${stats.multiQiratCount}`, 14, 74);
-        doc.text(`• New Students (30 days): ${stats.recentWeek}`, 14, 81);
-        
         const tableData = data.map(row => [row['No.'], row.Name, row.Gender, row.Phone, row.Department, row.Batch, row['Qirats Enrolled']]);
-        
         doc.autoTable({
             head: [['No.', 'Name', 'Gender', 'Phone', 'Department', 'Batch', 'Qirats']],
             body: tableData,
-            startY: 90,
+            startY: 50,
             theme: 'striped',
             headStyles: { fillColor: [16, 185, 129], textColor: [255, 255, 255], fontStyle: 'bold' },
             styles: { fontSize: 8, cellPadding: 3 }
         });
-        
         doc.save(`${groupName.replace(/[^a-z0-9]/gi, '_')}_report.pdf`);
     }
     
     function exportToWord(data, groupName, totalCount, stats) {
-        let html = `<!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <title>${groupName} - Group Report</title>
-            <style>
-                body { font-family: 'Arial', sans-serif; margin: 40px; }
-                h1 { color: #10b981; border-bottom: 2px solid #10b981; padding-bottom: 10px; }
-                .subtitle { color: #059669; margin: 10px 0; }
-                .kpi-box { background: #f0fdf4; padding: 15px; border-radius: 12px; margin: 20px 0; }
-                .kpi-box h3 { color: #059669; margin-bottom: 10px; }
-                table { border-collapse: collapse; width: 100%; margin-top: 20px; }
-                th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-                th { background: #10b981; color: white; }
-                tr:nth-child(even) { background: #f9fafb; }
-            </style>
-        </head>
-        <body>
-            <h1>📊 JUMJ Irshad - Group Report</h1>
-            <div class="subtitle">Group: ${escapeHtml(groupName)}</div>
-            <p>Generated: ${new Date().toLocaleString()} | Total Students: ${totalCount}</p>
-            
-            <div class="kpi-box">
-                <h3>Summary KPIs</h3>
-                <p><strong>Gender Split:</strong> Male ${stats.maleCount} | Female ${stats.femaleCount}</p>
-                <p><strong>Departments:</strong> ${stats.uniqueDepts} departments represented</p>
-                <p><strong>Multi-Qirat Students:</strong> ${stats.multiQiratCount}</p>
-                <p><strong>New Students (30 days):</strong> ${stats.recentWeek}</p>
-            </div>
-            
-            <h3>Student List</h3>
-            <table>
-                <thead>
-                    <tr><th>No.</th><th>Name</th><th>Gender</th><th>Phone</th><th>Department</th><th>Batch</th><th>Qirats</th></tr>
-                </thead>
-                <tbody>
-                    ${data.map(row => `
-                        <tr>
-                            <td>${escapeHtml(String(row['No.']))}</td>
-                            <td>${escapeHtml(row.Name)}</td>
-                            <td>${escapeHtml(row.Gender)}</td>
-                            <td>${escapeHtml(row.Phone)}</td>
-                            <td>${escapeHtml(row.Department)}</td>
-                            <td>${escapeHtml(row.Batch)}</td>
-                            <td>${escapeHtml(row['Qirats Enrolled'])}</td>
-                        </tr>
-                    `).join('')}
-                </tbody>
-            </table>
-        </body>
-        </html>`;
-        
+        let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${groupName} - Report</title>
+        <style>body{font-family:Arial;margin:40px}h1{color:#10b981}table{border-collapse:collapse;width:100%}th,td{border:1px solid #ddd;padding:10px}th{background:#10b981;color:white}</style>
+        </head><body><h1>JUMJ Irshad - ${groupName}</h1><p>Generated: ${new Date().toLocaleString()} | Students: ${totalCount}</p>
+        <table><thead><tr><th>No.</th><th>Name</th><th>Gender</th><th>Phone</th><th>Department</th><th>Batch</th><th>Qirats</th></tr></thead><tbody>
+        ${data.map(row => `<tr><td>${row['No.']}</td><td>${row.Name}</td><td>${row.Gender}</td><td>${row.Phone}</td><td>${row.Department}</td><td>${row.Batch}</td><td>${row['Qirats Enrolled']}</td></tr>`).join('')}
+        </tbody></table></body></html>`;
         downloadBlob(new Blob([html], { type: 'application/msword' }), `${groupName.replace(/[^a-z0-9]/gi, '_')}_report.doc`);
     }
     
-    // ========== MASTER EXPORTS (WITH NUMBER COLUMN, NO REGISTRATION DATE) ==========
     function exportAllGroupsToExcel() {
         if (currentGroups.length === 0) { showToast('No groups to export', true); return; }
         const wb = XLSX.utils.book_new();
         currentGroups.forEach(group => {
             const sheetData = group.members.map((m, idx) => formatStudentForExport(m, idx + 1));
             const ws = XLSX.utils.json_to_sheet(sheetData);
-            ws['!cols'] = [{wch:6},{wch:25},{wch:10},{wch:15},{wch:18},{wch:20},{wch:15},{wch:35}];
             let sheetName = group.name.replace(/[\\/*?:[\]]/g, '').slice(0, 31);
             XLSX.utils.book_append_sheet(wb, ws, sheetName);
         });
@@ -982,38 +1043,18 @@
     
     function exportAllGroupsToWord() {
         if (currentGroups.length === 0) { showToast('No groups', true); return; }
-        let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>JUMJ_All_Groups</title>
-        <style>
-            body { font-family: 'Segoe UI', Arial, sans-serif; margin: 40px; }
-            h1 { color: #10b981; border-bottom: 3px solid #10b981; padding-bottom: 10px; }
-            h2 { background: #f1f5f9; padding: 12px 16px; border-radius: 16px; margin-top: 30px; color: #0f172a; border-left: 5px solid #10b981; }
-            .group-summary { background: #f0fdf4; padding: 12px 20px; border-radius: 20px; margin: 10px 0 20px 0; display: flex; gap: 20px; flex-wrap: wrap; }
-            .kpi-badge { background: white; padding: 6px 14px; border-radius: 40px; font-size: 0.8rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-            table { width: 100%; border-collapse: collapse; margin: 15px 0; }
-            th, td { border: 1px solid #cbd5e1; padding: 8px 10px; text-align: left; font-size: 0.75rem; }
-            th { background: #10b981; color: white; }
-            .footer { margin-top: 40px; text-align: center; font-size: 0.7rem; color: #64748b; }
-        </style></head><body>
-        <h1>📊 JUMJ Irshad - Complete Groups Report</h1>
-        <p><strong>Grouping Mode:</strong> ${currentGroupMode.toUpperCase()} | <strong>Generated:</strong> ${new Date().toLocaleString()} | <strong>Total Groups:</strong> ${currentGroups.length}</p>`;
-        
+        let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>All Groups</title>
+        <style>body{font-family:Arial;margin:40px}h1{color:#10b981}h2{background:#f1f5f9;padding:10px}table{border-collapse:collapse;width:100%}th,td{border:1px solid #ddd;padding:8px}th{background:#10b981;color:white}</style>
+        </head><body><h1>JUMJ Irshad - All Groups</h1><p>Mode: ${currentGroupMode} | Generated: ${new Date().toLocaleString()}</p>`;
         currentGroups.forEach(group => {
-            const s = group.stats;
-            html += `<h2>📁 ${escapeHtml(group.name)} <span style="font-size:0.8rem;">(${group.memberCount} students)</span></h2>
-            <div class="group-summary">
-                <span class="kpi-badge">👥 Male: ${s.maleCount} | Female: ${s.femaleCount}</span>
-                <span class="kpi-badge">🏢 Departments: ${s.uniqueDepts}</span>
-                <span class="kpi-badge">🔄 Multi-Qirat: ${s.multiQiratCount}</span>
-                <span class="kpi-badge">🆕 New (30d): ${s.recentWeek}</span>
-            </div>
-            <table><thead><tr><th>No.</th><th>Name</th><th>Gender</th><th>Phone</th><th>Dept</th><th>Batch</th><th>Qirats</th></tr></thead><tbody>`;
+            html += `<h2>${group.name} (${group.memberCount} students)</h2><table><thead><tr><th>No.</th><th>Name</th><th>Gender</th><th>Phone</th><th>Dept</th><th>Batch</th><th>Qirats</th></tr></thead><tbody>`;
             group.members.forEach((m, idx) => {
-                html += `<tr><td>${idx + 1}</td><td>${escapeHtml(m.full_name)}</td><td>${escapeHtml(m.gender)}</td><td>${escapeHtml(m.phone)}</td><td>${escapeHtml(m.department)}</td><td>${escapeHtml(m.batch)}</td><td>${escapeHtml(getQiratNames(m).join(', ') || '-')}</td></tr>`;
+                html += `<tr><td>${idx+1}</td><td>${m.full_name}</td><td>${m.gender}</td><td>${m.phone}</td><td>${m.department}</td><td>${m.batch}</td><td>${getQiratNames(m).join(', ')}</td></tr>`;
             });
             html += `</tbody></table><br>`;
         });
-        html += `<div class="footer">© JUMJ Irshad • Exported on ${new Date().toLocaleString()}</div></body></html>`;
-        downloadBlob(new Blob([html], { type: 'application/msword' }), `JUMJ_AllGroups_${currentGroupMode}_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.doc`);
+        html += `</body></html>`;
+        downloadBlob(new Blob([html], { type: 'application/msword' }), `All_Groups_${currentGroupMode}.doc`);
         showToast(`Exported all ${currentGroups.length} groups to Word`);
     }
     
@@ -1022,34 +1063,28 @@
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
         let yPos = 20;
-        doc.setFontSize(20); doc.setTextColor(16, 185, 129);
-        doc.text(`JUMJ Irshad - Complete Groups Export`, 14, yPos); yPos += 10;
-        doc.setFontSize(11); doc.setTextColor(0,0,0);
-        doc.text(`Group Mode: ${currentGroupMode.toUpperCase()} | Generated: ${new Date().toLocaleString()} | Total Groups: ${currentGroups.length}`, 14, yPos); yPos += 10;
+        doc.setFontSize(18); doc.setTextColor(16, 185, 129);
+        doc.text(`JUMJ Irshad - All Groups`, 14, yPos); yPos += 10;
+        doc.setFontSize(10); doc.setTextColor(0,0,0);
+        doc.text(`Mode: ${currentGroupMode} | Generated: ${new Date().toLocaleString()}`, 14, yPos); yPos += 10;
         
         for (let i = 0; i < currentGroups.length; i++) {
             const group = currentGroups[i];
             if (yPos > 180) { doc.addPage(); yPos = 20; }
-            doc.setFontSize(14); doc.setTextColor(16, 185, 129);
+            doc.setFontSize(12); doc.setTextColor(16, 185, 129);
             doc.text(`${group.name} (${group.memberCount} students)`, 14, yPos); yPos += 7;
-            doc.setFontSize(9); doc.setTextColor(80,80,80);
-            const s = group.stats;
-            doc.text(`Stats: Male ${s.maleCount} | Female ${s.femaleCount} | Depts ${s.uniqueDepts} | Multi-Qirat ${s.multiQiratCount} | New30d ${s.recentWeek}`, 14, yPos); yPos += 7;
-            
-            const tableData = group.members.map((m, idx) => [idx + 1, m.full_name, m.gender, m.phone, m.department, m.batch, getQiratNames(m).join(', ').substring(0, 25)]);
+            const tableData = group.members.map((m, idx) => [idx+1, m.full_name, m.gender, m.phone, m.department, m.batch, getQiratNames(m).join(', ').substring(0, 25)]);
             const result = doc.autoTable({
                 head: [['No.', 'Name', 'Gender', 'Phone', 'Dept', 'Batch', 'Qirats']],
                 body: tableData,
                 startY: yPos,
                 theme: 'striped',
-                headStyles: { fillColor: [16, 185, 129], textColor: [255,255,255], fontStyle: 'bold' },
-                styles: { fontSize: 7, cellPadding: 2 },
-                margin: { left: 14, right: 14 }
+                headStyles: { fillColor: [16, 185, 129] },
+                styles: { fontSize: 7, cellPadding: 2 }
             });
-            yPos = result.finalY + 10;
-            if (i !== currentGroups.length - 1 && yPos > 190) { doc.addPage(); yPos = 20; }
+            yPos = result.finalY + 8;
         }
-        doc.save(`JUMJ_AllGroups_${currentGroupMode}_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.pdf`);
+        doc.save(`All_Groups_${currentGroupMode}.pdf`);
         showToast(`Exported all ${currentGroups.length} groups to PDF`);
     }
     
@@ -1061,28 +1096,27 @@
         URL.revokeObjectURL(link.href);
     }
     
-    window.toggleGroup = function(idx) {
-        const content = document.getElementById(`groupContent-${idx}`);
-        const card = document.querySelector(`.group-card[data-group-idx="${idx}"]`);
-        const icon = card?.querySelector('.toggle-icon');
-        if (content) { content.classList.toggle('show'); if(icon) { icon.classList.toggle('fa-chevron-down'); icon.classList.toggle('fa-chevron-up'); } }
-    };
-    
     searchInput.addEventListener('input', applyFilters);
     genderFilter.addEventListener('change', applyFilters);
     deptFilter.addEventListener('change', applyFilters);
     batchFilter.addEventListener('change', applyFilters);
     qiratFilter.addEventListener('change', applyFilters);
-    clearFiltersBtn.addEventListener('click', () => { searchInput.value = ''; genderFilter.value = ''; deptFilter.value = ''; batchFilter.value = ''; qiratFilter.value = ''; applyFilters(); showToast('Filters cleared'); });
+    clearFiltersBtn.addEventListener('click', () => { 
+        searchInput.value = ''; genderFilter.value = ''; deptFilter.value = ''; batchFilter.value = ''; qiratFilter.value = '';
+        applyFilters(); 
+        showToast('Filters cleared');
+    });
     exportAllExcelBtn.addEventListener('click', exportAllGroupsToExcel);
     exportAllWordBtn.addEventListener('click', exportAllGroupsToWord);
     exportAllPdfBtn.addEventListener('click', exportAllGroupsToPdf);
+    forceRefreshBtn.addEventListener('click', refreshFromCloud);
     
     document.querySelectorAll('.group-mode-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.group-mode-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             currentGroupMode = btn.dataset.mode;
+            saveGroupMode();
             buildGroups();
         });
     });
@@ -1090,13 +1124,18 @@
     initNavigation();
     if (admin?.role === 'super-admin') setTimeout(() => refreshNavigation(), 100);
     
-    // Try cache first, then Firestore
-    if (!loadFromCache()) {
-        loadDataFromFirestore();
-    } else {
+    // Initialize: load sticky filters, group mode, then load data
+    loadStickyFilters();
+    loadGroupMode();
+    
+    // Try cache first, but on refresh we'll fetch fresh
+    if (!isPageRefresh && loadFromCache()) {
         populateFilters();
         applyFilters();
-        setTimeout(() => loadDataFromFirestore(), 100);
+        // silently update in background
+        setTimeout(() => loadDataFromFirestore(false), 500);
+    } else {
+        loadDataFromFirestore(true);
     }
 </script>
 </body>
