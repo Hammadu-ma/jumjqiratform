@@ -30,7 +30,6 @@
             min-height: 100vh;
         }
 
-        /* Header */
         .header {
             background: white;
             border-bottom: 1px solid var(--border);
@@ -70,7 +69,6 @@
 
         .container { max-width: 1400px; margin: 0 auto; padding: 24px; }
 
-        /* Stats */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -99,7 +97,6 @@
             margin-top: 4px;
         }
 
-        /* Filters */
         .filters-bar {
             background: white;
             border-radius: 20px;
@@ -134,7 +131,6 @@
             font-size: 0.85rem;
         }
 
-        /* Buttons */
         .btn {
             padding: 8px 16px;
             border-radius: 12px;
@@ -151,7 +147,6 @@
         .btn-secondary { background: var(--gray); color: white; }
         .btn-outline { background: white; border: 1px solid var(--border); }
 
-        /* Batch Bar */
         .batch-bar {
             background: var(--dark);
             border-radius: 16px;
@@ -178,7 +173,6 @@
             font-size: 0.8rem;
         }
 
-        /* Table */
         .table-container {
             background: white;
             border-radius: 20px;
@@ -222,7 +216,6 @@
         .badge-qirat { background: var(--primary-light); color: var(--primary-dark); cursor: pointer; }
         .badge-no-qirat { background: var(--danger-light); color: var(--danger); }
 
-        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -243,7 +236,7 @@
             background: white;
             border-radius: 24px;
             padding: 24px;
-            max-width: 500px;
+            max-width: 550px;
             width: 90%;
             max-height: 85vh;
             overflow-y: auto;
@@ -276,6 +269,24 @@
             border-radius: 12px;
         }
 
+        .qirat-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .qirat-selector select {
+            flex: 1;
+        }
+
+        .qirat-list {
+            background: #f8fafc;
+            padding: 10px;
+            border-radius: 12px;
+            min-height: 60px;
+            margin-top: 8px;
+        }
+
         .qirat-tag {
             background: var(--primary-light);
             padding: 4px 10px;
@@ -284,6 +295,13 @@
             align-items: center;
             gap: 6px;
             margin: 4px;
+            font-size: 0.75rem;
+        }
+
+        .remove-qirat {
+            cursor: pointer;
+            color: var(--danger);
+            font-weight: bold;
         }
 
         .toast {
@@ -321,17 +339,14 @@
 </div>
 
 <div class="container">
-    <!-- Stats -->
     <div class="stats-grid" id="statsGrid"></div>
 
-    <!-- Actions -->
     <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px;">
         <button class="btn btn-primary" id="addBtn"><i class="fas fa-plus"></i> Add Student</button>
         <button class="btn btn-outline" id="bulkEditQiratBtn"><i class="fas fa-edit"></i> Bulk Edit Qirats</button>
         <button class="btn btn-outline" id="exportBtn"><i class="fas fa-download"></i> Export CSV</button>
     </div>
 
-    <!-- Filters -->
     <div class="filters-bar">
         <div class="filter-group"><label>🔍 Search</label><input type="text" id="searchInput" placeholder="Name or Phone"></div>
         <div class="filter-group"><label>⚥ Gender</label><select id="genderFilter"><option value="">All</option><option value="Male">Male</option><option value="Female">Female</option></select></div>
@@ -340,7 +355,6 @@
         <button class="btn btn-secondary" id="clearFiltersBtn">Clear</button>
     </div>
 
-    <!-- Quick Views -->
     <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
         <button class="btn btn-outline view-btn active" data-view="all">📊 All</button>
         <button class="btn btn-outline view-btn" data-view="no-qirat">🚫 No Qirat</button>
@@ -348,7 +362,6 @@
         <button class="btn btn-outline view-btn" data-view="multi-qirat">🔄 Multi Qirat</button>
     </div>
 
-    <!-- Batch Actions -->
     <div class="batch-bar">
         <div class="batch-left">
             <label style="display: flex; align-items: center; gap: 8px;">
@@ -362,7 +375,6 @@
         </div>
     </div>
 
-    <!-- Table -->
     <div class="table-container">
         <table class="student-table">
             <thead>
@@ -383,7 +395,7 @@
     </div>
 </div>
 
-<!-- Add/Edit Modal -->
+<!-- Student Modal -->
 <div id="studentModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
@@ -409,7 +421,7 @@
     </div>
 </div>
 
-<!-- Bulk Edit Qirats Modal -->
+<!-- Bulk Edit Modal -->
 <div id="bulkEditModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
@@ -452,8 +464,8 @@
     let currentView = 'all';
     let currentEditId = null;
     let pendingConfirm = null;
+    let currentQiratsList = [];
     
-    // Helper functions
     function showToast(msg, isErr = false) {
         const toast = document.getElementById('toast');
         toast.textContent = msg;
@@ -471,6 +483,14 @@
         return (student.schedules || []).map(s => s.qirat_name).filter(Boolean);
     }
     
+    function getAllExistingQirats() {
+        const qirats = new Set();
+        allStudents.forEach(s => {
+            getQirats(s).forEach(q => qirats.add(q));
+        });
+        return Array.from(qirats).sort();
+    }
+    
     function getCategory(student) {
         const q = getQirats(student);
         if (q.length === 0) return 'no-qirat';
@@ -478,7 +498,6 @@
         return 'multi-qirat';
     }
     
-    // Load data
     async function loadData() {
         try {
             const snapshot = await getDocs(collection(db, "registrations"));
@@ -550,6 +569,341 @@
         updateSelectedCount();
     }
     
+    function renderQiratList(qirats, onRemove) {
+        if (!qirats.length) return '<div style="color: var(--gray); font-size: 0.8rem;">No Qirats added yet</div>';
+        return qirats.map(q => `
+            <span class="qirat-tag">
+                ${escapeHtml(q)}
+                <span class="remove-qirat" onclick="(${onRemove})('${escapeHtml(q)}')">✖</span>
+            </span>
+        `).join('');
+    }
+    
+    function renderAddQiratSelector(existingQirats, onAdd) {
+        const allQirats = getAllExistingQirats();
+        const availableQirats = allQirats.filter(q => !existingQirats.includes(q));
+        
+        if (availableQirats.length === 0 && allQirats.length > 0) {
+            return '<div style="font-size: 0.75rem; color: var(--gray);">All existing Qirats already added. Create new one below.</div>';
+        }
+        
+        return `
+            <div class="qirat-selector">
+                <select id="existingQiratSelect">
+                    <option value="">-- Select from existing --</option>
+                    ${availableQirats.map(q => `<option value="${escapeHtml(q)}">${escapeHtml(q)}</option>`).join('')}
+                </select>
+                <button class="btn btn-outline" onclick="(${onAdd})()">+ Add</button>
+            </div>
+        `;
+    }
+    
+    function renderNewQiratInput(onAddNew) {
+        return `
+            <div style="display: flex; gap: 8px; margin-top: 8px;">
+                <input type="text" id="newQiratName" placeholder="Or create new Qirat..." style="flex: 1;">
+                <button class="btn btn-primary" onclick="(${onAddNew})()">Create</button>
+            </div>
+        `;
+    }
+    
+    function openAddModal() {
+        currentEditId = null;
+        currentQiratsList = [];
+        
+        document.getElementById('modalTitle').textContent = 'Add Student';
+        document.getElementById('modalBody').innerHTML = `
+            <div class="form-group">
+                <label>Full Name *</label>
+                <input type="text" id="studentName" placeholder="Enter name">
+            </div>
+            <div class="form-group">
+                <label>Gender</label>
+                <select id="studentGender">
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Phone</label>
+                <input type="text" id="studentPhone" placeholder="Phone number">
+            </div>
+            <div class="form-group">
+                <label>Department</label>
+                <input type="text" id="studentDept" placeholder="Department">
+            </div>
+            <div class="form-group">
+                <label>Batch</label>
+                <input type="text" id="studentBatch" placeholder="e.g., 1st Year">
+            </div>
+            <div class="form-group">
+                <label>Qirats</label>
+                <div id="qiratListContainer" class="qirat-list"></div>
+                <div id="addQiratSection"></div>
+            </div>
+            <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px;">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" id="saveStudentBtn">Save</button>
+            </div>
+        `;
+        
+        refreshAddQiratUI();
+        document.getElementById('saveStudentBtn').onclick = saveStudent;
+        document.getElementById('studentModal').classList.add('active');
+    }
+    
+    function refreshAddQiratUI() {
+        const container = document.getElementById('qiratListContainer');
+        const addSection = document.getElementById('addQiratSection');
+        
+        container.innerHTML = renderQiratList(currentQiratsList, (q) => `removeQiratFromAdd('${q}')`);
+        
+        addSection.innerHTML = `
+            ${renderAddQiratSelector(currentQiratsList, () => 'addExistingQiratToAdd()')}
+            ${renderNewQiratInput(() => 'addNewQiratToAdd()')}
+        `;
+    }
+    
+    window.addExistingQiratToAdd = () => {
+        const select = document.getElementById('existingQiratSelect');
+        const qirat = select?.value;
+        if (!qirat) { showToast("Select a Qirat", true); return; }
+        if (currentQiratsList.includes(qirat)) { showToast("Qirat already added", true); return; }
+        currentQiratsList.push(qirat);
+        refreshAddQiratUI();
+    };
+    
+    window.addNewQiratToAdd = () => {
+        const input = document.getElementById('newQiratName');
+        const qirat = input?.value.trim();
+        if (!qirat) { showToast("Enter Qirat name", true); return; }
+        if (currentQiratsList.includes(qirat)) { showToast("Qirat already added", true); return; }
+        currentQiratsList.push(qirat);
+        input.value = '';
+        refreshAddQiratUI();
+    };
+    
+    window.removeQiratFromAdd = (qirat) => {
+        currentQiratsList = currentQiratsList.filter(q => q !== qirat);
+        refreshAddQiratUI();
+    };
+    
+    async function saveStudent() {
+        const name = document.getElementById('studentName').value.trim();
+        if (!name) { showToast("Name required", true); return; }
+        
+        const schedules = currentQiratsList.map(q => ({ qirat_name: q, enrolled_date: new Date().toISOString() }));
+        
+        const studentData = {
+            full_name: name,
+            gender: document.getElementById('studentGender').value,
+            phone: document.getElementById('studentPhone').value,
+            department: document.getElementById('studentDept').value || 'Other',
+            batch: document.getElementById('studentBatch').value || 'General',
+            schedules: schedules,
+            timestamp: serverTimestamp()
+        };
+        
+        if (currentEditId) {
+            await updateDoc(doc(db, "registrations", currentEditId), studentData);
+            showToast("Student updated");
+        } else {
+            await addDoc(collection(db, "registrations"), studentData);
+            showToast("Student added");
+        }
+        closeModal();
+        loadData();
+    }
+    
+    window.openEditStudent = async (id) => {
+        const student = allStudents.find(s => s.id === id);
+        if (!student) return;
+        currentEditId = id;
+        currentQiratsList = [...getQirats(student)];
+        
+        document.getElementById('modalTitle').textContent = 'Edit Student';
+        document.getElementById('modalBody').innerHTML = `
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="studentName" value="${escapeHtml(student.full_name)}">
+            </div>
+            <div class="form-group">
+                <label>Gender</label>
+                <select id="studentGender">
+                    <option value="Male" ${student.gender === 'Male' ? 'selected' : ''}>Male</option>
+                    <option value="Female" ${student.gender === 'Female' ? 'selected' : ''}>Female</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Phone</label>
+                <input type="text" id="studentPhone" value="${escapeHtml(student.phone)}">
+            </div>
+            <div class="form-group">
+                <label>Department</label>
+                <input type="text" id="studentDept" value="${escapeHtml(student.department)}">
+            </div>
+            <div class="form-group">
+                <label>Batch</label>
+                <input type="text" id="studentBatch" value="${escapeHtml(student.batch)}">
+            </div>
+            <div class="form-group">
+                <label>Qirats</label>
+                <div id="qiratListContainer" class="qirat-list"></div>
+                <div id="addQiratSection"></div>
+            </div>
+            <div style="display: flex; gap: 12px; margin-top: 20px;">
+                <button class="btn btn-warning" id="deleteQiratsOnlyBtn">Delete All Qirats Only</button>
+                <button class="btn btn-primary" id="saveStudentBtn">Save</button>
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+            </div>
+        `;
+        
+        refreshEditQiratUI();
+        document.getElementById('saveStudentBtn').onclick = saveStudent;
+        document.getElementById('deleteQiratsOnlyBtn').onclick = async () => {
+            await updateDoc(doc(db, "registrations", id), { schedules: [] });
+            showToast("All Qirats removed from student");
+            closeModal();
+            loadData();
+        };
+        document.getElementById('studentModal').classList.add('active');
+    };
+    
+    function refreshEditQiratUI() {
+        const container = document.getElementById('qiratListContainer');
+        const addSection = document.getElementById('addQiratSection');
+        
+        container.innerHTML = renderQiratList(currentQiratsList, (q) => `removeQiratFromEdit('${q}')`);
+        
+        addSection.innerHTML = `
+            ${renderAddQiratSelector(currentQiratsList, () => 'addExistingQiratToEdit()')}
+            ${renderNewQiratInput(() => 'addNewQiratToEdit()')}
+        `;
+    }
+    
+    window.addExistingQiratToEdit = () => {
+        const select = document.getElementById('existingQiratSelect');
+        const qirat = select?.value;
+        if (!qirat) { showToast("Select a Qirat", true); return; }
+        if (currentQiratsList.includes(qirat)) { showToast("Qirat already added", true); return; }
+        currentQiratsList.push(qirat);
+        refreshEditQiratUI();
+    };
+    
+    window.addNewQiratToEdit = () => {
+        const input = document.getElementById('newQiratName');
+        const qirat = input?.value.trim();
+        if (!qirat) { showToast("Enter Qirat name", true); return; }
+        if (currentQiratsList.includes(qirat)) { showToast("Qirat already added", true); return; }
+        currentQiratsList.push(qirat);
+        input.value = '';
+        refreshEditQiratUI();
+    };
+    
+    window.removeQiratFromEdit = (qirat) => {
+        currentQiratsList = currentQiratsList.filter(q => q !== qirat);
+        refreshEditQiratUI();
+    };
+    
+    window.deleteStudent = (id, name) => {
+        document.getElementById('confirmTitle').textContent = 'Delete Student';
+        document.getElementById('confirmMessage').innerHTML = `Delete <strong>${name}</strong> permanently?`;
+        pendingConfirm = async () => {
+            await deleteDoc(doc(db, "registrations", id));
+            selectedIds.delete(id);
+            showToast(`Deleted ${name}`);
+            loadData();
+            closeConfirmModal();
+        };
+        document.getElementById('confirmModal').classList.add('active');
+    };
+    
+    async function deleteSelected() {
+        if (selectedIds.size === 0) { showToast("No students selected", true); return; }
+        document.getElementById('confirmTitle').textContent = 'Delete Selected';
+        document.getElementById('confirmMessage').innerHTML = `Delete <strong>${selectedIds.size}</strong> selected students permanently?`;
+        pendingConfirm = async () => {
+            for (const id of selectedIds) {
+                await deleteDoc(doc(db, "registrations", id));
+            }
+            showToast(`Deleted ${selectedIds.size} students`);
+            selectedIds.clear();
+            loadData();
+            closeConfirmModal();
+        };
+        document.getElementById('confirmModal').classList.add('active');
+    }
+    
+    async function removeQiratsFromSelected() {
+        if (selectedIds.size === 0) { showToast("No students selected", true); return; }
+        document.getElementById('confirmTitle').textContent = 'Remove Qirats';
+        document.getElementById('confirmMessage').innerHTML = `Remove ALL Qirats from <strong>${selectedIds.size}</strong> selected students? Students will remain.`;
+        pendingConfirm = async () => {
+            for (const id of selectedIds) {
+                await updateDoc(doc(db, "registrations", id), { schedules: [] });
+            }
+            showToast(`Removed Qirats from ${selectedIds.size} students`);
+            loadData();
+            closeConfirmModal();
+        };
+        document.getElementById('confirmModal').classList.add('active');
+    }
+    
+    window.editQiratGlobal = (oldName) => {
+        const newName = prompt(`Rename "${oldName}" to:`, oldName);
+        if (!newName || newName === oldName) return;
+        let count = 0;
+        const updates = [];
+        for (const student of allStudents) {
+            const hasQirat = getQirats(student).includes(oldName);
+            if (hasQirat) {
+                const newSchedules = (student.schedules || []).map(s => 
+                    s.qirat_name === oldName ? { ...s, qirat_name: newName } : s
+                );
+                updates.push(updateDoc(doc(db, "registrations", student.id), { schedules: newSchedules }));
+                count++;
+            }
+        }
+        Promise.all(updates).then(() => {
+            showToast(`Renamed "${oldName}" → "${newName}" for ${count} students`);
+            loadData();
+        }).catch(err => showToast(err.message, true));
+    };
+    
+    function showBulkEditModal() {
+        const allQirats = getAllExistingQirats();
+        if (allQirats.length === 0) { showToast("No Qirats found", true); return; }
+        
+        document.getElementById('bulkEditList').innerHTML = allQirats.map(q => {
+            const count = allStudents.filter(s => getQirats(s).includes(q)).length;
+            return `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid var(--border);">
+                    <span><strong>${escapeHtml(q)}</strong> (${count} students)</span>
+                    <button class="btn btn-primary" onclick="editQiratGlobal('${escapeHtml(q)}')">✏️ Rename</button>
+                </div>
+            `;
+        }).join('');
+        document.getElementById('bulkEditModal').classList.add('active');
+    }
+    
+    function exportToCSV() {
+        const data = filteredStudents.map(s => ({
+            Name: s.full_name,
+            Gender: s.gender,
+            Phone: s.phone,
+            Department: s.department,
+            Batch: s.batch,
+            Qirats: getQirats(s).join(', ')
+        }));
+        if (data.length === 0) { showToast("No data to export", true); return; }
+        
+        const ws = XLSX.utils.json_to_sheet(data);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Students');
+        XLSX.writeFile(wb, `students_${new Date().toISOString().slice(0,10)}.xlsx`);
+        showToast("Exported successfully");
+    }
+    
     function renderTable() {
         const tbody = document.getElementById('tableBody');
         if (filteredStudents.length === 0) {
@@ -609,195 +963,10 @@
         renderTable();
     }
     
-    // Add Student
-    function openAddModal() {
-        currentEditId = null;
-        document.getElementById('modalTitle').textContent = 'Add Student';
-        document.getElementById('modalBody').innerHTML = `
-            <div class="form-group"><label>Full Name *</label><input type="text" id="studentName" placeholder="Enter name"></div>
-            <div class="form-group"><label>Gender</label><select id="studentGender"><option value="Male">Male</option><option value="Female">Female</option></select></div>
-            <div class="form-group"><label>Phone</label><input type="text" id="studentPhone" placeholder="Phone number"></div>
-            <div class="form-group"><label>Department</label><input type="text" id="studentDept" placeholder="Department"></div>
-            <div class="form-group"><label>Batch</label><input type="text" id="studentBatch" placeholder="e.g., 1st Year"></div>
-            <div class="form-group"><label>Qirats (comma separated)</label><input type="text" id="studentQirats" placeholder="e.g., Quran hifz, Sefina"></div>
-            <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px;">
-                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-                <button class="btn btn-primary" id="saveStudentBtn">Save</button>
-            </div>
-        `;
-        document.getElementById('saveStudentBtn').onclick = saveStudent;
-        document.getElementById('studentModal').classList.add('active');
-    }
-    
-    async function saveStudent() {
-        const name = document.getElementById('studentName').value.trim();
-        if (!name) { showToast("Name required", true); return; }
-        const qirats = document.getElementById('studentQirats').value.split(',').map(q => q.trim()).filter(q => q);
-        const schedules = qirats.map(q => ({ qirat_name: q, enrolled_date: new Date().toISOString() }));
-        
-        const studentData = {
-            full_name: name,
-            gender: document.getElementById('studentGender').value,
-            phone: document.getElementById('studentPhone').value,
-            department: document.getElementById('studentDept').value || 'Other',
-            batch: document.getElementById('studentBatch').value || 'General',
-            schedules: schedules,
-            timestamp: serverTimestamp()
-        };
-        
-        if (currentEditId) {
-            await updateDoc(doc(db, "registrations", currentEditId), studentData);
-            showToast("Student updated");
-        } else {
-            await addDoc(collection(db, "registrations"), studentData);
-            showToast("Student added");
-        }
-        closeModal();
-        loadData();
-    }
-    
-    // Edit Student
-    window.openEditStudent = async (id) => {
-        const student = allStudents.find(s => s.id === id);
-        if (!student) return;
-        currentEditId = id;
-        const qirats = getQirats(student).join(', ');
-        
-        document.getElementById('modalTitle').textContent = 'Edit Student';
-        document.getElementById('modalBody').innerHTML = `
-            <div class="form-group"><label>Full Name</label><input type="text" id="studentName" value="${escapeHtml(student.full_name)}"></div>
-            <div class="form-group"><label>Gender</label><select id="studentGender"><option value="Male" ${student.gender === 'Male' ? 'selected' : ''}>Male</option><option value="Female" ${student.gender === 'Female' ? 'selected' : ''}>Female</option></select></div>
-            <div class="form-group"><label>Phone</label><input type="text" id="studentPhone" value="${escapeHtml(student.phone)}"></div>
-            <div class="form-group"><label>Department</label><input type="text" id="studentDept" value="${escapeHtml(student.department)}"></div>
-            <div class="form-group"><label>Batch</label><input type="text" id="studentBatch" value="${escapeHtml(student.batch)}"></div>
-            <div class="form-group"><label>Qirats (comma separated)</label><input type="text" id="studentQirats" value="${escapeHtml(qirats)}"></div>
-            <div style="display: flex; gap: 12px; margin-top: 20px;">
-                <button class="btn btn-warning" id="deleteQiratsOnlyBtn">Delete All Qirats Only</button>
-                <button class="btn btn-primary" id="saveStudentBtn">Save</button>
-                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-            </div>
-        `;
-        document.getElementById('saveStudentBtn').onclick = saveStudent;
-        document.getElementById('deleteQiratsOnlyBtn').onclick = async () => {
-            await updateDoc(doc(db, "registrations", id), { schedules: [] });
-            showToast("All Qirats removed from student");
-            closeModal();
-            loadData();
-        };
-        document.getElementById('studentModal').classList.add('active');
-    };
-    
-    // Delete Student
-    window.deleteStudent = (id, name) => {
-        document.getElementById('confirmTitle').textContent = 'Delete Student';
-        document.getElementById('confirmMessage').innerHTML = `Delete <strong>${name}</strong> permanently?`;
-        pendingConfirm = async () => {
-            await deleteDoc(doc(db, "registrations", id));
-            selectedIds.delete(id);
-            showToast(`Deleted ${name}`);
-            loadData();
-            closeConfirmModal();
-        };
-        document.getElementById('confirmModal').classList.add('active');
-    };
-    
-    // Batch Delete Selected
-    async function deleteSelected() {
-        if (selectedIds.size === 0) { showToast("No students selected", true); return; }
-        document.getElementById('confirmTitle').textContent = 'Delete Selected';
-        document.getElementById('confirmMessage').innerHTML = `Delete <strong>${selectedIds.size}</strong> selected students permanently?`;
-        pendingConfirm = async () => {
-            for (const id of selectedIds) {
-                await deleteDoc(doc(db, "registrations", id));
-            }
-            showToast(`Deleted ${selectedIds.size} students`);
-            selectedIds.clear();
-            loadData();
-            closeConfirmModal();
-        };
-        document.getElementById('confirmModal').classList.add('active');
-    }
-    
-    // Batch Remove Qirats from Selected
-    async function removeQiratsFromSelected() {
-        if (selectedIds.size === 0) { showToast("No students selected", true); return; }
-        document.getElementById('confirmTitle').textContent = 'Remove Qirats';
-        document.getElementById('confirmMessage').innerHTML = `Remove ALL Qirats from <strong>${selectedIds.size}</strong> selected students? Students will remain.`;
-        pendingConfirm = async () => {
-            for (const id of selectedIds) {
-                await updateDoc(doc(db, "registrations", id), { schedules: [] });
-            }
-            showToast(`Removed Qirats from ${selectedIds.size} students`);
-            loadData();
-            closeConfirmModal();
-        };
-        document.getElementById('confirmModal').classList.add('active');
-    }
-    
-    // Global Qirat Edit
-    window.editQiratGlobal = (oldName) => {
-        const newName = prompt(`Rename "${oldName}" to:`, oldName);
-        if (!newName || newName === oldName) return;
-        let count = 0;
-        const updates = [];
-        for (const student of allStudents) {
-            const hasQirat = getQirats(student).includes(oldName);
-            if (hasQirat) {
-                const newSchedules = (student.schedules || []).map(s => 
-                    s.qirat_name === oldName ? { ...s, qirat_name: newName } : s
-                );
-                updates.push(updateDoc(doc(db, "registrations", student.id), { schedules: newSchedules }));
-                count++;
-            }
-        }
-        Promise.all(updates).then(() => {
-            showToast(`Renamed "${oldName}" → "${newName}" for ${count} students`);
-            loadData();
-        }).catch(err => showToast(err.message, true));
-    };
-    
-    // Bulk Edit Qirats Modal
-    function showBulkEditModal() {
-        const allQirats = [...new Set(allStudents.flatMap(s => getQirats(s)))];
-        if (allQirats.length === 0) { showToast("No Qirats found", true); return; }
-        
-        document.getElementById('bulkEditList').innerHTML = allQirats.map(q => {
-            const count = allStudents.filter(s => getQirats(s).includes(q)).length;
-            return `
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid var(--border);">
-                    <span><strong>${escapeHtml(q)}</strong> (${count} students)</span>
-                    <button class="btn btn-primary" onclick="editQiratGlobal('${escapeHtml(q)}')">✏️ Rename</button>
-                </div>
-            `;
-        }).join('');
-        document.getElementById('bulkEditModal').classList.add('active');
-    }
-    
-    // Export to CSV
-    function exportToCSV() {
-        const data = filteredStudents.map(s => ({
-            Name: s.full_name,
-            Gender: s.gender,
-            Phone: s.phone,
-            Department: s.department,
-            Batch: s.batch,
-            Qirats: getQirats(s).join(', ')
-        }));
-        if (data.length === 0) { showToast("No data to export", true); return; }
-        
-        const ws = XLSX.utils.json_to_sheet(data);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'Students');
-        XLSX.writeFile(wb, `students_${new Date().toISOString().slice(0,10)}.xlsx`);
-        showToast("Exported successfully");
-    }
-    
-    // Close modals
     window.closeModal = () => document.getElementById('studentModal').classList.remove('active');
     window.closeConfirmModal = () => document.getElementById('confirmModal').classList.remove('active');
     window.closeBulkEditModal = () => document.getElementById('bulkEditModal').classList.remove('active');
     
-    // Event Listeners
     document.getElementById('searchInput').addEventListener('input', applyFilters);
     document.getElementById('genderFilter').addEventListener('change', applyFilters);
     document.getElementById('deptFilter').addEventListener('change', applyFilters);
