@@ -3,12 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>JUMJ Irshad | Advanced Tables View</title>
+    <title>JUMJ Irshad | Advanced Student Management</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -19,6 +21,8 @@
             --secondary: #6366f1;
             --accent: #f59e0b;
             --danger: #ef4444;
+            --danger-dark: #dc2626;
+            --warning: #f59e0b;
             --dark: #0f172a;
             --card-bg: #ffffff;
             --text-primary: #0f172a;
@@ -82,125 +86,68 @@
             gap: 8px;
             transition: all 0.2s;
         }
+        .back-btn:hover { background: var(--primary); color: white; }
 
-        .back-btn:hover {
-            background: var(--primary);
-            color: white;
-        }
+        .main-container { max-width: 1600px; margin: 0 auto; padding: 24px; }
 
-        .main-container {
-            max-width: 1600px;
-            margin: 0 auto;
-            padding: 24px;
-        }
-
-        .stats-bar {
+        /* Student Category Tabs */
+        .category-tabs {
             display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
-            margin-bottom: 24px;
-        }
-
-        .stat-pill {
-            background: var(--card-bg);
-            padding: 12px 24px;
-            border-radius: 60px;
-            display: flex;
-            align-items: center;
             gap: 12px;
-            box-shadow: var(--shadow-sm);
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            background: var(--card-bg);
+            padding: 8px;
+            border-radius: 60px;
             border: 1px solid var(--border);
         }
-
-        .stat-pill i { font-size: 1.3rem; color: var(--primary); }
-        .stat-pill .value { font-weight: 800; font-size: 1.2rem; }
-        .stat-pill .label { color: var(--text-muted); font-size: 0.75rem; }
-
-        .filters-row {
-            background: var(--card-bg);
-            border-radius: 28px;
-            padding: 20px 24px;
-            margin-bottom: 24px;
+        .category-tab {
+            padding: 10px 24px;
+            border-radius: 40px;
+            border: none;
+            background: transparent;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
             display: flex;
-            flex-wrap: wrap;
-            gap: 16px;
-            align-items: flex-end;
+            align-items: center;
+            gap: 8px;
+        }
+        .category-tab:hover { background: var(--primary-light); color: var(--primary-dark); }
+        .category-tab.active { background: linear-gradient(135deg, #10b981, #059669); color: white; }
+        .category-count { background: rgba(0,0,0,0.1); padding: 2px 8px; border-radius: 30px; font-size: 0.7rem; }
+        .category-tab.active .category-count { background: rgba(255,255,255,0.2); }
+
+        /* Student Table */
+        .student-table-container {
+            background: var(--card-bg);
+            border-radius: 24px;
+            overflow-x: auto;
             box-shadow: var(--shadow-md);
             border: 1px solid var(--border);
         }
-
-        .filter-group { flex: 1; min-width: 140px; }
-        .filter-group label { font-size: 0.7rem; font-weight: 700; color: var(--primary); display: block; margin-bottom: 6px; text-transform: uppercase; }
-        .filter-group input, .filter-group select { width: 100%; padding: 10px 14px; border: 2px solid var(--border); border-radius: 16px; font-family: inherit; font-size: 0.85rem; background: white; }
-        .filter-group input:focus, .filter-group select:focus { outline: none; border-color: var(--primary); }
-
-        .btn-clear { background: #64748b; color: white; border: none; padding: 10px 24px; border-radius: 16px; font-weight: 600; cursor: pointer; }
-        .btn-primary { background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; padding: 10px 24px; border-radius: 16px; font-weight: 600; cursor: pointer; }
-        .btn-refresh { background: #f59e0b; color: white; border: none; padding: 10px 24px; border-radius: 16px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
-
-        .export-bar {
-            background: var(--card-bg);
-            border-radius: 24px;
-            padding: 16px 24px;
-            margin-bottom: 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 16px;
-            border: 1px solid var(--border);
-        }
-
-        .export-buttons { display: flex; gap: 12px; flex-wrap: wrap; }
-        .export-btn { padding: 8px 20px; border: none; border-radius: 40px; font-weight: 600; font-size: 0.8rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; }
-        .export-csv { background: #10b981; color: white; }
-        .export-excel { background: #059669; color: white; }
-        .export-pdf { background: #ef4444; color: white; }
-        .export-word { background: #3b82f6; color: white; }
-        .export-btn:hover { transform: translateY(-2px); filter: brightness(1.05); }
-
-        .table-container {
-            background: var(--card-bg);
-            border-radius: 28px;
-            overflow: hidden;
-            box-shadow: var(--shadow-lg);
-            border: 1px solid var(--border);
-        }
-
-        .table-wrapper {
-            overflow-x: auto;
-            max-height: 60vh;
-            overflow-y: auto;
-        }
-
-        table {
+        .student-table {
             width: 100%;
             border-collapse: collapse;
             font-size: 0.8rem;
+            min-width: 800px;
         }
-
-        th, td {
+        .student-table th, .student-table td {
             padding: 14px 12px;
             text-align: left;
             border-bottom: 1px solid var(--border);
         }
-
-        th {
+        .student-table th {
             background: #f8fafc;
             font-weight: 700;
             color: var(--text-primary);
             position: sticky;
             top: 0;
-            cursor: pointer;
-            user-select: none;
-            white-space: nowrap;
         }
-
-        th:hover { background: #f1f5f9; }
-        th i { margin-left: 6px; opacity: 0.5; }
-
+        .student-table tr:hover { background: #f8fafc; }
         .badge {
-            padding: 4px 12px;
+            padding: 4px 10px;
             border-radius: 30px;
             font-size: 0.7rem;
             font-weight: 600;
@@ -208,38 +155,25 @@
         }
         .badge-male { background: #dbeafe; color: #1e40af; }
         .badge-female { background: #fce7f3; color: #be185d; }
-        .badge-dept { background: #e0f2fe; color: #0369a1; }
-
-        .action-buttons { display: flex; gap: 8px; white-space: nowrap; }
-        .icon-btn { background: none; border: none; cursor: pointer; padding: 6px 10px; border-radius: 10px; transition: all 0.2s; color: #64748b; }
-        .icon-btn.edit:hover { background: #d1fae5; color: #10b981; }
-        .icon-btn.delete:hover { background: #fee2e2; color: #ef4444; }
-
-        .pagination {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-            padding: 20px;
-            border-top: 1px solid var(--border);
-            flex-wrap: wrap;
-        }
-        .page-btn {
-            background: white;
-            border: 1px solid var(--border);
-            padding: 8px 14px;
-            border-radius: 12px;
+        .badge-qirat { background: #d1fae5; color: #065f46; margin: 2px; display: inline-block; }
+        .badge-no-qirat { background: #fee2e2; color: #991b1b; }
+        .badge-single-qirat { background: #fef3c7; color: #92400e; }
+        .action-buttons { display: flex; gap: 6px; flex-wrap: wrap; }
+        .action-btn {
+            background: none;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 20px;
             cursor: pointer;
-            font-weight: 500;
+            color: var(--text-muted);
             transition: all 0.2s;
+            font-size: 0.7rem;
         }
-        .page-btn.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-        .page-btn:hover:not(.active) { background: var(--primary-light); }
+        .action-btn.edit-qirat:hover { background: #d1fae5; color: var(--primary); }
+        .action-btn.delete-qirat-student:hover { background: #fee2e2; color: var(--danger); }
+        .action-btn.delete-student:hover { background: #fee2e2; color: var(--danger); }
 
+        /* Edit Modal */
         .modal {
             display: none;
             position: fixed;
@@ -258,15 +192,53 @@
             background: white;
             border-radius: 32px;
             padding: 28px;
-            max-width: 550px;
-            width: 90%;
+            max-width: 600px;
+            width: 95%;
             max-height: 85vh;
             overflow-y: auto;
         }
-        .form-group { margin-bottom: 18px; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-header h3 { font-size: 1.3rem; }
+        .close-modal { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-muted); }
+        .form-group { margin-bottom: 16px; }
         .form-group label { font-weight: 600; display: block; margin-bottom: 6px; color: var(--text-primary); }
-        .form-group input, .form-group select { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 16px; }
+        .form-group input, .form-group select { width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 16px; font-family: inherit; }
+        .qirat-list { background: #f8fafc; padding: 12px; border-radius: 16px; margin: 12px 0; }
+        .qirat-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--primary-light);
+            padding: 4px 10px;
+            border-radius: 30px;
+            margin: 4px;
+        }
+        .remove-qirat-tag { cursor: pointer; color: var(--danger); font-size: 0.7rem; }
+        .add-qirat-input { display: flex; gap: 8px; margin-top: 8px; }
+        .add-qirat-input input { flex: 1; }
+        .btn-primary { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 30px; font-weight: 600; cursor: pointer; }
+        .btn-danger { background: var(--danger); color: white; border: none; padding: 10px 20px; border-radius: 30px; font-weight: 600; cursor: pointer; }
+        .btn-secondary { background: #64748b; color: white; border: none; padding: 10px 20px; border-radius: 30px; font-weight: 600; cursor: pointer; }
 
+        /* Filters */
+        .filters-bar {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: flex-end;
+            border: 1px solid var(--border);
+        }
+        .filter-group { flex: 1; min-width: 140px; }
+        .filter-group label { font-size: 0.7rem; font-weight: 700; color: var(--primary); display: block; margin-bottom: 6px; }
+        .filter-group input, .filter-group select { width: 100%; padding: 10px 14px; border: 2px solid var(--border); border-radius: 16px; font-family: inherit; }
+        .btn-clear { background: #64748b; color: white; border: none; padding: 10px 24px; border-radius: 16px; font-weight: 600; cursor: pointer; }
+        .btn-export { background: var(--primary); color: white; border: none; padding: 10px 24px; border-radius: 16px; font-weight: 600; cursor: pointer; }
+
+        /* Toast */
         .toast {
             position: fixed;
             bottom: 100px;
@@ -282,135 +254,102 @@
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
         .empty-state { text-align: center; padding: 60px; color: var(--text-muted); }
-        .checkbox-col { width: 30px; text-align: center; }
-        .batch-actions { display: flex; gap: 12px; margin-left: auto; }
 
-        .offline-badge {
-            background: #fef3c7;
-            color: #92400e;
-            padding: 4px 12px;
-            border-radius: 30px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
+        @media (max-width: 768px) {
+            .main-container { padding: 16px; }
+            .category-tabs { border-radius: 20px; }
+            .category-tab { padding: 8px 16px; font-size: 0.8rem; }
+            .filters-bar { flex-direction: column; }
         }
-
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(20px);
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            padding: 12px 20px 20px;
-            border-top: 1px solid var(--border);
-            z-index: 200;
-        }
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 8px 16px;
-            border-radius: 40px;
-            color: var(--text-muted);
-        }
-        .nav-item i { font-size: 1.4rem; }
-        .nav-item span { font-size: 0.7rem; font-weight: 500; }
-        .nav-item.active { color: var(--primary); background: var(--primary-light); }
-
-        @media (min-width: 768px) { body { padding-bottom: 0; } .bottom-nav { display: none; } }
-        @media (max-width: 768px) { .main-container { padding: 16px; padding-bottom: 80px; } .filters-row { flex-direction: column; } .export-bar { flex-direction: column; align-items: stretch; } }
     </style>
 </head>
 <body>
 
 <div class="glass-header">
     <div class="header-content">
-        <div class="logo"><h1><i class="fas fa-table"></i> Advanced Tables</h1></div>
-        <button class="back-btn" onclick="window.location.href='index.html'"><i class="fas fa-arrow-left"></i> Back</button>
+        <div class="logo"><h1><i class="fas fa-users-gear"></i> Student Manager</h1></div>
+        <button class="back-btn" onclick="window.location.href='index.html'"><i class="fas fa-arrow-left"></i> Back to Home</button>
     </div>
 </div>
 
 <div class="main-container">
-    <div class="stats-bar">
-        <div class="stat-pill"><i class="fas fa-users"></i><div><span class="value" id="totalCount">0</span><span class="label"> Total</span></div></div>
-        <div class="stat-pill"><i class="fas fa-filter"></i><div><span class="value" id="filteredCount">0</span><span class="label"> Filtered</span></div></div>
-        <div class="stat-pill"><i class="fas fa-check-square"></i><div><span class="value" id="selectedCount">0</span><span class="label"> Selected</span></div></div>
-        <div class="stat-pill" id="offlineIndicator" style="display:none;"><i class="fas fa-wifi-slash"></i><div><span class="value">Offline</span><span class="label"> Mode</span></div></div>
+    <!-- Category Tabs -->
+    <div class="category-tabs" id="categoryTabs">
+        <button class="category-tab active" data-category="all"><i class="fas fa-users"></i> All Students <span id="countAll" class="category-count">0</span></button>
+        <button class="category-tab" data-category="no-qirat"><i class="fas fa-ban"></i> No Qirat <span id="countNoQirat" class="category-count">0</span></button>
+        <button class="category-tab" data-category="single-qirat"><i class="fas fa-book"></i> Single Qirat <span id="countSingleQirat" class="category-count">0</span></button>
+        <button class="category-tab" data-category="multi-qirat"><i class="fas fa-layer-group"></i> Multi Qirat <span id="countMultiQirat" class="category-count">0</span></button>
     </div>
 
-    <div class="filters-row">
-        <div class="filter-group"><label><i class="fas fa-search"></i> Search</label><input type="text" id="searchInput" placeholder="Name / Phone / Telegram"></div>
+    <!-- Filters -->
+    <div class="filters-bar">
+        <div class="filter-group"><label><i class="fas fa-search"></i> Search</label><input type="text" id="searchInput" placeholder="Name / Phone"></div>
         <div class="filter-group"><label><i class="fas fa-venus-mars"></i> Gender</label><select id="genderFilter"><option value="">All</option><option value="Male">Male</option><option value="Female">Female</option></select></div>
         <div class="filter-group"><label><i class="fas fa-building"></i> Department</label><select id="deptFilter"><option value="">All</option></select></div>
-        <div class="filter-group"><label><i class="fas fa-graduation-cap"></i> Batch</label><select id="batchFilter"><option value="">All</option></select></div>
+        <div class="filter-group"><label><i class="fas fa-calendar"></i> Batch</label><select id="batchFilter"><option value="">All</option></select></div>
         <button class="btn-clear" id="clearFiltersBtn"><i class="fas fa-eraser"></i> Clear</button>
-        <button class="btn-primary" id="addStudentBtn"><i class="fas fa-plus"></i> Add Student</button>
-        <button class="btn-refresh" id="refreshDataBtn"><i class="fas fa-sync-alt"></i> Refresh from Cloud</button>
+        <button class="btn-export" id="exportCSVBtn"><i class="fas fa-file-csv"></i> Export CSV</button>
+        <button class="btn-export" id="exportExcelBtn"><i class="fas fa-file-excel"></i> Export Excel</button>
     </div>
 
-    <div class="export-bar">
-        <div class="export-buttons">
-            <button class="export-btn export-csv" id="exportCSVBtn"><i class="fas fa-file-csv"></i> CSV</button>
-            <button class="export-btn export-excel" id="exportExcelBtn"><i class="fas fa-file-excel"></i> Excel</button>
-            <button class="export-btn export-pdf" id="exportPDFBtn"><i class="fas fa-file-pdf"></i> PDF Report</button>
-            <button class="export-btn export-word" id="exportWordBtn"><i class="fas fa-file-word"></i> Word</button>
-        </div>
-        <div class="batch-actions">
-            <button class="btn-clear" id="deleteSelectedBtn" style="background:#ef4444;"><i class="fas fa-trash"></i> Delete Selected</button>
-        </div>
-    </div>
-
-    <div class="table-container">
-        <div class="table-wrapper">
-            <table id="dataTable">
-                <thead>
-                    <tr>
-                        <th class="checkbox-col"><input type="checkbox" id="selectAllCheckbox"></th>
-                        <th onclick="sortTable('full_name')">Name <i class="fas fa-sort"></i></th>
-                        <th onclick="sortTable('gender')">Gender <i class="fas fa-sort"></i></th>
-                        <th>Phone</th>
-                        <th>Telegram</th>
-                        <th onclick="sortTable('department')">Department <i class="fas fa-sort"></i></th>
-                        <th onclick="sortTable('batch')">Batch <i class="fas fa-sort"></i></th>
-                        <th>Qirats</th>
-                        <th onclick="sortTable('timestamp')">Date <i class="fas fa-sort"></i></th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody"></tbody>
-            </table>
-        </div>
-        <div class="pagination" id="pagination"></div>
+    <!-- Student Table -->
+    <div class="student-table-container">
+        <table class="student-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Gender</th>
+                    <th>Phone</th>
+                    <th>Department</th>
+                    <th>Batch</th>
+                    <th>Qirats</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="studentTableBody">
+                <tr><td colspan="8" class="empty-state">Loading students...</td></tr>
+            </tbody>
+        </table>
     </div>
 </div>
 
-<div id="studentModal" class="modal"><div class="modal-content"><h3 id="modalTitle">Add Student</h3><form id="studentForm"><div class="form-group"><label>Full Name *</label><input type="text" id="full_name" required></div><div class="form-group"><label>Gender</label><select id="gender"><option>Male</option><option>Female</option></select></div><div class="form-group"><label>Phone</label><input type="text" id="phone"></div><div class="form-group"><label>Telegram</label><input type="text" id="telegram"></div><div class="form-group"><label>Department</label><select id="department"><option>Medicine</option><option>Pharmacy</option><option>Nursing</option><option>Other</option></select></div><div class="form-group"><label>Batch</label><input type="text" id="batch" placeholder="e.g., 1st Year"></div><div class="form-group"><label>Qirats (comma)</label><input type="text" id="qirats" placeholder="Hafs, Warsh"></div><div style="display:flex; gap:12px; justify-content:flex-end;"><button type="button" class="btn-clear" id="cancelModalBtn">Cancel</button><button type="submit" class="btn-primary">Save</button></div></form><button id="modalClose" style="position:absolute; top:20px; right:24px; background:none; border:none; font-size:24px;">&times;</button></div></div>
+<!-- Edit Student Modal -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-user-edit"></i> Edit Student</h3>
+            <button class="close-modal" onclick="closeEditModal()">&times;</button>
+        </div>
+        <div id="editFormContent"></div>
+    </div>
+</div>
+
+<!-- Edit Qirat (Global) Modal -->
+<div id="editQiratGlobalModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-edit"></i> Edit Qirat Name (Global)</h3>
+            <button class="close-modal" onclick="closeEditQiratGlobalModal()">&times;</button>
+        </div>
+        <div id="editQiratGlobalForm"></div>
+    </div>
+</div>
 
 <div id="toast" class="toast"></div>
 
 <script type="module">
-    import { protectPage, initAuthUI, setupAutoLogout } from './auth.js';
-    import { initNavigation } from './nav.js';
-
-    if (!protectPage('admin-login.html')) {
-        throw new Error('Redirecting to login');
-    }
-
-    const admin = await initAuthUI();
+    import { protectPage, initAuthUI, setupAutoLogout, getCurrentAdminSync } from './auth.js';
+    import { initNavigation, refreshNavigation } from './nav.js';
+    
+    if (!protectPage('admin-login.html')) throw new Error('Redirecting to login');
+    const admin = initAuthUI();
     setupAutoLogout(60);
-
+    initNavigation();
+    if (admin?.role === 'super-admin') refreshNavigation();
+    
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, deleteDoc, doc, addDoc, updateDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     
     const firebaseConfig = {
         apiKey: "AIzaSyAR_g5y04YAGCrTvZCowrE7hw8h7k1du08",
@@ -424,18 +363,9 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     
-    // ========== CACHED DATA (SINGLE LOAD) ==========
     let allStudents = [];
     let filteredStudents = [];
-    let dataLoaded = false;
-    let isLoading = false;
-    
-    let currentPage = 1;
-    let rowsPerPage = 15;
-    let sortColumn = 'timestamp';
-    let sortDirection = 'desc';
-    let selectedIds = new Set();
-    let currentEditId = null;
+    let currentCategory = 'all';
     
     // DOM Elements
     const searchInput = document.getElementById('searchInput');
@@ -443,84 +373,38 @@
     const deptFilter = document.getElementById('deptFilter');
     const batchFilter = document.getElementById('batchFilter');
     const clearFiltersBtn = document.getElementById('clearFiltersBtn');
-    const tableBody = document.getElementById('tableBody');
-    const totalCountSpan = document.getElementById('totalCount');
-    const filteredCountSpan = document.getElementById('filteredCount');
-    const selectedCountSpan = document.getElementById('selectedCount');
-    const selectAllCheckbox = document.getElementById('selectAllCheckbox');
-    const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
-    const addStudentBtn = document.getElementById('addStudentBtn');
-    const refreshDataBtn = document.getElementById('refreshDataBtn');
-    const studentModal = document.getElementById('studentModal');
-    const modalTitle = document.getElementById('modalTitle');
-    const studentForm = document.getElementById('studentForm');
-    const cancelModalBtn = document.getElementById('cancelModalBtn');
-    const modalClose = document.getElementById('modalClose');
+    const exportCSVBtn = document.getElementById('exportCSVBtn');
+    const exportExcelBtn = document.getElementById('exportExcelBtn');
+    const studentTableBody = document.getElementById('studentTableBody');
     const toast = document.getElementById('toast');
-    const exportCSV = document.getElementById('exportCSVBtn');
-    const exportExcel = document.getElementById('exportExcelBtn');
-    const exportPDF = document.getElementById('exportPDFBtn');
-    const exportWord = document.getElementById('exportWordBtn');
-    const offlineIndicator = document.getElementById('offlineIndicator');
     
-    function showToast(msg, isErr = false) {
-        toast.textContent = msg;
-        toast.style.background = isErr ? '#ef4444' : '#10b981';
-        toast.style.display = 'block';
-        setTimeout(() => toast.style.display = 'none', 3000);
+    let currentEditStudentId = null;
+    let currentEditQiratGlobalName = null;
+    
+    function showToast(msg, isErr = false) { 
+        toast.textContent = msg; 
+        toast.style.background = isErr ? '#ef4444' : '#10b981'; 
+        toast.style.display = 'block'; 
+        setTimeout(() => toast.style.display = 'none', 3000); 
     }
     
     function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
     function getQiratNames(student) { return (student.schedules || []).map(s => s.qirat_name).filter(Boolean); }
     
-    // Save to localStorage cache
-    function saveToCache() {
-        try {
-            const cacheData = {
-                students: allStudents,
-                timestamp: new Date().toISOString(),
-                version: '1.0'
-            };
-            localStorage.setItem('tables_cache', JSON.stringify(cacheData));
-        } catch (e) { console.warn('Cache save failed:', e); }
+    function getStudentCategory(student) {
+        const qirats = getQiratNames(student);
+        if (qirats.length === 0) return 'no-qirat';
+        if (qirats.length === 1) return 'single-qirat';
+        return 'multi-qirat';
     }
     
-    // Load from localStorage cache
-    function loadFromCache() {
-        try {
-            const cached = localStorage.getItem('tables_cache');
-            if (cached) {
-                const data = JSON.parse(cached);
-                if (data.students && data.students.length > 0) {
-                    allStudents = data.students;
-                    dataLoaded = true;
-                    console.log('Loaded from cache:', allStudents.length, 'students');
-                    return true;
-                }
-            }
-        } catch (e) { console.warn('Cache load failed:', e); }
-        return false;
-    }
-    
-    // Load from Firestore (ONCE)
-    async function loadDataFromFirestore(force = false) {
-        if (isLoading) return;
-        if (dataLoaded && !force) {
-            console.log('Using cached data, not loading from Firestore');
-            return;
-        }
-        
-        isLoading = true;
-        showToast('Loading data...');
-        
+    async function loadData() {
         try {
             const querySnapshot = await getDocs(collection(db, "registrations"));
             allStudents = [];
             querySnapshot.forEach((docSnap) => {
                 const data = docSnap.data();
-                let timestamp = data.timestamp;
-                if (timestamp && typeof timestamp.toDate === 'function') timestamp = timestamp.toDate();
-                else timestamp = new Date();
+                let timestamp = data.timestamp?.toDate?.() || new Date(data.timestamp) || new Date();
                 allStudents.push({
                     id: docSnap.id,
                     full_name: data.full_name || 'N/A',
@@ -533,422 +417,337 @@
                     timestamp: timestamp
                 });
             });
-            
-            dataLoaded = true;
-            saveToCache();
-            offlineIndicator.style.display = 'none';
-            showToast(`Loaded ${allStudents.length} students`);
-            
             populateFilters();
-            applyFiltersAndRender();
-        } catch (error) {
-            console.error("Error loading from Firestore:", error);
-            if (loadFromCache()) {
-                offlineIndicator.style.display = 'flex';
-                showToast('Using cached data (offline mode)', false);
-                populateFilters();
-                applyFiltersAndRender();
-            } else {
-                showToast("Error loading data: " + error.message, true);
-            }
-        } finally {
-            isLoading = false;
-        }
+            updateCategoryCounts();
+            applyFilters();
+        } catch (error) { showToast("Error loading: " + error.message, true); }
     }
     
-    async function refreshFromCloud() {
-        showToast('Refreshing from cloud...');
-        await loadDataFromFirestore(true);
-        showToast('Data refreshed from cloud');
-    }
-    
-    function updateCacheAfterWrite(studentId, newData = null, isDelete = false) {
-        if (isDelete) {
-            allStudents = allStudents.filter(s => s.id !== studentId);
-        } else if (newData) {
-            const index = allStudents.findIndex(s => s.id === studentId);
-            if (index !== -1) {
-                allStudents[index] = { ...allStudents[index], ...newData };
-            } else {
-                allStudents.push(newData);
-            }
-        }
-        saveToCache();
-        applyFiltersAndRender();
+    function updateCategoryCounts() {
+        const counts = { all: allStudents.length, 'no-qirat': 0, 'single-qirat': 0, 'multi-qirat': 0 };
+        allStudents.forEach(s => { const cat = getStudentCategory(s); if (cat !== 'all') counts[cat]++; });
+        document.getElementById('countAll').textContent = counts.all;
+        document.getElementById('countNoQirat').textContent = counts['no-qirat'];
+        document.getElementById('countSingleQirat').textContent = counts['single-qirat'];
+        document.getElementById('countMultiQirat').textContent = counts['multi-qirat'];
     }
     
     function populateFilters() {
         const departments = [...new Set(allStudents.map(s => s.department))];
         const batches = [...new Set(allStudents.map(s => s.batch))];
-        deptFilter.innerHTML = '<option value="">All Departments</option>' + departments.map(d => `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join('');
-        batchFilter.innerHTML = '<option value="">All Batches</option>' + batches.map(b => `<option value="${escapeHtml(b)}">${escapeHtml(b)}</option>`).join('');
+        deptFilter.innerHTML = '<option value="">All</option>' + departments.map(d => `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join('');
+        batchFilter.innerHTML = '<option value="">All</option>' + batches.map(b => `<option value="${escapeHtml(b)}">${escapeHtml(b)}</option>`).join('');
     }
     
-    function applyFiltersAndRender() {
+    function applyFilters() {
         const search = searchInput.value.toLowerCase();
         const gender = genderFilter.value;
         const department = deptFilter.value;
         const batch = batchFilter.value;
         
-        filteredStudents = allStudents.filter(s => {
-            const matchSearch = s.full_name.toLowerCase().includes(search) || s.phone.includes(search) || s.telegram.toLowerCase().includes(search);
+        let filtered = allStudents.filter(s => {
+            const matchCategory = currentCategory === 'all' || getStudentCategory(s) === currentCategory;
+            const matchSearch = s.full_name.toLowerCase().includes(search) || s.phone.includes(search);
             const matchGender = !gender || s.gender === gender;
             const matchDept = !department || s.department === department;
             const matchBatch = !batch || s.batch === batch;
-            return matchSearch && matchGender && matchDept && matchBatch;
+            return matchCategory && matchSearch && matchGender && matchDept && matchBatch;
         });
         
-        filteredStudents.sort((a, b) => {
-            let valA = a[sortColumn], valB = b[sortColumn];
-            if (sortColumn === 'timestamp') { valA = a.timestamp; valB = b.timestamp; }
-            if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
-            if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
-            return 0;
-        });
-        
-        totalCountSpan.textContent = allStudents.length;
-        filteredCountSpan.textContent = filteredStudents.length;
-        selectedCountSpan.textContent = selectedIds.size;
-        
+        filteredStudents = filtered;
         renderTable();
-        renderPagination();
     }
     
     function renderTable() {
-        const start = (currentPage - 1) * rowsPerPage;
-        const end = start + rowsPerPage;
-        const pageData = filteredStudents.slice(start, end);
-        
-        if (pageData.length === 0) {
-            tableBody.innerHTML = `<td><td colspan="10" class="empty-state">No students found</span></td>`;
+        if (filteredStudents.length === 0) {
+            studentTableBody.innerHTML = `<tr><td colspan="8" class="empty-state">No students found</td></tr>`;
             return;
         }
         
-        tableBody.innerHTML = pageData.map(student => `
-            <tr data-id="${student.id}">
-                <td class="checkbox-col"><input type="checkbox" class="row-checkbox" value="${student.id}" ${selectedIds.has(student.id) ? 'checked' : ''}></td>
-                <td><strong>${escapeHtml(student.full_name)}</strong></td>
-                <td><span class="badge ${student.gender === 'Male' ? 'badge-male' : 'badge-female'}">${escapeHtml(student.gender)}</span></td>
-                <td>${escapeHtml(student.phone)}</td>
-                <td>@${escapeHtml(student.telegram)}</td>
-                <td><span class="badge badge-dept">${escapeHtml(student.department)}</span></td>
-                <td>${escapeHtml(student.batch)}</td>
-                <td>${escapeHtml(getQiratNames(student).slice(0, 2).join(', ') || '-')}</td>
-                <td>${student.timestamp.toLocaleDateString()}</td>
-                <td class="action-buttons">
-                    <button class="icon-btn edit" onclick="window.editStudent('${student.id}')"><i class="fas fa-edit"></i></button>
-                    <button class="icon-btn delete" onclick="window.deleteStudent('${student.id}')"><i class="fas fa-trash"></i></button>
-                </td>
-            </tr>
-        `).join('');
-        
-        document.querySelectorAll('.row-checkbox').forEach(cb => {
-            cb.addEventListener('change', (e) => {
-                const id = cb.value;
-                if (cb.checked) selectedIds.add(id);
-                else selectedIds.delete(id);
-                selectedCountSpan.textContent = selectedIds.size;
-                updateSelectAllCheckbox();
-            });
-        });
+        studentTableBody.innerHTML = filteredStudents.map((s, idx) => {
+            const qirats = getQiratNames(s);
+            const qiratBadges = qirats.length === 0 ? '<span class="badge badge-no-qirat">No Qirat</span>' : 
+                qirats.map(q => `<span class="badge badge-qirat">${escapeHtml(q)}</span>`).join(' ');
+            const catClass = qirats.length === 0 ? 'badge-no-qirat' : (qirats.length === 1 ? 'badge-single-qirat' : 'badge-qirat');
+            
+            return `
+                <tr>
+                    <td>${idx + 1}</td>
+                    <td><strong>${escapeHtml(s.full_name)}</strong></td>
+                    <td><span class="badge ${s.gender === 'Male' ? 'badge-male' : 'badge-female'}">${escapeHtml(s.gender)}</span></td>
+                    <td>${escapeHtml(s.phone)}</td>
+                    <td>${escapeHtml(s.department)}</td>
+                    <td>${escapeHtml(s.batch)}</td>
+                    <td>${qiratBadges}</td>
+                    <td class="action-buttons">
+                        <button class="action-btn edit-qirat" onclick="openEditStudent('${s.id}')" title="Edit Student & Qirats"><i class="fas fa-edit"></i></button>
+                        <button class="action-btn delete-student" onclick="deleteStudent('${s.id}')" title="Delete Student"><i class="fas fa-trash-alt"></i></button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
     }
     
-    function renderPagination() {
-        const totalPages = Math.ceil(filteredStudents.length / rowsPerPage);
-        const paginationDiv = document.getElementById('pagination');
-        if (totalPages <= 1) { paginationDiv.innerHTML = ''; return; }
-        
-        let html = `<button class="page-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}><i class="fas fa-chevron-left"></i></button>`;
-        for (let i = 1; i <= Math.min(totalPages, 5); i++) {
-            html += `<button class="page-btn ${currentPage === i ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
-        }
-        if (totalPages > 5) html += `<span>...</span><button class="page-btn" onclick="changePage(${totalPages})">${totalPages}</button>`;
-        html += `<button class="page-btn" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}><i class="fas fa-chevron-right"></i></button>`;
-        paginationDiv.innerHTML = html;
-    }
-    
-    window.changePage = (page) => { if (page >= 1 && page <= Math.ceil(filteredStudents.length / rowsPerPage)) { currentPage = page; renderTable(); renderPagination(); } };
-    window.sortTable = (column) => { if (sortColumn === column) sortDirection = sortDirection === 'asc' ? 'desc' : 'asc'; else { sortColumn = column; sortDirection = 'asc'; } applyFiltersAndRender(); };
-    
-    function updateSelectAllCheckbox() {
-        const visibleIds = filteredStudents.slice((currentPage-1)*rowsPerPage, currentPage*rowsPerPage).map(s => s.id);
-        const allSelected = visibleIds.length > 0 && visibleIds.every(id => selectedIds.has(id));
-        selectAllCheckbox.checked = allSelected;
-        selectAllCheckbox.indeterminate = !allSelected && visibleIds.some(id => selectedIds.has(id));
-    }
-    
-    selectAllCheckbox.addEventListener('change', (e) => {
-        const visibleIds = filteredStudents.slice((currentPage-1)*rowsPerPage, currentPage*rowsPerPage).map(s => s.id);
-        if (e.target.checked) visibleIds.forEach(id => selectedIds.add(id));
-        else visibleIds.forEach(id => selectedIds.delete(id));
-        renderTable();
-        selectedCountSpan.textContent = selectedIds.size;
-    });
-    
-    window.editStudent = async (id) => {
-        const student = allStudents.find(s => s.id === id);
+    // Open Edit Student Modal
+    window.openEditStudent = async (studentId) => {
+        const student = allStudents.find(s => s.id === studentId);
         if (!student) return;
-        currentEditId = id;
-        modalTitle.textContent = "Edit Student";
-        document.getElementById('full_name').value = student.full_name;
-        document.getElementById('gender').value = student.gender;
-        document.getElementById('phone').value = student.phone;
-        document.getElementById('telegram').value = student.telegram;
-        document.getElementById('department').value = student.department;
-        document.getElementById('batch').value = student.batch;
-        document.getElementById('qirats').value = getQiratNames(student).join(', ');
-        studentModal.classList.add('active');
+        currentEditStudentId = studentId;
+        const qirats = getQiratNames(student);
+        
+        const modal = document.getElementById('editModal');
+        const formContent = document.getElementById('editFormContent');
+        
+        formContent.innerHTML = `
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="editName" value="${escapeHtml(student.full_name)}">
+            </div>
+            <div class="form-group">
+                <label>Gender</label>
+                <select id="editGender">
+                    <option value="Male" ${student.gender === 'Male' ? 'selected' : ''}>Male</option>
+                    <option value="Female" ${student.gender === 'Female' ? 'selected' : ''}>Female</option>
+                    <option value="Not Specified" ${student.gender === 'Not Specified' ? 'selected' : ''}>Not Specified</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Phone</label>
+                <input type="text" id="editPhone" value="${escapeHtml(student.phone)}">
+            </div>
+            <div class="form-group">
+                <label>Department</label>
+                <input type="text" id="editDepartment" value="${escapeHtml(student.department)}">
+            </div>
+            <div class="form-group">
+                <label>Batch</label>
+                <input type="text" id="editBatch" value="${escapeHtml(student.batch)}">
+            </div>
+            <div class="form-group">
+                <label>Qirats (Click ✖ to remove)</label>
+                <div class="qirat-list" id="editQiratList">
+                    ${qirats.length === 0 ? '<span style="color:#941;">No Qirats assigned</span>' : 
+                      qirats.map(q => `<span class="qirat-tag">${escapeHtml(q)} <span class="remove-qirat-tag" onclick="removeQiratFromEdit('${escapeHtml(q)}')">✖</span></span>`).join('')}
+                </div>
+                <div class="add-qirat-input">
+                    <input type="text" id="newQiratName" placeholder="Enter Qirat name">
+                    <button class="btn-primary" onclick="addQiratToEdit()" style="padding:8px 16px;">Add</button>
+                </div>
+                <div style="margin-top: 8px;">
+                    <button class="btn-secondary" onclick="showGlobalQiratSelector()" style="width:100%;">+ Add from Existing Qirats</button>
+                </div>
+            </div>
+            <div style="display: flex; gap: 12px; margin-top: 20px;">
+                <button class="btn-primary" onclick="saveStudentEdit()">Save Changes</button>
+                <button class="btn-danger" onclick="deleteStudentOnlyQirats()">Delete All Qirats Only</button>
+                <button class="btn-secondary" onclick="closeEditModal()">Cancel</button>
+            </div>
+        `;
+        modal.classList.add('active');
     };
     
-    window.deleteStudent = async (id) => {
-        if (confirm('Delete this student?')) {
-            try {
-                await deleteDoc(doc(db, "registrations", id));
-                selectedIds.delete(id);
-                updateCacheAfterWrite(id, null, true);
-                showToast('Deleted successfully');
-            } catch (error) {
-                showToast('Error deleting: ' + error.message, true);
-            }
-        }
+    window.removeQiratFromEdit = (qiratName) => {
+        const student = allStudents.find(s => s.id === currentEditStudentId);
+        if (!student) return;
+        const newSchedules = (student.schedules || []).filter(s => s.qirat_name !== qiratName);
+        updateDoc(doc(db, "registrations", currentEditStudentId), { schedules: newSchedules })
+            .then(() => { loadData(); showToast(`Removed "${qiratName}"`); closeEditModal(); })
+            .catch(err => showToast(err.message, true));
     };
     
-    deleteSelectedBtn.addEventListener('click', async () => {
-        if (selectedIds.size === 0) { showToast('No students selected', true); return; }
-        if (confirm(`Delete ${selectedIds.size} selected student(s)?`)) {
-            try {
-                const batch = writeBatch(db);
-                for (const id of selectedIds) {
-                    batch.delete(doc(db, "registrations", id));
-                }
-                await batch.commit();
-                
-                for (const id of selectedIds) {
-                    allStudents = allStudents.filter(s => s.id !== id);
-                }
-                selectedIds.clear();
-                saveToCache();
-                applyFiltersAndRender();
-                showToast(`Deleted ${selectedIds.size} students`);
-            } catch (error) {
-                showToast('Error: ' + error.message, true);
-            }
-        }
-    });
+    window.addQiratToEdit = () => {
+        const newQirat = document.getElementById('newQiratName').value.trim();
+        if (!newQirat) return showToast("Enter Qirat name", true);
+        const student = allStudents.find(s => s.id === currentEditStudentId);
+        if (!student) return;
+        const currentQirats = getQiratNames(student);
+        if (currentQirats.includes(newQirat)) return showToast("Qirat already exists", true);
+        const newSchedules = [...(student.schedules || []), { qirat_name: newQirat, enrolled_date: new Date().toISOString() }];
+        updateDoc(doc(db, "registrations", currentEditStudentId), { schedules: newSchedules })
+            .then(() => { loadData(); showToast(`Added "${newQirat}"`); closeEditModal(); })
+            .catch(err => showToast(err.message, true));
+    };
     
-    addStudentBtn.addEventListener('click', () => { currentEditId = null; modalTitle.textContent = "Add Student"; studentForm.reset(); studentModal.classList.add('active'); });
-    function closeModal() { studentModal.classList.remove('active'); currentEditId = null; }
-    cancelModalBtn.addEventListener('click', closeModal);
-    modalClose.addEventListener('click', closeModal);
-    refreshDataBtn.addEventListener('click', refreshFromCloud);
+    window.showGlobalQiratSelector = () => {
+        const allQirats = [...new Set(allStudents.flatMap(s => getQiratNames(s)))];
+        if (allQirats.length === 0) return showToast("No existing Qirats found", true);
+        const selector = prompt(`Select Qirat to add:\n${allQirats.join('\n')}\n\nType the exact name:`);
+        if (selector && allQirats.includes(selector)) {
+            document.getElementById('newQiratName').value = selector;
+        } else if (selector) { showToast("Qirat not found", true); }
+    };
     
-    function findExistingStudent(full_name) {
-        const normalizedName = full_name.trim().toLowerCase();
-        return allStudents.find(s => s.full_name.trim().toLowerCase() === normalizedName);
-    }
-    
-    studentForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const full_name = document.getElementById('full_name').value.trim();
-        if (!full_name) { showToast('Name required', true); return; }
+    window.saveStudentEdit = async () => {
+        const newName = document.getElementById('editName').value;
+        const newGender = document.getElementById('editGender').value;
+        const newPhone = document.getElementById('editPhone').value;
+        const newDept = document.getElementById('editDepartment').value;
+        const newBatch = document.getElementById('editBatch').value;
         
-        const schedules = document.getElementById('qirats').value.split(',').filter(s => s.trim()).map(q => ({ qirat_name: q.trim(), days: ["Flexible"], time_preference: "Evening" }));
-        const studentData = {
-            full_name: full_name,
-            gender: document.getElementById('gender').value,
-            phone: document.getElementById('phone').value,
-            telegram: document.getElementById('telegram').value,
-            department: document.getElementById('department').value,
-            batch: document.getElementById('batch').value,
-            schedules: schedules,
-            timestamp: new Date()
-        };
-        
-        try {
-            if (currentEditId) {
-                const studentRef = doc(db, "registrations", currentEditId);
-                await updateDoc(studentRef, { ...studentData, updatedAt: new Date() });
-                updateCacheAfterWrite(currentEditId, studentData);
-                showToast('Student updated successfully');
-            } else {
-                const existing = findExistingStudent(full_name);
-                if (existing) {
-                    const existingQirats = getQiratNames(existing);
-                    const newQirats = schedules.map(s => s.qirat_name);
-                    const mergedQirats = [...new Set([...existingQirats, ...newQirats])];
-                    const mergedSchedules = mergedQirats.map(q => ({ qirat_name: q, days: ["Flexible"], time_preference: "Evening" }));
-                    
-                    const hasChanges = (
-                        existing.gender !== studentData.gender ||
-                        existing.phone !== studentData.phone ||
-                        existing.telegram !== studentData.telegram ||
-                        existing.department !== studentData.department ||
-                        existing.batch !== studentData.batch ||
-                        mergedQirats.length !== existingQirats.length
-                    );
-                    
-                    if (hasChanges) {
-                        const studentRef = doc(db, "registrations", existing.id);
-                        await updateDoc(studentRef, {
-                            gender: studentData.gender,
-                            phone: studentData.phone,
-                            telegram: studentData.telegram,
-                            department: studentData.department,
-                            batch: studentData.batch,
-                            schedules: mergedSchedules,
-                            timestamp: new Date()
-                        });
-                        const mergedStudent = { ...existing, ...studentData, schedules: mergedSchedules };
-                        updateCacheAfterWrite(existing.id, mergedStudent);
-                        const newQiratsAdded = mergedQirats.length - existingQirats.length;
-                        showToast(`✅ Student exists! Merged ${newQiratsAdded} new Qirat(s) into existing record.`);
-                    } else {
-                        showToast(`⚠️ Student already exists with same information. No changes made.`);
-                    }
-                } else {
-                    const docRef = await addDoc(collection(db, "registrations"), studentData);
-                    const newStudent = { id: docRef.id, ...studentData };
-                    allStudents.push(newStudent);
-                    saveToCache();
-                    applyFiltersAndRender();
-                    showToast('Student added successfully');
-                }
-            }
-            closeModal();
-            applyFiltersAndRender();
-        } catch (error) { showToast("Error: " + error.message, true); }
-    });
-    
-    // ========== BEAUTIFUL EXPORT FUNCTIONS ==========
-    function getExportData() { 
-        return filteredStudents.map(s => ({ 
-            'Name': s.full_name, 
-            'Gender': s.gender, 
-            'Phone': s.phone, 
-            'Telegram': s.telegram, 
-            'Department': s.department, 
-            'Batch': s.batch, 
-            'Qirats': getQiratNames(s).join(', ')
-        })); 
-    }
-    
-    exportCSV.addEventListener('click', () => {
-        const data = getExportData();
-        if (!data.length) { showToast('No data to export', true); return; }
-        const headers = Object.keys(data[0]);
-        const rows = data.map(row => headers.map(h => `"${String(row[h] || '').replace(/"/g, '""')}"`).join(','));
-        const blob = new Blob(["\uFEFF" + [headers.join(','), ...rows].join('\n')], { type: 'text/csv' });
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `students_${new Date().toISOString().slice(0,19)}.csv`; a.click(); URL.revokeObjectURL(a.href);
-        showToast('CSV exported');
-    });
-    
-    exportExcel.addEventListener('click', () => {
-        const data = getExportData();
-        if (!data.length) { showToast('No data to export', true); return; }
-        const ws = XLSX.utils.json_to_sheet(data);
-        ws['!cols'] = [{wch:25},{wch:10},{wch:15},{wch:18},{wch:20},{wch:15},{wch:35}];
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'Students');
-        XLSX.writeFile(wb, `students_${new Date().toISOString().slice(0,19)}.xlsx`);
-        showToast('Excel exported');
-    });
-    
-    exportPDF.addEventListener('click', async () => {
-        const data = getExportData();
-        if (!data.length) { showToast('No data to export', true); return; }
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-        const kpi = { total: filteredStudents.length, male: filteredStudents.filter(s=>s.gender==='Male').length, female: filteredStudents.filter(s=>s.gender==='Female').length };
-        
-        doc.setFontSize(18);
-        doc.setTextColor(16, 185, 129);
-        doc.text("JUMJ Irshad - Student Report", 14, 20);
-        
-        doc.setFontSize(10);
-        doc.setTextColor(100, 100, 100);
-        doc.text(`Generated: ${new Date().toLocaleString()} | Total Students: ${kpi.total} | Male: ${kpi.male} | Female: ${kpi.female}`, 14, 30);
-        
-        doc.autoTable({
-            head: [['Name', 'Gender', 'Phone', 'Department', 'Batch', 'Qirats']],
-            body: data.map(r => [r.Name, r.Gender, r.Phone, r.Department, r.Batch, r.Qirats]),
-            startY: 45,
-            theme: 'striped',
-            headStyles: { fillColor: [16, 185, 129], textColor: [255, 255, 255], fontStyle: 'bold' },
-            styles: { fontSize: 9, cellPadding: 3 }
+        await updateDoc(doc(db, "registrations", currentEditStudentId), {
+            full_name: newName, gender: newGender, phone: newPhone, department: newDept, batch: newBatch
         });
+        showToast("Student updated");
+        loadData();
+        closeEditModal();
+    };
+    
+    window.deleteStudentOnlyQirats = async () => {
+        if (confirm("Delete ALL Qirats from this student only?")) {
+            await updateDoc(doc(db, "registrations", currentEditStudentId), { schedules: [] });
+            showToast("All Qirats removed from student");
+            loadData();
+            closeEditModal();
+        }
+    };
+    
+    window.deleteStudent = async (studentId) => {
+        if (confirm("Delete this student permanently?")) {
+            await deleteDoc(doc(db, "registrations", studentId));
+            showToast("Student deleted");
+            loadData();
+        }
+    };
+    
+    window.closeEditModal = () => {
+        document.getElementById('editModal').classList.remove('active');
+        currentEditStudentId = null;
+    };
+    
+    // Global Qirat Edit Feature
+    window.openEditQiratGlobal = (qiratName) => {
+        currentEditQiratGlobalName = qiratName;
+        const modal = document.getElementById('editQiratGlobalModal');
+        const form = document.getElementById('editQiratGlobalForm');
+        form.innerHTML = `
+            <div class="form-group">
+                <label>Current Qirat Name: <strong>${escapeHtml(qiratName)}</strong></label>
+                <label>New Qirat Name</label>
+                <input type="text" id="newGlobalQiratName" class="form-control" placeholder="Enter new name">
+            </div>
+            <div style="display: flex; gap: 12px; margin-top: 20px;">
+                <button class="btn-primary" onclick="saveGlobalQiratEdit()">Update for All Students</button>
+                <button class="btn-danger" onclick="deleteGlobalQirat()">Delete This Qirat from ALL Students</button>
+                <button class="btn-secondary" onclick="closeEditQiratGlobalModal()">Cancel</button>
+            </div>
+            <div style="margin-top: 16px; padding: 12px; background: #fef3c7; border-radius: 16px; font-size: 0.8rem;">
+                <i class="fas fa-info-circle"></i> This will update the Qirat name for EVERY student who has it.
+            </div>
+        `;
+        modal.classList.add('active');
+    };
+    
+    window.saveGlobalQiratEdit = async () => {
+        const newName = document.getElementById('newGlobalQiratName').value.trim();
+        if (!newName) return showToast("Enter new Qirat name", true);
+        if (newName === currentEditQiratGlobalName) return closeEditQiratGlobalModal();
         
-        doc.save(`students_report.pdf`);
-        showToast('PDF exported');
-    });
+        let updatedCount = 0;
+        for (const student of allStudents) {
+            const hasQirat = (student.schedules || []).some(s => s.qirat_name === currentEditQiratGlobalName);
+            if (hasQirat) {
+                const newSchedules = (student.schedules || []).map(s => 
+                    s.qirat_name === currentEditQiratGlobalName ? { ...s, qirat_name: newName } : s
+                );
+                await updateDoc(doc(db, "registrations", student.id), { schedules: newSchedules });
+                updatedCount++;
+            }
+        }
+        showToast(`✅ Renamed "${currentEditQiratGlobalName}" → "${newName}" for ${updatedCount} students`);
+        loadData();
+        closeEditQiratGlobalModal();
+    };
     
-    exportWord.addEventListener('click', () => {
-        const data = getExportData();
-        if (!data.length) { showToast('No data to export', true); return; }
-        let html = `<!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <title>Students Report</title>
-            <style>
-                body { font-family: 'Arial', sans-serif; margin: 40px; }
-                h1 { color: #10b981; border-bottom: 2px solid #10b981; padding-bottom: 10px; }
-                table { border-collapse: collapse; width: 100%; margin-top: 20px; }
-                th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-                th { background: #10b981; color: white; }
-                tr:nth-child(even) { background: #f9fafb; }
-            </style>
-        </head>
-        <body>
-            <h1>📊 JUMJ Irshad - Student Report</h1>
-            <p>Generated: ${new Date().toLocaleString()} | Total Students: ${data.length}</p>
-            <table>
-                <thead>
-                    <tr><th>Name</th><th>Gender</th><th>Phone</th><th>Department</th><th>Batch</th><th>Qirats</th></tr>
-                </thead>
-                <tbody>
-                    ${data.map(r => `
-                        <tr>
-                            <td>${escapeHtml(r.Name)}</strong></td>
-                            <td>${escapeHtml(r.Gender)}</span></td>
-                            <td>${escapeHtml(r.Phone)}</span></td>
-                            <td>${escapeHtml(r.Department)}</span></td>
-                            <td>${escapeHtml(r.Batch)}</span></td>
-                            <td>${escapeHtml(r.Qirats)}</span></td>
-                        </tr>
-                    `).join('')}
-                </tbody>
-            </table>
-        </body>
-        </html>`;
-        const blob = new Blob([html], { type: 'application/msword' });
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `students_report.doc`; a.click(); URL.revokeObjectURL(a.href);
-        showToast('Word exported');
-    });
+    window.deleteGlobalQirat = async () => {
+        if (confirm(`⚠️ Remove "${currentEditQiratGlobalName}" from ALL students? This cannot be undone!`)) {
+            let updatedCount = 0;
+            for (const student of allStudents) {
+                const hasQirat = (student.schedules || []).some(s => s.qirat_name === currentEditQiratGlobalName);
+                if (hasQirat) {
+                    const newSchedules = (student.schedules || []).filter(s => s.qirat_name !== currentEditQiratGlobalName);
+                    await updateDoc(doc(db, "registrations", student.id), { schedules: newSchedules });
+                    updatedCount++;
+                }
+            }
+            showToast(`✅ Removed "${currentEditQiratGlobalName}" from ${updatedCount} students`);
+            loadData();
+            closeEditQiratGlobalModal();
+        }
+    };
     
-    searchInput.addEventListener('input', () => { currentPage = 1; applyFiltersAndRender(); });
-    genderFilter.addEventListener('change', () => { currentPage = 1; applyFiltersAndRender(); });
-    deptFilter.addEventListener('change', () => { currentPage = 1; applyFiltersAndRender(); });
-    batchFilter.addEventListener('change', () => { currentPage = 1; applyFiltersAndRender(); });
-    clearFiltersBtn.addEventListener('click', () => { searchInput.value = ''; genderFilter.value = ''; deptFilter.value = ''; batchFilter.value = ''; currentPage = 1; applyFiltersAndRender(); });
+    window.closeEditQiratGlobalModal = () => {
+        document.getElementById('editQiratGlobalModal').classList.remove('active');
+        currentEditQiratGlobalName = null;
+    };
     
-    // Try cache first, then Firestore
-    if (!loadFromCache()) {
-        loadDataFromFirestore();
-    } else {
-        populateFilters();
-        applyFiltersAndRender();
-        setTimeout(() => loadDataFromFirestore(), 100);
+    // Add inline edit option in table for Qirats
+    function addQiratActionButtons() {
+        // Add global edit buttons next to each qirat badge in the table
+        const qiratSpans = document.querySelectorAll('.badge-qirat');
+        qiratSpans.forEach(span => {
+            const qiratName = span.textContent;
+            if (!span.parentElement.querySelector('.edit-qirat-global')) {
+                const editBtn = document.createElement('span');
+                editBtn.innerHTML = `<i class="fas fa-pen" style="cursor:pointer; margin-left:4px; font-size:0.6rem; color:#10b981;" onclick="openEditQiratGlobal('${escapeHtml(qiratName)}')" title="Edit Qirat globally"></i>`;
+                span.appendChild(editBtn);
+            }
+        });
     }
     
-    document.addEventListener('DOMContentLoaded', () => {
-        initNavigation();
+    // Export functions
+    function exportToCSV() {
+        const data = filteredStudents.map(s => ({
+            Name: s.full_name, Gender: s.gender, Phone: s.phone, Department: s.department,
+            Batch: s.batch, Qirats: getQiratNames(s).join(', '), RegistrationDate: s.timestamp.toLocaleDateString()
+        }));
+        if (!data.length) return alert('No data to export');
+        const headers = ['Name', 'Gender', 'Phone', 'Department', 'Batch', 'Qirats', 'RegistrationDate'];
+        const rows = data.map(r => headers.map(h => `"${String(r[h] || '').replace(/"/g, '""')}"`).join(','));
+        const blob = new Blob(["\uFEFF" + [headers.join(','), ...rows].join('\n')], { type: 'text/csv' });
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `students_${new Date().toISOString().slice(0,10)}.csv`; a.click(); URL.revokeObjectURL(a.href);
+        showToast('CSV exported');
+    }
+    
+    function exportToExcel() {
+        const data = filteredStudents.map(s => ({
+            Name: s.full_name, Gender: s.gender, Phone: s.phone, Department: s.department,
+            Batch: s.batch, Qirats: getQiratNames(s).join(', '), RegistrationDate: s.timestamp.toLocaleDateString()
+        }));
+        if (!data.length) return alert('No data to export');
+        const ws = XLSX.utils.json_to_sheet(data);
+        const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Students');
+        XLSX.writeFile(wb, `students_${new Date().toISOString().slice(0,10)}.xlsx`);
+        showToast('Excel exported');
+    }
+    
+    // Event Listeners
+    searchInput.addEventListener('input', applyFilters);
+    genderFilter.addEventListener('change', applyFilters);
+    deptFilter.addEventListener('change', applyFilters);
+    batchFilter.addEventListener('change', applyFilters);
+    clearFiltersBtn.addEventListener('click', () => {
+        searchInput.value = ''; genderFilter.value = ''; deptFilter.value = ''; batchFilter.value = '';
+        applyFilters();
     });
-</script>
-        <!-- Navigation Script - Add this at the end of body -->
-<script type="module">
-    import { initNavigation } from './nav.js';
-    // Initialize navigation when DOM is ready
-    initNavigation();
+    exportCSVBtn.addEventListener('click', exportToCSV);
+    exportExcelBtn.addEventListener('click', exportToExcel);
+    
+    document.querySelectorAll('.category-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            currentCategory = tab.dataset.category;
+            applyFilters();
+        });
+    });
+    
+    // Close modals when clicking outside
+    window.onclick = (e) => {
+        if (e.target === document.getElementById('editModal')) closeEditModal();
+        if (e.target === document.getElementById('editQiratGlobalModal')) closeEditQiratGlobalModal();
+    };
+    
+    loadData();
 </script>
 </body>
 </html>
