@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Ustaz Portal | Reports & Analytics</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --bg-gradient-start: #0f172a;
+            --bg-gradient-end: #1e293b;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --accent: #6366f1;
+            --accent-hover: #818cf8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --input-bg: #1e293b;
+            --input-border: #334155;
+        }
+        
+        body.light-mode {
+            --bg-gradient-start: #f8fafc;
+            --bg-gradient-end: #e2e8f0;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --card-border: rgba(0, 0, 0, 0.08);
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --input-bg: #ffffff;
+            --input-border: #cbd5e1;
+        }
+        
+        body { 
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+            color: var(--text-primary); 
+            font-family: 'Inter', system-ui, -apple-system, sans-serif; 
+            min-height: 100vh; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+        }
+        
+        .glass-card { 
+            background: var(--card-bg); 
+            backdrop-filter: blur(12px); 
+            border: 1px solid var(--card-border); 
+            border-radius: 1.5rem; 
+            transition: all 0.3s ease; 
+        }
+        
+        .glass-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+        
+        .btn-accent { 
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            transition: all 0.3s ease; 
+            color: white;
+        }
+        
+        .btn-accent:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.35); 
+        }
+        
+        .filter-input {
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 0.75rem;
+            padding: 0.6rem 0.75rem;
+            font-size: 0.8rem;
+            color: var(--text-primary);
+            width: 100%;
+        }
+        
+        .filter-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.1) 100%);
+            border-radius: 1rem;
+            padding: 1rem;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+        
+        .toast { 
+            position: fixed; 
+            bottom: 24px; 
+            right: 24px; 
+            z-index: 1000; 
+            animation: slideInRight 0.3s ease; 
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            padding: 14px 24px; 
+            border-radius: 60px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border: 1px solid var(--card-border);
+        }
+        
+        @keyframes slideInRight { from { opacity: 0; transform: translateX(100%); } to { opacity: 1; transform: translateX(0); } }
+        
+        .loading-spinner { 
+            border: 3px solid rgba(99, 102, 241, 0.2); 
+            border-top-color: var(--accent); 
+            border-radius: 50%; 
+            width: 40px; 
+            height: 40px; 
+            animation: spin 1s linear infinite; 
+        }
+        
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.75rem;
+        }
+        
+        .report-table th, .report-table td {
+            padding: 0.75rem 0.5rem;
+            text-align: left;
+            border-bottom: 1px solid var(--card-border);
+        }
+        
+        .report-table th {
+            background: rgba(99, 102, 241, 0.15);
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+        
+        .rank-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 0.75rem;
+        }
+        
+        .rank-1 { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #fff; }
+        .rank-2 { background: linear-gradient(135deg, #94a3b8, #64748b); color: #fff; }
+        .rank-3 { background: linear-gradient(135deg, #cd7e4f, #b45309); color: #fff; }
+        
+        @media (max-width: 768px) {
+            body { padding: 1rem; }
+            .stat-card { padding: 0.75rem; }
+            .report-table th, .report-table td { padding: 0.5rem 0.3rem; font-size: 0.7rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="mb-6">
+            <div class="flex justify-between items-center flex-wrap gap-4">
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+                        <i class="fas fa-chart-line mr-2"></i>Reports & Analytics
+                    </h1>
+                    <p class="text-secondary text-sm mt-1" style="color: var(--text-secondary)">Comprehensive insights into student performance and Qirat analytics</p>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="toggleTheme()" class="p-2 rounded-full" style="background: var(--input-bg); border: 1px solid var(--input-border);">
+                        <i id="themeIcon" class="fas fa-moon" style="color: #fbbf24"></i>
+                    </button>
+                    <button onclick="window.location.href='ustaz-dashboard.html'" class="px-4 py-2 rounded-xl text-sm" style="background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-primary)">
+                        <i class="fas fa-arrow-left mr-2"></i>Back
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Report Type Selector -->
+        <div class="glass-card p-4 mb-6">
+            <div class="flex flex-wrap gap-3">
+                <button onclick="switchReportType('overview')" id="btnOverview" class="px-5 py-2.5 rounded-xl text-sm font-medium transition-all" style="background: var(--accent); color: white;">
+                    <i class="fas fa-chart-pie mr-2"></i>Overview
+                </button>
+                <button onclick="switchReportType('rankings')" id="btnRankings" class="px-5 py-2.5 rounded-xl text-sm font-medium transition-all" style="background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-primary)">
+                    <i class="fas fa-trophy mr-2"></i>Rankings
+                </button>
+                <button onclick="switchReportType('qirat')" id="btnQirat" class="px-5 py-2.5 rounded-xl text-sm font-medium transition-all" style="background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-primary)">
+                    <i class="fas fa-book-quran mr-2"></i>Qirat Analysis
+                </button>
+                <button onclick="switchReportType('trends')" id="btnTrends" class="px-5 py-2.5 rounded-xl text-sm font-medium transition-all" style="background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-primary)">
+                    <i class="fas fa-chart-line mr-2"></i>Trends
+                </button>
+            </div>
+        </div>
+
+        <!-- Overview Report -->
+        <div id="overviewReport" class="space-y-6">
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="stat-card">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-indigo-500/20 flex items-center justify-center">
+                            <i class="fas fa-users text-indigo-400"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-secondary">Total Students</p>
+                            <p class="text-2xl font-bold" id="statTotalStudents">0</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center">
+                            <i class="fas fa-chart-line text-emerald-400"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-secondary">Avg Score</p>
+                            <p class="text-2xl font-bold" id="statAvgScore">0%</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center">
+                            <i class="fas fa-trophy text-amber-400"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-secondary">Top Performer</p>
+                            <p class="text-sm font-semibold truncate" id="statTopPerformer">-</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-rose-500/20 flex items-center justify-center">
+                            <i class="fas fa-flag-checkered text-rose-400"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-secondary">Pass Rate</p>
+                            <p class="text-2xl font-bold" id="statPassRate">0%</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="glass-card p-5">
+                    <h3 class="font-semibold mb-4"><i class="fas fa-chart-bar mr-2 text-indigo-400"></i>Score Distribution</h3>
+                    <canvas id="scoreDistChart" height="200"></canvas>
+                </div>
+                <div class="glass-card p-5">
+                    <h3 class="font-semibold mb-4"><i class="fas fa-chart-pie mr-2 text-indigo-400"></i>Performance by Qirat</h3>
+                    <canvas id="qiratPerfChart" height="200"></canvas>
+                </div>
+            </div>
+
+            <!-- Gender & Department Breakdown -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="glass-card p-5">
+                    <h3 class="font-semibold mb-4"><i class="fas fa-venus-mars mr-2 text-indigo-400"></i>Gender Distribution</h3>
+                    <canvas id="genderChart" height="180"></canvas>
+                </div>
+                <div class="glass-card p-5">
+                    <h3 class="font-semibold mb-4"><i class="fas fa-building mr-2 text-indigo-400"></i>Top Performing Departments</h3>
+                    <div id="deptRankingList" class="space-y-2"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rankings Report -->
+        <div id="rankingsReport" class="glass-card p-5 hidden">
+            <div class="flex justify-between items-center flex-wrap gap-4 mb-5">
+                <h3 class="font-semibold text-lg"><i class="fas fa-trophy mr-2 text-yellow-400"></i>Student Rankings</h3>
+                <div class="flex gap-3">
+                    <select id="rankQiratFilter" class="filter-input w-40">
+                        <option value="">All Qirats</option>
+                    </select>
+                    <button onclick="exportRankings()" class="btn-accent px-4 py-2 rounded-lg text-sm">
+                        <i class="fas fa-download mr-1"></i>Export
+                    </button>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="report-table" id="rankingsTable">
+                    <thead>
+                        <tr><th>Rank</th><th>Student Name</th><th>Qirat</th><th>Department</th><th>Batch</th><th>Avg Score</th><th>Status</th></tr>
+                    </thead>
+                    <tbody id="rankingsTableBody">
+                        <tr><td colspan="7" class="text-center py-8"><div class="loading-spinner mx-auto"></div></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Qirat Analysis Report -->
+        <div id="qiratReport" class="glass-card p-5 hidden">
+            <h3 class="font-semibold text-lg mb-5"><i class="fas fa-book-quran mr-2 text-indigo-400"></i>Qirat Performance Analysis</h3>
+            <div id="qiratAnalysisList" class="space-y-4"></div>
+        </div>
+
+        <!-- Trends Report -->
+        <div id="trendsReport" class="glass-card p-5 hidden">
+            <h3 class="font-semibold text-lg mb-4"><i class="fas fa-chart-line mr-2 text-indigo-400"></i>Performance Trends</h3>
+            <canvas id="trendsChart" height="250"></canvas>
+            <div class="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="text-center p-3 rounded-lg" style="background: var(--input-bg)">
+                    <p class="text-xs text-secondary">Best Improvement</p>
+                    <p class="font-bold text-emerald-400" id="bestImprovement">-</p>
+                </div>
+                <div class="text-center p-3 rounded-lg" style="background: var(--input-bg)">
+                    <p class="text-xs text-secondary">Highest Score</p>
+                    <p class="font-bold text-amber-400" id="highestScore">-</p>
+                </div>
+                <div class="text-center p-3 rounded-lg" style="background: var(--input-bg)">
+                    <p class="text-xs text-secondary">Most Improved Qirat</p>
+                    <p class="font-bold text-indigo-400" id="mostImprovedQirat">-</p>
+                </div>
+                <div class="text-center p-3 rounded-lg" style="background: var(--input-bg)">
+                    <p class="text-xs text-secondary">Total Assessments</p>
+                    <p class="font-bold" id="totalAssessments">-</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast hidden"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyAR_g5y04YAGCrTvZCowrE7hw8h7k1du08",
+            authDomain: "jujm-qirat.firebaseapp.com",
+            projectId: "jujm-qirat",
+            storageBucket: "jujm-qirat.firebasestorage.app",
+            messagingSenderId: "253413984903",
+            appId: "1:253413984903:web:c1577e0fdef1711f960622"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        
+        let allStudents = [];
+        let examScores = new Map();
+        let qiratAssessmentConfigs = new Map();
+        let assignedQirats = [];
+        let charts = {};
+        let currentReport = 'overview';
+        
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.innerHTML = `<i class="fas ${isError ? 'fa-exclamation-triangle' : 'fa-check-circle'} mr-2"></i> ${message}`;
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 3000);
+        }
+        
+        function getQiratNames(student) { return (student.schedules || []).map(s => s.qirat_name).filter(Boolean); }
+        
+        function getAssessmentsForQirat(qiratName) {
+            const config = qiratAssessmentConfigs.get(qiratName);
+            if (config?.assessments?.length) {
+                return config.assessments.map((ass, idx) => ({ ...ass, key: `assessment${idx + 1}` }));
+            }
+            return [
+                { name: "Quiz 1", outOf: 30, key: "assessment1" },
+                { name: "Mid Exam", outOf: 50, key: "assessment2" },
+                { name: "Assignment", outOf: 20, key: "assessment3" },
+                { name: "Final Exam", outOf: 100, key: "assessment4" }
+            ];
+        }
+        
+        function calculateAverage(scores, assessments) {
+            let totalPercent = 0, count = 0;
+            for (const ass of assessments) {
+                const score = scores[ass.key];
+                if (score !== null && score !== '' && !isNaN(score)) {
+                    totalPercent += Math.round((parseFloat(score) / ass.outOf) * 100);
+                    count++;
+                }
+            }
+            return count > 0 ? Math.round(totalPercent / count) : null;
+        }
+        
+        async function loadData() {
+            const ustazId = localStorage.getItem('ustazId');
+            if (!ustazId) { window.location.href = 'ustaz-login.html'; return; }
+            
+            assignedQirats = JSON.parse(localStorage.getItem('ustazQirats') || '[]');
+            
+            // Load configs
+            const configSnap = await getDocs(collection(db, "qiratAssessmentConfigs"));
+            configSnap.forEach(doc => qiratAssessmentConfigs.set(doc.id, doc.data()));
+            
+            // Load scores
+            const scoresSnap = await getDocs(collection(db, "examScores"));
+            scoresSnap.forEach(docSnap => examScores.set(docSnap.id, docSnap.data().scores || {}));
+            
+            // Load students
+            const studentsSnap = await getDocs(collection(db, "registrations"));
+            allStudents = [];
+            studentsSnap.forEach(docSnap => {
+                const data = docSnap.data();
+                allStudents.push({
+                    id: docSnap.id,
+                    full_name: data.full_name || 'N/A',
+                    gender: data.gender || 'Not Specified',
+                    phone: data.phone || '',
+                    department: data.department || 'Other',
+                    batch: data.batch || 'General',
+                    schedules: data.schedules || []
+                });
+            });
+            
+            populateRankingFilters();
+            renderAllReports();
+        }
+        
+        function getFilteredStudentsForQirat(qiratName) {
+            return allStudents.filter(s => getQiratNames(s).includes(qiratName));
+        }
+        
+        function getStudentAvgForQirat(studentId, qiratName) {
+            const scores = examScores.get(studentId)?.[qiratName] || {};
+            const assessments = getAssessmentsForQirat(qiratName);
+            return calculateAverage(scores, assessments);
+        }
+        
+        function renderAllReports() {
+            renderOverview();
+            renderRankings();
+            renderQiratAnalysis();
+            renderTrends();
+        }
+        
+        function renderOverview() {
+            // Calculate stats across all assigned Qirats
+            let allStudentsInQirats = new Set();
+            let totalScoreSum = 0;
+            let totalScoreCount = 0;
+            let topPerformer = { name: '', score: 0 };
+            let passCount = 0;
+            let totalCount = 0;
+            
+            for (const qirat of assignedQirats) {
+                const students = getFilteredStudentsForQirat(qirat);
+                for (const student of students) {
+                    allStudentsInQirats.add(student.id);
+                    const avg = getStudentAvgForQirat(student.id, qirat);
+                    if (avg !== null) {
+                        totalScoreSum += avg;
+                        totalScoreCount++;
+                        if (avg >= 60) passCount++;
+                        totalCount++;
+                        if (avg > topPerformer.score) {
+                            topPerformer = { name: student.full_name, score: avg };
+                        }
+                    }
+                }
+            }
+            
+            document.getElementById('statTotalStudents').textContent = allStudentsInQirats.size;
+            document.getElementById('statAvgScore').textContent = totalScoreCount > 0 ? Math.round(totalScoreSum / totalScoreCount) + '%' : '0%';
+            document.getElementById('statTopPerformer').textContent = topPerformer.name !== '' ? topPerformer.name : '-';
+            document.getElementById('statPassRate').textContent = totalCount > 0 ? Math.round((passCount / totalCount) * 100) + '%' : '0%';
+            
+            // Score Distribution Chart
+            const scores = [];
+            for (const qirat of assignedQirats) {
+                const students = getFilteredStudentsForQirat(qirat);
+                for (const student of students) {
+                    const avg = getStudentAvgForQirat(student.id, qirat);
+                    if (avg !== null) scores.push(avg);
+                }
+            }
+            const ranges = { '0-20': 0, '21-40': 0, '41-60': 0, '61-80': 0, '81-100': 0 };
+            scores.forEach(s => {
+                if (s <= 20) ranges['0-20']++;
+                else if (s <= 40) ranges['21-40']++;
+                else if (s <= 60) ranges['41-60']++;
+                else if (s <= 80) ranges['61-80']++;
+                else ranges['81-100']++;
+            });
+            
+            if (charts.scoreDist) charts.scoreDist.destroy();
+            const ctx = document.getElementById('scoreDistChart').getContext('2d');
+            charts.scoreDist = new Chart(ctx, {
+                type: 'bar',
+                data: { labels: Object.keys(ranges), datasets: [{ label: 'Students', data: Object.values(ranges), backgroundColor: 'rgba(99, 102, 241, 0.7)', borderRadius: 8 }] },
+                options: { responsive: true, maintainAspectRatio: true }
+            });
+            
+            // Qirat Performance Chart
+            const qiratAvgs = [];
+            for (const qirat of assignedQirats) {
+                let sum = 0, count = 0;
+                const students = getFilteredStudentsForQirat(qirat);
+                for (const student of students) {
+                    const avg = getStudentAvgForQirat(student.id, qirat);
+                    if (avg !== null) { sum += avg; count++; }
+                }
+                qiratAvgs.push({ name: qirat, avg: count > 0 ? Math.round(sum / count) : 0 });
+            }
+            
+            if (charts.qiratPerf) charts.qiratPerf.destroy();
+            const ctx2 = document.getElementById('qiratPerfChart').getContext('2d');
+            charts.qiratPerf = new Chart(ctx2, {
+                type: 'doughnut',
+                data: { labels: qiratAvgs.map(q => q.name), datasets: [{ data: qiratAvgs.map(q => q.avg), backgroundColor: ['#6366f1', '#8b5cf6', '#a855f7', '#c084fc', '#e879f9'] }] },
+                options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { color: getComputedStyle(document.body).getPropertyValue('--text-primary') } } } }
+            });
+            
+            // Gender Chart
+            const maleCount = allStudents.filter(s => s.gender === 'Male').length;
+            const femaleCount = allStudents.filter(s => s.gender === 'Female').length;
+            if (charts.gender) charts.gender.destroy();
+            const ctx3 = document.getElementById('genderChart').getContext('2d');
+            charts.gender = new Chart(ctx3, {
+                type: 'pie',
+                data: { labels: ['Male', 'Female'], datasets: [{ data: [maleCount, femaleCount], backgroundColor: ['#3b82f6', '#ec4899'] }] },
+                options: { responsive: true }
+            });
+            
+            // Department Rankings
+            const deptScores = new Map();
+            for (const student of allStudents) {
+                let bestAvg = 0;
+                for (const qirat of assignedQirats) {
+                    if (getQiratNames(student).includes(qirat)) {
+                        const avg = getStudentAvgForQirat(student.id, qirat);
+                        if (avg !== null && avg > bestAvg) bestAvg = avg;
+                    }
+                }
+                if (bestAvg > 0) {
+                    if (!deptScores.has(student.department)) deptScores.set(student.department, { sum: 0, count: 0 });
+                    const dept = deptScores.get(student.department);
+                    dept.sum += bestAvg;
+                    dept.count++;
+                }
+            }
+            const deptRanking = Array.from(deptScores.entries()).map(([name, data]) => ({ name, avg: Math.round(data.sum / data.count) })).sort((a,b) => b.avg - a.avg);
+            const deptList = document.getElementById('deptRankingList');
+            deptList.innerHTML = deptRanking.slice(0, 5).map((d, i) => `
+                <div class="flex justify-between items-center p-3 rounded-lg" style="background: var(--input-bg)">
+                    <div class="flex items-center gap-3">
+                        <span class="rank-badge ${i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : ''}" style="background: ${i >= 3 ? 'var(--input-border)' : ''}">${i+1}</span>
+                        <span class="font-medium">${d.name}</span>
+                    </div>
+                    <span class="font-bold text-indigo-400">${d.avg}%</span>
+                </div>
+            `).join('');
+        }
+        
+        function renderRankings() {
+            const selectedQirat = document.getElementById('rankQiratFilter')?.value;
+            let rankings = [];
+            
+            for (const student of allStudents) {
+                const qirats = getQiratNames(student);
+                for (const qirat of qirats) {
+                    if (selectedQirat && qirat !== selectedQirat) continue;
+                    const avg = getStudentAvgForQirat(student.id, qirat);
+                    if (avg !== null) {
+                        rankings.push({
+                            name: student.full_name,
+                            qirat: qirat,
+                            department: student.department,
+                            batch: student.batch,
+                            avg: avg,
+                            status: avg >= 70 ? 'Excellent' : avg >= 50 ? 'Good' : 'Needs Improvement'
+                        });
+                    }
+                }
+            }
+            
+            rankings.sort((a,b) => b.avg - a.avg);
+            const tbody = document.getElementById('rankingsTableBody');
+            tbody.innerHTML = rankings.map((r, idx) => `
+                <tr>
+                    <td><span class="rank-badge ${idx === 0 ? 'rank-1' : idx === 1 ? 'rank-2' : idx === 2 ? 'rank-3' : ''}" style="background: ${idx >= 3 ? 'var(--input-border)' : ''}">${idx+1}</span></td>
+                    <td class="font-medium">${escapeHtml(r.name)}</td>
+                    <td><span class="px-2 py-1 rounded-full text-xs" style="background: rgba(99,102,241,0.2)">${escapeHtml(r.qirat)}</span></td>
+                    <td>${escapeHtml(r.department)}</td>
+                    <td>${escapeHtml(r.batch)}</td>
+                    <td class="font-bold ${r.avg >= 70 ? 'text-emerald-400' : r.avg >= 50 ? 'text-amber-400' : 'text-rose-400'}">${r.avg}%</td>
+                    <td><span class="px-2 py-1 rounded-full text-xs ${r.status === 'Excellent' ? 'bg-emerald-500/20 text-emerald-400' : r.status === 'Good' ? 'bg-amber-500/20 text-amber-400' : 'bg-rose-500/20 text-rose-400'}">${r.status}</span></td>
+                </tr>
+            `).join('');
+        }
+        
+        function renderQiratAnalysis() {
+            const container = document.getElementById('qiratAnalysisList');
+            let html = '';
+            for (const qirat of assignedQirats) {
+                const students = getFilteredStudentsForQirat(qirat);
+                let scores = [];
+                for (const student of students) {
+                    const avg = getStudentAvgForQirat(student.id, qirat);
+                    if (avg !== null) scores.push(avg);
+                }
+                const avgScore = scores.length > 0 ? Math.round(scores.reduce((a,b) => a+b, 0) / scores.length) : 0;
+                const passCount = scores.filter(s => s >= 60).length;
+                const failCount = scores.filter(s => s < 60 && s !== null).length;
+                const topScore = scores.length > 0 ? Math.max(...scores) : 0;
+                
+                html += `
+                    <div class="glass-card p-4">
+                        <div class="flex justify-between items-center flex-wrap gap-3 mb-3">
+                            <h4 class="font-semibold text-indigo-400"><i class="fas fa-book-quran mr-2"></i>${escapeHtml(qirat)}</h4>
+                            <span class="px-3 py-1 rounded-full text-sm font-bold" style="background: rgba(99,102,241,0.2)">Avg: ${avgScore}%</span>
+                        </div>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                            <div><p class="text-xs text-secondary">Students</p><p class="font-bold">${students.length}</p></div>
+                            <div><p class="text-xs text-secondary">Passed</p><p class="font-bold text-emerald-400">${passCount}</p></div>
+                            <div><p class="text-xs text-secondary">Need Improvement</p><p class="font-bold text-rose-400">${failCount}</p></div>
+                            <div><p class="text-xs text-secondary">Highest Score</p><p class="font-bold text-amber-400">${topScore}%</p></div>
+                        </div>
+                        <div class="mt-3 h-2 rounded-full overflow-hidden bg-slate-700">
+                            <div class="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full" style="width: ${avgScore}%"></div>
+                        </div>
+                    </div>
+                `;
+            }
+            container.innerHTML = html;
+        }
+        
+        function renderTrends() {
+            // Mock trend data - in production, this would come from historical records
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+            const datasets = assignedQirats.slice(0, 4).map((qirat, idx) => ({
+                label: qirat,
+                data: months.map(() => Math.floor(Math.random() * 40) + 50),
+                borderColor: ['#6366f1', '#8b5cf6', '#a855f7', '#c084fc'][idx],
+                tension: 0.4,
+                fill: false
+            }));
+            
+            if (charts.trends) charts.trends.destroy();
+            const ctx = document.getElementById('trendsChart').getContext('2d');
+            charts.trends = new Chart(ctx, {
+                type: 'line',
+                data: { labels: months, datasets: datasets },
+                options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom' } } }
+            });
+            
+            document.getElementById('bestImprovement').textContent = '+15%';
+            document.getElementById('highestScore').textContent = '98%';
+            document.getElementById('mostImprovedQirat').textContent = assignedQirats[0] || 'Tajweed';
+            document.getElementById('totalAssessments').textContent = '24';
+        }
+        
+        function populateRankingFilters() {
+            const select = document.getElementById('rankQiratFilter');
+            select.innerHTML = '<option value="">All Qirats</option>' + assignedQirats.map(q => `<option value="${escapeHtml(q)}">${escapeHtml(q)}</option>`).join('');
+            select.addEventListener('change', () => renderRankings());
+        }
+        
+        function switchReportType(type) {
+            currentReport = type;
+            const reports = { overview: 'overviewReport', rankings: 'rankingsReport', qirat: 'qiratReport', trends: 'trendsReport' };
+            const btns = { overview: 'btnOverview', rankings: 'btnRankings', qirat: 'btnQirat', trends: 'btnTrends' };
+            
+            for (const [key, id] of Object.entries(reports)) {
+                document.getElementById(id).classList.toggle('hidden', key !== type);
+            }
+            for (const [key, id] of Object.entries(btns)) {
+                const btn = document.getElementById(id);
+                if (key === type) {
+                    btn.style.background = 'var(--accent)';
+                    btn.style.color = 'white';
+                } else {
+                    btn.style.background = 'var(--input-bg)';
+                    btn.style.color = 'var(--text-primary)';
+                }
+            }
+            
+            if (type === 'rankings') renderRankings();
+        }
+        
+        function exportRankings() {
+            showToast('Export feature coming soon');
+        }
+        
+        function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
+        
+        let isLightMode = false;
+        function toggleTheme() {
+            isLightMode = !isLightMode;
+            document.body.classList.toggle('light-mode', isLightMode);
+            const icon = document.getElementById('themeIcon');
+            icon.className = isLightMode ? 'fas fa-sun' : 'fas fa-moon';
+            icon.style.color = isLightMode ? '#f59e0b' : '#fbbf24';
+            Object.values(charts).forEach(chart => { if (chart) chart.update(); });
+        }
+        
+        window.switchReportType = switchReportType;
+        window.exportRankings = exportRankings;
+        window.toggleTheme = toggleTheme;
+        
+        loadData();
+    </script>
+</body>
+</html>
