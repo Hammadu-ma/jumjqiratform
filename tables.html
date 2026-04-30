@@ -8,9 +8,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
-
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -134,12 +131,106 @@
         .filter-group { flex: 1; min-width: 140px; }
         .filter-group label { font-size: 0.7rem; font-weight: 700; color: var(--primary); display: block; margin-bottom: 6px; }
         .filter-group input, .filter-group select { width: 100%; padding: 10px 14px; border: 2px solid var(--border); border-radius: 16px; font-family: inherit; }
-        .exclude-filter-group { flex: 1; min-width: 180px; background: #fef3c7; border-radius: 16px; padding: 0 12px; border-left: 3px solid var(--warning); }
-        .exclude-filter-group label { color: #92400e; }
+        
+        /* Multi-select styles */
+        .multi-select-group { flex: 1; min-width: 180px; }
+        .multi-select-group label { font-size: 0.7rem; font-weight: 700; display: block; margin-bottom: 6px; }
+        .multi-select-group .filter-label-blue { color: var(--primary); }
+        .multi-select-group .filter-label-red { color: var(--danger); }
+        .multi-select-group .filter-label-orange { color: var(--warning); }
+        .multi-select-container { position: relative; }
+        .multi-select-btn {
+            width: 100%;
+            padding: 10px 14px;
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            background: white;
+            cursor: pointer;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .multi-select-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            margin-top: 4px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 50;
+            display: none;
+            box-shadow: var(--shadow-lg);
+        }
+        .multi-select-dropdown.show { display: block; }
+        .multi-select-option {
+            padding: 8px 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .multi-select-option:hover { background: var(--primary-light); }
+        .multi-select-option input { width: 16px; height: 16px; cursor: pointer; }
+        .selected-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 6px;
+        }
+        .selected-tag {
+            background: var(--primary-light);
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .selected-tag-remove {
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .selected-tag-remove:hover { color: var(--danger); }
+
         .btn-clear { background: #64748b; color: white; border: none; padding: 10px 24px; border-radius: 16px; font-weight: 600; cursor: pointer; }
         .btn-warning { background: var(--warning); color: white; border: none; padding: 10px 24px; border-radius: 16px; font-weight: 600; cursor: pointer; }
         .btn-primary { background: var(--primary); color: white; border: none; padding: 10px 24px; border-radius: 16px; font-weight: 600; cursor: pointer; }
         .btn-danger { background: var(--danger); color: white; border: none; padding: 10px 24px; border-radius: 16px; font-weight: 600; cursor: pointer; }
+        .btn-outline-danger { background: white; color: var(--danger); border: 2px solid var(--danger); padding: 8px 20px; border-radius: 16px; font-weight: 600; cursor: pointer; }
+        .btn-sm { padding: 6px 12px; font-size: 0.7rem; }
+
+        /* Batch Actions Bar */
+        .batch-actions-bar {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border-radius: 24px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .batch-actions-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .select-all-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+        }
+        .select-all-checkbox input { width: 18px; height: 18px; cursor: pointer; }
+        .selected-count { color: white; font-size: 0.8rem; }
+        .batch-actions-right { display: flex; gap: 12px; flex-wrap: wrap; }
 
         /* Student Table */
         .student-table-container {
@@ -153,7 +244,7 @@
             width: 100%;
             border-collapse: collapse;
             font-size: 0.8rem;
-            min-width: 800px;
+            min-width: 900px;
         }
         .student-table th, .student-table td {
             padding: 14px 12px;
@@ -168,6 +259,7 @@
             top: 0;
         }
         .student-table tr:hover { background: #f8fafc; }
+        .student-table tr.selected { background: #d1fae5; }
         .badge {
             padding: 4px 10px;
             border-radius: 30px;
@@ -177,7 +269,8 @@
         }
         .badge-male { background: #dbeafe; color: #1e40af; }
         .badge-female { background: #fce7f3; color: #be185d; }
-        .badge-qirat { background: #d1fae5; color: #065f46; margin: 2px; display: inline-block; }
+        .badge-qirat { background: #d1fae5; color: #065f46; margin: 2px; display: inline-block; cursor: pointer; }
+        .badge-qirat:hover { background: #a7f3d0; }
         .badge-no-qirat { background: #fee2e2; color: #991b1b; }
         .badge-single-qirat { background: #fef3c7; color: #92400e; }
         .action-buttons { display: flex; gap: 6px; flex-wrap: wrap; }
@@ -192,10 +285,9 @@
             font-size: 0.7rem;
         }
         .action-btn.edit-qirat:hover { background: #d1fae5; color: var(--primary); }
-        .action-btn.delete-qirat-student:hover { background: #fee2e2; color: var(--danger); }
         .action-btn.delete-student:hover { background: #fee2e2; color: var(--danger); }
 
-        /* Modals */
+        /* Modal styles */
         .modal {
             display: none;
             position: fixed;
@@ -240,26 +332,6 @@
         .add-qirat-input input { flex: 1; }
         .btn-secondary { background: #64748b; color: white; border: none; padding: 10px 20px; border-radius: 30px; font-weight: 600; cursor: pointer; }
 
-        /* Bulk Edit List */
-        .bulk-qirat-list {
-            max-height: 300px;
-            overflow-y: auto;
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 8px;
-        }
-        .bulk-qirat-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            border-bottom: 1px solid var(--border);
-        }
-        .bulk-qirat-item:last-child { border-bottom: none; }
-        .bulk-qirat-name { font-weight: 600; }
-        .bulk-qirat-count { font-size: 0.7rem; color: var(--text-muted); margin-left: 8px; }
-        .bulk-qirat-actions { display: flex; gap: 8px; }
-
         .toast {
             position: fixed;
             bottom: 100px;
@@ -280,6 +352,8 @@
             .category-tabs { border-radius: 20px; }
             .category-tab { padding: 8px 16px; font-size: 0.8rem; }
             .filters-bar { flex-direction: column; }
+            .batch-actions-bar { flex-direction: column; align-items: stretch; }
+            .batch-actions-left { justify-content: space-between; }
         }
     </style>
 </head>
@@ -307,12 +381,52 @@
         <div class="filter-group"><label><i class="fas fa-venus-mars"></i> Gender</label><select id="genderFilter"><option value="">All</option><option value="Male">Male</option><option value="Female">Female</option></select></div>
         <div class="filter-group"><label><i class="fas fa-building"></i> Department</label><select id="deptFilter"><option value="">All</option></select></div>
         <div class="filter-group"><label><i class="fas fa-calendar"></i> Batch</label><select id="batchFilter"><option value="">All</option></select></div>
-        <div class="exclude-filter-group"><label><i class="fas fa-ban"></i> 🔴 Exclude Qirat (Hide students with this Qirat)</label><select id="excludeQiratFilter"><option value="">None (Show All)</option></select></div>
-        <button class="btn-primary" id="bulkEditQiratBtn"><i class="fas fa-edit"></i> Bulk Edit Qirats</button>
-        <button class="btn-warning" id="bulkDeleteQiratBtn"><i class="fas fa-trash-alt"></i> Bulk Delete Qirat</button>
+        
+        <!-- Include Qirat Filter (Show only students with selected Qirats) -->
+        <div class="multi-select-group">
+            <label class="filter-label-blue"><i class="fas fa-filter"></i> 📌 Include Qirats (AND)</label>
+            <div class="multi-select-container" id="includeQiratContainer">
+                <div class="multi-select-btn" onclick="toggleIncludeDropdown()">
+                    <span id="includeQiratText">All Qirats</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="multi-select-dropdown" id="includeQiratDropdown"></div>
+            </div>
+            <div class="selected-tags" id="includeQiratTags"></div>
+        </div>
+
+        <!-- Exclude Qirat Filter (Hide students with selected Qirats) -->
+        <div class="multi-select-group">
+            <label class="filter-label-red"><i class="fas fa-ban"></i> 🔴 Exclude Qirats (OR)</label>
+            <div class="multi-select-container" id="excludeQiratContainer">
+                <div class="multi-select-btn" onclick="toggleExcludeDropdown()">
+                    <span id="excludeQiratText">None</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="multi-select-dropdown" id="excludeQiratDropdown"></div>
+            </div>
+            <div class="selected-tags" id="excludeQiratTags"></div>
+        </div>
+
         <button class="btn-clear" id="clearFiltersBtn"><i class="fas fa-eraser"></i> Clear</button>
+        <button class="btn-primary" id="bulkEditQiratBtn"><i class="fas fa-edit"></i> Bulk Edit Qirats</button>
         <button class="btn-primary" id="exportCSVBtn"><i class="fas fa-file-csv"></i> Export CSV</button>
-        <button class="btn-primary" id="exportExcelBtn"><i class="fas fa-file-excel"></i> Export Excel</button>
+    </div>
+
+    <!-- Batch Actions Bar -->
+    <div class="batch-actions-bar">
+        <div class="batch-actions-left">
+            <div class="select-all-checkbox">
+                <input type="checkbox" id="selectAllCheckbox">
+                <label>Select All</label>
+            </div>
+            <div class="selected-count" id="selectedCount">0 students selected</div>
+        </div>
+        <div class="batch-actions-right">
+            <button class="btn-outline-danger btn-sm" id="batchDeleteByQiratBtn"><i class="fas fa-trash-alt"></i> Delete by Qirat(s)</button>
+            <button class="btn-danger btn-sm" id="batchDeleteSelectedBtn"><i class="fas fa-trash-alt"></i> Delete Selected</button>
+            <button class="btn-warning btn-sm" id="batchDeleteQiratsOnlyBtn"><i class="fas fa-book"></i> Delete Qirats Only</button>
+        </div>
     </div>
 
     <!-- Student Table -->
@@ -320,6 +434,7 @@
         <table class="student-table">
             <thead>
                 <tr>
+                    <th style="width: 30px;"><input type="checkbox" id="headerSelectCheckbox" style="width: 16px; height: 16px;"></th>
                     <th>#</th>
                     <th>Name</th>
                     <th>Gender</th>
@@ -331,7 +446,7 @@
                 </tr>
             </thead>
             <tbody id="studentTableBody">
-                <tr><td colspan="8" class="empty-state">Loading students...</td></tr>
+                <tr><td colspan="9" class="empty-state">Loading students...</td></tr>
             </tbody>
         </table>
     </div>
@@ -357,21 +472,46 @@
         </div>
         <div id="bulkEditContent">
             <p>Select a Qirat to rename for ALL students:</p>
-            <div id="bulkQiratList" class="bulk-qirat-list"></div>
+            <div id="bulkQiratList" style="max-height: 300px; overflow-y: auto;"></div>
         </div>
     </div>
 </div>
 
-<!-- Bulk Delete Qirat Modal -->
-<div id="bulkDeleteModal" class="modal">
+<!-- Batch Delete by Qirat Modal -->
+<div id="batchDeleteByQiratModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
-            <h3><i class="fas fa-trash-alt"></i> Bulk Delete Qirat</h3>
-            <button class="close-modal" onclick="closeBulkDeleteModal()">&times;</button>
+            <h3><i class="fas fa-trash-alt"></i> Delete Students by Qirat</h3>
+            <button class="close-modal" onclick="closeBatchDeleteByQiratModal()">&times;</button>
         </div>
-        <div id="bulkDeleteContent">
-            <p>⚠️ Select a Qirat to DELETE from ALL students:</p>
-            <div id="bulkDeleteQiratList" class="bulk-qirat-list"></div>
+        <div class="form-group">
+            <label>Select Qirats (students who have ANY of these will be deleted)</label>
+            <div id="deleteByQiratMultiSelect" style="border: 2px solid var(--border); border-radius: 16px; padding: 8px; max-height: 200px; overflow-y: auto;"></div>
+        </div>
+        <div style="display: flex; gap: 12px; margin-top: 20px;">
+            <button class="btn-danger" id="confirmDeleteByQiratBtn">Delete Students</button>
+            <button class="btn-secondary" onclick="closeBatchDeleteByQiratModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- Batch Delete Qirats Only Modal -->
+<div id="batchDeleteQiratsOnlyModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-book"></i> Delete Qirats Only (Keep Students)</h3>
+            <button class="close-modal" onclick="closeBatchDeleteQiratsOnlyModal()">&times;</button>
+        </div>
+        <div class="form-group">
+            <label>Select Qirats to REMOVE from selected students:</label>
+            <div id="deleteQiratsOnlyMultiSelect" style="border: 2px solid var(--border); border-radius: 16px; padding: 8px; max-height: 200px; overflow-y: auto;"></div>
+        </div>
+        <div style="margin-top: 16px; padding: 12px; background: #fef3c7; border-radius: 16px;">
+            <i class="fas fa-info-circle"></i> This will only remove the selected Qirats from students. Students will remain in the system.
+        </div>
+        <div style="display: flex; gap: 12px; margin-top: 20px;">
+            <button class="btn-warning" id="confirmDeleteQiratsOnlyBtn">Remove Selected Qirats</button>
+            <button class="btn-secondary" onclick="closeBatchDeleteQiratsOnlyModal()">Cancel</button>
         </div>
     </div>
 </div>
@@ -406,19 +546,28 @@
     let allStudents = [];
     let filteredStudents = [];
     let currentCategory = 'all';
+    let selectedStudentIds = new Set();
+    
+    // Filter state
+    let includeQiratsList = [];
+    let excludeQiratsList = [];
+    let allQiratsList = [];
     
     // DOM Elements
     const searchInput = document.getElementById('searchInput');
     const genderFilter = document.getElementById('genderFilter');
     const deptFilter = document.getElementById('deptFilter');
     const batchFilter = document.getElementById('batchFilter');
-    const excludeQiratFilter = document.getElementById('excludeQiratFilter');
     const clearFiltersBtn = document.getElementById('clearFiltersBtn');
     const exportCSVBtn = document.getElementById('exportCSVBtn');
-    const exportExcelBtn = document.getElementById('exportExcelBtn');
     const bulkEditQiratBtn = document.getElementById('bulkEditQiratBtn');
-    const bulkDeleteQiratBtn = document.getElementById('bulkDeleteQiratBtn');
     const studentTableBody = document.getElementById('studentTableBody');
+    const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+    const headerSelectCheckbox = document.getElementById('headerSelectCheckbox');
+    const selectedCountSpan = document.getElementById('selectedCount');
+    const batchDeleteSelectedBtn = document.getElementById('batchDeleteSelectedBtn');
+    const batchDeleteByQiratBtn = document.getElementById('batchDeleteByQiratBtn');
+    const batchDeleteQiratsOnlyBtn = document.getElementById('batchDeleteQiratsOnlyBtn');
     const toast = document.getElementById('toast');
     
     let currentEditStudentId = null;
@@ -444,11 +593,91 @@
         return [...new Set(allStudents.flatMap(s => getQiratNames(s)))].sort();
     }
     
-    function populateExcludeFilter() {
-        const allQirats = getAllQirats();
-        excludeQiratFilter.innerHTML = '<option value="">None (Show All)</option>' + 
-            allQirats.map(q => `<option value="${escapeHtml(q)}">🔴 Exclude: ${escapeHtml(q)}</option>`).join('');
+    function updateAllQiratsList() {
+        allQiratsList = getAllQirats();
+        renderIncludeDropdown();
+        renderExcludeDropdown();
     }
+    
+    function renderIncludeDropdown() {
+        const dropdown = document.getElementById('includeQiratDropdown');
+        dropdown.innerHTML = allQiratsList.map(q => `
+            <label class="multi-select-option">
+                <input type="checkbox" value="${escapeHtml(q)}" ${includeQiratsList.includes(q) ? 'checked' : ''} onchange="toggleIncludeQirat('${escapeHtml(q)}')">
+                <span>${escapeHtml(q)} (${allStudents.filter(s => getQiratNames(s).includes(q)).length} students)</span>
+            </label>
+        `).join('');
+        
+        const textSpan = document.getElementById('includeQiratText');
+        if (includeQiratsList.length === 0) textSpan.textContent = 'All Qirats';
+        else if (includeQiratsList.length === 1) textSpan.textContent = includeQiratsList[0];
+        else textSpan.textContent = `${includeQiratsList.length} Qirats selected`;
+        
+        const tagsContainer = document.getElementById('includeQiratTags');
+        tagsContainer.innerHTML = includeQiratsList.map(q => `<span class="selected-tag">${escapeHtml(q)} <span class="selected-tag-remove" onclick="toggleIncludeQirat('${escapeHtml(q)}')">✖</span></span>`).join('');
+    }
+    
+    function renderExcludeDropdown() {
+        const dropdown = document.getElementById('excludeQiratDropdown');
+        dropdown.innerHTML = allQiratsList.map(q => `
+            <label class="multi-select-option">
+                <input type="checkbox" value="${escapeHtml(q)}" ${excludeQiratsList.includes(q) ? 'checked' : ''} onchange="toggleExcludeQirat('${escapeHtml(q)}')">
+                <span>${escapeHtml(q)} (${allStudents.filter(s => getQiratNames(s).includes(q)).length} students)</span>
+            </label>
+        `).join('');
+        
+        const textSpan = document.getElementById('excludeQiratText');
+        if (excludeQiratsList.length === 0) textSpan.textContent = 'None';
+        else if (excludeQiratsList.length === 1) textSpan.textContent = excludeQiratsList[0];
+        else textSpan.textContent = `${excludeQiratsList.length} Qirats excluded`;
+        
+        const tagsContainer = document.getElementById('excludeQiratTags');
+        tagsContainer.innerHTML = excludeQiratsList.map(q => `<span class="selected-tag" style="background:#fee2e2; color:#991b1b;">🚫 ${escapeHtml(q)} <span class="selected-tag-remove" onclick="toggleExcludeQirat('${escapeHtml(q)}')">✖</span></span>`).join('');
+    }
+    
+    window.toggleIncludeQirat = (qirat) => {
+        if (includeQiratsList.includes(qirat)) {
+            includeQiratsList = includeQiratsList.filter(q => q !== qirat);
+        } else {
+            includeQiratsList.push(qirat);
+        }
+        applyFilters();
+    };
+    
+    window.toggleExcludeQirat = (qirat) => {
+        if (excludeQiratsList.includes(qirat)) {
+            excludeQiratsList = excludeQiratsList.filter(q => q !== qirat);
+        } else {
+            excludeQiratsList.push(qirat);
+        }
+        applyFilters();
+    };
+    
+    let includeDropdownOpen = false;
+    let excludeDropdownOpen = false;
+    
+    window.toggleIncludeDropdown = () => {
+        includeDropdownOpen = !includeDropdownOpen;
+        document.getElementById('includeQiratDropdown').classList.toggle('show', includeDropdownOpen);
+        if (excludeDropdownOpen) toggleExcludeDropdown();
+    };
+    
+    window.toggleExcludeDropdown = () => {
+        excludeDropdownOpen = !excludeDropdownOpen;
+        document.getElementById('excludeQiratDropdown').classList.toggle('show', excludeDropdownOpen);
+        if (includeDropdownOpen) toggleIncludeDropdown();
+    };
+    
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('#includeQiratContainer')) {
+            document.getElementById('includeQiratDropdown').classList.remove('show');
+            includeDropdownOpen = false;
+        }
+        if (!e.target.closest('#excludeQiratContainer')) {
+            document.getElementById('excludeQiratDropdown').classList.remove('show');
+            excludeDropdownOpen = false;
+        }
+    });
     
     async function loadData() {
         try {
@@ -470,7 +699,7 @@
                 });
             });
             populateFilters();
-            populateExcludeFilter();
+            updateAllQiratsList();
             updateCategoryCounts();
             applyFilters();
         } catch (error) { showToast("Error loading: " + error.message, true); }
@@ -497,7 +726,6 @@
         const gender = genderFilter.value;
         const department = deptFilter.value;
         const batch = batchFilter.value;
-        const excludeQirat = excludeQiratFilter.value;
         
         let filtered = allStudents.filter(s => {
             const matchCategory = currentCategory === 'all' || getStudentCategory(s) === currentCategory;
@@ -505,27 +733,60 @@
             const matchGender = !gender || s.gender === gender;
             const matchDept = !department || s.department === department;
             const matchBatch = !batch || s.batch === batch;
-            const matchExclude = !excludeQirat || !getQiratNames(s).includes(excludeQirat);
-            return matchCategory && matchSearch && matchGender && matchDept && matchBatch && matchExclude;
+            
+            const studentQirats = getQiratNames(s);
+            const matchInclude = includeQiratsList.length === 0 || includeQiratsList.some(q => studentQirats.includes(q));
+            const matchExclude = excludeQiratsList.length === 0 || !excludeQiratsList.some(q => studentQirats.includes(q));
+            
+            return matchCategory && matchSearch && matchGender && matchDept && matchBatch && matchInclude && matchExclude;
         });
         
         filteredStudents = filtered;
+        selectedStudentIds.clear();
+        selectAllCheckbox.checked = false;
+        headerSelectCheckbox.checked = false;
+        updateSelectedCount();
+        renderTable();
+    }
+    
+    function updateSelectedCount() {
+        selectedCountSpan.textContent = `${selectedStudentIds.size} student(s) selected`;
+        if (selectAllCheckbox) selectAllCheckbox.checked = filteredStudents.length > 0 && selectedStudentIds.size === filteredStudents.length;
+        if (headerSelectCheckbox) headerSelectCheckbox.checked = filteredStudents.length > 0 && selectedStudentIds.size === filteredStudents.length;
+    }
+    
+    function toggleSelectAll() {
+        if (selectAllCheckbox.checked || headerSelectCheckbox.checked) {
+            filteredStudents.forEach(s => selectedStudentIds.add(s.id));
+        } else {
+            filteredStudents.forEach(s => selectedStudentIds.delete(s.id));
+        }
+        updateSelectedCount();
+        renderTable();
+    }
+    
+    function toggleSelectStudent(studentId) {
+        if (selectedStudentIds.has(studentId)) selectedStudentIds.delete(studentId);
+        else selectedStudentIds.add(studentId);
+        updateSelectedCount();
         renderTable();
     }
     
     function renderTable() {
         if (filteredStudents.length === 0) {
-            studentTableBody.innerHTML = `<tr><td colspan="8" class="empty-state">No students found</td></tr>`;
+            studentTableBody.innerHTML = `<tr><td colspan="9" class="empty-state">No students found</td></tr>`;
             return;
         }
         
         studentTableBody.innerHTML = filteredStudents.map((s, idx) => {
             const qirats = getQiratNames(s);
             const qiratBadges = qirats.length === 0 ? '<span class="badge badge-no-qirat">No Qirat</span>' : 
-                qirats.map(q => `<span class="badge badge-qirat">${escapeHtml(q)} <i class="fas fa-pen" style="cursor:pointer; font-size:0.6rem; margin-left:4px; color:#10b981;" onclick="event.stopPropagation(); openEditQiratGlobal('${escapeHtml(q)}')" title="Edit this Qirat globally"></i></span>`).join(' ');
+                qirats.map(q => `<span class="badge badge-qirat" onclick="openEditQiratGlobal('${escapeHtml(q)}')" title="Click to edit this Qirat globally">${escapeHtml(q)} <i class="fas fa-pen" style="font-size:0.6rem;"></i></span>`).join(' ');
+            const isSelected = selectedStudentIds.has(s.id);
             
             return `
-                <tr>
+                <tr class="${isSelected ? 'selected' : ''}">
+                    <td><input type="checkbox" class="student-checkbox" data-id="${s.id}" ${isSelected ? 'checked' : ''} onchange="toggleSelectStudent('${s.id}')"></td>
                     <td>${idx + 1}</td>
                     <td><strong>${escapeHtml(s.full_name)}</strong></td>
                     <td><span class="badge ${s.gender === 'Male' ? 'badge-male' : 'badge-female'}">${escapeHtml(s.gender)}</span></td>
@@ -540,6 +801,12 @@
                 </tr>
             `;
         }).join('');
+        
+        document.querySelectorAll('.student-checkbox').forEach(cb => {
+            cb.addEventListener('change', (e) => {
+                toggleSelectStudent(e.target.dataset.id);
+            });
+        });
     }
     
     // Edit Student Modal
@@ -584,8 +851,11 @@
                       qirats.map(q => `<span class="qirat-tag">${escapeHtml(q)} <span class="remove-qirat-tag" onclick="removeQiratFromEdit('${escapeHtml(q)}')">✖</span></span>`).join('')}
                 </div>
                 <div class="add-qirat-input">
-                    <input type="text" id="newQiratName" placeholder="Enter Qirat name">
-                    <button class="btn-primary" onclick="addQiratToEdit()" style="padding:8px 16px;">Add</button>
+                    <input type="text" id="newQiratName" placeholder="Enter Qirat name" list="existingQiratsList">
+                    <datalist id="existingQiratsList">
+                        ${allQiratsList.map(q => `<option value="${escapeHtml(q)}">`).join('')}
+                    </datalist>
+                    <button class="btn-primary" onclick="addQiratToEdit()" style="padding:8px 16px;">+ Add</button>
                 </div>
             </div>
             <div style="display: flex; gap: 12px; margin-top: 20px;">
@@ -656,7 +926,7 @@
         currentEditStudentId = null;
     };
     
-    // Global Qirat Edit Feature (Single)
+    // Global Qirat Edit Feature
     window.openEditQiratGlobal = (qiratName) => {
         const newName = prompt(`Edit Qirat "${qiratName}"\nEnter new name for ALL students:`, qiratName);
         if (!newName || newName === qiratName) return;
@@ -681,24 +951,22 @@
     
     // Bulk Edit Modal
     function showBulkEditModal() {
-        const allQirats = getAllQirats();
+        const allQiratsListCurrent = getAllQirats();
         const modal = document.getElementById('bulkEditModal');
         const container = document.getElementById('bulkQiratList');
         
-        if (allQirats.length === 0) {
+        if (allQiratsListCurrent.length === 0) {
             container.innerHTML = '<p style="text-align:center; padding:20px;">No Qirats found</p>';
         } else {
-            container.innerHTML = allQirats.map(q => {
+            container.innerHTML = allQiratsListCurrent.map(q => {
                 const count = allStudents.filter(s => getQiratNames(s).includes(q)).length;
                 return `
-                    <div class="bulk-qirat-item">
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid var(--border);">
                         <div>
-                            <span class="bulk-qirat-name">📖 ${escapeHtml(q)}</span>
-                            <span class="bulk-qirat-count">(${count} students)</span>
+                            <strong>📖 ${escapeHtml(q)}</strong>
+                            <span style="font-size:0.7rem; color: var(--text-muted); margin-left: 8px;">(${count} students)</span>
                         </div>
-                        <div class="bulk-qirat-actions">
-                            <button class="btn-primary" onclick="renameQiratBulk('${escapeHtml(q)}')" style="padding:6px 12px; font-size:0.7rem;">✏️ Rename</button>
-                        </div>
+                        <button class="btn-primary btn-sm" onclick="renameQiratBulk('${escapeHtml(q)}')">✏️ Rename</button>
                     </div>
                 `;
             }).join('');
@@ -733,55 +1001,125 @@
         document.getElementById('bulkEditModal').classList.remove('active');
     }
     
-    // Bulk Delete Modal
-    function showBulkDeleteModal() {
-        const allQirats = getAllQirats();
-        const modal = document.getElementById('bulkDeleteModal');
-        const container = document.getElementById('bulkDeleteQiratList');
+    // Batch Delete Selected Students
+    async function batchDeleteSelected() {
+        if (selectedStudentIds.size === 0) return showToast("No students selected", true);
+        if (!confirm(`Delete ${selectedStudentIds.size} selected students permanently?`)) return;
         
-        if (allQirats.length === 0) {
-            container.innerHTML = '<p style="text-align:center; padding:20px;">No Qirats found</p>';
+        let deleted = 0;
+        for (const id of selectedStudentIds) {
+            await deleteDoc(doc(db, "registrations", id));
+            deleted++;
+        }
+        showToast(`✅ Deleted ${deleted} students`);
+        selectedStudentIds.clear();
+        loadData();
+    }
+    
+    // Batch Delete by Qirat Modal
+    function showBatchDeleteByQiratModal() {
+        const modal = document.getElementById('batchDeleteByQiratModal');
+        const container = document.getElementById('deleteByQiratMultiSelect');
+        const allQiratsListCurrent = getAllQirats();
+        
+        if (allQiratsListCurrent.length === 0) {
+            container.innerHTML = '<p>No Qirats found</p>';
         } else {
-            container.innerHTML = allQirats.map(q => {
+            container.innerHTML = allQiratsListCurrent.map(q => {
                 const count = allStudents.filter(s => getQiratNames(s).includes(q)).length;
                 return `
-                    <div class="bulk-qirat-item">
-                        <div>
-                            <span class="bulk-qirat-name">📖 ${escapeHtml(q)}</span>
-                            <span class="bulk-qirat-count">(${count} students)</span>
-                        </div>
-                        <div class="bulk-qirat-actions">
-                            <button class="btn-danger" onclick="deleteQiratBulk('${escapeHtml(q)}')" style="padding:6px 12px; font-size:0.7rem;">🗑️ Delete</button>
-                        </div>
-                    </div>
+                    <label style="display: flex; align-items: center; gap: 8px; padding: 8px; cursor: pointer; border-bottom: 1px solid var(--border);">
+                        <input type="checkbox" class="delete-by-qirat-checkbox" value="${escapeHtml(q)}">
+                        <span><strong>${escapeHtml(q)}</strong> <span style="font-size:0.7rem; color: var(--text-muted);">(${count} students)</span></span>
+                    </label>
                 `;
             }).join('');
         }
         modal.classList.add('active');
     }
     
-    window.deleteQiratBulk = (qiratName) => {
-        if (!confirm(`⚠️ Delete "${qiratName}" from ALL ${allStudents.filter(s => getQiratNames(s).includes(qiratName)).length} students? This cannot be undone!`)) return;
+    function closeBatchDeleteByQiratModal() {
+        document.getElementById('batchDeleteByQiratModal').classList.remove('active');
+    }
+    
+    async function confirmDeleteByQirat() {
+        const selectedQirats = [];
+        document.querySelectorAll('.delete-by-qirat-checkbox:checked').forEach(cb => {
+            selectedQirats.push(cb.value);
+        });
+        if (selectedQirats.length === 0) return showToast("Select at least one Qirat", true);
         
-        let updatedCount = 0;
-        const updatePromises = [];
-        for (const student of allStudents) {
-            const hasQirat = (student.schedules || []).some(s => s.qirat_name === qiratName);
-            if (hasQirat) {
-                const newSchedules = (student.schedules || []).filter(s => s.qirat_name !== qiratName);
-                updatePromises.push(updateDoc(doc(db, "registrations", student.id), { schedules: newSchedules }));
-                updatedCount++;
+        const studentsToDelete = allStudents.filter(s => {
+            const studentQirats = getQiratNames(s);
+            return selectedQirats.some(q => studentQirats.includes(q));
+        });
+        
+        if (studentsToDelete.length === 0) return showToast("No students found with selected Qirats", true);
+        if (!confirm(`Delete ${studentsToDelete.length} students who have ANY of: ${selectedQirats.join(', ')}?`)) return;
+        
+        let deleted = 0;
+        for (const student of studentsToDelete) {
+            await deleteDoc(doc(db, "registrations", student.id));
+            deleted++;
+        }
+        showToast(`✅ Deleted ${deleted} students`);
+        loadData();
+        closeBatchDeleteByQiratModal();
+    }
+    
+    // Batch Delete Qirats Only Modal
+    function showBatchDeleteQiratsOnlyModal() {
+        if (selectedStudentIds.size === 0) {
+            showToast("Please select students first", true);
+            return;
+        }
+        const modal = document.getElementById('batchDeleteQiratsOnlyModal');
+        const container = document.getElementById('deleteQiratsOnlyMultiSelect');
+        const allQiratsListCurrent = getAllQirats();
+        
+        if (allQiratsListCurrent.length === 0) {
+            container.innerHTML = '<p>No Qirats found</p>';
+        } else {
+            container.innerHTML = allQiratsListCurrent.map(q => {
+                return `
+                    <label style="display: flex; align-items: center; gap: 8px; padding: 8px; cursor: pointer; border-bottom: 1px solid var(--border);">
+                        <input type="checkbox" class="delete-qirat-only-checkbox" value="${escapeHtml(q)}">
+                        <span>${escapeHtml(q)}</span>
+                    </label>
+                `;
+            }).join('');
+        }
+        modal.classList.add('active');
+    }
+    
+    function closeBatchDeleteQiratsOnlyModal() {
+        document.getElementById('batchDeleteQiratsOnlyModal').classList.remove('active');
+    }
+    
+    async function confirmDeleteQiratsOnly() {
+        const selectedQirats = [];
+        document.querySelectorAll('.delete-qirat-only-checkbox:checked').forEach(cb => {
+            selectedQirats.push(cb.value);
+        });
+        if (selectedQirats.length === 0) return showToast("Select at least one Qirat to remove", true);
+        if (!confirm(`Remove ${selectedQirats.join(', ')} from ${selectedStudentIds.size} selected students?`)) return;
+        
+        let updated = 0;
+        for (const studentId of selectedStudentIds) {
+            const student = allStudents.find(s => s.id === studentId);
+            if (student) {
+                const currentSchedules = student.schedules || [];
+                const newSchedules = currentSchedules.filter(s => !selectedQirats.includes(s.qirat_name));
+                if (newSchedules.length !== currentSchedules.length) {
+                    await updateDoc(doc(db, "registrations", studentId), { schedules: newSchedules });
+                    updated++;
+                }
             }
         }
-        Promise.all(updatePromises).then(() => {
-            showToast(`✅ Removed "${qiratName}" from ${updatedCount} students`);
-            loadData();
-            closeBulkDeleteModal();
-        }).catch(err => showToast(err.message, true));
-    };
-    
-    function closeBulkDeleteModal() {
-        document.getElementById('bulkDeleteModal').classList.remove('active');
+        showToast(`✅ Removed selected Qirats from ${updated} students`);
+        loadData();
+        closeBatchDeleteQiratsOnlyModal();
+        selectedStudentIds.clear();
     }
     
     // Export functions
@@ -798,32 +1136,29 @@
         showToast('CSV exported');
     }
     
-    function exportToExcel() {
-        const data = filteredStudents.map(s => ({
-            Name: s.full_name, Gender: s.gender, Phone: s.phone, Department: s.department,
-            Batch: s.batch, Qirats: getQiratNames(s).join(', '), RegistrationDate: s.timestamp.toLocaleDateString()
-        }));
-        if (!data.length) return alert('No data to export');
-        const ws = XLSX.utils.json_to_sheet(data);
-        const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Students');
-        XLSX.writeFile(wb, `students_${new Date().toISOString().slice(0,10)}.xlsx`);
-        showToast('Excel exported');
-    }
-    
     // Event Listeners
     searchInput.addEventListener('input', applyFilters);
     genderFilter.addEventListener('change', applyFilters);
     deptFilter.addEventListener('change', applyFilters);
     batchFilter.addEventListener('change', applyFilters);
-    excludeQiratFilter.addEventListener('change', applyFilters);
     clearFiltersBtn.addEventListener('click', () => {
-        searchInput.value = ''; genderFilter.value = ''; deptFilter.value = ''; batchFilter.value = ''; excludeQiratFilter.value = '';
+        searchInput.value = ''; genderFilter.value = ''; deptFilter.value = ''; batchFilter.value = '';
+        includeQiratsList = [];
+        excludeQiratsList = [];
+        updateAllQiratsList();
         applyFilters();
     });
     exportCSVBtn.addEventListener('click', exportToCSV);
-    exportExcelBtn.addEventListener('click', exportToExcel);
     bulkEditQiratBtn.addEventListener('click', showBulkEditModal);
-    bulkDeleteQiratBtn.addEventListener('click', showBulkDeleteModal);
+    batchDeleteSelectedBtn.addEventListener('click', batchDeleteSelected);
+    batchDeleteByQiratBtn.addEventListener('click', showBatchDeleteByQiratModal);
+    batchDeleteQiratsOnlyBtn.addEventListener('click', showBatchDeleteQiratsOnlyModal);
+    
+    document.getElementById('confirmDeleteByQiratBtn')?.addEventListener('click', confirmDeleteByQirat);
+    document.getElementById('confirmDeleteQiratsOnlyBtn')?.addEventListener('click', confirmDeleteQiratsOnly);
+    
+    selectAllCheckbox.addEventListener('change', toggleSelectAll);
+    headerSelectCheckbox.addEventListener('change', toggleSelectAll);
     
     document.querySelectorAll('.category-tab').forEach(tab => {
         tab.addEventListener('click', () => {
@@ -834,12 +1169,28 @@
         });
     });
     
-    // Close modals when clicking outside
     window.onclick = (e) => {
         if (e.target === document.getElementById('editModal')) closeEditModal();
         if (e.target === document.getElementById('bulkEditModal')) closeBulkEditModal();
-        if (e.target === document.getElementById('bulkDeleteModal')) closeBulkDeleteModal();
+        if (e.target === document.getElementById('batchDeleteByQiratModal')) closeBatchDeleteByQiratModal();
+        if (e.target === document.getElementById('batchDeleteQiratsOnlyModal')) closeBatchDeleteQiratsOnlyModal();
     };
+    
+    // Expose functions to global scope
+    window.toggleSelectStudent = toggleSelectStudent;
+    window.toggleIncludeQirat = toggleIncludeQirat;
+    window.toggleExcludeQirat = toggleExcludeQirat;
+    window.openEditQiratGlobal = openEditQiratGlobal;
+    window.renameQiratBulk = renameQiratBulk;
+    window.removeQiratFromEdit = removeQiratFromEdit;
+    window.addQiratToEdit = addQiratToEdit;
+    window.saveStudentEdit = saveStudentEdit;
+    window.deleteStudentOnlyQirats = deleteStudentOnlyQirats;
+    window.deleteStudent = deleteStudent;
+    window.closeEditModal = closeEditModal;
+    window.closeBulkEditModal = closeBulkEditModal;
+    window.closeBatchDeleteByQiratModal = closeBatchDeleteByQiratModal;
+    window.closeBatchDeleteQiratsOnlyModal = closeBatchDeleteQiratsOnlyModal;
     
     loadData();
 </script>
