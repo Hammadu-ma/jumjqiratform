@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Ustaz Portal | Smart Points Import</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.07);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --accent-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            --primary-glow: rgba(99, 102, 241, 0.3);
+        }
+        body { 
+            background: #0f172a; 
+            color: #f1f5f9; 
+            font-family: 'Inter', system-ui, -apple-system, sans-serif; 
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        body.light-mode { 
+            background: linear-gradient(135deg, #f0f9ff 0%, #e6f7f0 100%); 
+            color: #0f172a; 
+        }
+        body.light-mode .glass-card { background: rgba(255, 255, 255, 0.95); border-color: #e2e8f0; }
+        body.light-mode .bg-slate-900 { background: #ffffff; }
+        body.light-mode .bg-slate-800 { background: #f1f5f9; }
+        body.light-mode .border-slate-700 { border-color: #e2e8f0; }
+        body.light-mode .text-slate-400 { color: #64748b; }
+        body.light-mode .preview-table th { background: #e2e8f0; color: #1e293b; }
+        body.light-mode .preview-table td { border-color: #cbd5e1; }
+        body.light-mode .drop-zone { background: #f8fafc; }
+        .glass-card { 
+            background: var(--glass-bg); 
+            backdrop-filter: blur(12px); 
+            border: 1px solid var(--glass-border); 
+            border-radius: 1.5rem; 
+            transition: all 0.3s ease; 
+        }
+        .btn-premium { 
+            background: var(--accent-gradient); 
+            transition: all 0.3s ease; 
+        }
+        .btn-premium:hover, .btn-premium:active { 
+            transform: translateY(-2px); 
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3); 
+        }
+        .drop-zone {
+            border: 2px dashed rgba(99, 102, 241, 0.5);
+            border-radius: 1.5rem;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .drop-zone:hover, .drop-zone.drag-over {
+            border-color: #6366f1;
+            background: rgba(99, 102, 241, 0.1);
+            transform: scale(0.98);
+        }
+        .preview-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.7rem;
+        }
+        .preview-table th, .preview-table td {
+            padding: 0.7rem 0.5rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            vertical-align: middle;
+        }
+        .preview-table th {
+            background: rgba(99, 102, 241, 0.2);
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .status-chip {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 999px;
+            font-size: 0.65rem;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        .status-success { background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .status-error { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
+        .status-warning { background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
+        .toast { 
+            position: fixed; 
+            bottom: 20px; 
+            right: 20px; 
+            z-index: 1000; 
+            animation: slideIn 0.3s ease; 
+            background: #1f2937; 
+            color: white; 
+            padding: 12px 20px; 
+            border-radius: 50px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            font-size: 0.85rem;
+            max-width: 400px;
+        }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(100%); } to { opacity: 1; transform: translateX(0); } }
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .loading-spinner { 
+            border: 3px solid rgba(99, 102, 241, 0.3); 
+            border-top-color: #6366f1; 
+            border-radius: 50%; 
+            width: 40px; 
+            height: 40px; 
+            animation: spin 1s linear infinite; 
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
+        .template-badge {
+            background: rgba(99, 102, 241, 0.15);
+            border-radius: 40px;
+            padding: 0.3rem 0.8rem;
+            font-size: 0.7rem;
+            transition: all 0.2s;
+        }
+        .template-badge:hover {
+            background: rgba(99, 102, 241, 0.3);
+        }
+        @media (max-width: 768px) {
+            .preview-table th, .preview-table td { padding: 0.5rem 0.3rem; font-size: 0.65rem; }
+            .status-chip { font-size: 0.6rem; padding: 0.15rem 0.4rem; }
+        }
+    </style>
+</head>
+<body class="p-4 md:p-6">
+
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="glass-card p-4 md:p-6 mb-6">
+            <div class="flex justify-between items-center flex-wrap gap-4">
+                <div>
+                    <h1 class="text-xl md:text-3xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+                        <i class="fas fa-cloud-upload-alt mr-2"></i>Smart Points Import
+                    </h1>
+                    <p class="text-slate-400 text-xs md:text-sm mt-1">Bulk import exam scores for your assigned Qirats</p>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="toggleTheme()" class="theme-toggle p-2 rounded-full bg-slate-700 hover:bg-slate-600 transition-all">
+                        <i id="themeIcon" class="fas fa-moon text-yellow-400"></i>
+                    </button>
+                    <a href="ustaz-dashboard.html" class="px-4 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-sm flex items-center gap-2">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Qirat Selection Banner -->
+        <div class="glass-card p-4 mb-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+                <div>
+                    <h3 class="text-sm font-semibold"><i class="fas fa-book-quran mr-2 text-indigo-400"></i>Import Target Qirat</h3>
+                    <p class="text-xs text-slate-400 mt-1">Select which Qirat you want to update scores for</p>
+                </div>
+                <div class="flex flex-wrap gap-2" id="qiratSelector">
+                    <div class="text-slate-400">Loading assigned Qirats...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Import Zone -->
+        <div class="glass-card p-6 mb-6">
+            <div class="text-center mb-6">
+                <div class="w-20 h-20 mx-auto bg-indigo-500/20 rounded-full flex items-center justify-center mb-4">
+                    <i class="fas fa-file-excel text-3xl text-indigo-400"></i>
+                </div>
+                <h2 class="text-xl font-bold mb-2">Import Student Points</h2>
+                <p class="text-slate-400 text-sm max-w-md mx-auto">Upload Excel/CSV file with student scores. Supports .xlsx, .xls, .csv</p>
+            </div>
+
+            <!-- Drop Zone -->
+            <div id="dropZone" class="drop-zone p-8 text-center cursor-pointer transition-all" onclick="document.getElementById('fileInput').click()">
+                <input type="file" id="fileInput" accept=".xlsx,.xls,.csv,.xlsm" class="hidden" onchange="handleFileUpload(this.files)">
+                <i class="fas fa-cloud-upload-alt text-5xl text-indigo-400 mb-3"></i>
+                <p class="text-sm font-medium">Drag & drop your file here or <span class="text-indigo-400 underline">browse</span></p>
+                <p class="text-xs text-slate-500 mt-2">Supports Excel (.xlsx, .xls) and CSV files</p>
+            </div>
+
+            <!-- Template Download -->
+            <div class="flex justify-center gap-3 mt-6 flex-wrap">
+                <button onclick="downloadTemplate()" class="template-badge flex items-center gap-2">
+                    <i class="fas fa-download"></i> Download Excel Template
+                </button>
+                <button onclick="downloadCSVTemplate()" class="template-badge flex items-center gap-2">
+                    <i class="fas fa-file-csv"></i> Download CSV Template
+                </button>
+            </div>
+        </div>
+
+        <!-- Preview Section -->
+        <div id="previewSection" class="glass-card overflow-hidden hidden">
+            <div class="p-4 border-b border-slate-700 flex justify-between items-center flex-wrap gap-3">
+                <div>
+                    <h3 class="text-base md:text-lg font-semibold">
+                        <i class="fas fa-eye mr-2 text-indigo-400"></i>Import Preview
+                    </h3>
+                    <p class="text-xs text-slate-400 mt-1" id="previewStats">Review data before importing</p>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="cancelImport()" class="px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-sm">
+                        <i class="fas fa-times mr-1"></i> Cancel
+                    </button>
+                    <button id="confirmImportBtn" onclick="confirmImport()" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-sm font-medium">
+                        <i class="fas fa-check-circle mr-1"></i> Import to System
+                    </button>
+                </div>
+            </div>
+            <div class="overflow-x-auto custom-scrollbar" style="max-height: 500px;">
+                <table class="preview-table" id="previewTable">
+                    <thead id="previewHeader"></thead>
+                    <tbody id="previewBody"></tbody>
+                </table>
+            </div>
+            <div class="p-4 border-t border-slate-700 bg-slate-800/30 flex justify-between items-center text-xs">
+                <div id="validationSummary" class="text-slate-400"></div>
+                <div class="flex gap-3">
+                    <button onclick="clearPreview()" class="text-slate-400 hover:text-white">Clear</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Import Progress Modal -->
+        <div id="importProgressModal" class="fixed inset-0 z-50 hidden bg-slate-950/90 backdrop-blur-sm flex items-center justify-center">
+            <div class="glass-card w-full max-w-md p-6 text-center">
+                <div class="loading-spinner mx-auto mb-4"></div>
+                <h3 class="text-lg font-semibold mb-2">Importing Scores...</h3>
+                <p id="progressText" class="text-slate-400 text-sm">Processing records...</p>
+                <div class="mt-4 w-full bg-slate-700 rounded-full h-2 overflow-hidden">
+                    <div id="progressBar" class="bg-indigo-500 h-2 transition-all duration-300" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast hidden"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyAR_g5y04YAGCrTvZCowrE7hw8h7k1du08",
+            authDomain: "jujm-qirat.firebaseapp.com",
+            projectId: "jujm-qirat",
+            storageBucket: "jujm-qirat.firebasestorage.app",
+            messagingSenderId: "253413984903",
+            appId: "1:253413984903:web:c1577e0fdef1711f960622"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        
+        let assignedQirats = [];
+        let currentQirat = '';
+        let studentsMap = new Map(); // studentId -> student object
+        let previewData = []; // array of { studentId, studentName, assessmentKey, score, valid, errorMsg, originalRow }
+        let assessmentConfig = null; // { name, outOf, key }
+        let allStudents = [];
+        
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.innerHTML = `<i class="fas ${isError ? 'fa-exclamation-triangle' : 'fa-check-circle'} mr-2"></i> ${message}`;
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 3000);
+        }
+        
+        function showLoading(show) {
+            const modal = document.getElementById('importProgressModal');
+            if (show) modal.classList.remove('hidden');
+            else modal.classList.add('hidden');
+        }
+        
+        function updateProgress(percent, text) {
+            document.getElementById('progressBar').style.width = `${percent}%`;
+            document.getElementById('progressText').innerText = text;
+        }
+        
+        async function loadUstazData() {
+            const ustazId = localStorage.getItem('ustazId');
+            if (!ustazId) {
+                window.location.href = 'ustaz-login.html';
+                return false;
+            }
+            const storedQirats = localStorage.getItem('ustazQirats');
+            if (storedQirats) {
+                assignedQirats = JSON.parse(storedQirats);
+            }
+            if (assignedQirats.length === 0) {
+                document.getElementById('qiratSelector').innerHTML = '<div class="text-amber-400 text-sm">No Qirats assigned. Contact admin.</div>';
+                return false;
+            }
+            currentQirat = assignedQirats[0];
+            renderQiratSelector();
+            await loadStudents();
+            return true;
+        }
+        
+        function renderQiratSelector() {
+            const container = document.getElementById('qiratSelector');
+            container.innerHTML = assignedQirats.map(q => `
+                <button onclick="selectImportQirat('${escapeHtml(q)}')" 
+                    class="qirat-tab px-4 py-2 rounded-full text-sm font-medium transition-all ${q === currentQirat ? 'bg-indigo-600 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}">
+                    <i class="fas fa-book-quran mr-1"></i> ${escapeHtml(q)}
+                </button>
+            `).join('');
+        }
+        
+        window.selectImportQirat = (qirat) => {
+            currentQirat = qirat;
+            renderQiratSelector();
+            clearPreview();
+            showToast(`Switched to ${qirat}`, false);
+        };
+        
+        async function loadStudents() {
+            try {
+                const snapshot = await getDocs(collection(db, "registrations"));
+                allStudents = [];
+                studentsMap.clear();
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    const student = {
+                        id: docSnap.id,
+                        full_name: data.full_name || 'N/A',
+                        gender: data.gender || 'Not Specified',
+                        phone: data.phone || '',
+                        department: data.department || 'Other',
+                        batch: data.batch || 'General',
+                        schedules: data.schedules || []
+                    };
+                    allStudents.push(student);
+                    studentsMap.set(docSnap.id, student);
+                    studentsMap.set(student.full_name.toLowerCase(), student);
+                    if (student.phone) studentsMap.set(student.phone, student);
+                });
+                console.log(`Loaded ${allStudents.length} students`);
+            } catch(e) { console.error(e); showToast('Failed to load students', true); }
+        }
+        
+        async function getAssessmentConfigForQirat(qiratName) {
+            try {
+                const configRef = doc(db, "qiratAssessmentConfigs", qiratName);
+                const configSnap = await getDoc(configRef);
+                if (configSnap.exists() && configSnap.data().assessments?.length > 0) {
+                    return configSnap.data().assessments[0]; // For import, we focus on first main assessment or customizable
+                }
+            } catch(e) { console.warn(e); }
+            return { name: "Exam Score", outOf: 100, key: "assessment1" };
+        }
+        
+        function findStudentByIdentifier(identifier) {
+            if (!identifier) return null;
+            const lowerId = identifier.toString().trim().toLowerCase();
+            // Try exact ID match
+            if (studentsMap.has(lowerId)) return studentsMap.get(lowerId);
+            // Try name match
+            for (let student of allStudents) {
+                if (student.full_name.toLowerCase() === lowerId) return student;
+                if (student.phone === identifier.toString().trim()) return student;
+            }
+            return null;
+        }
+        
+        function parseExcelFile(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: "" });
+                    if (!rows || rows.length < 2) reject(new Error("File is empty"));
+                    const headers = rows[0].map(h => String(h || "").trim().toLowerCase());
+                    const studentNameIdx = headers.findIndex(h => h.includes('student') || h.includes('name'));
+                    const studentIdIdx = headers.findIndex(h => h.includes('id') || h.includes('identifier'));
+                    const scoreIdx = headers.findIndex(h => h.includes('score') || h.includes('point') || h.includes('mark') || h.includes('grade'));
+                    
+                    if (studentNameIdx === -1 && studentIdIdx === -1) reject(new Error("Missing student name/ID column"));
+                    if (scoreIdx === -1) reject(new Error("Missing score column"));
+                    
+                    const records = [];
+                    for (let i = 1; i < rows.length; i++) {
+                        const row = rows[i];
+                        if (!row || row.length === 0) continue;
+                        const identifier = studentIdIdx !== -1 ? row[studentIdIdx] : row[studentNameIdx];
+                        const scoreRaw = row[scoreIdx];
+                        if (!identifier || identifier.toString().trim() === "") continue;
+                        records.push({
+                            identifier: identifier.toString().trim(),
+                            score: scoreRaw !== undefined && scoreRaw !== "" ? parseFloat(scoreRaw) : null,
+                            rawRow: row
+                        });
+                    }
+                    resolve({ records, headers, scoreColIndex: scoreIdx });
+                };
+                reader.onerror = reject;
+                reader.readAsArrayBuffer(file);
+            });
+        }
+        
+        async function processImportFile(file) {
+            try {
+                const { records } = await parseExcelFile(file);
+                if (records.length === 0) throw new Error("No valid records found");
+                
+                const config = await getAssessmentConfigForQirat(currentQirat);
+                assessmentConfig = config;
+                
+                const validated = [];
+                for (let rec of records) {
+                    const student = findStudentByIdentifier(rec.identifier);
+                    let valid = true;
+                    let errorMsg = "";
+                    let studentId = null;
+                    let studentName = rec.identifier;
+                    
+                    if (!student) {
+                        valid = false;
+                        errorMsg = "Student not found in system";
+                    } else {
+                        studentId = student.id;
+                        studentName = student.full_name;
+                        // check if student enrolled in this qirat
+                        const hasQirat = (student.schedules || []).some(s => s.qirat_name === currentQirat);
+                        if (!hasQirat) {
+                            valid = false;
+                            errorMsg = `Not enrolled in ${currentQirat}`;
+                        }
+                    }
+                    
+                    let scoreValue = rec.score;
+                    if (scoreValue === null || isNaN(scoreValue)) {
+                        valid = false;
+                        errorMsg = errorMsg || "Invalid score value";
+                    } else if (scoreValue < 0 || scoreValue > config.outOf) {
+                        valid = false;
+                        errorMsg = `Score must be between 0 and ${config.outOf}`;
+                    }
+                    
+                    validated.push({
+                        identifier: rec.identifier,
+                        studentId: studentId,
+                        studentName: studentName,
+                        score: valid ? scoreValue : null,
+                        valid: valid,
+                        errorMsg: errorMsg,
+                        outOf: config.outOf,
+                        assessmentKey: config.key,
+                        assessmentName: config.name
+                    });
+                }
+                
+                previewData = validated;
+                renderPreviewTable();
+                const validCount = previewData.filter(p => p.valid).length;
+                document.getElementById('previewStats').innerHTML = `<i class="fas fa-chart-line mr-1"></i> ${validCount} of ${previewData.length} records valid | Assessment: ${config.name} (0-${config.outOf})`;
+                document.getElementById('validationSummary').innerHTML = validCount === previewData.length ? 
+                    '<span class="text-emerald-400">✓ All records are valid and ready to import</span>' : 
+                    `<span class="text-amber-400">⚠️ ${previewData.length - validCount} record(s) have issues. Fix before importing.</span>`;
+                
+                document.getElementById('previewSection').classList.remove('hidden');
+            } catch(e) {
+                showToast(e.message, true);
+                console.error(e);
+            }
+        }
+        
+        function renderPreviewTable() {
+            const thead = document.getElementById('previewHeader');
+            const tbody = document.getElementById('previewBody');
+            
+            thead.innerHTML = `<tr>
+                <th>Status</th>
+                <th>Student Identifier</th>
+                <th>Student Name</th>
+                <th>${assessmentConfig?.name || 'Score'} ( / ${assessmentConfig?.outOf || 100})</th>
+                <th>Message</th>
+            </tr>`;
+            
+            tbody.innerHTML = previewData.map(item => {
+                const statusClass = item.valid ? 'status-success' : 'status-error';
+                const statusIcon = item.valid ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-exclamation-circle"></i>';
+                return `<tr>
+                    <td><span class="status-chip ${statusClass}">${statusIcon} ${item.valid ? 'Valid' : 'Invalid'}</span></td>
+                    <td class="font-mono text-xs">${escapeHtml(item.identifier)}</td>
+                    <td class="font-medium">${escapeHtml(item.studentName || '-')}</td>
+                    <td>${item.valid ? `<span class="font-bold text-indigo-300">${item.score}</span> / ${item.outOf}` : '-'}</td>
+                    <td class="text-xs ${item.valid ? 'text-emerald-400/70' : 'text-rose-400'}">${escapeHtml(item.errorMsg || 'Ready')}</td>
+                </tr>`;
+            }).join('');
+        }
+        
+        async function confirmImport() {
+            const validItems = previewData.filter(p => p.valid);
+            if (validItems.length === 0) {
+                showToast("No valid records to import", true);
+                return;
+            }
+            
+            showLoading(true);
+            updateProgress(0, `Importing ${validItems.length} records...`);
+            
+            let successCount = 0;
+            let failCount = 0;
+            
+            for (let i = 0; i < validItems.length; i++) {
+                const item = validItems[i];
+                try {
+                    // Fetch current scores
+                    const scoreRef = doc(db, "examScores", item.studentId);
+                    const scoreSnap = await getDoc(scoreRef);
+                    let currentScores = scoreSnap.exists() ? scoreSnap.data().scores || {} : {};
+                    let qiratScores = currentScores[currentQirat] || {};
+                    
+                    // Update the specific assessment
+                    qiratScores[item.assessmentKey] = item.score;
+                    currentScores[currentQirat] = qiratScores;
+                    
+                    await setDoc(scoreRef, { scores: currentScores }, { merge: true });
+                    successCount++;
+                    updateProgress(Math.round((i+1)/validItems.length * 100), `Imported ${successCount} of ${validItems.length}`);
+                } catch(e) {
+                    console.error(e);
+                    failCount++;
+                }
+            }
+            
+            showLoading(false);
+            showToast(`✅ Import complete! ${successCount} scores updated, ${failCount} failed.`);
+            clearPreview();
+            
+            // Optionally refresh dashboard data if needed
+            if (successCount > 0) {
+                // Trigger save event for parent dashboard sync
+                localStorage.setItem('scoresUpdated', Date.now().toString());
+            }
+        }
+        
+        window.handleFileUpload = async (files) => {
+            if (!files || files.length === 0) return;
+            const file = files[0];
+            if (!currentQirat) {
+                showToast("Please select a Qirat first", true);
+                return;
+            }
+            await processImportFile(file);
+            document.getElementById('fileInput').value = '';
+        };
+        
+        window.downloadTemplate = () => {
+            const wsData = [
+                ["Student Name/ID", "Score"],
+                ["Ahmad bin Ali", "85"],
+                ["Siti Aishah", "92"],
+                ["Muhammad Faiz", "78"]
+            ];
+            const ws = XLSX.utils.aoa_to_sheet(wsData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "PointsImport");
+            XLSX.writeFile(wb, `points_template_${currentQirat || 'qirat'}.xlsx`);
+            showToast("Template downloaded");
+        };
+        
+        window.downloadCSVTemplate = () => {
+            const csvContent = "Student Name/ID,Score\nAhmad bin Ali,85\nSiti Aishah,92\nMuhammad Faiz,78";
+            const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `points_template_${currentQirat || 'qirat'}.csv`;
+            link.click();
+            showToast("CSV Template downloaded");
+        };
+        
+        window.clearPreview = () => {
+            previewData = [];
+            assessmentConfig = null;
+            document.getElementById('previewSection').classList.add('hidden');
+            document.getElementById('previewHeader').innerHTML = '';
+            document.getElementById('previewBody').innerHTML = '';
+        };
+        
+        window.cancelImport = clearPreview;
+        
+        // Drag & Drop handlers
+        const dropZone = document.getElementById('dropZone');
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('drag-over');
+        });
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('drag-over');
+        });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('drag-over');
+            const files = e.dataTransfer.files;
+            if (files.length) handleFileUpload(files);
+        });
+        
+        function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
+        
+        let isLightMode = false;
+        window.toggleTheme = () => {
+            isLightMode = !isLightMode;
+            const icon = document.getElementById('themeIcon');
+            if (isLightMode) { document.body.classList.add('light-mode'); icon.className = 'fas fa-sun text-yellow-500'; }
+            else { document.body.classList.remove('light-mode'); icon.className = 'fas fa-moon text-yellow-400'; }
+        };
+        
+        window.selectImportQirat = selectImportQirat;
+        window.confirmImport = confirmImport;
+        
+        async function init() {
+            if (localStorage.getItem('ustazLoggedIn') !== 'true') {
+                window.location.href = 'ustaz-login.html';
+                return;
+            }
+            const success = await loadUstazData();
+            if (!success) {
+                document.getElementById('qiratSelector').innerHTML = '<div class="text-amber-400">No assigned Qirats. Please contact admin.</div>';
+            }
+        }
+        
+        init();
+    </script>
+</body>
+</html>
