@@ -36,14 +36,6 @@ const USTAZ_NAV_CONFIG = {
             path: 'ustaz-profile.html',
             mobileOrder: 3,
             desktopOrder: 3
-        },
-        {
-            id: 'reports',
-            name: 'Reports',
-            icon: 'fas fa-chart-line',
-            path: 'ustaz-reports.html',
-            mobileOrder: 5,
-            desktopOrder: 5
         }
     ],
     
