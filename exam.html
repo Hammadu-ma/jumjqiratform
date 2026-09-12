@@ -654,6 +654,21 @@
                 if (btn) btn.innerHTML = '<i class="fas fa-expand"></i>';
             });
             document.getElementById(id).classList.remove('hidden');
+
+            // Default to fullscreen on mobile
+            const isMobile = window.innerWidth <= 768;
+            const box = document.querySelector(`#${id} .modal-box`);
+            const wrap = document.getElementById(id);
+            const btn = document.getElementById(`fsBtn-${id}`);
+            if (isMobile) {
+                box?.classList.add('modal-fullscreen');
+                wrap?.classList.add('modal-open-fullscreen');
+                if (btn) btn.innerHTML = '<i class="fas fa-compress"></i>';
+            } else {
+                box?.classList.remove('modal-fullscreen');
+                wrap?.classList.remove('modal-open-fullscreen');
+                if (btn) btn.innerHTML = '<i class="fas fa-expand"></i>';
+            }
         }
 
         function hideAllModals() {
