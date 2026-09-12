@@ -70,33 +70,6 @@
 
         button, input, select, textarea { font: inherit; }
 
-        /* ===== Dark mode (toggle) — navy alternate ===== */
-        body.dark-mode {
-            background: #0a1421;
-            color: #dbe1e8;
-        }
-        body.dark-mode:before { opacity: .18; }
-        body.dark-mode .glass-card { background: #101b2a; border-color: rgba(255,255,255,.08); }
-        body.dark-mode .bg-slate-900 { background: #101b2a !important; }
-        body.dark-mode .bg-slate-800, body.dark-mode .bg-slate-800\/50, body.dark-mode .bg-slate-800\/30 { background: rgba(255,255,255,.05) !important; }
-        body.dark-mode .bg-slate-700 { background: rgba(255,255,255,.09) !important; color: #dbe1e8 !important; }
-        body.dark-mode .bg-slate-600 { background: rgba(255,255,255,.14) !important; }
-        body.dark-mode .border-slate-700 { border-color: rgba(255,255,255,.1) !important; }
-        body.dark-mode .text-slate-300, body.dark-mode .text-slate-400 { color: #9aa5b2 !important; }
-        body.dark-mode .text-slate-500 { color: #7c8794 !important; }
-        body.dark-mode .score-input, body.dark-mode .filter-input, body.dark-mode .mark-cell-input { background: #0d1826; border-color: rgba(255,255,255,.14); color: #f1f5f9; }
-        body.dark-mode .qirat-list-card { background: #101b2a; border-color: rgba(255,255,255,.09); }
-        body.dark-mode .hero-stats { background: linear-gradient(135deg, #0d2140 0%, #06244c 55%, #050f1e 100%); }
-        body.dark-mode .assessment-table td { border-bottom-color: rgba(255,255,255,.08); }
-        body.dark-mode .desktop-nav { background: rgba(10, 20, 33, .95); border-bottom-color: rgba(255,255,255,.08); }
-        body.dark-mode .spreadsheet-wrap thead th { background: #101b2a; }
-        body.dark-mode .spreadsheet-wrap th.sticky-col, body.dark-mode .spreadsheet-wrap td.sticky-col { background: #0a1421; }
-        body.dark-mode .toast { background: #101b2a; border: 1px solid rgba(255,255,255,.12); }
-        body.dark-mode .modal-filter-bar { background: rgba(255,255,255,.04); border-color: rgba(255,255,255,.08); }
-        body.dark-mode #dataTable thead, body.dark-mode .bottom-nav { background: rgba(10,20,33,.97) !important; }
-        body.dark-mode .nav-link { color: #9aa5b2; }
-        body.dark-mode .page-title-gradient, body.dark-mode h1 span.grad { color: #f1f5f9; }
-
         /* ===== Card ===== */
         .glass-card {
             background: var(--surface);
@@ -246,8 +219,6 @@
         .rank-2 { background: linear-gradient(135deg, #e4e7ea, #b6bcc2); color: #2c3238; }
         .rank-3 { background: linear-gradient(135deg, #eec9a4, #c98a4d); color: #4a2c10; }
 
-        .theme-toggle { cursor: pointer; transition: all 0.3s; }
-        .theme-toggle:hover, .theme-toggle:active { transform: rotate(15deg); }
 
         .qirat-list-card {
             background: var(--surface);
@@ -487,9 +458,6 @@
             <p class="text-slate-400 text-xs md:text-sm mt-1">Detailed analytics and score management</p>
         </div>
         <div class="flex gap-2 items-center">
-            <button onclick="toggleTheme()" class="theme-toggle p-2 rounded-full bg-slate-700 hover:bg-slate-600 transition-all">
-                <i id="themeIcon" class="fas fa-moon text-yellow-400 text-sm md:text-base"></i>
-            </button>
             <div class="flex gap-1 md:gap-2 bg-slate-800/50 p-1 rounded-2xl border border-slate-700">
                 <button onclick="switchView('qirat')" class="view-btn active">By Qirat</button>
                 <button onclick="switchView('department')" class="view-btn text-slate-400">By Dept</button>
@@ -1423,14 +1391,6 @@
             if (btn) btn.innerHTML = '<i class="fas fa-expand"></i>';
             currentStudentId = null;
             currentOpenQiratIndex = null;
-        };
-        
-        let isDarkMode = false;
-        window.toggleTheme = () => {
-            isDarkMode = !isDarkMode;
-            const icon = document.getElementById('themeIcon');
-            if (isDarkMode) { document.body.classList.add('dark-mode'); icon.className = 'fas fa-sun text-amber-300'; }
-            else { document.body.classList.remove('dark-mode'); icon.className = 'fas fa-moon text-indigo-400'; }
         };
         
         document.getElementById('searchInput').addEventListener('input', (e) => { currentFilters.search = e.target.value; renderCurrentView(); });
