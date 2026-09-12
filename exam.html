@@ -212,6 +212,31 @@
         }
         @keyframes slideIn { from { opacity: 0; transform: translateY(100%); } to { opacity: 1; transform: translateY(0); } }
 
+        .sync-status {
+            position: fixed;
+            top: 12px;
+            right: 12px;
+            z-index: 1001;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            background: var(--surface);
+            border: 1px solid var(--line);
+            box-shadow: var(--shadow-sm);
+            padding: 6px 12px;
+            border-radius: var(--pill);
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--muted);
+            transition: opacity .3s ease, transform .3s ease;
+        }
+        .sync-status.sync-status-hide { opacity: 0; transform: translateY(-6px); pointer-events: none; }
+        .sync-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+        .sync-dot-saving { background: var(--gold); animation: syncPulse 1s ease-in-out infinite; }
+        .sync-dot-saved { background: var(--green); }
+        .sync-dot-error { background: var(--danger); }
+        @keyframes syncPulse { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+
         .settings-card { transition: all 0.25s ease; }
         .settings-card:hover { background: var(--brand-soft); transform: translateX(3px); }
 
@@ -609,6 +634,10 @@
     </div>
 
     <div id="toast" class="toast hidden"></div>
+    <div id="syncStatus" class="sync-status hidden sync-status-hide">
+        <span id="syncStatusDot" class="sync-dot sync-dot-saved"></span>
+        <span id="syncStatusText">All changes saved</span>
+    </div>
 
     <script type="module">
         import { protectPage, initAuthUI, setupAutoLogout } from './auth.js';
@@ -778,34 +807,108 @@
             return count > 0 ? Math.round(total / count) : null;
         }
         
-        async function saveExamScore(studentId, qiratName, assessmentKey, value) {
+        // ===== Local-first score entry: update instantly, sync to Firestore in the background =====
+        const PENDING_KEY = 'jujm_pending_exam_scores_v1';
+        const SYNC_DEBOUNCE_MS = 1200;
+        let pendingWrites = new Map();   // studentId -> scores object awaiting a Firestore write
+        let pendingTimers = new Map();   // studentId -> debounce timer
+
+        function readPendingStore() {
+            try { return JSON.parse(localStorage.getItem(PENDING_KEY) || '{}'); }
+            catch(e) { return {}; }
+        }
+        function writePendingStore() {
             try {
-                // Get current scores for this student
-                let currentScores = examScores.get(studentId) || {};
-                let qiratScores = currentScores[qiratName] || {};
-                
-                // Update the specific assessment
-                qiratScores[assessmentKey] = value ? parseFloat(value) : null;
-                currentScores[qiratName] = qiratScores;
-                
-                // Save to Map
-                examScores.set(studentId, currentScores);
-                
-                // Save to Firebase - store the entire student's scores object
-                const examRef = doc(db, "examScores", studentId);
-                await setDoc(examRef, { 
-                    studentId: studentId,
-                    scores: currentScores,
-                    lastUpdated: new Date().toISOString()
-                }, { merge: true });
-                
-                return true;
-            } catch(e) { 
-                console.error("Save error:", e); 
-                showToast("Error saving score", true); 
-                return false; 
+                const obj = {};
+                pendingWrites.forEach((scores, studentId) => { obj[studentId] = scores; });
+                if (Object.keys(obj).length) localStorage.setItem(PENDING_KEY, JSON.stringify(obj));
+                else localStorage.removeItem(PENDING_KEY);
+            } catch(e) { console.warn('Could not persist pending scores locally', e); }
+        }
+
+        function setSyncStatus(state) {
+            const el = document.getElementById('syncStatus');
+            const dot = document.getElementById('syncStatusDot');
+            const text = document.getElementById('syncStatusText');
+            if (!el) return;
+            el.classList.remove('hidden');
+            if (state === 'saving') {
+                dot.className = 'sync-dot sync-dot-saving';
+                text.textContent = pendingWrites.size > 1 ? `Saving ${pendingWrites.size}…` : 'Saving…';
+                el.classList.remove('sync-status-hide');
+            } else if (state === 'saved') {
+                dot.className = 'sync-dot sync-dot-saved';
+                text.textContent = 'All changes saved';
+                setTimeout(() => { if (!pendingWrites.size) el.classList.add('sync-status-hide'); }, 1500);
+            } else if (state === 'error') {
+                dot.className = 'sync-dot sync-dot-error';
+                text.textContent = 'Save failed — retrying…';
+                el.classList.remove('sync-status-hide');
             }
         }
+
+        // Instant, synchronous local update — no network wait, so typing/entering marks feels immediate
+        function updateScoreLocal(studentId, qiratName, assessmentKey, value) {
+            let currentScores = examScores.get(studentId) || {};
+            let qiratScores = currentScores[qiratName] || {};
+            qiratScores[assessmentKey] = value ? parseFloat(value) : null;
+            currentScores[qiratName] = qiratScores;
+            examScores.set(studentId, currentScores);
+            return currentScores;
+        }
+
+        // Queue a background sync for this student, debounced so rapid edits coalesce into one write
+        function queueScoreSync(studentId) {
+            pendingWrites.set(studentId, examScores.get(studentId));
+            writePendingStore();
+            setSyncStatus('saving');
+            if (pendingTimers.has(studentId)) clearTimeout(pendingTimers.get(studentId));
+            pendingTimers.set(studentId, setTimeout(() => flushStudentScores(studentId), SYNC_DEBOUNCE_MS));
+        }
+
+        async function flushStudentScores(studentId) {
+            pendingTimers.delete(studentId);
+            const scoresToSave = examScores.get(studentId);
+            if (!scoresToSave) return;
+            try {
+                const examRef = doc(db, "examScores", studentId);
+                await setDoc(examRef, {
+                    studentId: studentId,
+                    scores: scoresToSave,
+                    lastUpdated: new Date().toISOString()
+                }, { merge: true });
+                pendingWrites.delete(studentId);
+                writePendingStore();
+                setSyncStatus(pendingWrites.size ? 'saving' : 'saved');
+            } catch(e) {
+                console.error("Save error:", e);
+                setSyncStatus('error');
+                // Keep it queued in localStorage and retry shortly
+                pendingTimers.set(studentId, setTimeout(() => flushStudentScores(studentId), 4000));
+            }
+        }
+
+        // On load, resume any edits that were made but never finished syncing (e.g. tab closed mid-save)
+        function resumePendingScores() {
+            const stored = readPendingStore();
+            const studentIds = Object.keys(stored);
+            if (!studentIds.length) return;
+            studentIds.forEach(studentId => {
+                examScores.set(studentId, stored[studentId]);
+                pendingWrites.set(studentId, stored[studentId]);
+                pendingTimers.set(studentId, setTimeout(() => flushStudentScores(studentId), SYNC_DEBOUNCE_MS));
+            });
+            setSyncStatus('saving');
+        }
+
+        window.addEventListener('beforeunload', (e) => {
+            if (pendingWrites.size) {
+                // Pending edits are already safe in localStorage and will resume next load,
+                // but warn the user in case they want to wait for the sync to finish.
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        });
         
         async function loadExamScores() {
             try {
@@ -857,6 +960,7 @@
                 });
                 await loadQiratAssessmentConfigs();
                 await loadExamScores();
+                resumePendingScores();
                 populateFilters();
                 updateHeroStats();
                 renderCharts();
@@ -993,13 +1097,11 @@
             document.getElementById('tableBody').innerHTML = bodyHtml;
         }
 
-        window.markEntrySaveScore = async (studentId, qiratName, assessmentNum, value) => {
-            const success = await saveExamScore(studentId, qiratName, `assessment${assessmentNum}`, value);
-            if (success) {
-                await renderCurrentView();
-                updateHeroStats();
-                showToast('Score saved');
-            }
+        window.markEntrySaveScore = (studentId, qiratName, assessmentNum, value) => {
+            updateScoreLocal(studentId, qiratName, `assessment${assessmentNum}`, value);
+            renderCurrentView();
+            updateHeroStats();
+            queueScoreSync(studentId);
         };
         
         async function renderQiratView() {
@@ -1128,18 +1230,15 @@
             }
         }
         
-        window.autoSaveScoreKeepOpen = async (studentId, qiratName, assessmentNum, value, qiratIndex) => {
-            const success = await saveExamScore(studentId, qiratName, `assessment${assessmentNum}`, value);
-            if (success) {
-                // Local cache already reflects the write — no need to re-fetch the whole collection
-                // Update the specific panel without closing modal
-                await updateSingleQiratPanel(studentId, qiratIndex);
-                // Update main view and stats
-                await renderCurrentView();
-                updateHeroStats();
-                renderCharts();
-                showToast('Score saved successfully!');
-            }
+        window.autoSaveScoreKeepOpen = (studentId, qiratName, assessmentNum, value, qiratIndex) => {
+            updateScoreLocal(studentId, qiratName, `assessment${assessmentNum}`, value);
+            // Update the specific panel without closing modal
+            updateSingleQiratPanel(studentId, qiratIndex);
+            // Update main view and stats
+            renderCurrentView();
+            updateHeroStats();
+            renderCharts();
+            queueScoreSync(studentId);
         };
         
         window.toggleQiratDropdown = (index) => {
