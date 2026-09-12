@@ -880,6 +880,7 @@
                 pendingWrites.delete(studentId);
                 writePendingStore();
                 setSyncStatus(pendingWrites.size ? 'saving' : 'saved');
+                renderCharts();
             } catch(e) {
                 console.error("Save error:", e);
                 setSyncStatus('error');
@@ -1066,16 +1067,16 @@
                 const totalPossible = calculateTotalPossible(assessments);
                 const avg = calculateAverage(scores, assessments);
                 const grade = gradeInfo(avg);
-                bodyHtml += `<tr class="fade-in">
+                bodyHtml += `<tr class="fade-in" data-student-id="${student.id}">
                     <td class="px-3 py-2 sticky-col text-left"><div class="font-medium text-sm">${escapeHtml(student.full_name)}</div><div class="text-[10px] text-slate-500">${escapeHtml(student.department)}</div></td>`;
                 assessments.forEach((a, i) => {
                     const val = scores[`assessment${i+1}`];
                     const safeQirat = qiratName.replace(/'/g, "\\'");
                     bodyHtml += `<td class="px-2 py-2 text-center"><input type="number" class="mark-cell-input" min="0" max="${a.outOf}" step="0.5" value="${val !== null && val !== undefined ? val : ''}" placeholder="—" onchange="markEntrySaveScore('${student.id}', '${safeQirat}', ${i+1}, this.value)"></td>`;
                 });
-                bodyHtml += `<td class="px-3 py-2 text-center font-semibold text-purple-400 text-sm">${totalPoints}/${totalPossible}</td>
-                    <td class="px-3 py-2 text-center font-semibold text-indigo-400 text-sm">${avg !== null ? avg + '%' : '-'}</td>
-                    <td class="px-3 py-2 text-center"><span class="grade-pill ${grade.cls}">${grade.label}</span></td>
+                bodyHtml += `<td class="px-3 py-2 text-center font-semibold text-purple-400 text-sm me-total">${totalPoints}/${totalPossible}</td>
+                    <td class="px-3 py-2 text-center font-semibold text-indigo-400 text-sm me-avg">${avg !== null ? avg + '%' : '-'}</td>
+                    <td class="px-3 py-2 text-center me-grade"><span class="grade-pill ${grade.cls}">${grade.label}</span></td>
                 </tr>`;
             });
 
@@ -1086,20 +1087,60 @@
             const classAvgs = filteredStudents.map(s => calculateAverage(getStudentExamScores(s.id, qiratName), assessments)).filter(v => v !== null);
             const classAvgPct = classAvgs.length ? Math.round(classAvgs.reduce((a, b) => a + b, 0) / classAvgs.length) : null;
 
-            bodyHtml += `<tr class="font-semibold" style="background:rgba(99,102,241,0.12);">
+            bodyHtml += `<tr class="font-semibold" id="meClassAvgRow" style="background:rgba(99,102,241,0.12);">
                 <td class="px-3 py-2 sticky-col text-left text-sm" style="background:rgba(99,102,241,0.18);">Class Average</td>
-                ${classAverages.map(v => `<td class="px-2 py-2 text-center text-xs">${v}</td>`).join('')}
+                ${classAverages.map(v => `<td class="px-2 py-2 text-center text-xs me-classavg-cell">${v}</td>`).join('')}
                 <td class="px-3 py-2 text-center"></td>
-                <td class="px-3 py-2 text-center text-indigo-300 text-sm">${classAvgPct !== null ? classAvgPct + '%' : '-'}</td>
+                <td class="px-3 py-2 text-center text-indigo-300 text-sm me-classavg-total">${classAvgPct !== null ? classAvgPct + '%' : '-'}</td>
                 <td class="px-3 py-2 text-center"></td>
             </tr>`;
 
             document.getElementById('tableBody').innerHTML = bodyHtml;
         }
 
+        // Update just the one row (and the class-average row) that changed — no full table rebuild,
+        // so the input keeps focus and nothing else on screen flickers or "reloads".
+        function patchMarkEntryRow(studentId, qiratName) {
+            if (currentView !== 'markentry' || currentFilters.qirat !== qiratName) return;
+            const row = document.querySelector(`#tableBody tr[data-student-id="${studentId}"]`);
+            if (!row) return;
+            const assessments = getAssessmentsForQirat(qiratName);
+            const scores = getStudentExamScores(studentId, qiratName);
+            const totalPoints = calculateTotalPoints(scores, assessments);
+            const totalPossible = calculateTotalPossible(assessments);
+            const avg = calculateAverage(scores, assessments);
+            const grade = gradeInfo(avg);
+
+            const totalCell = row.querySelector('.me-total');
+            const avgCell = row.querySelector('.me-avg');
+            const gradeCell = row.querySelector('.me-grade');
+            if (totalCell) totalCell.textContent = `${totalPoints}/${totalPossible}`;
+            if (avgCell) avgCell.textContent = avg !== null ? `${avg}%` : '-';
+            if (gradeCell) gradeCell.innerHTML = `<span class="grade-pill ${grade.cls}">${grade.label}</span>`;
+
+            patchMarkEntryClassAverageRow(qiratName, assessments);
+        }
+
+        function patchMarkEntryClassAverageRow(qiratName, assessments) {
+            const row = document.getElementById('meClassAvgRow');
+            if (!row) return;
+            const filteredStudents = applyFilters(allStudents).filter(s => getQiratNames(s).includes(qiratName));
+            const classAverages = assessments.map((a, i) => {
+                const vals = filteredStudents.map(s => getStudentExamScores(s.id, qiratName)[`assessment${i+1}`]).filter(v => v !== null && v !== undefined && v !== '');
+                return vals.length ? (vals.reduce((sum, v) => sum + parseFloat(v), 0) / vals.length).toFixed(1) : '-';
+            });
+            const classAvgs = filteredStudents.map(s => calculateAverage(getStudentExamScores(s.id, qiratName), assessments)).filter(v => v !== null);
+            const classAvgPct = classAvgs.length ? Math.round(classAvgs.reduce((a, b) => a + b, 0) / classAvgs.length) : null;
+
+            const cells = row.querySelectorAll('.me-classavg-cell');
+            cells.forEach((cell, i) => { cell.textContent = classAverages[i] !== undefined ? classAverages[i] : '-'; });
+            const totalCell = row.querySelector('.me-classavg-total');
+            if (totalCell) totalCell.textContent = classAvgPct !== null ? `${classAvgPct}%` : '-';
+        }
+
         window.markEntrySaveScore = (studentId, qiratName, assessmentNum, value) => {
             updateScoreLocal(studentId, qiratName, `assessment${assessmentNum}`, value);
-            renderCurrentView();
+            patchMarkEntryRow(studentId, qiratName);
             updateHeroStats();
             queueScoreSync(studentId);
         };
@@ -1234,10 +1275,9 @@
             updateScoreLocal(studentId, qiratName, `assessment${assessmentNum}`, value);
             // Update the specific panel without closing modal
             updateSingleQiratPanel(studentId, qiratIndex);
-            // Update main view and stats
-            renderCurrentView();
+            // Keep the mark-entry grid in sync too, without rebuilding the whole table
+            patchMarkEntryRow(studentId, qiratName);
             updateHeroStats();
-            renderCharts();
             queueScoreSync(studentId);
         };
         
