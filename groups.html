@@ -64,10 +64,8 @@
             background: var(--surface);
             border-bottom: 1px solid var(--line);
             padding: 16px 24px;
-            position: sticky;
-            top: 0;
-            z-index: 100;
             box-shadow: var(--shadow-sm);
+            margin-bottom: 24px;
         }
 
         .header-content {
@@ -505,16 +503,102 @@
             to { transform: translateX(0); opacity: 1; }
         }
 
+        /* ===== Mobile bottom nav (floating) ===== */
+        .bottom-nav {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
+            background: rgba(11, 20, 33, .97);
+            backdrop-filter: blur(14px);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 8px 6px;
+            border: 1px solid rgba(255,255,255,.1);
+            border-radius: 18px;
+            box-shadow: 0 14px 40px rgba(0,0,0,.25);
+            z-index: 200;
+            display: none;
+            transition: opacity .3s ease, transform .3s ease;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .bottom-nav.nav-hidden { opacity: 0; transform: translateY(16px); pointer-events: none; }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 7px 10px;
+            border-radius: 13px;
+            color: #9ea8b3;
+            transition: all 0.2s;
+        }
+        .nav-item i { font-size: 1.05rem; }
+        .nav-item span { font-size: 0.58rem; font-weight: 600; }
+        .nav-item.active { color: #fff; background: linear-gradient(90deg, rgba(15,107,64,.9), rgba(15,107,64,.6)); }
+
+        /* ===== Desktop top bar ===== */
+        .desktop-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 250;
+            background: rgba(255,255,255,.92);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--line);
+            padding: 0.7rem 1.5rem;
+        }
+        .nav-link {
+            padding: 0.5rem 1rem;
+            border-radius: var(--r-sm);
+            transition: all 0.2s;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--muted);
+        }
+        .nav-link:hover { background: var(--brand-soft); color: var(--brand); }
+        .nav-link.active { background: var(--brand); color: #fff; }
+
         @media (max-width: 768px) {
             .main-container { padding: 16px; padding-bottom: 80px; }
             .group-header { flex-direction: column; align-items: flex-start; }
             .group-export-buttons { width: 100%; justify-content: flex-start; }
             .filters-bar { flex-direction: column; }
             .filter-group { width: 100%; }
+            body { padding-top: 60px; }
+            .desktop-nav { display: none; }
+            .bottom-nav { display: flex; }
+        }
+        @media (min-width: 769px) {
+            body { padding-top: 78px; }
+            .bottom-nav { display: none; }
+            .desktop-nav { display: block; }
         }
     </style>
 </head>
 <body>
+
+<div class="desktop-nav">
+    <div class="max-w-7xl mx-auto flex justify-between items-center" style="max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-mosque" style="color: var(--brand); font-size: 1.2rem;"></i>
+            <span style="font-weight: 800; font-size: 1.05rem; color: var(--ink);">JUMJ Irshad</span>
+        </div>
+        <div class="flex gap-1" style="display: flex; gap: 4px;">
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="groups.html" class="nav-link active">Groups</a>
+            <a href="analytics.html" class="nav-link">Analytics</a>
+            <a href="exam.html" class="nav-link">Exams</a>
+            <a href="import.html" class="nav-link">Import</a>
+        </div>
+    </div>
+</div>
 
 <div class="glass-header">
     <div class="header-content">
@@ -557,6 +641,14 @@
     </div>
 </div>
 
+<div class="bottom-nav">
+    <button class="nav-item" onclick="window.location.href='index.html'"><i class="fas fa-home"></i><span>Home</span></button>
+    <button class="nav-item active" onclick="window.location.href='groups.html'"><i class="fas fa-layer-group"></i><span>Groups</span></button>
+    <button class="nav-item" onclick="window.location.href='exam.html'"><i class="fas fa-graduation-cap"></i><span>Exams</span></button>
+    <button class="nav-item" onclick="window.location.href='import.html'"><i class="fas fa-upload"></i><span>Import</span></button>
+    <button class="nav-item" onclick="window.location.href='profile.html'"><i class="fas fa-user"></i><span>Profile</span></button>
+</div>
+
 <div id="toast" class="toast"></div>
 
 <div id="editModal" class="modal-overlay">
@@ -584,7 +676,6 @@
 
 <script type="module">
     import { protectPage, initAuthUI, setupAutoLogout } from './auth.js';
-    import { initNavigation, refreshNavigation } from './nav.js';
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     
@@ -1210,9 +1301,26 @@
         });
     });
     
-    initNavigation();
-    if (admin?.role === 'super-admin') setTimeout(() => refreshNavigation(), 100);
-    
+    // Fade the mobile bottom nav out while scrolling down, back in when scrolling up or near the top
+    (function() {
+        const nav = document.querySelector('.bottom-nav');
+        if (!nav) return;
+        let lastY = window.scrollY;
+        let ticking = false;
+        window.addEventListener('scroll', () => {
+            if (ticking) return;
+            ticking = true;
+            requestAnimationFrame(() => {
+                const y = window.scrollY;
+                if (y < 40) nav.classList.remove('nav-hidden');
+                else if (y > lastY) nav.classList.add('nav-hidden');
+                else if (y < lastY) nav.classList.remove('nav-hidden');
+                lastY = y;
+                ticking = false;
+            });
+        }, { passive: true });
+    })();
+
     // Initialize: load sticky filters, group mode, then load data
     loadStickyFilters();
     loadGroupMode();
