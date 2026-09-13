@@ -334,7 +334,11 @@
             box-shadow: 0 14px 40px rgba(0,0,0,.25);
             z-index: 200;
             display: none;
+            transition: opacity .3s ease, transform .3s ease;
+            opacity: 1;
+            transform: translateY(0);
         }
+        .bottom-nav.nav-hidden { opacity: 0; transform: translateY(16px); pointer-events: none; }
         .nav-item {
             display: flex;
             flex-direction: column;
@@ -1828,6 +1832,30 @@
         window.applyDeptFilters = applyDeptFilters;
         window.clearDeptFilters = clearDeptFilters;
         
+        // Fade the mobile bottom nav out while scrolling down, back in when scrolling up or near the top
+        (function() {
+            const nav = document.querySelector('.bottom-nav');
+            if (!nav) return;
+            let lastY = window.scrollY;
+            let ticking = false;
+            window.addEventListener('scroll', () => {
+                if (ticking) return;
+                ticking = true;
+                requestAnimationFrame(() => {
+                    const y = window.scrollY;
+                    if (y < 40) {
+                        nav.classList.remove('nav-hidden');
+                    } else if (y > lastY) {
+                        nav.classList.add('nav-hidden'); // scrolling down
+                    } else if (y < lastY) {
+                        nav.classList.remove('nav-hidden'); // scrolling up
+                    }
+                    lastY = y;
+                    ticking = false;
+                });
+            }, { passive: true });
+        })();
+
         history.replaceState({ examModal: null }, '');
         loadData();
     </script>
