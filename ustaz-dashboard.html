@@ -366,6 +366,40 @@
         .me-empty-state { text-align: center; padding: 3rem 1rem; color: var(--muted); }
         .me-empty-state i { font-size: 2rem; margin-bottom: 0.75rem; display: block; }
 
+        /* ===== Bulk import ===== */
+        .import-tab {
+            padding: 8px 16px;
+            border-radius: var(--r-md) var(--r-md) 0 0;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--muted);
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+        }
+        .import-tab.active { color: var(--brand); border-bottom-color: var(--brand); }
+        .import-dropzone {
+            border: 2px dashed var(--line-strong);
+            border-radius: var(--r-lg);
+            padding: 2rem 1rem;
+            text-align: center;
+            color: var(--muted);
+            transition: all .2s;
+            cursor: pointer;
+        }
+        .import-dropzone:hover, .import-dropzone.drag-over { border-color: var(--brand); background: var(--brand-soft); color: var(--brand-2); }
+        .import-dropzone i { font-size: 1.75rem; margin-bottom: 0.5rem; display: block; }
+        .import-paste-area {
+            width: 100%; min-height: 140px; background: #fbfcfc; border: 1px solid var(--line-strong);
+            border-radius: var(--r-md); padding: 0.75rem; font-family: "JetBrains Mono", monospace; font-size: 0.75rem; color: var(--ink);
+        }
+        .import-paste-area:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-soft); }
+        .import-preview-table { width: 100%; border-collapse: collapse; font-size: 0.72rem; }
+        .import-preview-table th, .import-preview-table td { padding: 0.4rem 0.5rem; text-align: center; border-bottom: 1px solid var(--line); white-space: nowrap; }
+        .import-preview-table th { background: var(--brand-soft); color: var(--brand-2); text-transform: uppercase; font-size: 0.6rem; position: sticky; top: 0; }
+        .import-preview-table td:first-child, .import-preview-table th:first-child { text-align: left; }
+        .import-row-unmatched td { background: var(--danger-soft); }
+        .import-row-matched td:last-child { color: var(--green); font-weight: 700; }
+
         /* ===== Map legacy Tailwind color utility classes onto the JUmed palette ===== */
         .bg-slate-900 { background: var(--surface) !important; }
         .bg-slate-800, .bg-slate-800\/50, .bg-slate-800\/30 { background: var(--surface-2) !important; }
@@ -497,6 +531,7 @@
                         <button onclick="switchView('list')" id="viewBtnList" class="view-btn active"><i class="fas fa-list mr-1"></i>List</button>
                         <button onclick="switchView('markentry')" id="viewBtnMarkEntry" class="view-btn"><i class="fas fa-table-cells mr-1"></i>Mark Entry</button>
                     </div>
+                    <button onclick="openImportModal()" class="px-3 py-1.5 rounded-lg btn-premium text-xs"><i class="fas fa-file-import"></i> Import Marks</button>
                     <button onclick="exportToCSV()" class="px-3 py-1.5 rounded-lg bg-slate-700 text-xs"><i class="fas fa-file-csv"></i> CSV</button>
                     <button onclick="exportToExcel()" class="px-3 py-1.5 rounded-lg bg-slate-700 text-xs"><i class="fas fa-file-excel"></i> Excel</button>
                     <button onclick="exportToPDF()" class="px-3 py-1.5 rounded-lg bg-slate-700 text-xs"><i class="fas fa-file-pdf"></i> PDF</button>
@@ -543,6 +578,52 @@
                 </div>
             </div>
             <div id="modalContent" class="p-4 md:p-6 overflow-y-auto custom-scrollbar"></div>
+        </div>
+    </div>
+
+    <div id="importModal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 md:p-4">
+        <div class="glass-card modal-box w-full max-w-4xl max-h-[85vh] overflow-hidden modal-enter flex flex-col bg-slate-900">
+            <div class="p-4 md:p-6 border-b border-slate-700 flex justify-between items-center bg-slate-800/30">
+                <h2 class="text-xl md:text-2xl font-bold"><i class="fas fa-file-import mr-2"></i> Import Marks</h2>
+                <div class="flex gap-1 md:gap-2 items-center">
+                    <button id="fsBtn-importModal" onclick="toggleModalFullscreen('importModal')" class="px-2 py-1 md:px-3 rounded-lg bg-slate-700 text-xs" title="Toggle fullscreen"><i class="fas fa-expand"></i></button>
+                    <button onclick="closeImportModal()" class="text-slate-400 hover:text-white px-1"><i class="fas fa-times text-xl"></i></button>
+                </div>
+            </div>
+            <div class="p-4 md:p-6 overflow-y-auto custom-scrollbar">
+                <p id="importQiratInfo" class="text-sm mb-4"></p>
+
+                <div class="flex gap-2 border-b border-slate-700 mb-4">
+                    <div id="importTabPaste" class="import-tab active" onclick="switchImportTab('paste')"><i class="fas fa-paste mr-1"></i> Paste Data</div>
+                    <div id="importTabUpload" class="import-tab" onclick="switchImportTab('upload')"><i class="fas fa-upload mr-1"></i> Upload File</div>
+                </div>
+
+                <div id="importPastePanel">
+                    <p class="text-xs text-slate-400 mb-2">Paste rows copied from Excel/Sheets — first column is the student's full name, followed by one column per assessment below.</p>
+                    <textarea id="importPasteArea" class="import-paste-area" placeholder="Student Name&#9;Quiz 1&#9;Midterm&#9;Final&#10;Ahmed Ali&#9;18&#9;25&#9;40"></textarea>
+                    <div class="flex justify-between items-center mt-2">
+                        <label class="text-xs flex items-center gap-2"><input type="checkbox" id="importHasHeaderPaste" checked> First row is a header</label>
+                        <button onclick="parseImportPaste()" class="px-3 py-1.5 rounded-lg btn-premium text-xs"><i class="fas fa-magnifying-glass mr-1"></i> Parse & Preview</button>
+                    </div>
+                </div>
+
+                <div id="importUploadPanel" class="hidden">
+                    <p class="text-xs text-slate-400 mb-2">Upload a .csv or .xlsx file — first column is the student's full name, followed by one column per assessment below.</p>
+                    <label for="importFileInput" id="importDropzone" class="import-dropzone block">
+                        <i class="fas fa-cloud-arrow-up"></i>
+                        <span>Click to choose a file, or drag one here</span>
+                        <div id="importFileName" class="text-xs mt-2"></div>
+                    </label>
+                    <input type="file" id="importFileInput" accept=".csv,.xlsx,.xls" class="hidden">
+                    <label class="text-xs flex items-center gap-2 mt-2"><input type="checkbox" id="importHasHeaderFile" checked> First row is a header</label>
+                </div>
+
+                <div id="importPreviewWrap" class="mt-4"></div>
+            </div>
+            <div class="p-4 border-t border-slate-700 flex justify-end gap-2">
+                <button onclick="closeImportModal()" class="px-4 py-2 rounded-lg bg-slate-700 text-sm">Cancel</button>
+                <button onclick="confirmImport()" id="importConfirmBtn" class="px-4 py-2 rounded-lg btn-premium text-sm" disabled><i class="fas fa-check mr-1"></i> Confirm Import</button>
+            </div>
         </div>
     </div>
 
@@ -1080,6 +1161,187 @@
             const totalCell = row.querySelector('.me-classavg-total');
             if (totalCell) totalCell.textContent = classAvgPct !== null ? `${classAvgPct}%` : '-';
         }
+
+        // ===== Bulk import marks (paste or CSV/Excel upload) =====
+        let importAssessments = [];
+        let importQiratName = '';
+        let importParsedRows = [];
+        let importPool = [];
+
+        window.openImportModal = () => {
+            if (!currentQirat) { showToast('Select a Qirat tab first', true); return; }
+            importQiratName = currentQirat;
+            importAssessments = getAssessmentsForQirat(currentQirat);
+            importParsedRows = [];
+            importPool = allStudents.filter(s => getQiratNames(s).includes(currentQirat));
+            document.getElementById('importQiratInfo').innerHTML = `Importing marks for <strong>${escapeHtml(currentQirat)}</strong> (${importPool.length} students enrolled). Columns after the student name should be, in order: <strong>${importAssessments.map(a => escapeHtml(a.name)).join(', ')}</strong>.`;
+            document.getElementById('importPasteArea').value = '';
+            document.getElementById('importFileInput').value = '';
+            document.getElementById('importFileName').textContent = '';
+            document.getElementById('importPreviewWrap').innerHTML = '';
+            document.getElementById('importConfirmBtn').disabled = true;
+            switchImportTab('paste');
+
+            const modal = document.getElementById('importModal');
+            modal.classList.remove('hidden');
+            const isMobile = window.innerWidth <= 768;
+            const box = modal.querySelector('.modal-box');
+            const btn = document.getElementById('fsBtn-importModal');
+            if (isMobile) { box?.classList.add('modal-fullscreen'); modal.classList.add('modal-open-fullscreen'); if (btn) btn.innerHTML = '<i class="fas fa-compress"></i>'; }
+            else { box?.classList.remove('modal-fullscreen'); modal.classList.remove('modal-open-fullscreen'); if (btn) btn.innerHTML = '<i class="fas fa-expand"></i>'; }
+        };
+
+        window.closeImportModal = () => { document.getElementById('importModal').classList.add('hidden'); };
+
+        window.switchImportTab = (tab) => {
+            document.getElementById('importTabPaste').classList.toggle('active', tab === 'paste');
+            document.getElementById('importTabUpload').classList.toggle('active', tab === 'upload');
+            document.getElementById('importPastePanel').classList.toggle('hidden', tab !== 'paste');
+            document.getElementById('importUploadPanel').classList.toggle('hidden', tab !== 'upload');
+        };
+
+        function parseDelimitedText(text) {
+            const lines = text.split(/\r\n|\r|\n/).filter(l => l.trim() !== '');
+            if (!lines.length) return [];
+            const delimiter = lines[0].includes('\t') ? '\t' : ',';
+            return lines.map(line => {
+                if (delimiter === ',') {
+                    const cells = []; let cur = '', inQuotes = false;
+                    for (let i = 0; i < line.length; i++) {
+                        const ch = line[i];
+                        if (ch === '"') { inQuotes = !inQuotes; continue; }
+                        if (ch === ',' && !inQuotes) { cells.push(cur); cur = ''; continue; }
+                        cur += ch;
+                    }
+                    cells.push(cur);
+                    return cells.map(c => c.trim());
+                }
+                return line.split('\t').map(c => c.trim());
+            });
+        }
+
+        function findStudentByName(name, pool) {
+            const norm = (name || '').trim().toLowerCase();
+            if (!norm) return null;
+            const matches = pool.filter(s => (s.full_name || '').trim().toLowerCase() === norm);
+            return matches.length === 1 ? matches[0] : null;
+        }
+
+        window.parseImportPaste = () => {
+            const text = document.getElementById('importPasteArea').value;
+            const hasHeader = document.getElementById('importHasHeaderPaste').checked;
+            processImportRows(parseDelimitedText(text), hasHeader);
+        };
+
+        document.getElementById('importFileInput').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            document.getElementById('importFileName').textContent = file.name;
+            const hasHeader = document.getElementById('importHasHeaderFile').checked;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                try {
+                    const wb = XLSX.read(ev.target.result, { type: 'binary' });
+                    const sheet = wb.Sheets[wb.SheetNames[0]];
+                    const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: false, defval: '' });
+                    processImportRows(rows.map(r => r.map(c => String(c).trim())), hasHeader);
+                } catch(err) {
+                    console.error(err);
+                    showToast('Could not read that file', true);
+                }
+            };
+            reader.readAsBinaryString(file);
+        });
+
+        const importDropzone = document.getElementById('importDropzone');
+        ['dragenter', 'dragover'].forEach(evt => importDropzone.addEventListener(evt, e => { e.preventDefault(); importDropzone.classList.add('drag-over'); }));
+        ['dragleave', 'drop'].forEach(evt => importDropzone.addEventListener(evt, e => { e.preventDefault(); importDropzone.classList.remove('drag-over'); }));
+        importDropzone.addEventListener('drop', e => {
+            const file = e.dataTransfer.files[0];
+            if (!file) return;
+            document.getElementById('importFileInput').files = e.dataTransfer.files;
+            document.getElementById('importFileInput').dispatchEvent(new Event('change'));
+        });
+
+        function processImportRows(rows, hasHeader) {
+            rows = rows.filter(r => r.some(c => c !== ''));
+            if (!rows.length) { showToast('No data found to import', true); return; }
+            let headerRow = null, dataRows = rows;
+            if (hasHeader) { headerRow = rows[0]; dataRows = rows.slice(1); }
+
+            const maxCols = Math.max(headerRow ? headerRow.length : 0, ...dataRows.map(r => r.length));
+            let colMap = [];
+            for (let i = 1; i < maxCols; i++) {
+                if (headerRow) {
+                    const label = (headerRow[i] || '').trim().toLowerCase();
+                    const match = importAssessments.find(a => a.name.trim().toLowerCase() === label);
+                    colMap[i] = match ? match.key : (importAssessments[i - 1] ? importAssessments[i - 1].key : null);
+                } else {
+                    colMap[i] = importAssessments[i - 1] ? importAssessments[i - 1].key : null;
+                }
+            }
+
+            importParsedRows = dataRows.map(row => {
+                const name = row[0] || '';
+                const student = findStudentByName(name, importPool);
+                const values = {};
+                colMap.forEach((key, i) => {
+                    if (key && row[i] !== undefined && row[i] !== '') {
+                        const num = parseFloat(row[i]);
+                        if (!isNaN(num)) values[key] = num;
+                    }
+                });
+                return { rawName: name, studentId: student ? student.id : null, values };
+            }).filter(r => r.rawName);
+
+            renderImportPreview();
+        }
+
+        function renderImportPreview() {
+            if (!importParsedRows.length) {
+                document.getElementById('importPreviewWrap').innerHTML = `<p class="text-sm text-slate-400">No rows to preview.</p>`;
+                document.getElementById('importConfirmBtn').disabled = true;
+                return;
+            }
+            let html = `<div style="max-height:320px; overflow:auto;"><table class="import-preview-table">
+                <thead><tr><th>#</th><th>Student</th>${importAssessments.map(a => `<th>${escapeHtml(a.name)}</th>`).join('')}<th>Status</th></tr></thead><tbody>`;
+            importParsedRows.forEach((row, idx) => {
+                const valuesHtml = importAssessments.map(a => `<td>${row.values[a.key] !== undefined ? row.values[a.key] : '—'}</td>`).join('');
+                let statusHtml, rowClass;
+                if (row.studentId) {
+                    statusHtml = `<i class="fas fa-check-circle"></i> Matched`;
+                    rowClass = 'import-row-matched';
+                } else {
+                    const options = importPool.map(s => `<option value="${s.id}">${escapeHtml(s.full_name)}</option>`).join('');
+                    statusHtml = `<select onchange="resolveImportRow(${idx}, this.value)" class="filter-input" style="font-size:0.68rem; padding:2px 4px; width:auto;">
+                        <option value="">— Skip —</option>${options}</select>`;
+                    rowClass = 'import-row-unmatched';
+                }
+                html += `<tr class="${rowClass}"><td>${idx+1}</td><td>${escapeHtml(row.rawName)}</td>${valuesHtml}<td>${statusHtml}</td></tr>`;
+            });
+            html += `</tbody></table></div>`;
+            const matchedCount = importParsedRows.filter(r => r.studentId).length;
+            html += `<p class="text-xs text-slate-400 mt-2">${matchedCount} of ${importParsedRows.length} row(s) matched automatically. Use the dropdown to fix an unmatched name, or leave as "Skip" to ignore that row.</p>`;
+            document.getElementById('importPreviewWrap').innerHTML = html;
+            document.getElementById('importConfirmBtn').disabled = false;
+        }
+
+        window.resolveImportRow = (idx, studentId) => { importParsedRows[idx].studentId = studentId || null; };
+
+        window.confirmImport = () => {
+            let studentCount = 0;
+            importParsedRows.forEach(row => {
+                if (!row.studentId || !Object.keys(row.values).length) return;
+                Object.entries(row.values).forEach(([key, val]) => updateScoreLocal(row.studentId, importQiratName, key, val));
+                queueScoreSync(row.studentId);
+                studentCount++;
+            });
+            closeImportModal();
+            renderCurrentView();
+            updateStats();
+            renderChart();
+            showToast(studentCount ? `Imported marks for ${studentCount} student(s)` : 'No matched rows to import', !studentCount);
+        };
 
         // Instant local update + row patch, with the same debounced background sync as the modal editor
         window.markEntrySaveScore = (studentId, qiratName, assessmentKey, value) => {
