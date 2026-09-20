@@ -51,7 +51,7 @@ footer{font-size:10px;color:var(--faint);line-height:1.6}code{background:var(--b
 /* mobile */
 @media(max-width:1050px){.stat-grid{grid-template-columns:repeat(3,1fr)}.login-shell{grid-template-columns:1fr}.login-visual{min-height:360px}.login-panel{min-height:calc(100vh - 360px)}}
 @media(max-width:860px){.app-shell{display:block}.sidebar{position:sticky;top:0;width:100%;height:auto;min-height:64px;flex-direction:row;align-items:center}.sidebar-toggle{display:none}.sidebar-brand{border:0;border-right:1px solid rgba(255,255,255,.08);padding:12px 14px}.sidebar-brand .brand-mark{width:34px;height:34px}.sidebar-nav{flex-direction:row;overflow-x:auto;padding:8px 10px;gap:3px;scrollbar-width:none}.sidebar-nav::-webkit-scrollbar{display:none}.nav-section{display:none}.nav-item{flex:0 0 auto;padding:9px 11px}.nav-item.active:after{display:none}.sidebar-foot{display:none}.main{height:auto}.main:before{display:none}.main-scroll{padding:20px 14px 50px}.topbar{padding-bottom:18px;margin-bottom:22px}.topbar-right{display:none}.page-head{align-items:flex-start}.page-head-meta{display:none}.module-context{grid-template-columns:1fr}.module-context .field{min-width:0}.analytics-cols{grid-template-columns:1fr}.stat-grid{grid-template-columns:repeat(2,1fr)}.barchart-row{grid-template-columns:110px 1fr 55px}.card{padding:17px;border-radius:15px}}
-@media(max-width:560px){.login-visual{min-height:300px;padding:30px 24px}.login-visual h1{font-size:2.1rem}.login-grid{display:none}.login-panel{padding:30px 20px}.login-card h2{font-size:26px}.page-title{font-size:1.55rem}.tabs{margin-left:-3px;margin-right:-3px}.toolbar{align-items:stretch}.toolbar .field{width:100%;min-width:0}.toolbar .field input,.toolbar .field select{max-width:none}.toolbar-actions{width:100%}.toolbar-actions .btn{flex:1}.stat-grid{grid-template-columns:1fr 1fr;gap:8px}.stat-card{padding:13px}.stat-card .stat-value{font-size:20px}.barchart-row{grid-template-columns:85px 1fr 48px;gap:7px}.histogram-label{display:none}.indiv-comp-row{grid-template-columns:1fr}.login-brand{margin-bottom:26px}}
+@media(max-width:560px){.login-visual{min-height:300px;padding:30px 24px}.login-visual h1{font-size:2.1rem}.login-grid{display:none}.login-panel{padding:30px 20px}.login-card h2{font-size:26px}.page-title{font-size:1.55rem}.tabs{margin-left:-3px;margin-right:-3px}.toolbar{align-items:stretch}.toolbar .field{width:100%;min-width:0}.toolbar .field input,.toolbar .field select{max-width:none}.toolbar-actions{width:100%}.toolbar-actions .btn{flex:1}.stat-grid{grid-template-columns:1fr 1fr;gap:8px}.stat-card{padding:13px}.stat-card .stat-value{font-size:20px}.barchart-row{grid-template-columns:85px 1fr 48px;gap:7px}.histogram-label{display:none}.indiv-comp-row{grid-template-columns:1fr}.login-brand{margin-bottom:26px}.subject-leaderboard-card{flex-basis:225px}.subject-leaderboard-card h4{font-size:10px}.histogram-bar-inner{height:110px}}
 
 /* ===== JUMJ 2.0 PRODUCT REDESIGN ===== */
 :root{
@@ -96,6 +96,42 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.34;ba
 #screen-students .tab-panel.active,#screen-results .tab-panel.active{animation:panelIn .2s ease-out}@keyframes panelIn{from{opacity:.5;transform:translateY(3px)}to{opacity:1;transform:none}}
 #screen-students .tabgroup,#screen-results .tabgroup{position:relative}
 #screen-students .tabgroup:before,#screen-results .tabgroup:before{content:"";display:block;position:absolute;right:0;top:-3px;width:90px;height:2px;background:#d4ad55;border-radius:2px}
+/* ===== student avatars everywhere + read-only/edit directory rows ===== */
+.sp-avatar.sm{--sz:26px;border-radius:8px}
+.sp-avatar.sm b{font-size:10px}
+.sp-avatar.md{--sz:36px;border-radius:10px}
+.stu-row{display:inline-flex;align-items:center;gap:8px;color:inherit;text-decoration:none;max-width:100%;vertical-align:middle}
+.stu-row .stu-name{font-weight:650;border-bottom:1px dashed rgba(23,107,79,.4);transition:color .15s,border-color .15s;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stu-row:hover .stu-name,.stu-row:focus-visible .stu-name{color:var(--brand);border-bottom-color:var(--brand)}
+.global-search-item .sp-avatar{flex:none}
+.stu-identity{display:flex;align-items:center;gap:11px;min-width:220px}
+.stu-avatarlink{flex:none;display:block;border-radius:10px;transition:transform .15s,box-shadow .15s}
+.stu-avatarlink:hover,.stu-avatarlink:focus-visible{transform:scale(1.07);box-shadow:0 4px 12px rgba(11,40,30,.22);outline:0}
+.stu-idmeta{min-width:0;display:flex;flex-direction:column;gap:2px}
+.stu-idmeta .stuNameInput{font-weight:750;font-size:12.5px;color:var(--ink)}
+.stu-idmeta .stuEmailInput{font-size:10.5px;color:var(--muted);font-family:"JetBrains Mono",monospace}
+td input[readonly],td select:disabled{background:transparent!important;border-color:transparent!important;box-shadow:none!important;padding-left:2px!important;color:var(--ink);cursor:default;opacity:1;-webkit-text-fill-color:var(--ink);appearance:none;-webkit-appearance:none}
+td input[readonly]::placeholder{color:var(--faint)}
+td input[readonly]:focus,td select:disabled:focus{box-shadow:none!important;border-color:transparent!important}
+.stuSubjCell .subjpick.locked{pointer-events:none}
+.stuSubjCell .subjpick.locked summary{cursor:default}
+.stu-actions{display:flex;align-items:center;gap:6px;justify-content:flex-end}
+.stu-editbtn{border:1px solid var(--line-strong);background:#fff;color:#50615b;width:29px;height:29px;flex:none;border-radius:8px;display:inline-grid;place-items:center;cursor:pointer;transition:.15s ease;font-size:11px}
+.stu-editbtn:hover{background:var(--brand-soft);color:var(--brand-2);border-color:var(--brand)}
+tr.editing{background:#fffdf5}
+tr.editing td{background:transparent!important}
+tr.editing .stu-editbtn{background:var(--brand);color:#fff;border-color:var(--brand)}
+tr:not(.editing) .stuSaveBtn{display:none}
+#allStudentsBody td{vertical-align:middle}
+/* compact filters/toolbar — consistent app-wide */
+.toolbar{gap:9px;margin-bottom:13px}
+.toolbar .field,.filter-row .field{min-width:120px}
+.toolbar .field label,.filter-row .field label{font-size:9.5px;margin-bottom:4px}
+.toolbar .field input,.toolbar .field select,.filter-row .field input,.filter-row .field select{padding:7px 9px;font-size:11.5px;border-radius:7px}
+.toolbar .btn,.filter-row .btn{padding:7px 10px;font-size:10.5px;margin-bottom:0!important}
+.toolbar-actions{gap:7px}
+.toolbar-actions .btn{padding:7px 10px;font-size:10.5px}
+.summary-row{font-size:10.5px;gap:11px}
 @media(max-width:1050px){.global-topbar{grid-template-columns:1fr auto}.global-center{display:none}.sidebar{width:240px;flex-basis:240px}.stat-grid{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:860px){.global-topbar{height:60px;padding:0 14px}.global-product{font-size:11px}.global-context{display:none}.main-scroll{padding:25px 14px 55px}.sidebar{width:100%;padding:0}.sidebar-brand{margin:0;padding:10px 12px;border-radius:0;background:transparent;border:0;border-right:1px solid rgba(255,255,255,.07)}.nav-item{border-radius:9px}.page-title{font-size:2rem}.tabs{width:100%;overflow:auto}.tab-btn{flex:0 0 auto}.card{padding:16px}.stat-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:560px){.admin-avatar{width:31px;height:31px}.global-logo{width:31px;height:31px}.main-scroll{padding:22px 12px 45px}.page-head{margin-bottom:22px}.page-title{font-size:1.8rem}.page-head-meta{display:none}.stat-grid{gap:7px}.stat-card .stat-value{font-size:21px}}
@@ -399,18 +435,18 @@ tbody td.mono{font-size:11px}
 /* gender colours: pink = female, green = male */
 .gchip{display:inline-flex;align-items:center;padding:2px 10px;border-radius:99px;font-size:10px;font-weight:700;line-height:1.5;white-space:nowrap;border:1px solid transparent}
 .gchip.f{background:#fde3ee;color:#b0336a;border-color:#f6bfd6}
-.gchip.m{background:#dcf3e4;color:#1d6b3e;border-color:#b3dfc2}
+.gchip.m{background:var(--brand-soft);color:var(--brand-2);border-color:var(--brand-soft-2)}
 .gchip.none{background:transparent;color:#a7aaa0;padding:2px 4px}
-.stuGenderInput.g-f{background:#fde3ee!important;color:#b0336a;border-color:#f6bfd6!important;font-weight:700}
-.stuGenderInput.g-m{background:#dcf3e4!important;color:#1d6b3e;border-color:#b3dfc2!important;font-weight:700}
+.stuGenderInput.g-f{background:#fde3ee!important;color:#b0336a!important;border-color:#f6bfd6!important;font-weight:700;border-radius:var(--pill)!important;padding-inline:12px!important}
+.stuGenderInput.g-m{background:var(--brand-soft)!important;color:var(--brand-2)!important;border-color:var(--brand-soft-2)!important;font-weight:700;border-radius:var(--pill)!important;padding-inline:12px!important}
 tbody tr:has(.gchip.f) td:first-child{box-shadow:inset 3px 0 0 #f2a9c6}
-tbody tr:has(.gchip.m) td:first-child{box-shadow:inset 3px 0 0 #7fcf9b}
+tbody tr:has(.gchip.m) td:first-child{box-shadow:inset 3px 0 0 var(--brand)}
 [dir=rtl] tbody tr:has(.gchip.f) td:first-child{box-shadow:inset -3px 0 0 #f2a9c6}
-[dir=rtl] tbody tr:has(.gchip.m) td:first-child{box-shadow:inset -3px 0 0 #7fcf9b}
+[dir=rtl] tbody tr:has(.gchip.m) td:first-child{box-shadow:inset -3px 0 0 var(--brand)}
 tbody tr:has(.stuGenderInput.g-f) td:first-child{box-shadow:inset 3px 0 0 #f2a9c6}
-tbody tr:has(.stuGenderInput.g-m) td:first-child{box-shadow:inset 3px 0 0 #7fcf9b}
+tbody tr:has(.stuGenderInput.g-m) td:first-child{box-shadow:inset 3px 0 0 var(--brand)}
 [dir=rtl] tbody tr:has(.stuGenderInput.g-f) td:first-child{box-shadow:inset -3px 0 0 #f2a9c6}
-[dir=rtl] tbody tr:has(.stuGenderInput.g-m) td:first-child{box-shadow:inset -3px 0 0 #7fcf9b}
+[dir=rtl] tbody tr:has(.stuGenderInput.g-m) td:first-child{box-shadow:inset -3px 0 0 var(--brand)}
 
 .subjpick-list small{color:#a2a79f;font-size:10px}
 .btn-gold:disabled,.btn-gold:disabled:hover{background:#ebe6d4;color:#8c8a78;box-shadow:none;cursor:not-allowed}
@@ -909,13 +945,13 @@ th.sp-open-cell,td.sp-open-cell{width:46px;padding-inline-end:0!important}
             <div class="sub-two">
               <div class="card">
                 <p class="card-title">Leaderboard</p>
-                <div class="table-scroll table-compact" style="margin-top:10px"><table style="min-width:420px"><thead><tr><th></th><th>Student</th><th>Gender</th><th>Score</th><th>%</th></tr></thead><tbody id="ovLeaderBody"></tbody></table></div>
+                <div class="table-scroll table-compact" style="margin-top:10px"><table><thead><tr><th></th><th>Student</th><th>Gender</th><th>Score</th><th>%</th></tr></thead><tbody id="ovLeaderBody"></tbody></table></div>
               </div>
               <div class="card">
                 <p class="card-title" id="ovMissingHeading">Awaiting results</p>
                 <p class="hint">Enrolled students with no result yet.</p>
                 <div class="ok-box" id="ovMissingOk"></div>
-                <div class="table-scroll table-compact" id="ovMissingWrap" style="max-height:340px"><table style="min-width:340px"><thead><tr><th>Name</th><th>Gender</th><th>Email</th><th></th></tr></thead><tbody id="ovMissingBody"></tbody></table></div>
+                <div class="table-scroll table-compact" id="ovMissingWrap" style="max-height:340px"><table><thead><tr><th>Name</th><th>Gender</th><th>Email</th><th></th></tr></thead><tbody id="ovMissingBody"></tbody></table></div>
               </div>
             </div>
             <div class="card" style="margin-top:14px">
@@ -1237,8 +1273,8 @@ th.sp-open-cell,td.sp-open-cell{width:46px;padding-inline-end:0!important}
               <div class="ok-box" id="stuOk"></div>
               <div class="table-scroll" style="max-height:640px;">
                 <table>
-                  <thead><tr><th class="chk"><input type="checkbox" id="stuSelectAll"></th><th class="sp-open-cell"></th><th>Name</th><th>Email</th><th>Gender</th><th>Phone</th><th>Department</th><th>Batch</th><th>Subjects</th><th>Status</th><th></th></tr></thead>
-                  <tbody id="allStudentsBody"><tr><td colspan="12">Loading…</td></tr></tbody>
+                  <thead><tr><th class="chk"><input type="checkbox" id="stuSelectAll"></th><th>Student</th><th>Gender</th><th>Phone</th><th>Department</th><th>Batch</th><th>Subjects</th><th>Status</th><th></th></tr></thead>
+                  <tbody id="allStudentsBody"><tr><td colspan="9">Loading…</td></tr></tbody>
                 </table>
               </div>
             </div>
@@ -1287,7 +1323,6 @@ th.sp-open-cell,td.sp-open-cell{width:46px;padding-inline-end:0!important}
 
           <div class="tab-panel" id="tabStuIndiv">
             <div class="card">
-              <p class="hint">Look up a student by name or email. If no account exists yet, fill in their details to create one; if one exists you can update their details and subjects here.</p>
               <div class="field-row"><div class="field"><label for="acctLookupId">Student name or email</label><input type="text" id="acctLookupId" placeholder="e.g. Kadir Kemal"></div></div>
               <div class="btn-row"><button class="btn btn-secondary" id="acctLookupBtn">Find student</button></div>
               <div class="error-box" id="acctLookupError"></div>
@@ -2272,7 +2307,6 @@ const AR = {
   'Paste names or emails':'لصق أسماء أو بريد','Student names or emails (one per line)':'أسماء الطلاب أو بريدهم الإلكتروني (واحد في كل سطر)','Create accounts for the missing students':'إنشاء حسابات للطلاب غير الموجودين','e.g. Kadir Kemal':'مثال: Kadir Kemal',
   'Students are matched by their name — add an email column if two students share the same name.':'تتم مطابقة الطلاب بأسمائهم — أضف عمود email إذا اشترك طالبان في الاسم نفسه.',
   "Only name is required. email defaults to the student's name @jumj.com (for example kadir.kemal@jumj.com). gender, phone, department, batch and subjects are optional; subjects is a semicolon-separated list of subject names or keys. For students who already have an account, blank columns are left as they are and subjects are added to their existing ones.":'الحقل المطلوب فقط: name. يُنشأ البريد الإلكتروني تلقائيًا من اسم الطالب @jumj.com (مثل kadir.kemal@jumj.com). الحقول gender وphone وdepartment وbatch وsubjects اختيارية؛ و subjects قائمة مفصولة بفاصلة منقوطة لأسماء المواد أو معرّفاتها. بالنسبة للطلاب الذين لديهم حساب، تبقى الحقول الفارغة كما هي وتُضاف المواد إلى موادهم الحالية.',
-  'Look up a student by name or email. If no account exists yet, fill in their details to create one; if one exists you can update their details and subjects here.':'ابحث عن الطالب بالاسم أو البريد الإلكتروني. إن لم يوجد حساب فأدخل بياناته لإنشائه؛ وإن وُجد فيمكنك تحديث بياناته ومواده هنا.',
   'Enter a student name or email.':'أدخل اسم الطالب أو بريده الإلكتروني.','Paste at least one student name or email.':'الصق اسم طالب واحد أو بريده على الأقل.',
   'Several students share this name — enter their email instead.':'يشترك عدة طلاب في هذا الاسم — أدخل بريد الطالب بدلًا منه.','Several students share this name — search by email instead.':'يشترك عدة طلاب في هذا الاسم — ابحث بالبريد الإلكتروني بدلًا منه.',
   'Several students share this name — add an email column.':'يشترك عدة طلاب في هذا الاسم — أضف عمود email.','Several existing students share this name — add an email column.':'يشترك عدة طلاب حاليين في هذا الاسم — أضف عمود email.',
@@ -2775,8 +2809,8 @@ function renderSubOverview(){
 const OV_SKELETON = `
   <div class="card"><p class="card-title">Score distribution</p><p class="hint">How many graded students fall in each 10% band.</p><div class="histogram" id="ovHistogram"></div></div>
   <div class="sub-two">
-    <div class="card"><p class="card-title">Leaderboard</p><div class="table-scroll table-compact" style="margin-top:10px"><table style="min-width:420px"><thead><tr><th></th><th>Student</th><th>Gender</th><th>Score</th><th>%</th></tr></thead><tbody id="ovLeaderBody"></tbody></table></div></div>
-    <div class="card"><p class="card-title" id="ovMissingHeading">Awaiting results</p><p class="hint">Enrolled students with no result yet.</p><div class="ok-box" id="ovMissingOk"></div><div class="table-scroll table-compact" id="ovMissingWrap" style="max-height:340px"><table style="min-width:340px"><thead><tr><th>Name</th><th>Gender</th><th>Email</th><th></th></tr></thead><tbody id="ovMissingBody"></tbody></table></div></div>
+    <div class="card"><p class="card-title">Leaderboard</p><div class="table-scroll table-compact" style="margin-top:10px"><table><thead><tr><th></th><th>Student</th><th>Gender</th><th>Score</th><th>%</th></tr></thead><tbody id="ovLeaderBody"></tbody></table></div></div>
+    <div class="card"><p class="card-title" id="ovMissingHeading">Awaiting results</p><p class="hint">Enrolled students with no result yet.</p><div class="ok-box" id="ovMissingOk"></div><div class="table-scroll table-compact" id="ovMissingWrap" style="max-height:340px"><table><thead><tr><th>Name</th><th>Gender</th><th>Email</th><th></th></tr></thead><tbody id="ovMissingBody"></tbody></table></div></div>
   </div>
   <div class="card" style="margin-top:14px"><p class="card-title">Top performers by component</p><div class="subject-leaderboards-scroll" id="ovCompWrap"></div></div>`;
 $('ovTopN').addEventListener('change', () => {
@@ -3426,30 +3460,51 @@ function renderAllStudentsTable(){
   $('stuSelectAll').checked = false; setTimeout(() => { if(typeof updateStuDeleteBtn === 'function') updateStuDeleteBtn(); refreshBulkBtn('stu'); }, 0);
   const body = $('allStudentsBody');
   if(!rows.length){
-    body.innerHTML = `<tr><td colspan="12">${allStudents.length ? 'No students match.' : 'No students yet — add some with Bulk import or Add individually.'}</td></tr>`;
+    body.innerHTML = `<tr><td colspan="9">${allStudents.length ? 'No students match.' : 'No students yet — add some with Bulk import or Add individually.'}</td></tr>`;
     return;
   }
   const genders = ['', 'Male', 'Female'];
   body.innerHTML = rows.map(s => `
     <tr data-uid="${s.uid}">
       <td class="chk"><input type="checkbox" class="stuChk"></td>
-      <td class="sp-open-cell"><a class="sp-mini" href="#/students/${encodeURIComponent(s.uid)}" style="--g:${spGrad(s.uid)}" title="${esc(L('Open profile','فتح الملف'))}" aria-label="${esc(L('Open profile','فتح الملف'))}">${esc(initials(s.name))}</a></td>
-      <td><input type="text" class="stuNameInput" value="${esc(s.name)}"></td>
-      <td><input type="email" class="stuEmailInput" value="${esc(s.email)}"></td>
-      <td><select class="stuGenderInput g-${s.gender === 'Female' ? 'f' : s.gender === 'Male' ? 'm' : 'n'}">${genders.map(g => `<option value="${g}" ${s.gender===g?'selected':''}>${g||'—'}</option>`).join('')}</select></td>
-      <td><input type="text" class="stuPhoneInput" value="${esc(s.phone)}" placeholder="09…"></td>
-      <td><input type="text" class="stuDeptInput" value="${esc(s.department)}" placeholder="e.g. Medicine"></td>
-      <td><input type="text" class="stuBatchInput" value="${esc(s.batch)}" placeholder="e.g. 2024"></td>
+      <td class="stu-identity">
+        <a class="stu-avatarlink" href="#/students/${encodeURIComponent(s.uid)}" title="${esc(L('Open profile','فتح الملف'))}" aria-label="${esc(L('Open profile','فتح الملف'))}">${spAvatar(s, 'md')}</a>
+        <div class="stu-idmeta">
+          <input type="text" class="stuNameInput" value="${esc(s.name)}" readonly>
+          <input type="email" class="stuEmailInput" value="${esc(s.email)}" readonly>
+        </div>
+      </td>
+      <td><select class="stuGenderInput g-${s.gender === 'Female' ? 'f' : s.gender === 'Male' ? 'm' : 'n'}" disabled>${genders.map(g => `<option value="${g}" ${s.gender===g?'selected':''}>${g||'—'}</option>`).join('')}</select></td>
+      <td><input type="text" class="stuPhoneInput" value="${esc(s.phone)}" placeholder="09…" readonly></td>
+      <td><input type="text" class="stuDeptInput" value="${esc(s.department)}" placeholder="e.g. Medicine" readonly></td>
+      <td><input type="text" class="stuBatchInput" value="${esc(s.batch)}" placeholder="e.g. 2024" readonly></td>
       <td class="stuSubjCell">${pickerHTML(s.subjectIds)}</td>
       <td class="status"></td>
-      <td><button class="btn btn-secondary btn-sm stuSaveBtn" disabled>Save</button></td>
+      <td class="stu-actions">
+        <button type="button" class="stu-editbtn" title="Edit" aria-label="Edit"><i class="fa-solid fa-pen"></i></button>
+        <button class="btn btn-secondary btn-sm stuSaveBtn" disabled>Save</button>
+      </td>
     </tr>`).join('');
 
   body.querySelectorAll('tr[data-uid]').forEach(tr => {
     const uid = tr.dataset.uid;
-    const saveBtn = tr.querySelector('.stuSaveBtn'), statusTd = tr.querySelector('.status');
+    const saveBtn = tr.querySelector('.stuSaveBtn'), statusTd = tr.querySelector('.status'), editBtn = tr.querySelector('.stu-editbtn');
     const subjCell = tr.querySelector('.stuSubjCell');
+    const subjPick = subjCell.querySelector('.subjpick');
+    if(subjPick) subjPick.classList.add('locked');
     wirePicker(subjCell);
+    const textInputs = tr.querySelectorAll('.stuNameInput,.stuEmailInput,.stuPhoneInput,.stuDeptInput,.stuBatchInput');
+    const gsel = tr.querySelector('.stuGenderInput');
+    const setEditing = (on) => {
+      tr.classList.toggle('editing', on);
+      textInputs.forEach(i => { i.readOnly = !on; });
+      gsel.disabled = !on;
+      if(subjPick) subjPick.classList.toggle('locked', !on);
+      editBtn.innerHTML = on ? '<i class="fa-solid fa-check"></i>' : '<i class="fa-solid fa-pen"></i>';
+      editBtn.title = on ? 'Done' : 'Edit'; editBtn.setAttribute('aria-label', editBtn.title);
+      if(on) tr.querySelector('.stuNameInput').focus();
+    };
+    editBtn.addEventListener('click', () => setEditing(!tr.classList.contains('editing')));
     const read = () => ({
       name: tr.querySelector('.stuNameInput').value.trim(),
       email: tr.querySelector('.stuEmailInput').value.trim(),
@@ -3464,7 +3519,6 @@ function renderAllStudentsTable(){
     tr.dataset.orig = snapshot();
     const check = () => { const d = snapshot() !== tr.dataset.orig; saveBtn.disabled = !d; tr.classList.toggle('dirty', d); };
     tr.addEventListener('input', check); tr.addEventListener('change', check);
-    const gsel = tr.querySelector('.stuGenderInput');
     gsel.addEventListener('change', () => { gsel.className = 'stuGenderInput g-' + (gsel.value === 'Female' ? 'f' : gsel.value === 'Male' ? 'm' : 'n'); });
 
     const doSave = async () => {
@@ -3481,6 +3535,7 @@ function renderAllStudentsTable(){
         tr.dataset.orig = snapshot(); tr.classList.remove('dirty');
         statusTd.textContent = 'Saved ✓'; statusTd.className = 'status done'; saveBtn.textContent = 'Save'; saveBtn.classList.remove('is-busy');
         renderSideSubjects();
+        setEditing(false);
         setTimeout(() => { statusTd.textContent=''; statusTd.className='status'; }, 2500);
         return true;
       }catch(err){
@@ -4104,7 +4159,11 @@ function spAvatar(s, cls){
   return `<span class="sp-avatar ${cls || ''}" style="--g:${spGrad(s.uid)}">${photo ? `<img src="${esc(photo)}" alt="" referrerpolicy="no-referrer" onerror="this.remove()">` : ''}<b>${esc(initials(s.name))}</b></span>`;
 }
 function stuLink(uid, name){
-  return uid ? `<a class="sp-namelink" href="#/students/${encodeURIComponent(uid)}">${esc(name)}</a>` : esc(name);
+  const s = (uid && typeof studentByUid === 'function' && studentByUid(uid)) || {uid, name};
+  const av = spAvatar(s, 'sm');
+  return uid
+    ? `<a class="stu-row" href="#/students/${encodeURIComponent(uid)}">${av}<span class="stu-name">${esc(name)}</span></a>`
+    : `<span class="stu-row">${av}<span class="stu-name">${esc(name)}</span></span>`;
 }
 const spPct  = (v) => (v === null || v === undefined || Number.isNaN(v)) ? '—' : v.toFixed(1) + '%';
 const spTrim = (v) => (v === null || v === undefined || Number.isNaN(v)) ? '—' : String(+(+v).toFixed(2));
@@ -4577,11 +4636,11 @@ async function stampEnrollment(uid, slugs, opts){
     allSubjects.filter(s => (s.name + ' ' + s.slug + ' ' + teacherLabel(s.teacherUid)).toLowerCase().includes(q)).slice(0,5)
       .forEach(s => hits.push({icon:'fa-book-medical', title:s.name, sub:`Subject · ${enrolledStudents(s.slug).length} enrolled`, go:() => go('subjects/' + encodeURIComponent(s.slug) + '/overview')}));
     allStudents.filter(s => (s.name+' '+s.email).toLowerCase().includes(q)).slice(0,4)
-      .forEach(s => hits.push({icon:'fa-user-graduate', title:s.name || s.email, sub:'Student profile · ' + s.email, go:() => go('students/' + encodeURIComponent(s.uid))}));
+      .forEach(s => hits.push({avatar: spAvatar(s, 'sm'), title:s.name || s.email, sub:'Student profile · ' + s.email, go:() => go('students/' + encodeURIComponent(s.uid))}));
     allTeachers.filter(t => (t.name+' '+t.email).toLowerCase().includes(q)).slice(0,3)
       .forEach(t => hits.push({icon:'fa-chalkboard-user', title:t.name || t.email, sub:'Teacher · ' + t.email, go:() => go('teachers', () => { $('teachSearch').value = t.email; renderAllTeachersTable(); })}));
     if(/overview|analytic|performance|average|rank/.test(q)) hits.unshift({icon:'fa-chart-column', title:'Open Overview', sub:'Cohort performance by subject', go:() => go('overview')});
-    results.innerHTML = hits.length ? hits.slice(0,8).map((h,i) => `<div class="global-search-item" data-i="${i}"><i class="fa-solid ${h.icon}"></i><div><b>${esc(h.title)}</b><small>${esc(h.sub)}</small></div></div>`).join('') : '<div class="notification-empty">No matches</div>';
+    results.innerHTML = hits.length ? hits.slice(0,8).map((h,i) => `<div class="global-search-item" data-i="${i}">${h.avatar || `<i class="fa-solid ${h.icon}"></i>`}<div><b>${esc(h.title)}</b><small>${esc(h.sub)}</small></div></div>`).join('') : '<div class="notification-empty">No matches</div>';
     results.classList.add('show');
     results.querySelectorAll('.global-search-item').forEach((el,i) => el.onclick = () => { results.classList.remove('show'); input.value = ''; hits[i].go(); });
   }
