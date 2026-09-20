@@ -6,7 +6,7 @@
 <title>JUmed — Admin</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Amiri:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
 :root{
@@ -301,22 +301,15 @@ thead th{background:#f6f1e2}
 
 /* topbar bits */
 .hijri-chip{display:inline-flex;gap:7px;align-items:center;font-size:10px;font-weight:700;color:#7d5b12;background:#f8efd6;border:1px solid #ecd9a4;border-radius:99px;padding:6px 11px;white-space:nowrap}
-.side-verse{padding:0 6px 10px;text-align:center;color:#d9b45a}
-.side-verse .ar{display:block;font-size:19px;line-height:1.5}
-.side-verse small{font-size:9px;color:#78907f;letter-spacing:.08em}
-.sidebar.collapsed .side-verse{display:none}
-.page-head-meta .ar{font-size:22px;color:#a27b28;letter-spacing:0;font-weight:700}
 
-/* salam banner */
-.salam{position:relative;overflow:hidden;display:grid;grid-template-columns:auto 1fr auto;gap:22px;align-items:center;background:linear-gradient(135deg,#072e25,#0b5b46);color:#e9f1ea;border-radius:20px;padding:18px 26px;margin-bottom:26px;box-shadow:0 18px 40px rgba(7,46,37,.16)}
+/* welcome banner */
+.salam{position:relative;overflow:hidden;display:grid;grid-template-columns:1fr auto;gap:22px;align-items:center;background:linear-gradient(135deg,#072e25,#0b5b46);color:#e9f1ea;border-radius:20px;padding:22px 28px;margin-bottom:26px;box-shadow:0 18px 40px rgba(7,46,37,.16)}
 .salam:before{content:"";position:absolute;inset:0;background-image:var(--pattern);background-size:88px 88px;opacity:.22;mask-image:linear-gradient(90deg,transparent,black)}
 .salam>*{position:relative}
-.salam-ar{font-size:clamp(20px,2.4vw,30px);color:#e3c273;line-height:1.5}
-.salam-en b{display:block;font-size:15px;color:#fff;letter-spacing:-.02em}
-.salam-en span{font-size:11px;color:#a9c4b6}
-.salam-verse{text-align:center;border-left:1px solid rgba(255,255,255,.14);padding-left:22px}
-.salam-verse .ar{display:block;font-size:22px;color:#e3c273;line-height:1.5}
-.salam-verse small{font-size:10px;color:#a9c4b6}
+.salam-title{font-size:clamp(20px,2.4vw,28px);color:#f0d68a;font-weight:700;letter-spacing:-.03em;line-height:1.4}
+.salam-title.ar{font-size:clamp(24px,2.8vw,34px);font-weight:400;letter-spacing:0}
+.salam-meta{display:flex;flex-direction:column;gap:3px;text-align:end;font-size:11px;color:#a9c4b6}
+.salam-meta b{color:#fff;font-size:13px;letter-spacing:-.01em}
 
 /* login + splash */
 .login-visual{background:linear-gradient(150deg,#051f19,#0b4a3a 60%,#0d5b46)!important}
@@ -325,10 +318,6 @@ thead th{background:#f6f1e2}
 .bismillah{font-family:'Amiri','Noto Naskh Arabic',serif;direction:ltr;text-align:left;font-size:clamp(2rem,3.6vw,3.4rem);color:#e3c273;line-height:1.5;margin:0 0 6px;text-shadow:0 2px 24px rgba(227,194,115,.25)}
 .login-kicker{color:#cfe0d5!important}
 .login-visual p{color:#b7cfc2!important}
-.login-verse{margin-top:30px;padding:18px 20px;border:1px solid rgba(227,194,115,.28);border-radius:16px;background:rgba(255,255,255,.05);backdrop-filter:blur(6px)}
-.login-verse .ar{display:block;font-size:26px;color:#e3c273;line-height:1.6;text-align:center}
-.login-verse small{display:block;text-align:center;color:#a9c4b6;font-size:11px;margin-top:4px}
-.login-card h2 small{display:block;font-family:'Amiri',serif;font-size:22px;color:#a27b28;font-weight:700;margin-bottom:2px;direction:rtl;text-align:left}
 .auth-splash-bg{background:radial-gradient(circle at 20% 20%,rgba(20,140,100,.22),transparent 32%),radial-gradient(circle at 82% 75%,rgba(217,180,90,.16),transparent 30%),linear-gradient(135deg,#041a15,#0a3d31 55%,#031410)!important}
 .auth-splash-bg:before{background-image:var(--pattern)!important;background-size:88px 88px!important;opacity:.45}
 .splash-bismillah{font-family:'Amiri',serif;font-size:32px;color:#e3c273;margin-bottom:22px;direction:rtl}
@@ -374,7 +363,39 @@ thead th{background:#f6f1e2}
 @media(max-width:860px){.salam{grid-template-columns:1fr;text-align:center;gap:10px;padding:16px}.salam-verse{border-left:0;border-top:1px solid rgba(255,255,255,.14);padding:10px 0 0}.hijri-chip{display:none}}
 @media(prefers-reduced-motion:reduce){.subj-card,.stat-card,.hero-stat{animation:none}}
 
+/* ===== LANGUAGE SWITCH ===== */
+.lang-switch{display:inline-flex;background:#ebe4d0;border-radius:99px;padding:3px;gap:2px}
+.lang-switch button{border:0;background:transparent;color:#5c5a4c;font-size:11px;font-weight:700;padding:6px 13px;border-radius:99px;cursor:pointer;font-family:inherit;line-height:1.3}
+.lang-switch button.ar{font-family:'IBM Plex Sans Arabic','Amiri',sans-serif;font-size:13px;padding:4px 13px}
+.lang-switch button.active{background:#0a3d31;color:#fff;box-shadow:0 2px 8px rgba(10,61,49,.25)}
+.lang-login{position:absolute;top:22px;inset-inline-end:26px;z-index:3}
+.login-panel{position:relative}
+.global-actions{display:flex;align-items:center;gap:10px}
+
+/* ===== RTL / ARABIC ===== */
+html.lang-ar body,html.lang-ar button,html.lang-ar input,html.lang-ar select,html.lang-ar textarea{font-family:'IBM Plex Sans Arabic','Inter',system-ui,sans-serif}
+html.lang-ar .mono,html.lang-ar code,html.lang-ar kbd{font-family:'JetBrains Mono',monospace}
+[dir=rtl] *{letter-spacing:0!important}
+[dir=rtl] thead th{text-align:right}
+[dir=rtl] .sidebar-toggle{right:auto;left:-13px}
+[dir=rtl] .sidebar-toggle i{transform:rotate(180deg)}
+[dir=rtl] .sidebar.collapsed .sidebar-toggle i{transform:rotate(0)}
+[dir=rtl] .nav-item.active:before{left:auto;right:-2px}
+[dir=rtl] .crumbs a i,[dir=rtl] .subj-card-foot .open i,[dir=rtl] .attn-item .chip i{transform:scaleX(-1)}
+[dir=rtl] input[type=email],[dir=rtl] input[type=number],[dir=rtl] input[type=password],[dir=rtl] .mono,[dir=rtl] .stuIdInput,[dir=rtl] #lookupId,[dir=rtl] #acctLookupId,[dir=rtl] #teachLookupEmail,[dir=rtl] .comp-row input[data-f=key]{direction:ltr;text-align:left}
+[dir=rtl] .field input[type=text]::placeholder,[dir=rtl] .field textarea::placeholder{direction:rtl}
+[dir=rtl] .salam-meta{text-align:start}
+[dir=rtl] .bismillah,[dir=rtl] .splash-bismillah{direction:rtl;text-align:right}
+[dir=rtl] .login-visual-content{text-align:right}
+[dir=rtl] .subj-avg{text-align:left}
+[dir=rtl] .lang-login{inset-inline-end:auto;inset-inline-start:26px}
+[dir=rtl] .subjpick summary:after{margin-left:0;margin-right:auto}
+[dir=rtl] .hero-meta,[dir=rtl] .chips{direction:rtl}
+[dir=rtl] .table-scroll table{direction:rtl}
+@media(max-width:860px){.lang-switch button{padding:5px 9px}}
+
 </style>
+<script>try{if(localStorage.getItem("jumedLang")==="ar"){var r=document.documentElement;r.dir="rtl";r.lang="ar";r.classList.add("lang-ar")}}catch(e){}</script>
 </head>
 <body>
 <div id="netBar" class="netbar"><span></span></div>
@@ -388,7 +409,7 @@ thead th{background:#f6f1e2}
     <div class="splash-brand">JU<span>med</span></div>
     <div class="splash-kicker">Knowledge · Trust · Excellence</div>
     <div class="splash-loader"><span></span></div>
-    <div class="splash-status"><i class="fa-solid fa-shield-halved"></i><span>Preparing your workspace, in shā’ Allāh</span></div>
+    <div class="splash-status"><i class="fa-solid fa-shield-halved"></i><span>Preparing your workspace…</span></div>
   </div>
   <div class="splash-footer">Jimma University · Medical Education</div>
 </div>
@@ -400,16 +421,16 @@ thead th{background:#f6f1e2}
       <div class="bismillah">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
       <div class="login-kicker"><i class="fa-solid fa-moon"></i> Jimma University · Medical Education</div>
       <h1>JUmed</h1>
-      <p>A platform for the noble pursuit of knowledge — managing subjects, students and results with amanah (trust) and clarity.</p>
-      <div class="login-verse"><span class="ar">وَقُل رَّبِّ زِدْنِي عِلْمًا</span><small>“And say: My Lord, increase me in knowledge.” — Ṭā-Hā 20:114</small></div>
+      <p>A platform for managing subjects, students and results with trust and clarity.</p>
     </div>
   </section>
   <section class="login-panel">
+  <div class="lang-switch lang-login" role="group" aria-label="Language"><button type="button" data-lang="ar" class="ar">العربية</button><button type="button" data-lang="en">English</button></div>
   <div class="login-card">
     <div class="login-brand">
       <div class="mark"><svg class="logo-svg" viewBox="0 0 48 48" aria-hidden="true"><g class="star"><rect x="7" y="7" width="34" height="34" rx="2"/><rect x="7" y="7" width="34" height="34" rx="2" transform="rotate(45 24 24)"/></g><circle class="disc" cx="24" cy="24" r="12.5"/><circle class="moon" cx="24" cy="24" r="9"/><circle class="disc" cx="27.5" cy="22" r="8"/><path class="moon" d="M31 17.5l.9 2.4 2.5.1-2 1.6.7 2.4-2.1-1.4-2.1 1.4.7-2.4-2-1.6 2.5-.1z"/></svg></div><div><div class="name">JUmed</div><span class="tag">Academic admin workspace</span></div>
     </div>
-    <h2><small class="ar">السلام عليكم</small>As-salāmu ʿalaykum</h2>
+    <h2>Welcome back</h2>
     <p class="intro">Sign in to continue to the medical education admin console.</p>
     <div class="field">
       <label for="adminEmail">Admin email</label>
@@ -424,7 +445,7 @@ thead th{background:#f6f1e2}
     </div>
     <div class="error-box" id="adminError"></div>
     <div class="ok-box" id="adminOk"></div>
-    <div class="login-foot">Authorized personnel only · JUmed administration · Barakallāhu fīkum</div>
+    <div class="login-foot">Authorized personnel only · JUmed administration</div>
   </div>
   </section>
 </div>
@@ -462,7 +483,6 @@ thead th{background:#f6f1e2}
       </a>
     </nav>
     <div class="sidebar-foot">
-      <div class="side-verse"><span class="ar">وَقُل رَّبِّ زِدْنِي عِلْمًا</span><small>Ṭā-Hā 20:114</small></div>
       <div class="who" id="sidebarUserEmail"></div>
       <button class="btn btn-secondary btn-sm btn-block" id="adminSignOutBtn" title="Sign out">
         <i class="fa-solid fa-right-from-bracket sidebar-foot-icon"></i><span class="sidebar-foot-label">Sign out</span>
@@ -480,6 +500,7 @@ thead th{background:#f6f1e2}
         <div class="command-search"><i class="fa-solid fa-magnifying-glass"></i><input id="globalSearch" type="search" autocomplete="off" placeholder="Search subjects, students, teachers…" aria-label="Global search"><kbd>Ctrl K</kbd><div class="global-search-results" id="globalSearchResults"></div></div>
       </div>
       <div class="global-actions">
+        <div class="lang-switch" role="group" aria-label="Language"><button type="button" data-lang="ar" class="ar">العربية</button><button type="button" data-lang="en">English</button></div>
         <div class="hijri-chip" id="hijriChip"></div>
         <div class="admin-avatar" id="adminAvatar">A</div>
       </div>
@@ -489,7 +510,7 @@ thead th{background:#f6f1e2}
     <div class="screen" id="screen-subjects">
       <div class="main-scroll">
         <div class="salam" id="salamBar"></div>
-        <div class="page-head"><div><p class="page-title">Subjects</p><p class="page-sub">Seeking knowledge begins with the subject — who is enrolled, who teaches, how each is graded and how students perform. Open a subject to manage it all in one place.</p></div><div class="page-head-meta"><span class="ar">المواد الدراسية</span></div></div>
+        <div class="page-head"><div><p class="page-title">Subjects</p><p class="page-sub">Everything is organised around subjects — who is enrolled, who teaches, how each is graded and how students perform. Open a subject to manage it all in one place.</p></div><div class="page-head-meta">SUBJECT WORKSPACE</div></div>
 
         <div class="toolbar">
           <div class="field">
@@ -539,7 +560,7 @@ thead th{background:#f6f1e2}
             <div class="ok-box" id="maintOk"></div>
 
             <hr style="border:0;border-top:1px solid var(--line);margin:22px 0">
-            <p class="hint">Results are recorded per <b>subject</b>. This tool permanently deletes the <b>old module system</b>: every result stored under the old module definitions, plus all module definitions. Subject results are not touched unless a subject shares a slug with an old module.</p>
+            <p class="hint">Results are recorded per subject. This tool permanently deletes the old module system: every result stored under the old module definitions, plus all module definitions. Subject results are not touched unless a subject shares a slug with an old module.</p>
             <div class="btn-row"><button class="btn btn-secondary" id="cleanupScanBtn">Scan existing results &amp; modules</button></div>
             <div class="error-box" id="cleanupScan"></div>
             <div id="cleanupConfirmWrap" class="hidden" style="margin-top:1rem;">
@@ -585,6 +606,7 @@ thead th{background:#f6f1e2}
           <button class="tab-btn" data-tab="results"><i class="fa-solid fa-list-check"></i> Results</button>
           <button class="tab-btn" data-tab="grading"><i class="fa-solid fa-scale-balanced"></i> Grading</button>
           <button class="tab-btn" data-tab="settings"><i class="fa-solid fa-gear"></i> Settings</button>
+          <button class="tab-btn" data-tab="enroll"><i class="fa-solid fa-user-plus"></i> Enroll</button>
         </div>
 
         <!-- ---- Overview ---- -->
@@ -636,7 +658,7 @@ thead th{background:#f6f1e2}
             </div>
             <div class="table-scroll" style="max-height:520px;">
               <table style="min-width:720px">
-                <thead><tr><th class="chk"><input type="checkbox" id="enrSelectAll"></th><th>ID</th><th>Name</th><th>Department</th><th>Batch</th><th>Result</th><th></th></tr></thead>
+                <thead><tr><th class="chk"><input type="checkbox" id="enrSelectAll"></th><th>ID</th><th>Name</th><th>Department</th><th>Batch</th><th>Result</th></tr></thead>
                 <tbody id="enrBody"></tbody>
               </table>
             </div>
@@ -644,56 +666,6 @@ thead th{background:#f6f1e2}
             <div class="ok-box" id="enrOk"></div>
           </div>
 
-          <div class="card">
-            <div class="section-label">Add students to this subject</div>
-            <div class="tabgroup" id="addTabGroup">
-              <div class="tabs">
-                <button class="tab-btn active" data-target="tabAddSearch">Search &amp; add</button>
-                <button class="tab-btn" data-target="tabAddPaste">Paste student IDs</button>
-                <button class="tab-btn" data-target="tabAddNew">New students</button>
-              </div>
-
-              <div class="tab-panel active" id="tabAddSearch">
-                <div class="filter-row">
-                  <div class="field"><label for="addSearch">Search</label><input type="text" id="addSearch" placeholder="ID, name or email"></div>
-                  <div class="field" style="max-width:170px"><label for="addDept">Department</label><select id="addDept"></select></div><div class="field" style="max-width:130px"><label for="addBatch">Batch</label><select id="addBatch"></select></div><div class="field" style="max-width:130px"><label for="addGender">Gender</label><select id="addGender"></select></div><div class="field" style="max-width:200px"><label for="addSubj">Enrolled in</label><select id="addSubj"></select></div><button class="btn btn-secondary btn-sm" id="addClear" type="button" style="margin-bottom:15px">Clear filters</button>
-                </div>
-                <p class="mini-note"><b id="addCount">0</b></p>
-                <div class="table-scroll" style="max-height:340px;margin-top:8px">
-                  <table style="min-width:600px">
-                    <thead><tr><th class="chk"><input type="checkbox" id="addSelectAll"></th><th>ID</th><th>Name</th><th>Department</th><th>Batch</th><th>Other subjects</th></tr></thead>
-                    <tbody id="addBody"></tbody>
-                  </table>
-                </div>
-                <div class="pick-actions">
-                  <button class="btn" id="addEnrollBtn" disabled>Enroll selected</button>
-                  <button class="btn btn-secondary" id="addEnrollAllBtn" disabled>Enroll all matching</button>
-                </div>
-                <div class="error-box" id="addError"></div>
-                <div class="ok-box" id="addOk"></div>
-              </div>
-
-              <div class="tab-panel" id="tabAddPaste">
-                <div class="field wide">
-                  <label for="pasteIds">Student IDs (one per line, or comma-separated)</label>
-                  <textarea id="pasteIds" rows="6" placeholder="RU0967/16&#10;RU0787/16&#10;RU1102/16"></textarea>
-                </div>
-                <div class="btn-row"><button class="btn" id="pasteEnrollBtn">Enroll these students</button></div>
-                <div class="error-box" id="pasteError"></div>
-                <div class="ok-box" id="pasteOk"></div>
-                <div class="warn-box" id="pasteMissing"></div>
-                <div class="btn-row hidden" id="pasteCreateRow"><button class="btn btn-secondary" id="pasteCreateBtn">Create accounts for the missing IDs</button></div>
-              </div>
-
-              <div class="tab-panel" id="tabAddNew">
-                <p class="hint">Students who don't have an account yet can be imported from a CSV. Every imported student is enrolled in this subject automatically.</p>
-                <div class="btn-row">
-                  <button class="btn" id="newStuBulkBtn"><i class="fa-solid fa-file-csv"></i> Bulk import into this subject</button>
-                  <button class="btn btn-secondary" id="newStuOneBtn"><i class="fa-solid fa-user-plus"></i> Add one student</button>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
 
         <!-- ---- Results ---- -->
@@ -743,7 +715,7 @@ thead th{background:#f6f1e2}
                 <div class="ok-box" id="bulkOk"></div>
 
                 <div id="newCompWrap" class="hidden" style="margin-top:1.2rem;">
-                  <p class="hint">These columns aren't part of "<b id="newCompModuleName"></b>" yet. The label and key come straight from the column name — just set a max score and weight for each, then continue.</p>
+                  <p class="hint" id="newCompHint"></p>
                   <div class="comp-editor" id="newCompEditor"></div>
                   <div class="btn-row">
                     <button class="btn" id="saveNewCompBtn">Save components &amp; continue</button>
@@ -805,7 +777,7 @@ thead th{background:#f6f1e2}
         <div class="sub-panel" id="subTab-grading">
           <div class="card">
             <p class="card-title">Grading components</p>
-            <p class="hint">The scored parts of this subject (e.g. Midterm, Final). Each has a maximum raw score and a weight; a student's total is the sum of <code>raw / max × weight</code>. The sum of weights is the subject's total marks.</p>
+            <p class="hint">The scored parts of this subject (e.g. Midterm, Final). Each has a maximum raw score and a weight; a student's total is the sum of raw / max × weight. The sum of weights is the subject's total marks.</p>
             <div class="comp-editor" id="gradeCompEditor"></div>
             <div class="btn-row"><button class="btn btn-secondary btn-sm" id="gradeAddCompBtn" type="button">+ Add component</button></div>
             <div class="hint" id="gradeCompTotal" style="margin-top:8px"></div>
@@ -837,13 +809,67 @@ thead th{background:#f6f1e2}
             <div class="error-box" id="delError"></div>
           </div>
         </div>
+
+        <!-- ---- Enroll ---- -->
+        <div class="sub-panel" id="subTab-enroll">
+          <div class="card">
+            <div class="section-label">Add students to this subject</div>
+            <div class="tabgroup" id="addTabGroup">
+              <div class="tabs">
+                <button class="tab-btn active" data-target="tabAddSearch">Search &amp; add</button>
+                <button class="tab-btn" data-target="tabAddPaste">Paste student IDs</button>
+                <button class="tab-btn" data-target="tabAddNew">New students</button>
+              </div>
+
+              <div class="tab-panel active" id="tabAddSearch">
+                <div class="filter-row">
+                  <div class="field"><label for="addSearch">Search</label><input type="text" id="addSearch" placeholder="ID, name or email"></div>
+                  <div class="field" style="max-width:170px"><label for="addDept">Department</label><select id="addDept"></select></div><div class="field" style="max-width:130px"><label for="addBatch">Batch</label><select id="addBatch"></select></div><div class="field" style="max-width:130px"><label for="addGender">Gender</label><select id="addGender"></select></div><div class="field" style="max-width:200px"><label for="addSubj">Enrolled in</label><select id="addSubj"></select></div><button class="btn btn-secondary btn-sm" id="addClear" type="button" style="margin-bottom:15px">Clear filters</button>
+                </div>
+                <p class="mini-note"><b id="addCount">0</b></p>
+                <div class="table-scroll" style="max-height:340px;margin-top:8px">
+                  <table style="min-width:600px">
+                    <thead><tr><th class="chk"><input type="checkbox" id="addSelectAll"></th><th>ID</th><th>Name</th><th>Department</th><th>Batch</th><th>Other subjects</th></tr></thead>
+                    <tbody id="addBody"></tbody>
+                  </table>
+                </div>
+                <div class="pick-actions">
+                  <button class="btn" id="addEnrollBtn" disabled>Enroll selected</button>
+                  <button class="btn btn-secondary" id="addEnrollAllBtn" disabled>Enroll all matching</button>
+                </div>
+                <div class="error-box" id="addError"></div>
+                <div class="ok-box" id="addOk"></div>
+              </div>
+
+              <div class="tab-panel" id="tabAddPaste">
+                <div class="field wide">
+                  <label for="pasteIds">Student IDs (one per line, or comma-separated)</label>
+                  <textarea id="pasteIds" rows="6" placeholder="RU0967/16&#10;RU0787/16&#10;RU1102/16"></textarea>
+                </div>
+                <div class="btn-row"><button class="btn" id="pasteEnrollBtn">Enroll these students</button></div>
+                <div class="error-box" id="pasteError"></div>
+                <div class="ok-box" id="pasteOk"></div>
+                <div class="warn-box" id="pasteMissing"></div>
+                <div class="btn-row hidden" id="pasteCreateRow"><button class="btn btn-secondary" id="pasteCreateBtn">Create accounts for the missing IDs</button></div>
+              </div>
+
+              <div class="tab-panel" id="tabAddNew">
+                <p class="hint">Students who don't have an account yet can be imported from a CSV. Every imported student is enrolled in this subject automatically.</p>
+                <div class="btn-row">
+                  <button class="btn" id="newStuBulkBtn"><i class="fa-solid fa-file-csv"></i> Bulk import into this subject</button>
+                  <button class="btn btn-secondary" id="newStuOneBtn"><i class="fa-solid fa-user-plus"></i> Add one student</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
     <!-- ================= SCREEN: Overview (cohort) ================= -->
     <div class="screen" id="screen-overview">
       <div class="main-scroll">
-        <div class="page-head"><div><p class="page-title">Overview</p><p class="page-sub">Alhamdulillah for every step of progress — see how each subject is doing: setup gaps, grading progress and cohort performance.</p></div><div class="page-head-meta"><span class="ar">نظرة عامة</span></div></div>
+        <div class="page-head"><div><p class="page-title">Overview</p><p class="page-sub">See how each subject is doing at a glance — setup gaps, grading progress and cohort performance.</p></div><div class="page-head-meta">COHORT INTELLIGENCE</div></div>
 
         <div class="toolbar" style="margin-bottom:.4rem;border:0;padding:0">
           <span></span>
@@ -897,7 +923,7 @@ thead th{background:#f6f1e2}
     <!-- ================= SCREEN: Students (directory) ================= -->
     <div class="screen" id="screen-students">
       <div class="main-scroll">
-        <div class="page-head"><div><p class="page-title">Students</p><p class="page-sub">The directory of our ṭalabat al-ʿilm (seekers of knowledge). A student's subjects decide where they appear — manage enrollment here or from each subject's Roster.</p></div><div class="page-head-meta"><span class="ar">طلبة العلم</span></div></div>
+        <div class="page-head"><div><p class="page-title">Students</p><p class="page-sub">The directory of student accounts. A student's subjects decide where they appear — manage enrollment here or from each subject's Roster.</p></div><div class="page-head-meta">DIRECTORY</div></div>
 
         <div class="section-label">Student operations</div>
         <div class="tabgroup" id="stuTabGroup">
@@ -916,12 +942,16 @@ thead th{background:#f6f1e2}
                 </div>
                 <div class="toolbar-actions">
                   <span class="summary-row" style="margin:0;align-self:center;"><b id="stuCount">0</b></span>
+                  <button class="btn btn-danger btn-sm" id="stuDeleteBtn" disabled>Delete selected</button>
                   <button class="btn btn-secondary btn-sm" id="stuRefreshBtn"><i class="fa-solid fa-rotate"></i> Refresh</button>
                 </div>
               </div>
+              <div class="progress hidden" id="stuDelProgress"><div class="progress-track"><span></span></div><small></small></div>
+              <div class="error-box" id="stuError"></div>
+              <div class="ok-box" id="stuOk"></div>
               <div class="table-scroll" style="max-height:640px;">
                 <table>
-                  <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Gender</th><th>Phone</th><th>Department</th><th>Batch</th><th>Subjects</th><th>Status</th><th></th><th></th></tr></thead>
+                  <thead><tr><th class="chk"><input type="checkbox" id="stuSelectAll"></th><th>ID</th><th>Name</th><th>Email</th><th>Gender</th><th>Phone</th><th>Department</th><th>Batch</th><th>Subjects</th><th>Status</th><th></th></tr></thead>
                   <tbody id="allStudentsBody"><tr><td colspan="11">Loading…</td></tr></tbody>
                 </table>
               </div>
@@ -933,7 +963,7 @@ thead th{background:#f6f1e2}
               <div class="field wide">
                 <label for="acctCsvInput">CSV data</label>
                 <textarea id="acctCsvInput" rows="6" placeholder="id,name,email,gender,phone,department,batch,subjects&#10;Ru0787/16,Kadir Kemal,,Male,0912345678,Medicine,2024,Anatomy;Physiology"></textarea>
-                <p class="hint" style="margin-top:8px;">Only <b>id</b> and <b>name</b> are required. <b>subjects</b> is a semicolon-separated list of subject names or keys. For students who already have an account, blank columns are left as they are and subjects are added to their existing ones.</p>
+                <p class="hint" style="margin-top:8px;">Only id and name are required. subjects is a semicolon-separated list of subject names or keys. For students who already have an account, blank columns are left as they are and subjects are added to their existing ones.</p>
               </div>
               <div class="field" style="max-width:380px">
                 <label for="acctEnrollSubject">Also enroll every imported student in</label>
@@ -1006,7 +1036,7 @@ thead th{background:#f6f1e2}
     <!-- ================= SCREEN: Teachers (directory) ================= -->
     <div class="screen" id="screen-teachers">
       <div class="main-scroll">
-        <div class="page-head"><div><p class="page-title">Teachers</p><p class="page-sub">Our teachers and mentors (asātidh). They sign in at <code>teacher.html</code> and only see the subjects assigned to them — assign a teacher from the subject's Settings.</p></div><div class="page-head-meta"><span class="ar">الأساتذة</span></div></div>
+        <div class="page-head"><div><p class="page-title">Teachers</p><p class="page-sub">Create teacher accounts. Teachers sign in at teacher.html and only see the subjects assigned to them — assign a teacher from the subject's Settings.</p></div><div class="page-head-meta">DIRECTORY</div></div>
 
         <div class="section-label">Teacher operations</div>
         <div class="tabgroup" id="teachTabGroup">
@@ -1148,7 +1178,6 @@ const $ = (id) => document.getElementById(id);
 function setBox(id, msg, kind){
   const box = $(id);
   if(!box) return;
-  if(kind === 'ok' && msg && /^(Saved|Done|Enrolled|Removed|Teacher access synced|Subject created)/.test(msg)) msg = 'Alhamdulillah! ' + msg;
   box.className = kind === 'ok' ? 'ok-box' : kind === 'warn' ? 'warn-box' : 'error-box';
   if(!msg){ box.classList.remove('show'); box.textContent=''; return; }
   box.textContent = msg;
@@ -1372,7 +1401,7 @@ const route = {view:'subjects', slug:null, tab:'overview'};
 let pendingAfterRoute = null;
 let wsSlug = null; // subject the workspace is currently showing
 
-const SUB_TABS = ['overview','roster','results','grading','settings'];
+const SUB_TABS = ['overview','roster','results','grading','settings','enroll'];
 
 const subjectBySlug = (slug) => allSubjects.find(s => s.slug === slug) || null;
 const studentByUid = (uid) => allStudents.find(s => s.uid === uid) || null;
@@ -1723,6 +1752,332 @@ function refreshStudentFilters(){
 
 
 // ================================================================
+// Language (English / العربية) — DOM translator with RTL support
+// English is the source language of the UI; Arabic is applied on top of it.
+// ================================================================
+const LANG_KEY = 'jumedLang';
+let lang = 'en';
+try{ lang = localStorage.getItem(LANG_KEY) === 'ar' ? 'ar' : 'en'; }catch(e){}
+const L = (en, ar) => lang === 'ar' ? ar : en;
+
+const NOUN = {
+  student:['طالب واحد','طالبين','طلاب','طالبًا'], subject:['مادة واحدة','مادتين','مواد','مادة'], result:['نتيجة واحدة','نتيجتين','نتائج','نتيجة'],
+  row:['صف واحد','صفين','صفوف','صفًا'], teacher:['معلم واحد','معلمين','معلمين','معلمًا'], account:['حساب واحد','حسابين','حسابات','حسابًا'],
+  record:['سجل واحد','سجلين','سجلات','سجلًا'], component:['مكوّن واحد','مكوّنين','مكوّنات','مكوّنًا'], column:['عمود واحد','عمودين','أعمدة','عمودًا'],
+  deletion:['عملية حذف واحدة','عمليتا حذف','عمليات حذف','عملية حذف'], definition:['تعريف واحد','تعريفين','تعريفات','تعريفًا'], profile:['ملف واحد','ملفين','ملفات','ملفًا'],
+};
+function N(n, k){
+  n = +n; const f = NOUN[k];
+  if(n === 1) return f[0]; if(n === 2) return f[1];
+  return `${n} ${(n >= 0 && n <= 10) ? f[2] : f[3]}`;
+}
+
+const AR = {
+  // ---- shell / navigation
+  'Admin console':'لوحة الإدارة','Workspace':'مساحة العمل','Subjects':'المواد','Overview':'نظرة عامة','Your subjects':'موادك','Directory':'الدليل',
+  'Students':'الطلاب','Teachers':'المعلمون','Sign out':'تسجيل الخروج','Medical Education Operations':'إدارة التعليم الطبي','ADMIN':'الإدارة',
+  'Collapse sidebar':'طيّ الشريط الجانبي','Expand sidebar':'توسيع الشريط الجانبي','Global search':'بحث شامل',
+  'Search subjects, students, teachers…':'ابحث عن مادة أو طالب أو معلم…','Language':'اللغة',
+  'Jimma University · Medical Education':'جامعة جيما · التعليم الطبي','Academic admin workspace':'مساحة الإدارة الأكاديمية',
+  'Knowledge · Trust · Excellence':'العلم · الأمانة · الإتقان','Preparing your workspace…':'جارٍ تجهيز مساحة العمل بإذن الله…',
+  'Welcome back':'السلام عليكم','Sign in to continue to the medical education admin console.':'سجّل الدخول للمتابعة إلى لوحة إدارة التعليم الطبي.',
+  'A platform for managing subjects, students and results with trust and clarity.':'منصة لإدارة المواد والطلاب والنتائج بأمانة ووضوح.',
+  'Admin email':'البريد الإلكتروني للمشرف','Admin password':'كلمة مرور المشرف','Sign in to workspace':'الدخول إلى مساحة العمل',
+  'Authorized personnel only · JUmed administration':'للمصرّح لهم فقط · إدارة JUmed',
+  'Sign-in failed.':'تعذّر تسجيل الدخول.','This account is not authorized for admin access.':'هذا الحساب غير مصرّح له بالدخول إلى لوحة الإدارة.',
+  'Could not load data:':'تعذّر تحميل البيانات:',
+  // ---- page heads
+  'SUBJECT WORKSPACE':'مساحة المواد','COHORT INTELLIGENCE':'تحليلات الدفعة','DIRECTORY':'الدليل',
+  'Everything is organised around subjects — who is enrolled, who teaches, how each is graded and how students perform. Open a subject to manage it all in one place.':'كل شيء منظَّم حول المواد: من المسجَّلون، ومن يدرّس، وكيف يُقيَّم كلٌّ منها، وكيف يؤدّي الطلاب. افتح مادة لإدارتها بالكامل في مكان واحد.',
+  'See how each subject is doing at a glance — setup gaps, grading progress and cohort performance.':'اطّلع على وضع كل مادة بنظرة سريعة: الثغرات في الإعداد، وتقدّم التقييم، وأداء الدفعة.',
+  "The directory of student accounts. A student's subjects decide where they appear — manage enrollment here or from each subject's Roster.":'دليل حسابات الطلاب. تحدّد مواد الطالب أين يظهر — أدِر التسجيل من هنا أو من قائمة الطلاب في كل مادة.',
+  "Create teacher accounts. Teachers sign in at teacher.html and only see the subjects assigned to them — assign a teacher from the subject's Settings.":'أنشئ حسابات المعلمين. يسجّل المعلمون الدخول عبر teacher.html ولا يرون إلا المواد المسندة إليهم — أسنِد المعلم من إعدادات المادة.',
+  // ---- subjects screen
+  'Search subjects':'بحث في المواد','Search by subject or teacher':'ابحث بالمادة أو المعلم','Refresh':'تحديث','New subject':'مادة جديدة',
+  'Subject name':'اسم المادة','e.g. Anatomy':'مثال: التشريح','Assigned teacher':'المعلم المسؤول','— Unassigned —':'— غير مُسنَد —',
+  'Grading components (optional) — the scored parts of this subject (e.g. Midterm, Final) with a max and a weight. You can also add them later in the subject\'s Grading tab or by importing a results CSV.':'مكوّنات التقييم (اختيارية) — الأجزاء المُدرَّجة في هذه المادة (مثل الاختبار النصفي والنهائي) بحدٍّ أقصى ووزن. يمكنك إضافتها لاحقًا من تبويب التقييم أو باستيراد ملف نتائج CSV.',
+  '+ Add component':'+ إضافة مكوّن','Create subject':'إنشاء المادة','Cancel':'إلغاء','Maintenance':'الصيانة',
+  "Rebuilds every teacher's list of accessible subjects from the subjects table. Run once after upgrading, or any time teacher access looks out of sync.":'يعيد بناء قائمة المواد المتاحة لكل معلم من جدول المواد. شغّله مرة بعد التحديث، أو عند ظهور عدم تطابق في صلاحيات المعلمين.',
+  'Resync teacher access':'إعادة مزامنة صلاحيات المعلمين',
+  'Results are recorded per subject. This tool permanently deletes the old module system: every result stored under the old module definitions, plus all module definitions. Subject results are not touched unless a subject shares a slug with an old module.':'تُسجَّل النتائج لكل مادة. تحذف هذه الأداة نظام الوحدات القديم نهائيًا: كل نتيجة محفوظة ضمن تعريفات الوحدات القديمة، إضافةً إلى جميع تعريفات الوحدات. لا تتأثر نتائج المواد ما لم تشترك مادة في المعرّف نفسه مع وحدة قديمة.',
+  'Scan existing results & modules':'فحص النتائج والوحدات الموجودة','Type':'اكتب','to confirm':'للتأكيد',
+  'Permanently delete old results & modules':'حذف النتائج والوحدات القديمة نهائيًا',
+  // ---- workspace
+  'Switch subject':'تبديل المادة','Roster':'قائمة الطلاب','Results':'النتائج','Grading':'التقييم','Settings':'الإعدادات',
+  'Show top':'عرض الأعلى','Score distribution':'توزيع الدرجات','How many enrolled and graded students fall in each 10% band.':'عدد الطلاب المسجَّلين والمقيَّمين ضمن كل نطاق من 10%.',
+  'Leaderboard':'لوحة المتصدرين','Student':'الطالب','Score':'الدرجة','ID':'الرقم','Name':'الاسم','Awaiting results':'بانتظار النتائج',
+  'Enrolled students with no result yet.':'طلاب مسجَّلون لم تُسجَّل لهم نتيجة بعد.','Top performers by component':'الأعلى أداءً حسب المكوّن',
+  'Search enrolled students':'بحث في الطلاب المسجَّلين','ID, name or email':'الرقم أو الاسم أو البريد','Export CSV':'تصدير CSV','Remove selected':'إزالة المحدَّدين',
+  'Department':'القسم','Batch':'الدفعة','Result':'النتيجة','Add students to this subject':'إضافة طلاب إلى هذه المادة',
+  'Search & add':'بحث وإضافة','Paste student IDs':'لصق أرقام الطلاب','New students':'طلاب جدد','Search':'بحث','Clear filters':'مسح التصفية',
+  'Gender':'الجنس','Enrolled in':'مسجَّل في','Other subjects':'مواد أخرى','Enroll selected':'تسجيل المحدَّدين','Enroll all matching':'تسجيل كل المطابقين',
+  'Student IDs (one per line, or comma-separated)':'أرقام الطلاب (رقم في كل سطر أو مفصولة بفواصل)','Enroll these students':'تسجيل هؤلاء الطلاب',
+  'Create accounts for the missing IDs':'إنشاء حسابات للأرقام غير الموجودة',
+  "Students who don't have an account yet can be imported from a CSV. Every imported student is enrolled in this subject automatically.":'يمكن استيراد الطلاب الذين ليس لديهم حساب من ملف CSV. يُسجَّل كل طالب مستورد في هذه المادة تلقائيًا.',
+  'Bulk import into this subject':'استيراد جماعي إلى هذه المادة','Add one student':'إضافة طالب واحد',
+  'All results':'كل النتائج','Bulk import':'استيراد جماعي','Add individually':'إضافة فردية','Search by ID or name':'ابحث بالرقم أو الاسم','Show':'عرض',
+  'All students':'كل الطلاب','No result yet':'بلا نتيجة بعد','Has result':'لديه نتيجة','Partial only':'الجزئية فقط',
+  'CSV data':'بيانات CSV','Automatically enroll students who aren\'t in this subject yet':'تسجيل الطلاب تلقائيًا إن لم يكونوا مسجَّلين في هذه المادة','Parse & preview':'تحليل ومعاينة',
+  'Save components & continue':'حفظ المكوّنات والمتابعة','rows parsed':'صفوف تم تحليلها','with an account':'لديهم حساب','no account (skipped)':'بلا حساب (تم تجاوزهم)',
+  'imported':'تم استيرادهم','failed':'فشل','Run import':'تنفيذ الاستيراد','Student ID':'رقم الطالب','Start typing an enrolled student\'s ID or name':'ابدأ بكتابة رقم أو اسم طالب مسجَّل',
+  'Find student':'بحث عن الطالب','Email':'البريد الإلكتروني','This student isn\'t enrolled in this subject — enroll them when saving':'هذا الطالب غير مسجَّل في المادة — سيُسجَّل عند الحفظ','Save result':'حفظ النتيجة',
+  'Grading components':'مكوّنات التقييم',"The scored parts of this subject (e.g. Midterm, Final). Each has a maximum raw score and a weight; a student's total is the sum of raw / max × weight. The sum of weights is the subject's total marks.":'الأجزاء المُدرَّجة في هذه المادة (مثل الاختبار النصفي والنهائي). لكل جزء حدّ أقصى للدرجة الخام ووزن؛ ومجموع الطالب هو مجموع (الدرجة الخام ÷ الحد الأقصى × الوزن). ومجموع الأوزان هو إجمالي درجات المادة.',
+  'Save components':'حفظ المكوّنات',"Changing a component's max or weight doesn't rewrite results that are already saved — re-save or re-import them to recompute totals.":'لا يعيد تغيير الحد الأقصى أو الوزن كتابة النتائج المحفوظة — أعد حفظها أو استيرادها لإعادة احتساب المجاميع.',
+  'Subject details':'بيانات المادة','Subject key (permanent)':'معرّف المادة (دائم)','Save changes':'حفظ التغييرات','Delete this subject':'حذف هذه المادة','Delete subject':'حذف المادة',
+  "Removes the subject, unenrolls every student and revokes the teacher's access. You'll be asked separately whether to also delete the results already posted.":'يحذف المادة ويلغي تسجيل جميع الطلاب ويسحب صلاحية المعلم. سيُطلب منك بشكل منفصل تأكيد حذف النتائج المنشورة.',
+  // ---- overview screen
+  'Subject averages':'متوسطات المواد',"Average score as a percentage of each subject's total marks. Click a bar to open the subject.":'متوسط الدرجات كنسبة من إجمالي درجات كل مادة. انقر على شريط لفتح المادة.',
+  'Needs attention':'يحتاج إلى متابعة','Subjects with setup or grading gaps.':'مواد بها نقص في الإعداد أو التقييم.','Subject breakdown':'تفصيل المواد',
+  'Subject':'المادة','Teacher':'المعلم','Enrolled':'مسجّل','Graded':'مُقيَّم','Completion':'نسبة الإنجاز','Avg %':'المتوسط %','Median %':'الوسيط %','Highest %':'الأعلى %','Lowest %':'الأدنى %',
+  'Top performers':'الأعلى أداءً','Average across all the subjects a student has results in.':'المتوسط عبر جميع المواد التي للطالب نتائج فيها.','Lowest averages':'أدنى المتوسطات','Students who may need support.':'طلاب قد يحتاجون إلى دعم.',
+  // ---- students directory
+  'Student operations':'عمليات الطلاب','Delete selected':'حذف المحدَّدين','Status':'الحالة',
+  'Also enroll every imported student in':'تسجيل كل طالب مستورد أيضًا في',
+  "Only id and name are required. subjects is a semicolon-separated list of subject names or keys. For students who already have an account, blank columns are left as they are and subjects are added to their existing ones.":'الحقلان المطلوبان فقط: id و name. الحقل subjects قائمة مفصولة بفاصلة منقوطة لأسماء المواد أو معرّفاتها. بالنسبة للطلاب الذين لديهم حساب، تبقى الحقول الفارغة كما هي وتُضاف المواد إلى موادهم الحالية.',
+  'new accounts':'حسابات جديدة','existing students':'طلاب حاليون','Regenerate new emails / passwords':'إعادة توليد البريد وكلمات المرور الجديدة','Download credentials CSV':'تنزيل بيانات الدخول CSV',
+  'Account':'الحساب','Password':'كلمة المرور','Look up a student ID. If no account exists yet, fill in their details to create one; if one exists you can update their details and subjects here.':'ابحث برقم الطالب. إن لم يوجد حساب فأدخل بياناته لإنشائه؛ وإن وُجد فيمكنك تحديث بياناته ومواده هنا.',
+  'Password (new account only)':'كلمة المرور (للحساب الجديد فقط)','Phone':'الهاتف','Save account':'حفظ الحساب','Subjects':'المواد',
+  'e.g. Medicine':'مثال: الطب','e.g. 2024':'مثال: 2024','e.g. RU0967/16':'مثال: RU0967/16','Male':'ذكر','Female':'أنثى',
+  // ---- teachers
+  'Teacher operations':'عمليات المعلمين','All teachers':'كل المعلمين','Search by name, email, or phone':'ابحث بالاسم أو البريد أو الهاتف','Teaches':'يدرّس',
+  'Regenerate passwords':'إعادة توليد كلمات المرور','Look up a teacher by email. If no account exists yet, fill in their details to create one.':'ابحث عن المعلم بالبريد الإلكتروني. إن لم يوجد حساب فأدخل بياناته لإنشائه.',
+  'Teacher email':'بريد المعلم','Find teacher':'بحث عن المعلم','e.g. sara.getu@med.ju':'مثال: sara.getu@med.ju',
+  // ---- generic/buttons
+  'Save':'حفظ','Delete':'حذف','Loading…':'جارٍ التحميل…','Search by ID, name, or email':'ابحث بالرقم أو الاسم أو البريد',
+  'Label':'التسمية','Key':'المفتاح','Max':'الحد الأقصى','Weight':'الوزن','Every component needs a label.':'يجب أن يكون لكل مكوّن تسمية.',
+  'Pending':'قيد الانتظار','Working…':'جارٍ التنفيذ…','Imported ✓':'تم الاستيراد ✓','Failed':'فشل','No account':'بلا حساب','Saving…':'جارٍ الحفظ…','Saved ✓':'تم الحفظ ✓','Deleting…':'جارٍ الحذف…','Delete failed':'فشل الحذف',
+  'Syncing…':'جارٍ المزامنة…','None':'بدون','No subjects yet':'لا توجد مواد بعد','All departments':'كل الأقسام','All batches':'كل الدفعات','All genders':'كل الأجناس',
+  'Not enrolled anywhere':'غير مسجَّل في أي مادة',"— Don't enroll in a subject —":'— لا تسجّل في أي مادة —','Any / none':'أي مادة / بلا','Not in any subject':'ليس في أي مادة',
+  'Dept':'القسم','Importing':'جارٍ الاستيراد','Deleting':'جارٍ الحذف','Progress':'التقدم','Existing':'موجود','New':'جديد',
+  // ---- dynamic UI text
+  'No teacher':'بلا معلم','No grading components':'بلا مكوّنات تقييم','No students enrolled':'لا طلاب مسجَّلون','Average':'المتوسط','Parts':'الأجزاء','Open':'فتح','Ready':'جاهزة',
+  'No teacher assigned':'لم يُسنَد معلم','No matches':'لا نتائج مطابقة','No subject matches that search.':'لا توجد مادة مطابقة لهذا البحث.',
+  'Create your first subject, then enroll students, assign a teacher and start recording results.':'أنشئ مادتك الأولى، ثم سجّل الطلاب وأسنِد معلمًا وابدأ تسجيل النتائج.',
+  'Enter a subject name.':'أدخل اسم المادة.','Could not create subject.':'تعذّر إنشاء المادة.','Resync failed.':'فشلت المزامنة.','Scan failed.':'فشل الفحص.',
+  'Nothing to clean up — no results or module definitions exist.':'لا شيء للتنظيف — لا توجد نتائج أو تعريفات وحدات.',
+  'Some results could not be loaded:':'تعذّر تحميل بعض النتائج:','students':'طالب','Components':'المكوّنات','Total marks':'إجمالي الدرجات','Median':'الوسيط','Highest':'الأعلى','Lowest':'الأدنى',
+  'Loading results…':'جارٍ تحميل النتائج…','No students enrolled yet':'لا طلاب مسجَّلون بعد','Add students in the Enroll tab, then record results.':'أضف الطلاب من تبويب التسجيل، ثم سجّل النتائج.','Go to Enroll':'الانتقال إلى التسجيل',
+  'No results recorded yet.':'لم تُسجَّل نتائج بعد.','No results yet.':'لا نتائج بعد.','Enter result':'إدخال النتيجة','Everyone enrolled has a result.':'لكل المسجَّلين نتيجة.','No students enrolled.':'لا طلاب مسجَّلون.',
+  "student(s) have a result but aren't enrolled — see the Results tab.":'طلاب لديهم نتيجة لكنهم غير مسجَّلين — راجع تبويب النتائج.',
+  'No scores entered yet.':'لم تُدخَل درجات بعد.','This subject has no grading components yet — define them in the Grading tab.':'ليست لهذه المادة مكوّنات تقييم بعد — عرّفها من تبويب التقييم.',
+  'Raw':'الخام','Weighted':'الموزونة','No result':'بلا نتيجة','partial':'جزئية','not enrolled':'غير مسجَّل',
+  'No enrolled students match that search.':'لا يوجد طلاب مسجَّلون مطابقون لهذا البحث.','No students enrolled yet — add some in the Enroll tab.':'لا طلاب مسجَّلون بعد — أضف بعضهم من تبويب التسجيل.',
+  'Could not remove students.':'تعذّرت إزالة الطلاب.','Could not enroll students.':'تعذّر تسجيل الطلاب.','Could not enroll.':'تعذّر التسجيل.',
+  'Nobody left to add with these filters.':'لا يوجد من يمكن إضافته بهذه المرشّحات.','No student accounts yet.':'لا توجد حسابات طلاب بعد.',
+  'Paste at least one student ID.':'الصق رقم طالب واحدًا على الأقل.','Total':'الإجمالي','Total:':'الإجمالي:','Enrollment':'التسجيل','Will enroll':'سيُسجَّل','Not enrolled':'غير مسجَّل',
+  'not enrolled · enroll':'غير مسجَّل · تسجيل','Enroll':'تسجيل',
+  'No students match.':'لا يوجد طلاب مطابقون.','No students enrolled in this subject yet — add them in the Enroll tab.':'لا طلاب مسجَّلون في هذه المادة بعد — أضفهم من تبويب التسجيل.',
+  'Not every component has a score yet — total is based on what has been entered.':'لم تُدخَل درجة لكل مكوّن بعد — المجموع مبني على ما أُدخل.','Not every component has a score in this row.':'لا توجد درجة لكل مكوّن في هذا الصف.',
+  'Paste some CSV data first.':'الصق بيانات CSV أولًا.','CSV must include an "id" column.':'يجب أن يتضمّن ملف CSV عمود "id".','Could not save components.':'تعذّر حفظ المكوّنات.','Could not parse CSV.':'تعذّر تحليل ملف CSV.',
+  'No account — create this student first (Enroll → New students).':'لا حساب — أنشئ هذا الطالب أولًا (التسجيل ← طلاب جدد).',
+  'Could not enroll some students:':'تعذّر تسجيل بعض الطلاب:','Import failed.':'فشل الاستيراد.',
+  'This subject has no grading components yet — add them in the Grading tab first.':'ليست لهذه المادة مكوّنات تقييم بعد — أضفها من تبويب التقييم أولًا.',
+  'Enter a student ID.':'أدخل رقم الطالب.','Look up a student first.':'ابحث عن طالب أولًا.','This subject has no grading components yet.':'ليست لهذه المادة مكوّنات تقييم بعد.','Save failed.':'فشل الحفظ.',
+  'Could not save subject.':'تعذّر حفظ المادة.','Delete failed.':'فشل الحذف.','Grading completion':'نسبة إنجاز التقييم',
+  'OK = also permanently delete those results.':'موافق = حذف هذه النتائج نهائيًا أيضًا.','Cancel = keep the results and only delete the subject.':'إلغاء = الإبقاء على النتائج وحذف المادة فقط.',
+  // students/teachers dynamic
+  'No students yet — add some with Bulk import or Add individually.':'لا طلاب بعد — أضف بعضهم بالاستيراد الجماعي أو الإضافة الفردية.',
+  'Email already has an account (edit the email and re-run, or it may already be this student — check by ID).':'هذا البريد مرتبط بحساب بالفعل (عدّل البريد وأعد التشغيل، أو قد يكون هذا الطالب نفسه — تحقق بالرقم).',
+  'Look up a student ID first.':'ابحث عن رقم طالب أولًا.','Name and email are required.':'الاسم والبريد الإلكتروني مطلوبان.','Password must be at least 6 characters for a new account.':'يجب ألا تقل كلمة المرور عن 6 أحرف للحساب الجديد.',
+  'That email already has an account — if this is the same student, look them up by ID instead.':'هذا البريد مرتبط بحساب بالفعل — إن كان الطالب نفسه فابحث عنه بالرقم.',
+  'No teachers match.':'لا يوجد معلمون مطابقون.','No teachers yet — add one with Bulk import or Add individually.':'لا معلمين بعد — أضف معلمًا بالاستيراد الجماعي أو الإضافة الفردية.','No subjects':'بلا مواد',
+  'Email already has an account (may be a student or admin account — use a different email).':'هذا البريد مرتبط بحساب بالفعل (قد يكون حساب طالب أو مشرف) — استخدم بريدًا آخر.',
+  'Enter a teacher email.':'أدخل بريد المعلم.','Look up a teacher email first.':'ابحث عن بريد معلم أولًا.','That email already has an account — if this is the same teacher, look them up by email instead.':'هذا البريد مرتبط بحساب بالفعل — إن كان المعلم نفسه فابحث عنه بالبريد.',
+  'CSV must include "id" and "name" columns.':'يجب أن يتضمّن ملف CSV العمودين "id" و"name".','CSV must include "name" and "email" columns.':'يجب أن يتضمّن ملف CSV العمودين "name" و"email".',
+  // overview dynamic
+  'Could not load cohort results:':'تعذّر تحميل نتائج الدفعة:','Enrollments':'التسجيلات','student × subject':'طالب × مادة','across all recorded results':'عبر جميع النتائج المسجَّلة','loading…':'جارٍ التحميل…',
+  'No subjects yet.':'لا توجد مواد بعد.','Fix':'معالجة','Every subject is set up and fully graded.':'جميع المواد مُعدَّة ومُقيَّمة بالكامل.','(no name)':'(بلا اسم)','Refresh failed.':'فشل التحديث.',
+  'Open Overview':'فتح نظرة عامة','Cohort performance by subject':'أداء الدفعة حسب المادة','Escape':'Esc',
+  // tooltips
+  'How many graded students fall in each 10% band.':'عدد الطلاب المقيَّمين ضمن كل نطاق من 10%.','Not every component has a score yet.':'لم تُدخَل درجة لكل مكوّن بعد.','Unassigned':'غير مُسنَد',
+  'e.g. Midterm':'مثال: الاختبار النصفي','auto':'تلقائي','max':'الحد الأقصى','weight':'الوزن',
+  'Deletes their profile. Does NOT delete their sign-in — remove that separately in Firebase Console → Authentication → Users.':'يحذف ملفه الشخصي فقط ولا يحذف بيانات دخوله — احذفها بشكل منفصل من Firebase Console ← Authentication ← Users.',
+};
+
+// template patterns: {n}=integer, {d}=number, {s}=any text
+function P(tpl, fn){
+  let src = tpl.replace(/[.*+?^$()|\\\]\[]/g, '\\$&');
+  src = src.replace(/\\\[\\\[/g, '(?:').replace(/\\\]\\\]/g, ')?');
+  src = src.replace(/\{n\}/g, '(\\d+)').replace(/\{d\}/g, '(-?\\d+(?:\\.\\d+)?)').replace(/\{s\}/g, '(.+?)');
+  return [new RegExp('^' + src + '$', 's'), fn];
+}
+const T = (s) => tr(s);
+const AR_RE = [
+  P('{n} / {n} students', (m,a,b) => `${a} / ${b} طالب`),
+  P('{s} — {n} / {n} ({n}%)', (m,l,a,b,c) => `${T(l)} — ${a} / ${b} (${c}%)`),
+  P('Total marks for this subject (sum of weights): {n}', (m,a) => `إجمالي درجات المادة (مجموع الأوزان): ${a}`),
+  P('Component "{s}" needs both a max and a weight.', (m,a) => `المكوّن "${a}" يحتاج إلى حدٍّ أقصى ووزن.`),
+  P('Component "{s}" needs a max above 0.', (m,a) => `المكوّن "${a}" يحتاج إلى حدٍّ أقصى أكبر من 0.`),
+  P('of {n} subject(s)', (m,a) => `من ${N(a,'subject')}`),
+  P('{n}% graded', (m,a) => `${a}% مُقيَّم`),
+  P('{n}% complete', (m,a) => `${a}% مكتمل`),
+  P('median {d}%', (m,a) => `الوسيط ${a}%`),
+  P('of {n} enrolled[[ · {n} partial]]', (m,a,b) => `من ${a} مسجّل` + (b ? ` · ${b} جزئية` : '')),
+  P('Subject created, but the teacher access list could not be updated ({s}) — use "Resync teacher access" under Maintenance.', (m,e) => `أُنشئت المادة، لكن تعذّر تحديث قائمة صلاحيات المعلم (${e}) — استخدم «إعادة مزامنة صلاحيات المعلمين» ضمن الصيانة.`),
+  P('Teacher access synced for {n} teacher(s).', (m,a) => `تمت مزامنة صلاحيات ${N(a,'teacher')}.`),
+  P('Found {n} result record(s) across all students and {n} module definition(s). Deleting removes all of them permanently — including results posted for subjects.', (m,a,b) => `تم العثور على ${N(a,'record')} من النتائج لدى جميع الطلاب و${N(b,'definition')} للوحدات. سيؤدي الحذف إلى إزالتها جميعًا نهائيًا — بما فيها النتائج المنشورة للمواد.`),
+  P('Deleting… {n}/{n}', (m,a,b) => `جارٍ الحذف… ${a}/${b}`),
+  P('Done — {n} record(s) deleted.', (m,a) => `تم — حُذف ${N(a,'record')}.`),
+  P('Stopped after {n} deletion(s): {s}. Scan again to retry.', (m,a,e) => `توقّف بعد ${N(a,'deletion')}: ${e}. أعد الفحص للمحاولة مجددًا.`),
+  P('Awaiting results ({n})', (m,a) => `بانتظار النتائج (${a})`),
+  P('of {n} enrolled', (m,a) => `من ${a} مسجّل`),
+  P('Remove {n} selected', (m,a) => `إزالة ${a} محدَّدين`),
+  P('Remove {n} student(s) from {s}?', (m,a,s) => `إزالة ${N(a,'student')} من ${s}؟`),
+  P('{n} of them already have a result. Their results are kept (not deleted), but they won\'t count towards completion.', (m,a) => `لدى ${a} منهم نتيجة بالفعل. ستُحفظ نتائجهم (دون حذف) لكنها لن تُحتسب ضمن نسبة الإنجاز.`),
+  P('Removed {n} student(s) from {s}.', (m,a,s) => `تمت إزالة ${N(a,'student')} من ${s}.`),
+  P('{n} student(s) not yet enrolled[[ — showing the first {n}, narrow the filters to see others]]', (m,a,b) => `${N(a,'student')} غير مسجَّلين بعد` + (b ? ` — يُعرض أول ${b}، ضيّق المرشّحات لرؤية البقية` : '')),
+  P('Enroll {n} selected', (m,a) => `تسجيل ${a} محدَّدين`),
+  P('Enroll all {n} matching', (m,a) => `تسجيل كل ${a} مطابقين`),
+  P('Enrolled {n} student(s) in {s}.', (m,a,s) => `تم تسجيل ${N(a,'student')} في ${s}.`),
+  P('Enroll all {n} matching students in {s}?', (m,a,s) => `تسجيل كل الطلاب المطابقين (${a}) في ${s}؟`),
+  P('No account for: {s}', (m,a) => `لا يوجد حساب للأرقام: ${a}`),
+  P('Columns: {s}. Columns that aren\'t components of {s} yet will offer to create them. Columns missing from the file leave stored scores untouched.', (m,a,b) => `الأعمدة: ${a}. الأعمدة غير الموجودة ضمن مكوّنات ${b} سيُعرض عليك إنشاؤها. الأعمدة الناقصة من الملف تُبقي الدرجات المحفوظة كما هي.`),
+  P('{s} has no grading components yet. Include a column per scored part (e.g. midterm, final) and you\'ll be asked for each one\'s max and weight.', (m,a) => `ليست لـ ${a} مكوّنات تقييم بعد. أدرج عمودًا لكل جزء مُدرَّج (مثل midterm وfinal) وسيُطلب منك الحد الأقصى والوزن لكل منها.`),
+  P('{s} has no grading components yet. Define them in the Grading tab, or import a results CSV to create them from its columns.', (m,a) => `ليست لـ ${a} مكوّنات تقييم بعد. عرّفها من تبويب التقييم، أو استورد ملف نتائج CSV لإنشائها من أعمدته.`),
+  P('student(s) · {n} enrolled', (m,a) => `طالب · ${a} مسجَّل`),
+  P('Enroll this student in {s}', (m,a) => `تسجيل هذا الطالب في ${a}`),
+  P('These columns aren\'t part of "{s}" yet. The label and key come straight from the column name — just set a max score and weight for each, then continue.', (m,a) => `هذه الأعمدة ليست ضمن «${a}» بعد. تؤخذ التسمية والمفتاح مباشرة من اسم العمود — حدّد فقط الدرجة القصوى والوزن لكل منها ثم تابع.`),
+  P('Found {n} column(s) not yet in this subject: {s}. Set max & weight for each below, then continue.', (m,a,c) => `تم العثور على ${N(a,'column')} غير موجودة في هذه المادة: ${c}. حدّد الحد الأقصى والوزن لكل منها أدناه ثم تابع.`),
+  P('Enter max and weight for "{s}".', (m,a) => `أدخل الحد الأقصى والوزن لـ "${a}".`),
+  P('{s} (raw, out of {d}, weight {d})', (m,a,b,c) => `${a} (الدرجة الخام من ${b}، الوزن ${c})`),
+  P('No account found for "{s}" — create this student first (Enroll → New students).', (m,a) => `لا يوجد حساب للرقم "${a}" — أنشئ هذا الطالب أولًا (التسجيل ← طلاب جدد).`),
+  P('Found {s} ({s})[[ — not enrolled in {s} yet.]]', (m,a,b,c) => `تم العثور على ${a} (${b})` + (c ? ` — غير مسجَّل في ${c} بعد.` : '')),
+  P('Saved {s}\'s result for {s} and recalculated cohort stats.', (m,a,b) => `تم حفظ نتيجة ${a} في ${b} وإعادة احتساب إحصاءات الدفعة.`),
+  P('{n} result(s) already recorded for this subject.', (m,a) => `يوجد ${+a === 2 ? 'نتيجتان' : N(a,'result')} مسجَّلة بالفعل لهذه المادة.`),
+  P('Saved {n} component(s) — total marks {n}.', (m,a,b) => `تم حفظ ${N(a,'component')} — إجمالي الدرجات ${b}.`),
+  P('Saved, but the teacher access list could not be updated ({s}) — use "Resync teacher access" under Subjects → Maintenance.', (m,e) => `تم الحفظ، لكن تعذّر تحديث قائمة صلاحيات المعلم (${e}) — استخدم «إعادة مزامنة صلاحيات المعلمين» ضمن المواد ← الصيانة.`),
+  P('Saved "{s}".', (m,a) => `تم حفظ "${a}".`),
+  P('Delete subject "{s}"?', (m,a) => `حذف المادة "${a}"؟`),
+  P('This unenrolls {n} student(s) and revokes the teacher\'s access. This can\'t be undone.', (m,a) => `سيؤدي هذا إلى إلغاء تسجيل ${N(a,'student')} وسحب صلاحية المعلم. لا يمكن التراجع عن ذلك.`),
+  P('{n} result(s) have been posted for {s}.', (m,a,s) => `نُشرت ${N(a,'result')} للمادة ${s}.`),
+  P('The teacher access list could not be updated ({s}). Use "Resync teacher access".', (m,e) => `تعذّر تحديث قائمة صلاحيات المعلم (${e}). استخدم «إعادة مزامنة صلاحيات المعلمين».`),
+  P('of {n} student(s)', (m,a) => `من ${N(a,'student')}`),
+  P('Delete {n} selected', (m,a) => `حذف ${a} محدَّدين`),
+  P('Delete {n} student profile(s) and all their results? This can\'t be undone.', (m,a) => `حذف ${N(a,'profile')} للطلاب وجميع نتائجهم؟ لا يمكن التراجع عن ذلك.`),
+  P('Note: this only removes their data — their sign-in (email/password) will still work until you also delete it in Firebase Console → Authentication → Users.', () => 'ملاحظة: هذا يحذف بياناتهم فقط — سيبقى تسجيل دخولهم (البريد/كلمة المرور) يعمل حتى تحذفه أيضًا من Firebase Console ← Authentication ← Users.'),
+  P('{n} deleted, {n} failed.', (m,a,b) => `تم حذف ${a}، وفشل ${b}.`),
+  P('Deleted {n} student(s).', (m,a) => `تم حذف ${N(a,'student')}.`),
+  P('Done — {n} account(s) imported.', (m,a) => `تم — استيراد ${N(a,'account')}.`),
+  P('Done — {n} account(s) imported and enrolled.', (m,a) => `تم — استيراد ${N(a,'account')} وتسجيلهم.`),
+  P('Found existing student: {s} ({s}) — you can update their details below.', (m,a,b) => `تم العثور على طالب موجود: ${a} (${b}) — يمكنك تحديث بياناته أدناه.`),
+  P('No account found for "{s}" — filling this in will create a new student account.', (m,a) => `لا يوجد حساب للرقم "${a}" — سيؤدي إكمال البيانات إلى إنشاء حساب طالب جديد.`),
+  P('Saved {s}\'s account.', (m,a) => `تم حفظ حساب ${a}.`),
+  P('{n} imported, {n} failed. Check the Status column and re-run (only unchecked/failed/new rows will be retried).', (m,a,b) => `تم استيراد ${a} وفشل ${b}. راجع عمود الحالة وأعد التشغيل (ستُعاد محاولة الصفوف غير المحدَّدة أو الفاشلة أو الجديدة فقط).`),
+  P('{n} imported, {n} failed. Check the Status column and re-run.', (m,a,b) => `تم استيراد ${a} وفشل ${b}. راجع عمود الحالة وأعد التشغيل.`),
+  P('of {n} teacher(s)', (m,a) => `من ${N(a,'teacher')}`),
+  P('Delete {s}\'s teacher profile? This can\'t be undone.', (m,a) => `حذف الملف الشخصي للمعلم ${a}؟ لا يمكن التراجع عن ذلك.`),
+  P('Note: {n} subject(s) are still assigned to them ({s}) — reassign those in each subject\'s Settings.', (m,a,b) => `ملاحظة: ما زالت ${N(a,'subject')} مسندة إليه (${b}) — أعد إسنادها من إعدادات كل مادة.`),
+  P('Parsed {n} row(s).', (m,a) => `تم تحليل ${N(a,'row')}.`),
+  P('Done — {n} teacher account(s) imported.', (m,a) => `تم — استيراد ${N(a,'account')} للمعلمين.`),
+  P('Found existing teacher: {s} — you can update their details below.', (m,a) => `تم العثور على معلم موجود: ${a} — يمكنك تحديث بياناته أدناه.`),
+  P('No account found for "{s}" — filling this in will create a new teacher account.', (m,a) => `لا يوجد حساب للبريد "${a}" — سيؤدي إكمال البيانات إلى إنشاء حساب معلم جديد.`),
+  P('Saved {s}\'s teacher account. They can now sign in at teacher.html.', (m,a) => `تم حفظ حساب المعلم ${a}. يمكنه الآن تسجيل الدخول عبر teacher.html.`),
+  P('{n} with a teacher', (m,a) => `${a} لهم معلم`),
+  P('{n} enrolled somewhere', (m,a) => `${a} مسجَّلون في مادة ما`),
+  P('{s}% of enrollments[[ · {n} partial]]', (m,a,b) => `${a}% من التسجيلات` + (b ? ` · ${b} جزئية` : '')),
+  P('· {n} partial', (m,a) => `· ${a} جزئية`),
+  P('{n} of {n} awaiting results', (m,a,b) => `${a} من ${b} بانتظار النتائج`),
+  P('{n} result(s) from students not enrolled', (m,a) => `${N(a,'result')} من طلاب غير مسجَّلين`),
+  P('+ {n} more', (m,a) => `+ ${a} أخرى`),
+  P('Subject · {n} enrolled', (m,a) => `مادة · ${a} مسجَّل`),
+  P('Student · {s}', (m,a) => `طالب · ${a}`),
+  P('Teacher · {s}', (m,a) => `معلم · ${a}`),
+  P('Could not load cohort results: {s}', (m,a) => `تعذّر تحميل نتائج الدفعة: ${a}`),
+  P('Some results could not be loaded: {s}', (m,a) => `تعذّر تحميل بعض النتائج: ${a}`),
+  P('Could not load data: {s}', (m,a) => `تعذّر تحميل البيانات: ${a}`),
+  P('Parsed {n} row(s)', (m,a) => `تم تحليل ${N(a,'row')}`),
+];
+// substring rules (Firebase / network errors)
+const AR_SUB = [
+  [/auth\/(invalid-credential|wrong-password|user-not-found|invalid-email|invalid-login-credentials)/, 'البريد الإلكتروني أو كلمة المرور غير صحيحة.'],
+  [/auth\/too-many-requests/, 'محاولات كثيرة. حاول لاحقًا.'],
+  [/auth\/network-request-failed/, 'تعذّر الاتصال بالشبكة.'],
+  [/Missing or insufficient permissions/, 'لا تملك الصلاحيات الكافية لهذه العملية.'],
+];
+
+function tr(s){
+  if(lang !== 'ar' || !s) return s;
+  if(s.indexOf('\n') !== -1) return s.split('\n').map(tr).join('\n');
+  const lead = s.match(/^\s*/)[0], trail = s.match(/\s*$/)[0], core = s.trim();
+  if(!core) return s;
+  if(Object.prototype.hasOwnProperty.call(AR, core)) return lead + AR[core] + trail;
+  if(!/[A-Za-z]{2}/.test(core)) return s;
+  for(const [re, fn] of AR_RE){ const m = core.match(re); if(m) return lead + fn(...m) + trail; }
+  for(const [re, out] of AR_SUB){ if(re.test(core)) return lead + out + trail; }
+  return s;
+}
+
+const trOrig = new WeakMap();
+const SKIP_TAGS = new Set(['SCRIPT','STYLE','TEXTAREA','NOSCRIPT','CODE']);
+function applyText(n){
+  const p = n.parentNode; if(!p || SKIP_TAGS.has(p.nodeName)) return;
+  const rec = trOrig.get(n);
+  const en = (rec && n.nodeValue === rec.ar) ? rec.en : n.nodeValue;
+  if(lang === 'ar'){
+    const ar = tr(en);
+    if(ar !== en){ trOrig.set(n, {en, ar}); n.nodeValue = ar; }
+    else if(rec) trOrig.delete(n);
+  }else if(rec && n.nodeValue === rec.ar){ n.nodeValue = rec.en; trOrig.delete(n); }
+}
+const TR_ATTRS = ['placeholder','title','aria-label'];
+function applyAttrs(el){
+  if(!el.getAttribute) return;
+  TR_ATTRS.forEach(a => {
+    if(!el.hasAttribute(a) && !el.hasAttribute('data-en-' + a)) return;
+    const stored = el.getAttribute('data-en-' + a);
+    const cur = el.getAttribute(a);
+    const en = (stored !== null && cur === tr(stored)) ? stored : cur;
+    if(lang === 'ar'){
+      const ar = tr(en);
+      if(ar !== en){ el.setAttribute('data-en-' + a, en); el.setAttribute(a, ar); }
+    }else if(stored !== null){ el.setAttribute(a, stored); el.removeAttribute('data-en-' + a); }
+  });
+}
+function translateTree(root){
+  if(!root) return;
+  if(root.nodeType === 3){ applyText(root); return; }
+  if(root.nodeType !== 1) return;
+  if(SKIP_TAGS.has(root.nodeName)) return;
+  applyAttrs(root);
+  const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  let n; const nodes = []; while((n = w.nextNode())) nodes.push(n);
+  nodes.forEach(applyText);
+  root.querySelectorAll('[placeholder],[title],[aria-label],[data-en-placeholder],[data-en-title],[data-en-aria-label]').forEach(applyAttrs);
+}
+const trObserver = new MutationObserver(muts => {
+  if(lang !== 'ar') return;
+  trObserver.disconnect();
+  try{
+    muts.forEach(m => {
+      if(m.type === 'childList') m.addedNodes.forEach(translateTree);
+      else if(m.type === 'characterData') applyText(m.target);
+      else if(m.type === 'attributes') applyAttrs(m.target);
+    });
+  }finally{ trObserver.observe(document.body, {childList:true, subtree:true, characterData:true, attributes:true, attributeFilter:TR_ATTRS}); }
+});
+const _alert = window.alert.bind(window), _confirm = window.confirm.bind(window);
+window.alert = (m) => _alert(tr(String(m)));
+window.confirm = (m) => _confirm(tr(String(m)));
+
+function setLang(next){
+  lang = next === 'ar' ? 'ar' : 'en';
+  try{ localStorage.setItem(LANG_KEY, lang); }catch(e){}
+  const root = document.documentElement;
+  root.lang = lang; root.dir = lang === 'ar' ? 'rtl' : 'ltr'; root.classList.toggle('lang-ar', lang === 'ar');
+  document.querySelectorAll('.error-box.show,.ok-box.show,.warn-box.show').forEach(b => { b.classList.remove('show'); b.textContent = ''; });
+  translateTree(document.body);
+  document.querySelectorAll('.lang-switch button').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+  if(typeof renderSalam === 'function' && typeof bootstrapped !== 'undefined' && bootstrapped) renderSalam();
+  if(lang === 'ar'){ trObserver.disconnect(); trObserver.observe(document.body, {childList:true, subtree:true, characterData:true, attributes:true, attributeFilter:TR_ATTRS}); }
+  else trObserver.disconnect();
+}
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('.lang-switch button'); if(!b) return;
+  setLang(b.dataset.lang);
+});
+
+
+// ================================================================
 // SUBJECTS SCREEN (home)
 // ================================================================
 const newSubjEditor = createCompEditor($('newSubjCompEditor'), $('newSubjCompTotal'));
@@ -1742,7 +2097,7 @@ function renderSubjectsScreen(){
   $('subjCount').innerHTML = `<b>${list.length}</b> of ${allSubjects.length} subject(s)`;
   const grid = $('subjGrid');
   if(!allSubjects.length){
-    grid.innerHTML = `<div class="empty-state"><b>Bismillah — no subjects yet</b>Create your first subject, then enroll students, assign a teacher and start recording results.</div>`;
+    grid.innerHTML = `<div class="empty-state"><b>No subjects yet</b>Create your first subject, then enroll students, assign a teacher and start recording results.</div>`;
     return;
   }
   if(!list.length){ grid.innerHTML = `<div class="empty-state"><b>No matches</b>No subject matches that search.</div>`; return; }
@@ -1819,7 +2174,7 @@ $('createSubjBtn').addEventListener('click', async () => {
     $('newSubjName').value = ''; $('newSubjTeacher').value = ''; newSubjEditor.set([]);
     $('newSubjCard').classList.add('hidden');
     if(warn) alert(warn);
-    go('subjects/' + encodeURIComponent(slug) + '/roster');
+    go('subjects/' + encodeURIComponent(slug) + '/enroll');
   }catch(err){
     setBox('newSubjError', err.message || 'Could not create subject.');
   }finally{ setBusy(btn, false); }
@@ -1920,7 +2275,7 @@ function renderSubjectScreen(){
   });
 }
 function renderActiveTab(){
-  const fn = {overview: renderSubOverview, roster: renderRoster, results: renderResultsTab, grading: renderGrading, settings: renderSettings}[route.tab];
+  const fn = {overview: renderSubOverview, roster: renderRoster, results: renderResultsTab, grading: renderGrading, settings: renderSettings, enroll: renderEnroll}[route.tab];
   if(fn) fn();
 }
 
@@ -1968,8 +2323,8 @@ function renderSubOverview(){
   const body = $('ovBody');
   if(loading){ body.innerHTML = `<div class="card"><div class="loading-row"><span class="spin"></span> Loading results…<div class="progress-track" data-load="${subj.slug}" style="max-width:320px;margin:12px auto 0"><span></span></div><small class="load-note"></small></div></div>`; return; }
   if(!st.rows.length && !st.enrolled){
-    body.innerHTML = `<div class="card"><div class="empty-state" style="border:0"><b>No students enrolled yet</b>Add students in the Roster tab, then record results.<div class="btn-row" style="justify-content:center;margin-top:14px"><button class="btn" id="ovGoRoster">Go to Roster</button></div></div></div>`;
-    $('ovGoRoster').addEventListener('click', () => go('subjects/' + encodeURIComponent(subj.slug) + '/roster'));
+    body.innerHTML = `<div class="card"><div class="empty-state" style="border:0"><b>No students enrolled yet</b>Add students in the Enroll tab, then record results.<div class="btn-row" style="justify-content:center;margin-top:14px"><button class="btn" id="ovGoRoster">Go to Enroll</button></div></div></div>`;
+    $('ovGoRoster').addEventListener('click', () => go('subjects/' + encodeURIComponent(subj.slug) + '/enroll'));
     return;
   }
   body.innerHTML = OV_SKELETON;
@@ -2047,10 +2402,11 @@ function renderRoster(){
     const r = m.get(s.uid);
     let resCell = known ? '<span class="chip muted">No result</span>' : '<span class="chip muted">…</span>';
     if(r && r.maxTotal) resCell = `<span class="mono">${(r.total / r.maxTotal * 100).toFixed(1)}%</span>${r.complete ? '' : ' <span class="tag partial">partial</span>'}`;
-    return `<tr data-uid="${s.uid}"><td class="chk"><input type="checkbox" class="enrChk"></td><td class="mono">${esc(s.id)}</td><td>${esc(s.name)}</td><td>${esc(s.department || '—')}</td><td>${esc(s.batch || '—')}</td><td>${resCell}</td><td><button class="btn btn-danger btn-sm enrRemove">Remove</button></td></tr>`;
-  }).join('') : `<tr><td colspan="7">${enrolled.length ? 'No enrolled students match that search.' : 'No students enrolled yet — add some below.'}</td></tr>`;
-  $('enrBody').querySelectorAll('.enrRemove').forEach(b => b.addEventListener('click', () => removeFromSubject([b.closest('tr').dataset.uid])));
+    return `<tr data-uid="${s.uid}"><td class="chk"><input type="checkbox" class="enrChk"></td><td class="mono">${esc(s.id)}</td><td>${esc(s.name)}</td><td>${esc(s.department || '—')}</td><td>${esc(s.batch || '—')}</td><td>${resCell}</td></tr>`;
+  }).join('') : `<tr><td colspan="6">${enrolled.length ? 'No enrolled students match that search.' : 'No students enrolled yet — add some in the Enroll tab.'}</td></tr>`;
   updateEnrRemoveBtn();
+}
+function renderEnroll(){
   renderAddFilters();
   renderAddCandidates();
 }
@@ -2077,7 +2433,7 @@ async function removeFromSubject(uids){
   try{
     const n = await unenrollStudents(subj.slug, uids);
     $('enrSelectAll').checked = false;
-    renderHero(subj); renderRoster(); renderSideSubjects();
+    renderHero(subj); renderRoster(); renderEnroll(); renderSideSubjects();
     setBox('enrOk', `Removed ${n} student(s) from ${subj.name}.`, 'ok');
   }catch(err){ setBox('enrError', err.message || 'Could not remove students.'); }
 }
@@ -2125,7 +2481,7 @@ async function doEnroll(uids, okBox, errBox){
   setBox(errBox,''); setBox(okBox,'');
   try{
     const n = await enrollStudents(subj.slug, uids);
-    renderHero(subj); renderRoster(); renderSideSubjects();
+    renderHero(subj); renderRoster(); renderEnroll(); renderSideSubjects();
     setBox(okBox, `Enrolled ${n} student(s) in ${subj.name}.`, 'ok');
     return n;
   }catch(err){ setBox(errBox, err.message || 'Could not enroll students.'); return 0; }
@@ -2157,8 +2513,10 @@ $('pasteEnrollBtn').addEventListener('click', async () => {
   const btn = $('pasteEnrollBtn'); setBusy(btn, true);
   try{
     const n = await enrollStudents(subj.slug, found);
-    renderHero(subj); renderRoster(); renderSideSubjects();
-    setBox('pasteOk', `Enrolled ${n} student(s)${already ? `, ${already} already enrolled` : ''}${missing.length ? `, ${missing.length} not found` : ''}.`, 'ok');
+    renderHero(subj); renderRoster(); renderEnroll(); renderSideSubjects();
+    setBox('pasteOk', L(
+      `Enrolled ${n} student(s)${already ? `, ${already} already enrolled` : ''}${missing.length ? `, ${missing.length} not found` : ''}.`,
+      `تم تسجيل ${N(n,'student')}${already ? `، و${already} مسجَّلون سابقًا` : ''}${missing.length ? `، و${missing.length} غير موجودين` : ''}.`), 'ok');
     if(missing.length){
       missingPasted = missing;
       setBox('pasteMissing', `No account for: ${missing.join(', ')}`, 'warn');
@@ -2184,9 +2542,9 @@ function renderResultsTab(){
   const comps = subj.components || [];
   const keys = comps.map(c => c.key);
   $('csvInput').placeholder = `id,${(keys.length ? keys : ['midterm','final']).join(',')}\nRU0967/16,${(keys.length ? keys : ['a','b']).map(() => '0').join(',')}`;
-  $('bulkHint').innerHTML = comps.length
-    ? `Columns: <b>id</b>${' , '}${comps.map(c => `<b>${esc(c.key)}</b>`).join(', ')}. Columns that aren't components of ${esc(subj.name)} yet will offer to create them. Columns missing from the file leave stored scores untouched.`
-    : `${esc(subj.name)} has no grading components yet. Include a column per scored part (e.g. <b>midterm</b>, <b>final</b>) and you'll be asked for each one's max and weight.`;
+  $('bulkHint').textContent = comps.length
+    ? `Columns: ${['id'].concat(keys).join(', ')}. Columns that aren't components of ${subj.name} yet will offer to create them. Columns missing from the file leave stored scores untouched.`
+    : `${subj.name} has no grading components yet. Include a column per scored part (e.g. midterm, final) and you'll be asked for each one's max and weight.`;
   $('enrolledList').innerHTML = enrolledStudents(subj.slug).map(s => `<option value="${esc(s.id)}">${esc(s.name)}</option>`).join('');
   renderIndivComponents();
   renderAllResultsTable();
@@ -2221,7 +2579,7 @@ function renderAllResultsTable(){
     (f === '' || (f === 'missing' && !m.has(s.uid)) || (f === 'submitted' && m.has(s.uid)) || (f === 'partial' && m.has(s.uid) && !m.get(s.uid).complete)));
   $('resCount').innerHTML = `<b>${rows.length}</b> student(s) · ${enrolledCount} enrolled`;
   if(!rows.length){
-    body.innerHTML = `<tr><td colspan="${comps.length + 5}">${enrolledCount ? 'No students match.' : 'No students enrolled in this subject yet — add them in the Roster tab.'}</td></tr>`;
+    body.innerHTML = `<tr><td colspan="${comps.length + 5}">${enrolledCount ? 'No students match.' : 'No students enrolled in this subject yet — add them in the Enroll tab.'}</td></tr>`;
     return;
   }
   body.innerHTML = rows.map(s => {
@@ -2319,7 +2677,7 @@ $('parseBulkBtn').addEventListener('click', async () => {
 function renderNewCompForm(newCols){
   const subj = curSubj();
   pendingNewCols = newCols.map(h => ({ header:h, label: h.charAt(0).toUpperCase() + h.slice(1), key: keyify(h), max:'', weight:'' }));
-  $('newCompModuleName').textContent = subj.name;
+  $('newCompHint').textContent = `These columns aren't part of "${subj.name}" yet. The label and key come straight from the column name — just set a max score and weight for each, then continue.`;
   const editor = $('newCompEditor');
   editor.innerHTML = `<div class="comp-row head"><div>Label</div><div>Key</div><div>Max</div><div>Weight</div><div></div></div>` +
     pendingNewCols.map((r,i) => `
@@ -2392,15 +2750,17 @@ async function continueParse({headers, rows, idIdx, nameIdx}){
         enrolled: st ? isEnrolled(st, subj.slug) : false,
         components, total, complete,
         status: st ? 'pending' : 'noaccount',
-        error: st ? null : 'No account — create this student first (Roster → New students).',
+        error: st ? null : 'No account — create this student first (Enroll → New students).',
       };
     });
     $('bulkPreviewWrap').classList.remove('hidden');
     renderBulkTable();
     const noAcc = roster.filter(r => r.status === 'noaccount').length;
     const notEnr = roster.filter(r => r.existingUid && !r.enrolled).length;
-    const missingNote = missingCols.length ? ` "${missingCols.map(c=>c.label).join(', ')}" wasn't in this file — existing results kept their stored value.` : '';
-    setBox('bulkOk', `Parsed ${roster.length} row(s)${errors ? `, ${errors} skipped (no ID)` : ''}${noAcc ? `, ${noAcc} have no account (skipped)` : ''}${notEnr ? `, ${notEnr} aren't enrolled in ${subj.name} yet` : ''}.${missingNote}`, 'ok');
+    const cols = missingCols.map(c => c.label).join(', ');
+    setBox('bulkOk', L(
+      `Parsed ${roster.length} row(s)${errors ? `, ${errors} skipped (no ID)` : ''}${noAcc ? `, ${noAcc} have no account (skipped)` : ''}${notEnr ? `, ${notEnr} aren't enrolled in ${subj.name} yet` : ''}.${missingCols.length ? ` "${cols}" wasn't in this file — existing results kept their stored value.` : ''}`,
+      `تم تحليل ${N(roster.length,'row')}${errors ? `، وتخطّي ${errors} بلا رقم` : ''}${noAcc ? `، و${noAcc} بلا حساب (تم تجاوزهم)` : ''}${notEnr ? `، و${notEnr} غير مسجَّلين في ${subj.name} بعد` : ''}.${missingCols.length ? ` العمود "${cols}" غير موجود في هذا الملف — أُبقيت النتائج الحالية بقيمها المحفوظة.` : ''}`), 'ok');
   }catch(err){ setBox('bulkError', err.message || 'Could not parse CSV.'); }
   finally{ setBusy(btn, false); }
 }
@@ -2457,7 +2817,9 @@ $('runImportBtn').addEventListener('click', async () => {
     renderHero(subj); renderAllResultsTable(); renderSideSubjects();
   }
   setBusy(runBtn, false);
-  if(!fail) setBox('importOk', `Done — ${ok} result(s) imported${enrolledNow ? `, ${enrolledNow} student(s) enrolled` : ''}, cohort stats recalculated.`, 'ok');
+  if(!fail) setBox('importOk', L(
+    `Done — ${ok} result(s) imported${enrolledNow ? `, ${enrolledNow} student(s) enrolled` : ''}, cohort stats recalculated.`,
+    `تم — استيراد ${N(ok,'result')}${enrolledNow ? `، وتسجيل ${N(enrolledNow,'student')}` : ''}، وأُعيد احتساب إحصاءات الدفعة.`), 'ok');
   else setBox('importError', `${ok} imported, ${fail} failed. Check the Status column and re-run (only unchecked/failed/new rows will be retried).`);
 });
 
@@ -2495,7 +2857,7 @@ function runLookup(){
   const s = findStudentForLookup(text);
   if(!s){
     indivState = null;
-    $('lookupResult').textContent = `No account found for "${text}" — create this student first (Roster → New students).`;
+    $('lookupResult').textContent = `No account found for "${text}" — create this student first (Enroll → New students).`;
     $('lookupResult').classList.remove('hidden'); $('indivForm').classList.add('hidden'); return;
   }
   const enrolled = isEnrolled(s, subj.slug);
@@ -2641,6 +3003,7 @@ function renderAllStudentsTable(){
     (!filter || (s.id+' '+s.name+' '+s.email).toLowerCase().includes(filter)) && studentPasses(s, 'stu') &&
     (!sf || (sf === '__none' ? !s.subjectIds.some(x => subjectBySlug(x)) : s.subjectIds.includes(sf))));
   $('stuCount').innerHTML = `<b>${rows.length}</b> of ${allStudents.length} student(s)`;
+  $('stuSelectAll').checked = false; setTimeout(() => { if(typeof updateStuDeleteBtn === 'function') updateStuDeleteBtn(); }, 0);
   const body = $('allStudentsBody');
   if(!rows.length){
     body.innerHTML = `<tr><td colspan="11">${allStudents.length ? 'No students match.' : 'No students yet — add some with Bulk import or Add individually.'}</td></tr>`;
@@ -2649,6 +3012,7 @@ function renderAllStudentsTable(){
   const genders = ['', 'Male', 'Female'];
   body.innerHTML = rows.map(s => `
     <tr data-uid="${s.uid}">
+      <td class="chk"><input type="checkbox" class="stuChk"></td>
       <td><input type="text" class="stuIdInput" value="${esc(s.id)}"></td>
       <td><input type="text" class="stuNameInput" value="${esc(s.name)}"></td>
       <td><input type="email" class="stuEmailInput" value="${esc(s.email)}"></td>
@@ -2659,12 +3023,11 @@ function renderAllStudentsTable(){
       <td class="stuSubjCell">${pickerHTML(s.subjectIds)}</td>
       <td class="status"></td>
       <td><button class="btn btn-secondary btn-sm stuSaveBtn" disabled>Save</button></td>
-      <td><button class="btn btn-danger btn-sm stuDeleteBtn" title="Deletes their profile and all results. Does NOT delete their sign-in — remove that separately in Firebase Console → Authentication → Users.">Delete</button></td>
     </tr>`).join('');
 
   body.querySelectorAll('tr[data-uid]').forEach(tr => {
     const uid = tr.dataset.uid;
-    const saveBtn = tr.querySelector('.stuSaveBtn'), deleteBtn = tr.querySelector('.stuDeleteBtn'), statusTd = tr.querySelector('.status');
+    const saveBtn = tr.querySelector('.stuSaveBtn'), statusTd = tr.querySelector('.status');
     const subjCell = tr.querySelector('.stuSubjCell');
     wirePicker(subjCell);
     const read = () => ({
@@ -2701,25 +3064,39 @@ function renderAllStudentsTable(){
         saveBtn.disabled = false; saveBtn.textContent = 'Save'; saveBtn.classList.remove('is-busy');
       }
     });
-    deleteBtn.addEventListener('click', async () => {
-      const rec = studentByUid(uid);
-      const label = rec ? (rec.name || rec.id || uid) : uid;
-      if(!confirm(`Delete ${label}'s profile and all their results? This can't be undone.\n\nNote: this only removes their data — their sign-in (email/password) will still work until you also delete it in Firebase Console → Authentication → Users.`)) return;
-      deleteBtn.disabled = true; saveBtn.disabled = true; deleteBtn.textContent = 'Deleting…'; deleteBtn.classList.add('is-busy');
-      try{
-        const resultsSnap = await getDocs(collection(db, STUDENTS, uid, MODULE_RESULTS));
-        for(const d of resultsSnap.docs) await deleteDoc(d.ref);
-        await deleteDoc(doc(db, STUDENTS, uid));
-        allStudents = allStudents.filter(s => s.uid !== uid);
-        resultsStore.forEach(m => m.delete(uid));
-        renderSideSubjects(); renderAllStudentsTable();
-      }catch(err){
-        statusTd.textContent = err.message || 'Delete failed'; statusTd.className = 'status failed';
-        deleteBtn.disabled = false; saveBtn.disabled = false; deleteBtn.textContent = 'Delete'; deleteBtn.classList.remove('is-busy');
-      }
-    });
   });
 }
+function updateStuDeleteBtn(){
+  const n = $('allStudentsBody').querySelectorAll('.stuChk:checked').length;
+  $('stuDeleteBtn').classList.remove('is-busy'); $('stuDeleteBtn').disabled = !n;
+  $('stuDeleteBtn').textContent = n ? `Delete ${n} selected` : 'Delete selected';
+}
+$('allStudentsBody').addEventListener('change', e => { if(e.target.classList.contains('stuChk')) updateStuDeleteBtn(); });
+$('stuSelectAll').addEventListener('change', e => { $('allStudentsBody').querySelectorAll('.stuChk').forEach(c => c.checked = e.target.checked); updateStuDeleteBtn(); });
+$('stuDeleteBtn').addEventListener('click', async () => {
+  setBox('stuError',''); setBox('stuOk','');
+  const uids = Array.from($('allStudentsBody').querySelectorAll('.stuChk:checked')).map(c => c.closest('tr').dataset.uid);
+  if(!uids.length) return;
+  if(!confirm(`Delete ${uids.length} student profile(s) and all their results? This can't be undone.\n\nNote: this only removes their data — their sign-in (email/password) will still work until you also delete it in Firebase Console → Authentication → Users.`)) return;
+  const btn = $('stuDeleteBtn'); setBusy(btn, true);
+  let done = 0, failed = 0; setProgress('stuDelProgress', 0, uids.length, 'Deleting');
+  for(const uid of uids){
+    try{
+      const resultsSnap = await getDocs(collection(db, STUDENTS, uid, MODULE_RESULTS));
+      for(const d of resultsSnap.docs) await deleteDoc(d.ref);
+      await deleteDoc(doc(db, STUDENTS, uid));
+      allStudents = allStudents.filter(s => s.uid !== uid);
+      resultsStore.forEach(m => m.delete(uid));
+      done++;
+    }catch(err){ failed++; console.error('Delete failed for', uid, err); }
+    setProgress('stuDelProgress', done + failed, uids.length, 'Deleting');
+  }
+  setBusy(btn, false);
+  $('stuSelectAll').checked = false;
+  renderSideSubjects(); renderAllStudentsTable(); updateStuDeleteBtn();
+  if(failed) setBox('stuError', `${done} deleted, ${failed} failed.`);
+  else setBox('stuOk', `Deleted ${done} student(s).`, 'ok');
+});
 $('stuSearch').addEventListener('input', renderAllStudentsTable);
 $('stuSubjFilter').addEventListener('change', renderAllStudentsTable);
 $('stuRefreshBtn').addEventListener('click', async () => { await withBusy($('stuRefreshBtn'), loadAllStudents); refreshUI(); });
@@ -3106,7 +3483,7 @@ function renderOverview(){
   stats.forEach(({s, st}) => {
     if(!s.teacherUid) items.push({slug:s.slug, tab:'settings', name:s.name, text:'No teacher assigned', chip:'warn'});
     if(!(s.components||[]).length) items.push({slug:s.slug, tab:'grading', name:s.name, text:'No grading components', chip:'warn'});
-    if(!st.enrolled) items.push({slug:s.slug, tab:'roster', name:s.name, text:'No students enrolled', chip:'warn'});
+    if(!st.enrolled) items.push({slug:s.slug, tab:'enroll', name:s.name, text:'No students enrolled', chip:'warn'});
     else if(globalLoaded && st.completion !== null && st.completion < 100) items.push({slug:s.slug, tab:'results', name:s.name, text:`${st.enrolled - st.submittedEnrolled} of ${st.enrolled} awaiting results`, chip:''});
     if(globalLoaded && st.unenrolledWithResult) items.push({slug:s.slug, tab:'results', name:s.name, text:`${st.unenrolledWithResult} result(s) from students not enrolled`, chip:'danger'});
   });
@@ -3277,19 +3654,25 @@ onAuthStateChanged(auth, async (user) => {
 // ================================================================
 let adminName = 'Admin';
 function hijriDate(){
-  try{ return new Intl.DateTimeFormat('en-u-ca-islamic-umalqura', {day:'numeric', month:'long', year:'numeric'}).format(new Date()); }
+  try{ return new Intl.DateTimeFormat(lang === 'ar' ? 'ar-SA-u-ca-islamic-umalqura-nu-latn' : 'en-u-ca-islamic-umalqura', {day:'numeric', month:'long', year:'numeric'}).format(new Date()); }
   catch(e){ return ''; }
 }
-function gregDate(){ return new Date().toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long', year:'numeric'}); }
+function gregDate(){
+  try{ return new Date().toLocaleDateString(lang === 'ar' ? 'ar-u-nu-latn' : 'en-GB', {weekday:'long', day:'numeric', month:'long', year:'numeric'}); }
+  catch(e){ return ''; }
+}
 function renderSalam(){
   const h = hijriDate();
   const chip = $('hijriChip'); if(chip) chip.innerHTML = h ? `<i class="fa-solid fa-moon"></i> ${esc(h)}` : '';
   const el = $('salamBar'); if(!el) return;
+  const title = lang === 'ar' ? 'السلام عليكم ورحمة الله وبركاته' : `Welcome back, ${esc(adminName)}`;
+  const sub = lang === 'ar' ? `مرحبًا بك، ${esc(adminName)}` : 'JUmed Admin Console';
   el.innerHTML = `
-    <div class="salam-ar ar">السلام عليكم ورحمة الله وبركاته</div>
-    <div class="salam-en"><b>As-salāmu ʿalaykum, ${esc(adminName)}</b><span>${esc(gregDate())}${h ? ' · ' + esc(h) : ''}</span></div>
-    <div class="salam-verse"><span class="ar">وَقُل رَّبِّ زِدْنِي عِلْمًا</span><small>“My Lord, increase me in knowledge.” — Ṭā-Hā 20:114</small></div>`;
+    <div class="salam-title ${lang === 'ar' ? 'ar' : ''}">${title}</div>
+    <div class="salam-meta"><b>${sub}</b><span>${esc(gregDate())}</span><span>${esc(h)}</span></div>`;
 }
+// initial language
+setLang(lang);
 
 </script>
 </body>
