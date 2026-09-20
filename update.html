@@ -2053,8 +2053,12 @@ async function ensureSubjectResults(slug, force=false){
   if(!subj) return 'cached';
   const p = (async () => {
     const m = new Map(); let firstErr = null;
+    // IMPORTANT: only fetch result documents for students enrolled in THIS subject.
+    // The old code iterated over allStudents, causing every subject opening to
+    // issue one module-result read for every student in the entire school.
+    const enrolled = enrolledStudents(slug);
     let doneCount = 0;
-    for(const group of chunk(allStudents, 30)){
+    for(const group of chunk(enrolled, 30)){
       const pairs = await Promise.all(group.map(async s => {
         try{
           const snap = await getDoc(doc(db, STUDENTS, s.uid, MODULE_RESULTS, slug));
@@ -2062,7 +2066,7 @@ async function ensureSubjectResults(slug, force=false){
         }catch(e){ firstErr = firstErr || e; return [s.uid, null]; }
       }));
       pairs.forEach(([uid, data]) => { if(data) m.set(uid, normResult(data, subj)); });
-      doneCount += group.length; loadProgress(slug, doneCount, allStudents.length);
+      doneCount += group.length; loadProgress(slug, doneCount, enrolled.length);
     }
     if(firstErr) return {error: firstErr};
     resultsStore.set(slug, m);
