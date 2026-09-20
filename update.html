@@ -123,6 +123,11 @@ tr.editing td{background:transparent!important}
 tr.editing .stu-editbtn{background:var(--brand);color:#fff;border-color:var(--brand)}
 tr:not(.editing) .stuSaveBtn{display:none}
 #allStudentsBody td{vertical-align:middle}
+/* keep wide multi-column tables from blowing out mobile width */
+@media(max-width:760px){
+  #ovwBreakdownTable{min-width:0}
+  #ovwBreakdownTable .col-opt{display:none}
+}
 /* compact filters/toolbar — consistent app-wide */
 .toolbar{gap:9px;margin-bottom:13px}
 .toolbar .field,.filter-row .field{min-width:120px}
@@ -1218,8 +1223,8 @@ th.sp-open-cell,td.sp-open-cell{width:46px;padding-inline-end:0!important}
         <div class="card" style="margin-top:14px">
           <p class="card-title" style="margin-bottom:.9rem">Subject breakdown</p>
           <div class="table-scroll">
-            <table>
-              <thead><tr><th>Subject</th><th>Teacher</th><th>Enrolled</th><th>Graded</th><th>Completion</th><th>Avg %</th><th>Median %</th><th>Highest %</th><th>Lowest %</th></tr></thead>
+            <table id="ovwBreakdownTable">
+              <thead><tr><th>Subject</th><th class="col-opt">Teacher</th><th>Enrolled</th><th class="col-opt">Graded</th><th>Completion</th><th>Avg %</th><th class="col-opt">Median %</th><th class="col-opt">Highest %</th><th class="col-opt">Lowest %</th></tr></thead>
               <tbody id="ovwTableBody"><tr><td colspan="9">Loading…</td></tr></tbody>
             </table>
           </div>
@@ -4093,11 +4098,11 @@ function renderOverview(){
   $('ovwTableBody').innerHTML = stats.length ? stats.map(({s, st}) => `
     <tr class="rowlink" data-slug="${esc(s.slug)}">
       <td><b>${esc(s.name)}</b></td>
-      <td>${s.teacherUid ? esc(teacherLabel(s.teacherUid)) : '<span class="chip warn">Unassigned</span>'}</td>
+      <td class="col-opt">${s.teacherUid ? esc(teacherLabel(s.teacherUid)) : '<span class="chip warn">Unassigned</span>'}</td>
       <td class="mono">${st.enrolled}</td>
-      <td class="mono">${globalLoaded ? `${st.submittedEnrolled} / ${st.enrolled}` : '—'}</td>
+      <td class="mono col-opt">${globalLoaded ? `${st.submittedEnrolled} / ${st.enrolled}` : '—'}</td>
       <td>${globalLoaded && st.completion !== null ? st.completion.toFixed(0) + '%' : '—'}</td>
-      <td>${fmtPct(st.avg)}</td><td>${fmtPct(st.median)}</td><td>${fmtPct(st.max)}</td><td>${fmtPct(st.min)}</td>
+      <td>${fmtPct(st.avg)}</td><td class="col-opt">${fmtPct(st.median)}</td><td class="col-opt">${fmtPct(st.max)}</td><td class="col-opt">${fmtPct(st.min)}</td>
     </tr>`).join('') : `<tr><td colspan="9">No subjects yet.</td></tr>`;
   $('ovwTableBody').querySelectorAll('.rowlink').forEach(el => el.addEventListener('click', () => openFrom(el)));
 
@@ -4666,11 +4671,16 @@ async function stampEnrollment(uid, slugs, opts){
   let stored = null; try{ stored = localStorage.getItem('jumedAdminSidebarCollapsed'); }catch(e){}
   if(stored === '1') setCollapsed(true);
   toggleBtn.addEventListener('click', () => setCollapsed(!sidebar.classList.contains('collapsed')));
-  const scrollEl = $('mainScroll'); let hideTimer;
+  const scrollEl = $('mainScroll');
+  let lastY = scrollEl.scrollTop;
   scrollEl.addEventListener('scroll', () => {
     if(window.innerWidth > 860) return;
-    sidebar.classList.add('nav-faded'); clearTimeout(hideTimer);
-    hideTimer = setTimeout(() => sidebar.classList.remove('nav-faded'), 650);
+    const y = Math.max(0, scrollEl.scrollTop);
+    const delta = y - lastY;
+    if(y < 24) sidebar.classList.remove('nav-faded');
+    else if(delta > 4) sidebar.classList.add('nav-faded');
+    else if(delta < -4) sidebar.classList.remove('nav-faded');
+    lastY = y;
   }, {passive:true});
 })();
 
