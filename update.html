@@ -466,6 +466,215 @@ img,svg,canvas{max-width:100%}
 .progress,.ok-box{transition:opacity .45s ease}
 .progress.fade-out,.ok-box.fade-out{opacity:0}
 
+
+/* ================================================================
+   Student profile pages
+   ================================================================ */
+.sp-namelink{color:inherit;font-weight:650;text-decoration:none;border-bottom:1px dashed rgba(23,107,79,.4);transition:color .15s,border-color .15s}
+.sp-namelink:hover,.sp-namelink:focus-visible{color:var(--brand);border-bottom-color:var(--brand);outline:0}
+th.sp-open-cell,td.sp-open-cell{width:46px;padding-inline-end:0!important}
+.sp-mini{display:grid;place-items:center;width:30px;height:30px;border-radius:10px;background:var(--g,#176b4f);color:#fff;font-size:10px;font-weight:800;text-decoration:none;letter-spacing:-.01em;transition:transform .15s,box-shadow .15s}
+.sp-mini:hover,.sp-mini:focus-visible{transform:scale(1.1);box-shadow:0 4px 10px rgba(11,40,30,.25);outline:0}
+
+/* avatar */
+.sp-avatar{--sz:44px;position:relative;display:inline-grid;place-items:center;flex:none;width:var(--sz);height:var(--sz);border-radius:30%;background:var(--g,#176b4f);color:#fff;overflow:hidden}
+.sp-avatar b{font-size:calc(var(--sz) * .36);font-weight:800;letter-spacing:-.03em;line-height:1}
+.sp-avatar img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.sp-avatar.xl{--sz:104px;border-radius:34px;box-shadow:0 0 0 3px #0e3b2c,0 0 0 5px rgba(216,176,82,.9),0 16px 32px rgba(0,0,0,.3)}
+
+/* hero */
+.sp-hero{position:relative;overflow:hidden;border-radius:22px;padding:28px 28px 8px;margin-bottom:18px;color:#dcebe6;background:linear-gradient(135deg,#0a271e 0%,#0f4432 62%,#16694c 145%);box-shadow:0 22px 48px rgba(7,28,21,.16)}
+.sp-hero:before{content:"";position:absolute;width:420px;height:420px;border:1px solid rgba(255,255,255,.08);border-radius:50%;right:-150px;top:-230px;box-shadow:0 0 0 70px rgba(255,255,255,.02),0 0 0 140px rgba(255,255,255,.014);pointer-events:none}
+[dir=rtl] .sp-hero:before{right:auto;left:-150px}
+.sp-hero-row{position:relative;z-index:1;display:flex;gap:26px;align-items:center;flex-wrap:wrap}
+.sp-id{flex:1 1 260px;min-width:0}
+.sp-id h1{margin:0 0 12px;font-size:clamp(1.7rem,3.2vw,2.6rem);letter-spacing:-.05em;line-height:1.05;color:#fff;overflow-wrap:anywhere}
+.sp-chips{display:flex;flex-wrap:wrap;gap:8px}
+.sp-pill{display:inline-flex;align-items:center;gap:8px;padding:6px 13px;border-radius:99px;font-size:12px;font-weight:650;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.15);color:#e6f4ee;line-height:1.3}
+.sp-pill i{font-size:11px;opacity:.85}
+.sp-pill.f{background:rgba(240,150,190,.17);border-color:rgba(246,191,214,.42);color:#ffd9e8}
+.sp-pill.m{background:rgba(120,210,155,.15);border-color:rgba(160,225,185,.4);color:#cbf3d9}
+.sp-pill.dim{background:transparent;border-style:dashed;color:#7fa196;font-weight:500}
+.sp-contact{display:flex;flex-wrap:wrap;gap:6px 22px;margin-top:14px;font-size:12.5px;color:#a9c7bc}
+.sp-contact i{margin-inline-end:8px;color:#d8b052;width:13px;text-align:center}
+.sp-hero-actions{display:flex;gap:8px;align-self:flex-start}
+.sp-ic{width:38px;height:38px;border-radius:11px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.07);color:#e6f4ee;display:grid;place-items:center;cursor:pointer;font-size:13px;transition:background .15s,border-color .15s}
+.sp-ic:hover:not(:disabled),.sp-ic:focus-visible{background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.32);outline:0}
+.sp-ic:disabled{opacity:.3;cursor:default}
+.sp-ic.is-busy i{animation:spSpin .8s linear infinite}
+@keyframes spSpin{to{transform:rotate(360deg)}}
+[dir=rtl] .sp-flip{transform:scaleX(-1)}
+.sp-stats{position:relative;z-index:1;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));margin-top:26px;border-top:1px solid rgba(255,255,255,.11)}
+.sp-stat{padding:18px 18px 20px;border-inline-start:1px solid rgba(255,255,255,.08);min-width:0}
+.sp-stat:first-child{border-inline-start:0;padding-inline-start:0}
+.sp-stat b{display:block;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:24px;line-height:1.1;letter-spacing:-.05em;color:#fff;white-space:nowrap}
+.sp-stat:last-child b{font-size:17px;line-height:1.5;font-family:Inter,system-ui,sans-serif;letter-spacing:-.02em}
+.sp-stat span{display:block;margin-top:6px;font-size:11.5px;line-height:1.4;color:#8fb6a9}
+
+/* tabs & panels */
+.sp-tabs{margin-bottom:18px}
+.sp-tabbtn .sp-count{display:inline-block;margin-inline-start:5px;padding:0 7px;border-radius:99px;background:rgba(23,107,79,.12);color:var(--brand-2);font-size:10px;font-weight:800;line-height:17px}
+.sp-panel{display:none}
+.sp-panel.active{display:block;animation:panelIn .2s ease-out}
+.sp-grid{display:grid;gap:14px;margin-bottom:14px}
+.sp-grid.a{grid-template-columns:repeat(2,minmax(0,1fr))}
+.sp-grid.b{grid-template-columns:repeat(2,minmax(0,1fr))}
+.sp-grid.c{grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);align-items:start}
+.sp-grid>.card,.sp-panel>.card{margin-top:0!important}
+.sp-panel>.card+.card,.sp-mk+.sp-mk{margin-top:14px!important}
+.sp-h{margin:0 0 4px;font-size:.98rem;font-weight:750;letter-spacing:-.02em}
+.sp-sub{margin:0 0 18px;font-size:12px;color:var(--muted);line-height:1.6}
+.sp-note{display:flex;gap:9px;align-items:flex-start;margin:14px 2px 0;font-size:11.5px;line-height:1.6;color:var(--muted)}
+.sp-note i{margin-top:2px;color:var(--faint)}
+.sp-dash{color:var(--faint)}
+.sp-empty{display:grid;justify-items:center;text-align:center;gap:6px;padding:52px 20px;border:1px dashed #c5d2ce;border-radius:18px;background:rgba(255,255,255,.65);color:var(--muted)}
+.sp-empty i{font-size:26px;color:#9fb6ae;margin-bottom:6px}
+.sp-empty b{color:var(--ink);font-size:15px}
+.sp-empty p{margin:0;max-width:44ch;font-size:12.5px;line-height:1.6}
+
+/* summary */
+.sp-donut-wrap{display:flex;gap:26px;align-items:center;flex-wrap:wrap}
+.sp-donut{width:158px;height:158px;flex:none}
+.sp-donut .bg{fill:none;stroke:#efece4;stroke-width:12}
+.sp-donut .fg{fill:none;stroke-width:12;stroke-linecap:round;animation:spDraw .9s cubic-bezier(.2,.8,.2,1)}
+.sp-donut .fg.good{stroke:var(--brand)}.sp-donut .fg.warn{stroke:#d19a2a}.sp-donut .fg.bad{stroke:var(--danger)}
+.sp-donut text{font-family:"JetBrains Mono",ui-monospace,monospace;fill:var(--ink);letter-spacing:-.04em}
+.sp-donut text.sub{font-family:Inter,system-ui,sans-serif;fill:var(--muted);letter-spacing:0}
+@keyframes spDraw{from{stroke-dasharray:0 999}}
+.sp-facts{flex:1 1 200px;min-width:0;margin:0;display:grid;gap:0}
+.sp-facts>div{display:flex;justify-content:space-between;gap:14px;padding:10px 0;border-bottom:1px dashed var(--line);font-size:12.5px}
+.sp-facts>div:last-child{border-bottom:0}
+.sp-facts dt{color:var(--muted)}
+.sp-facts dd{margin:0;font-weight:700;text-align:end;overflow-wrap:anywhere}
+.sp-delta{font-weight:750;white-space:nowrap}.sp-delta.up{color:#1a7a53}.sp-delta.down{color:var(--danger)}
+.sp-bars{display:grid;gap:16px}
+.sp-bar-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:12.5px;margin-bottom:7px}
+.sp-bar-top b{font-weight:650;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sp-bar-top span{font-family:"JetBrains Mono",ui-monospace,monospace;font-weight:700;font-size:12px;white-space:nowrap}
+.sp-bar-top .lbl{font-family:Inter,system-ui,sans-serif;font-weight:500;color:var(--muted)}
+.sp-bar{position:relative;display:block;height:9px;border-radius:99px;background:#f0ede5}
+.sp-bar>i{position:absolute;inset-block:0;inset-inline-start:0;border-radius:99px;background:var(--brand);animation:spGrow .9s cubic-bezier(.2,.8,.2,1)}
+.sp-bar>i.warn{background:#d19a2a}.sp-bar>i.bad{background:var(--danger)}.sp-bar>i.none{background:transparent}
+.sp-bar>em{position:absolute;top:-4px;bottom:-4px;inset-inline-start:calc(var(--avg) * 1%);width:2px;margin-inline-start:-1px;border-radius:2px;background:var(--ink);opacity:.5}
+@keyframes spGrow{from{width:0}}
+.sp-legend{display:inline-flex;align-items:center;gap:8px}
+.sp-legend em{display:inline-block;width:2px;height:12px;background:var(--ink);opacity:.5;border-radius:2px}
+.sp-list{list-style:none;margin:0;padding:0}
+.sp-list li{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+.sp-list li:last-child{border-bottom:0;padding-bottom:0}
+.sp-list .t{flex:1;min-width:0}
+.sp-list .t b{display:block;font-size:13px;font-weight:650;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sp-list .t small{color:var(--muted);font-size:11.5px}
+.sp-score{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;color:var(--muted);white-space:nowrap}
+.sp-pct{display:inline-block;min-width:60px;text-align:center;padding:3px 10px;border-radius:99px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11px;font-weight:700;white-space:nowrap}
+.sp-pct.good{background:var(--brand-soft);color:var(--brand-2)}.sp-pct.warn{background:var(--warn-soft);color:#80520e}.sp-pct.bad{background:var(--danger-soft);color:#9b3030}.sp-pct.none{background:#f6f4f0;color:#7b8a85}
+
+/* ranks — the position track is the main visual */
+.sp-ranks{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:14px}
+.sp-rank{position:relative;background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px 18px 16px;overflow:hidden}
+.sp-rank header{display:flex;gap:11px;align-items:center;margin-bottom:18px}
+.sp-rank header>i{flex:none;width:36px;height:36px;border-radius:12px;display:grid;place-items:center;background:var(--brand-soft);color:var(--brand);font-size:14px}
+.sp-rank header b{display:block;font-size:13px;font-weight:700}
+.sp-rank header span{display:block;font-size:11.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:15ch}
+.sp-rank-num{display:flex;align-items:baseline;gap:9px;margin-bottom:18px}
+.sp-rank-num b{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:42px;line-height:1;letter-spacing:-.06em}
+.sp-rank-num span{color:var(--muted);font-size:13px}
+.sp-rank-why{margin:0;font-size:12px;color:var(--muted);line-height:1.6}
+.sp-rank.off .sp-rank-num b{color:#c5cdc9}
+.sp-trackwrap{direction:ltr}
+.sp-track{position:relative;height:8px;border-radius:99px;background:linear-gradient(to right,#f0d3d0,#f3e6c6 50%,#c6e6d9)}
+.sp-track>i{position:absolute;top:50%;left:calc(var(--pos) * 1%);width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50%;background:var(--brand);border:3px solid #fff;box-shadow:0 2px 7px rgba(11,40,30,.3)}
+.sp-track-ends{display:flex;justify-content:space-between;margin-top:8px;font-size:10.5px;color:var(--faint)}
+.sp-rank footer{display:flex;justify-content:space-between;gap:8px;margin-top:14px;padding-top:12px;border-top:1px dashed var(--line);font-size:11.5px;color:var(--muted)}
+.sp-rank footer b{color:var(--ink);font-weight:750}
+.sp-rank.gold{border-color:#e3c56f;background:linear-gradient(180deg,#fff9ea,#fff 60%)}.sp-rank.gold header>i{background:var(--gold-soft);color:#a87b15}.sp-rank.gold .sp-rank-num b{color:#84600f}.sp-rank.gold .sp-track>i{background:#c99a2e}
+.sp-rank.silver{border-color:#cfd6d3;background:linear-gradient(180deg,#f6f8f7,#fff 60%)}.sp-rank.silver header>i{background:#e9eeec;color:#5d6d68}
+.sp-rank.bronze{border-color:#e2c3a4;background:linear-gradient(180deg,#fdf5ee,#fff 60%)}.sp-rank.bronze header>i{background:#f8e6d5;color:#a4622c}
+.sp-rk{font-family:"JetBrains Mono",ui-monospace,monospace;font-weight:750;white-space:nowrap}
+.sp-rk small{font-weight:500;color:var(--muted);font-size:11px}
+.sp-rk.top1{color:#8a6410}.sp-rk.top2{color:#5d6d68}.sp-rk.top3{color:#a4622c}
+
+/* tables */
+.sp-tbl{width:100%;min-width:640px;border-collapse:collapse;font-size:12.5px;background:transparent}
+.sp-tbl thead th{position:static;text-transform:none;letter-spacing:0;font-size:11.5px;font-weight:650;color:var(--muted);background:#fbfaf7;padding:10px 14px;text-align:start;border-bottom:1px solid var(--line)}
+.sp-tbl tbody td,.sp-tbl tfoot td{padding:12px 14px;border-bottom:1px solid #f1eee7;vertical-align:middle;background:transparent}
+.sp-tbl tbody tr:last-child td{border-bottom:0}
+.sp-tbl tbody tr:hover td{background:#fbfaf7}
+.sp-tbl td.num{font-family:"JetBrains Mono",ui-monospace,monospace;white-space:nowrap}
+.sp-tbl td.num small{color:var(--muted);font-size:11px}
+.sp-tbl tfoot td{font-weight:750;border-top:2px solid var(--line);border-bottom:0;background:#fbfaf7}
+.sp-inbar{display:flex;align-items:center;gap:10px;min-width:150px}
+.sp-inbar .sp-bar{flex:1;height:7px}
+.sp-inbar b{font-weight:700;font-size:12px;min-width:48px;text-align:end}
+.sp-mk-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;margin-bottom:16px}
+.sp-mk-total{display:flex;align-items:center;gap:12px}
+.sp-mk-total b{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:24px;letter-spacing:-.05em}
+.sp-mk-total b small{font-size:13px;color:var(--muted);letter-spacing:0;font-weight:500}
+
+/* subjects */
+.sp-subjs{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.sp-subj{display:flex;flex-direction:column;gap:14px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px}
+.sp-subj-top{display:flex;gap:12px;align-items:center}
+.sp-subj-top .grow{flex:1;min-width:0}
+.sp-subj-top b{display:block;font-size:14px;letter-spacing:-.02em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sp-subj-top small{display:block;color:var(--muted);font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sp-subj-ic{flex:none;width:42px;height:42px;border-radius:13px;background:var(--brand-soft);color:var(--brand-2);display:grid;place-items:center;font-size:12px;font-weight:800}
+.sp-go{flex:none;width:30px;height:30px;border-radius:9px;display:grid;place-items:center;color:var(--muted);text-decoration:none;font-size:12px;border:1px solid var(--line)}
+.sp-go:hover,.sp-go:focus-visible{color:var(--brand);border-color:var(--brand);outline:0}
+.sp-subj-tags{display:flex;gap:6px;flex-wrap:wrap}
+.sp-mini-facts{margin:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding-top:12px;border-top:1px dashed var(--line)}
+.sp-mini-facts dt{font-size:11px;color:var(--muted);margin-bottom:3px}
+.sp-mini-facts dd{margin:0;font-size:12.5px;font-weight:700;font-family:"JetBrains Mono",ui-monospace,monospace;letter-spacing:-.02em;overflow-wrap:anywhere}
+.sp-subj .linkbtn{align-self:flex-start}
+
+/* enrollment metadata */
+.sp-trio{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:14px}
+.sp-mini-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 18px}
+.sp-mini-card span{display:block;font-size:12px;color:var(--muted);margin-bottom:8px}
+.sp-mini-card b{display:block;font-size:18px;letter-spacing:-.03em}
+.sp-mini-card small{display:block;margin-top:4px;font-size:11.5px;color:var(--muted)}
+.sp-ago{color:var(--muted);font-size:11.5px;margin-inline-start:4px}
+.sp-tl{list-style:none;margin:0;padding:0}
+.sp-tl li{position:relative;padding-inline-start:32px;padding-bottom:22px}
+.sp-tl li:last-child{padding-bottom:0}
+.sp-tl li:before{content:"";position:absolute;inset-inline-start:7px;top:20px;bottom:-4px;width:2px;background:var(--line)}
+.sp-tl li:last-child:before{display:none}
+.sp-tl .dot{position:absolute;inset-inline-start:0;top:2px;width:16px;height:16px;border-radius:50%;background:#fff;border:4px solid var(--brand)}
+.sp-tl li.unk .dot{border:2px dashed #b9c3bf}
+.sp-tl li>b{font-size:13.5px;letter-spacing:-.02em}
+.sp-tl .when{margin-top:3px;font-size:12.5px}
+.sp-tl .when small{display:inline;margin:0}
+.sp-tl small{display:block;margin-top:3px;font-size:11.5px;color:var(--muted);line-height:1.55}
+.sp-dl{margin:0}
+.sp-dl>div{display:grid;grid-template-columns:130px minmax(0,1fr);gap:14px;padding:11px 0;border-bottom:1px solid var(--line);font-size:12.5px}
+.sp-dl>div:last-child{border-bottom:0}
+.sp-dl dt{color:var(--muted)}
+.sp-dl dd{margin:0;font-weight:600;overflow-wrap:anywhere}
+.sp-uid{font-size:11px;font-weight:500;color:var(--muted)}
+
+@media(max-width:1180px){.sp-ranks{grid-template-columns:repeat(2,minmax(0,1fr))}.sp-stats{grid-template-columns:repeat(3,minmax(0,1fr))}.sp-stat:nth-child(4){border-inline-start:0;padding-inline-start:0}.sp-stat:nth-child(n+4){border-top:1px solid rgba(255,255,255,.08)}}
+@media(max-width:920px){.sp-grid.a,.sp-grid.b,.sp-grid.c{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:700px){
+  .sp-hero{padding:20px 16px 4px;border-radius:18px}
+  .sp-avatar.xl{--sz:82px;border-radius:28px}
+  .sp-hero-row{gap:18px}
+  .sp-hero-actions{width:100%}
+  .sp-stats{grid-template-columns:repeat(2,minmax(0,1fr));margin-top:20px}
+  .sp-stat{padding:14px 12px}
+  .sp-stat,.sp-stat:nth-child(4),.sp-stat:first-child{border-inline-start:0;padding-inline-start:0}
+  .sp-stat:nth-child(n+3){border-top:1px solid rgba(255,255,255,.08)}
+  .sp-stat:last-child{grid-column:1/-1}
+  .sp-trio{grid-template-columns:minmax(0,1fr)}
+  .sp-ranks{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .sp-rank{padding:14px 14px 12px}
+  .sp-rank-num b{font-size:32px}
+  .sp-rank header span{max-width:11ch}
+  .sp-dl>div{grid-template-columns:105px minmax(0,1fr)}
+  .sp-donut{width:132px;height:132px}
+  .sp-panel>.card,.sp-grid>.card{padding:16px!important}
+}
+@media(max-width:400px){.sp-ranks{grid-template-columns:minmax(0,1fr)}}
+@media(prefers-reduced-motion:reduce){.sp-donut .fg,.sp-bar>i{animation:none}}
 </style>
 <script>try{if(localStorage.getItem("jumedLang")==="ar"){var r=document.documentElement;r.dir="rtl";r.lang="ar";r.classList.add("lang-ar")}}catch(e){}</script>
 </head>
@@ -1028,8 +1237,8 @@ img,svg,canvas{max-width:100%}
               <div class="ok-box" id="stuOk"></div>
               <div class="table-scroll" style="max-height:640px;">
                 <table>
-                  <thead><tr><th class="chk"><input type="checkbox" id="stuSelectAll"></th><th>Name</th><th>Email</th><th>Gender</th><th>Phone</th><th>Department</th><th>Batch</th><th>Subjects</th><th>Status</th><th></th></tr></thead>
-                  <tbody id="allStudentsBody"><tr><td colspan="11">Loading…</td></tr></tbody>
+                  <thead><tr><th class="chk"><input type="checkbox" id="stuSelectAll"></th><th class="sp-open-cell"></th><th>Name</th><th>Email</th><th>Gender</th><th>Phone</th><th>Department</th><th>Batch</th><th>Subjects</th><th>Status</th><th></th></tr></thead>
+                  <tbody id="allStudentsBody"><tr><td colspan="12">Loading…</td></tr></tbody>
                 </table>
               </div>
             </div>
@@ -1111,6 +1320,10 @@ img,svg,canvas{max-width:100%}
     </div>
 
     <!-- ================= SCREEN: Teachers (directory) ================= -->
+    <div class="screen" id="screen-student">
+      <div class="main-scroll"><div id="spRoot"></div></div>
+    </div>
+
     <div class="screen" id="screen-teachers">
       <div class="main-scroll">
         <div class="page-head"><div><p class="page-title">Teachers</p><p class="page-sub">Create teacher accounts. Teachers sign in at teacher.html and only see the subjects assigned to them — assign subjects here or from each subject's Settings.</p></div><div class="page-head-meta">DIRECTORY</div></div>
@@ -1534,7 +1747,7 @@ function createCompEditor(editorEl, totalEl){
 // ================================================================
 // State
 // ================================================================
-let allStudents = []; // [{uid,id,name,email,gender,phone,department,batch,subjectIds}]
+let allStudents = []; // [{uid,id,name,email,gender,phone,department,batch,subjectIds,photo,idConfirmed,createdAt,createdBy,enrollments}]
 let allSubjects = []; // [{slug,name,teacherUid,teacherName,components}]
 let allTeachers = []; // [{uid,name,email,phone}]
 const resultsStore = new Map();   // slug -> Map(uid -> {components,total,complete,maxTotal})
@@ -1569,6 +1782,7 @@ function normResult(data, subj){
     total: resultTotal(data),
     complete: resultComplete(data),
     maxTotal: data.maxTotal || (subj ? maxTotalOf(subj) : null) || null,
+    updatedAt: data.updatedAt || null,
   };
 }
 function resultsKnown(slug){ return globalLoaded || loadedSubjects.has(slug); }
@@ -1625,6 +1839,11 @@ async function loadAllStudents(){
     department: d.data().department || '',
     batch: d.data().batch || '',
     subjectIds: Array.isArray(d.data().subjectIds) ? d.data().subjectIds : [],
+    photo: d.data().photoURL || d.data().avatarUrl || d.data().photo || '',
+    idConfirmed: !!d.data().idConfirmed,
+    createdAt: d.data().createdAt || '',
+    createdBy: d.data().createdBy || '',
+    enrollments: (d.data().enrollments && typeof d.data().enrollments === 'object') ? d.data().enrollments : {},
   }));
   allStudents.sort((a,b) => (a.name||'').localeCompare(b.name||'', undefined, {sensitivity:'base'}));
 }
@@ -1726,7 +1945,7 @@ async function writeResult(uid, subj, row){
     updatedAt: new Date().toISOString(),
   };
   await setDoc(doc(db, STUDENTS, uid, MODULE_RESULTS, subj.slug), docData, {merge:true});
-  storeMap(subj.slug).set(uid, {components: row.components, total: row.total, complete: !!row.complete, maxTotal});
+  storeMap(subj.slug).set(uid, {components: row.components, total: row.total, complete: !!row.complete, maxTotal, updatedAt: docData.updatedAt});
 }
 
 // ---- Enrollment (a student's subjectIds is the source of truth) ----
@@ -1737,8 +1956,19 @@ async function enrollStudents(slug, uids){
     group.forEach(uid => batch.update(doc(db, STUDENTS, uid), { subjectIds: arrayUnion(slug) }));
     await batch.commit();
     group.forEach(uid => { const s = studentByUid(uid); if(s && !s.subjectIds.includes(slug)) s.subjectIds.push(slug); });
+    await stampEnrollmentGroup(group, slug);
   }
   return todo.length;
+}
+// Best-effort: remember when (and by whom) each student was added to a subject.
+async function stampEnrollmentGroup(uids, slug){
+  const now = new Date().toISOString(), by = (auth.currentUser && auth.currentUser.email) || '';
+  try{
+    const b = writeBatch(db);
+    uids.forEach(uid => b.set(doc(db, STUDENTS, uid), {enrollments: {[slug]: {at: now, by}}}, {merge: true}));
+    await b.commit();
+    uids.forEach(uid => { const s = studentByUid(uid); if(s) s.enrollments = Object.assign({}, s.enrollments, {[slug]: {at: now, by}}); });
+  }catch(err){ console.warn('Could not record enrollment dates for', slug, err); }
 }
 async function unenrollStudents(slug, uids){
   const todo = uids.filter(uid => { const s = studentByUid(uid); return s && isEnrolled(s, slug); });
@@ -1820,6 +2050,7 @@ function refreshOptions(){
 function parseRoute(){
   const parts = location.hash.replace(/^#\/?/, '').split('/').filter(Boolean).map(decodeURIComponent);
   const view = parts[0] || 'subjects';
+  if(view === 'students' && parts[1]) return {view:'student', slug:null, uid:parts[1], tab: STU_TABS.includes(parts[2]) ? parts[2] : 'summary'};
   if(view === 'subjects' && parts[1]) return {view:'subject', slug:parts[1], tab: SUB_TABS.includes(parts[2]) ? parts[2] : 'overview'};
   if(['subjects','overview','students','teachers'].includes(view)) return {view, slug:null, tab:'overview'};
   return {view:'subjects', slug:null, tab:'overview'};
@@ -1844,17 +2075,17 @@ let lastRouteKey = '';
 function renderRoute(){
   if(!bootstrapped) return;
   const r = parseRoute();
-  const key = r.view + '/' + (r.slug || '');
+  const key = r.view + '/' + (r.slug || r.uid || '');
   const changedScreen = key !== lastRouteKey;
   lastRouteKey = key;
   Object.assign(route, r);
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   $('screen-' + r.view).classList.add('active');
-  document.querySelectorAll('#sideNav .nav-item[data-route]').forEach(n => n.classList.toggle('active', n.dataset.route === r.view));
+  document.querySelectorAll('#sideNav .nav-item[data-route]').forEach(n => n.classList.toggle('active', n.dataset.route === (r.view === 'student' ? 'students' : r.view)));
   refreshOptions();
   renderSideSubjects();
   if(typeof renderSalam === 'function') renderSalam();
-  const renderers = {subjects: renderSubjectsScreen, subject: renderSubjectScreen, overview: renderOverview, students: renderStudentsScreen, teachers: renderTeachersScreen};
+  const renderers = {subjects: renderSubjectsScreen, subject: renderSubjectScreen, overview: renderOverview, students: renderStudentsScreen, student: renderStudentProfile, teachers: renderTeachersScreen};
   renderers[r.view]();
   if(changedScreen) $('mainScroll').scrollTop = 0;
   if(pendingAfterRoute){ const f = pendingAfterRoute; pendingAfterRoute = null; f(); }
@@ -2509,7 +2740,7 @@ function renderSubOverview(){
   $('ovLeaderBody').innerHTML = top.length ? top.map((r,i) => {
     const s = studentByUid(r.uid) || {};
     const badge = r.complete ? '' : ' <span class="tag partial" title="Not every component has a score yet.">partial</span>';
-    return `<tr><td>${rankBadge(i)}</td><td>${esc(s.name || '(no name)')}${r.enrolled ? '' : ' <span class="chip warn">not enrolled</span>'}</td><td>${genderChip(s.gender)}</td><td>${r.total.toFixed(2)} / ${r.maxTotal}${badge}</td><td>${r.pct.toFixed(1)}%</td></tr>`;
+    return `<tr><td>${rankBadge(i)}</td><td>${stuLink(s.uid, s.name || '(no name)')}${r.enrolled ? '' : ' <span class="chip warn">not enrolled</span>'}</td><td>${genderChip(s.gender)}</td><td>${r.total.toFixed(2)} / ${r.maxTotal}${badge}</td><td>${r.pct.toFixed(1)}%</td></tr>`;
   }).join('') : `<tr><td colspan="5">No results yet.</td></tr>`;
   // awaiting
   const have = new Set(rows.map(r => r.uid));
@@ -2517,7 +2748,7 @@ function renderSubOverview(){
   $('ovMissingHeading').textContent = `Awaiting results (${missing.length})`;
   if(missing.length){
     $('ovMissingWrap').classList.remove('hidden'); setBox('ovMissingOk','');
-    $('ovMissingBody').innerHTML = missing.map(s => `<tr><td>${esc(s.name || '(no name)')}</td><td>${genderChip(s.gender)}</td><td class="mono">${esc(s.email)}</td><td><button class="linkbtn" data-enter="${s.uid}">Enter result</button></td></tr>`).join('');
+    $('ovMissingBody').innerHTML = missing.map(s => `<tr><td>${stuLink(s.uid, s.name || '(no name)')}</td><td>${genderChip(s.gender)}</td><td class="mono">${esc(s.email)}</td><td><button class="linkbtn" data-enter="${s.uid}">Enter result</button></td></tr>`).join('');
     $('ovMissingBody').querySelectorAll('[data-enter]').forEach(b => b.addEventListener('click', () => openIndividual(b.dataset.enter)));
   }else{
     $('ovMissingWrap').classList.add('hidden');
@@ -2536,7 +2767,7 @@ function renderSubOverview(){
     }).filter(Boolean).sort((a,b) => b.raw - a.raw).slice(0, ovTopN);
     const trs = crow.length ? crow.map((r,i) => {
       const s = studentByUid(r.uid) || {};
-      return `<tr><td>${rankBadge(i)}</td><td>${esc(s.name || '(unknown)')}</td><td>${genderChip(s.gender)}</td><td>${r.raw}/${r.max}</td><td>${r.weighted !== null && r.weighted !== undefined ? r.weighted.toFixed(2) : '—'}</td></tr>`;
+      return `<tr><td>${rankBadge(i)}</td><td>${stuLink(s.uid, s.name || '(unknown)')}</td><td>${genderChip(s.gender)}</td><td>${r.raw}/${r.max}</td><td>${r.weighted !== null && r.weighted !== undefined ? r.weighted.toFixed(2) : '—'}</td></tr>`;
     }).join('') : `<tr><td colspan="5">No scores entered yet.</td></tr>`;
     return `<div class="subject-leaderboard-card"><h4 title="${esc(c.label)}">${esc(c.label)}</h4><div class="table-scroll table-compact"><table><thead><tr><th></th><th>Student</th><th>Gender</th><th>Raw</th><th>Weighted</th></tr></thead><tbody>${trs}</tbody></table></div></div>`;
   }).join('') : `<p class="hint" style="margin:0">This subject has no grading components yet — define them in the Grading tab.</p>`;
@@ -2571,7 +2802,7 @@ function renderRoster(){
     const r = m.get(s.uid);
     let resCell = known ? '<span class="chip muted">No result</span>' : '<span class="chip muted">…</span>';
     if(r && r.maxTotal) resCell = `<span class="mono">${(r.total / r.maxTotal * 100).toFixed(1)}%</span>${r.complete ? '' : ' <span class="tag partial">partial</span>'}`;
-    return `<tr data-uid="${s.uid}"><td class="chk"><input type="checkbox" class="enrChk"></td><td>${esc(s.name)}</td><td class="mono">${esc(s.email)}</td><td>${genderChip(s.gender)}</td><td>${esc(s.department || '—')}</td><td>${esc(s.batch || '—')}</td><td>${resCell}</td></tr>`;
+    return `<tr data-uid="${s.uid}"><td class="chk"><input type="checkbox" class="enrChk"></td><td>${stuLink(s.uid, s.name)}</td><td class="mono">${esc(s.email)}</td><td>${genderChip(s.gender)}</td><td>${esc(s.department || '—')}</td><td>${esc(s.batch || '—')}</td><td>${resCell}</td></tr>`;
   }).join('') : `<tr><td colspan="7">${enrolled.length ? 'No enrolled students match that search.' : 'No students enrolled yet — add some in the Enroll tab.'}</td></tr>`;
   updateEnrRemoveBtn();
 }
@@ -2631,7 +2862,7 @@ function renderAddCandidates(){
   const shown = cands.slice(0, 100);
   $('addCount').innerHTML = `${cands.length} student(s) not yet enrolled${cands.length > shown.length ? ` — showing the first ${shown.length}, narrow the filters to see others` : ''}`;
   $('addBody').innerHTML = shown.length ? shown.map(s => `
-    <tr data-uid="${s.uid}"><td class="chk"><input type="checkbox" class="addChk"></td><td>${esc(s.name)}</td><td class="mono">${esc(s.email)}</td><td>${genderChip(s.gender)}</td><td>${esc(s.department || '—')}</td><td>${esc(s.batch || '—')}</td><td>${subjectChips(s.subjectIds, false)}</td></tr>`).join('')
+    <tr data-uid="${s.uid}"><td class="chk"><input type="checkbox" class="addChk"></td><td>${stuLink(s.uid, s.name)}</td><td class="mono">${esc(s.email)}</td><td>${genderChip(s.gender)}</td><td>${esc(s.department || '—')}</td><td>${esc(s.batch || '—')}</td><td>${subjectChips(s.subjectIds, false)}</td></tr>`).join('')
     : `<tr><td colspan="7">${allStudents.length ? 'Nobody left to add with these filters.' : 'No student accounts yet.'}</td></tr>`;
   $('addSelectAll').checked = false;
   updateAddButtons(cands.length);
@@ -2780,7 +3011,7 @@ function renderAllResultsTable(){
     const notEnr = isEnrolled(s, subj.slug) ? '' : ` <button class="chip warn enrollBtn" style="cursor:pointer" title="Enroll this student in ${esc(subj.name)}">not enrolled · enroll</button>`;
     return `
     <tr data-uid="${s.uid}">
-      <td>${esc(s.name)}${notEnr}<div class="subtext">${esc(s.email)}</div></td>
+      <td>${stuLink(s.uid, s.name)}${notEnr}<div class="subtext">${esc(s.email)}</div></td>
       <td>${genderChip(s.gender)}</td>
       ${comps.map(c => `<td><input type="number" step="any" class="resRawInput" data-key="${esc(c.key)}" value="${rawMap[c.key]}"></td>`).join('')}
       <td class="total-cell resTotal">${total}${partial}</td>
@@ -3195,13 +3426,14 @@ function renderAllStudentsTable(){
   $('stuSelectAll').checked = false; setTimeout(() => { if(typeof updateStuDeleteBtn === 'function') updateStuDeleteBtn(); refreshBulkBtn('stu'); }, 0);
   const body = $('allStudentsBody');
   if(!rows.length){
-    body.innerHTML = `<tr><td colspan="11">${allStudents.length ? 'No students match.' : 'No students yet — add some with Bulk import or Add individually.'}</td></tr>`;
+    body.innerHTML = `<tr><td colspan="12">${allStudents.length ? 'No students match.' : 'No students yet — add some with Bulk import or Add individually.'}</td></tr>`;
     return;
   }
   const genders = ['', 'Male', 'Female'];
   body.innerHTML = rows.map(s => `
     <tr data-uid="${s.uid}">
       <td class="chk"><input type="checkbox" class="stuChk"></td>
+      <td class="sp-open-cell"><a class="sp-mini" href="#/students/${encodeURIComponent(s.uid)}" style="--g:${spGrad(s.uid)}" title="${esc(L('Open profile','فتح الملف'))}" aria-label="${esc(L('Open profile','فتح الملف'))}">${esc(initials(s.name))}</a></td>
       <td><input type="text" class="stuNameInput" value="${esc(s.name)}"></td>
       <td><input type="email" class="stuEmailInput" value="${esc(s.email)}"></td>
       <td><select class="stuGenderInput g-${s.gender === 'Female' ? 'f' : s.gender === 'Male' ? 'm' : 'n'}">${genders.map(g => `<option value="${g}" ${s.gender===g?'selected':''}>${g||'—'}</option>`).join('')}</select></td>
@@ -3240,10 +3472,12 @@ function renderAllStudentsTable(){
       const rec = studentByUid(uid);
       const stale = rec ? rec.subjectIds.filter(x => !subjectBySlug(x)) : [];
       const subjectIds = [...subjIds(), ...stale];
+      const addedSlugs = rec ? subjectIds.filter(sl => !rec.subjectIds.includes(sl)) : [];
       saveBtn.disabled = true; saveBtn.textContent = 'Saving…'; saveBtn.classList.add('is-busy'); statusTd.textContent = ''; statusTd.className = 'status';
       try{
         await updateDoc(doc(db, STUDENTS, uid), {...vals, subjectIds});
         if(rec) Object.assign(rec, vals, {subjectIds});
+        if(addedSlugs.length) await stampEnrollment(uid, addedSlugs);
         tr.dataset.orig = snapshot(); tr.classList.remove('dirty');
         statusTd.textContent = 'Saved ✓'; statusTd.className = 'status done'; saveBtn.textContent = 'Save'; saveBtn.classList.remove('is-busy');
         renderSideSubjects();
@@ -3393,12 +3627,16 @@ $('runAcctImportBtn').addEventListener('click', async () => {
         uid = await createAuthUser(r.email, r.password);
         await setDoc(doc(db, STUDENTS, uid), { name: r.name, email: r.email, idConfirmed: false,
           gender: r.gender || '', phone: r.phone || '', department: r.department || '', batch: r.batch || '', subjectIds: r.subjectIds || [] });
+        await stampEnrollment(uid, r.subjectIds || [], {created: true});
       }else{
         // Existing student: only overwrite what the CSV actually supplied; subjects are added, never replaced.
         const upd = { name: r.name };
         ['gender','phone','department','batch'].forEach(k => { if(r[k]) upd[k] = r[k]; });
         if(r.subjectIds && r.subjectIds.length) upd.subjectIds = arrayUnion(...r.subjectIds);
+        const known = studentByUid(uid);
+        const addedSlugs = known ? (r.subjectIds || []).filter(sl => !known.subjectIds.includes(sl)) : [];
         await updateDoc(doc(db, STUDENTS, uid), upd);
+        if(addedSlugs.length) await stampEnrollment(uid, addedSlugs);
       }
       r.status = 'done'; r.existingUid = uid; ok++;
     }catch(err){
@@ -3465,8 +3703,12 @@ $('saveAcctIndivBtn').addEventListener('click', async () => {
     if(!uid){
       uid = await createAuthUser(email, password);
       await setDoc(doc(db, STUDENTS, uid), { name, email, idConfirmed: false, gender, phone, department, batch, subjectIds });
+      await stampEnrollment(uid, subjectIds, {created: true});
     }else{
+      const known = studentByUid(uid);
+      const addedSlugs = known ? subjectIds.filter(sl => !known.subjectIds.includes(sl)) : [];
       await updateDoc(doc(db, STUDENTS, uid), { name, email, gender, phone, department, batch, subjectIds });
+      if(addedSlugs.length) await stampEnrollment(uid, addedSlugs);
     }
     acctIndivState.existingUid = uid; acctIndivState.subjectIds = subjectIds;
     setBox('acctIndivOk', `Saved ${name}'s account.`, 'ok');
@@ -3809,10 +4051,10 @@ function renderOverview(){
   stats.forEach(({st}) => st.rows.forEach(r => { if(!by.has(r.uid)) by.set(r.uid, []); by.get(r.uid).push(r.pct); }));
   const srows = Array.from(by.entries()).map(([uid, pcts]) => {
     const s = studentByUid(uid) || {};
-    return {name: s.name || '(no name)', gender: s.gender || '', count: pcts.length, avg: pcts.reduce((a,b)=>a+b,0)/pcts.length};
+    return {uid, name: s.name || '(no name)', gender: s.gender || '', count: pcts.length, avg: pcts.reduce((a,b)=>a+b,0)/pcts.length};
   }).sort((a,b) => b.avg - a.avg);
   const n = Math.min(ovwTopN, Math.max(1, allStudents.length));
-  const line = (r, rank) => `<tr><td>${rankBadge(rank)}</td><td>${esc(r.name)}</td><td>${genderChip(r.gender)}</td><td>${r.count}</td><td>${r.avg.toFixed(1)}%</td></tr>`;
+  const line = (r, rank) => `<tr><td>${rankBadge(rank)}</td><td>${stuLink(r.uid, r.name)}</td><td>${genderChip(r.gender)}</td><td>${r.count}</td><td>${r.avg.toFixed(1)}%</td></tr>`;
   $('ovwTop').innerHTML = srows.length ? srows.slice(0, n).map((r,i) => line(r, i)).join('') : `<tr><td colspan="5">No results yet.</td></tr>`;
   $('ovwLow').innerHTML = srows.length ? srows.slice(-n).reverse().map((r,i) => line(r, srows.length - 1 - i)).join('') : `<tr><td colspan="5">No results yet.</td></tr>`;
 }
@@ -3831,6 +4073,499 @@ $('ovwRefreshBtn').addEventListener('click', async () => {
 });
 
 // ================================================================
+// STUDENT PROFILE PAGES  —  #/students/<uid>[/<tab>]
+// Everything here reads from state the console already loads
+// (allStudents, allSubjects, resultsStore) — no extra queries except
+// the one-time cohort results load if it has not finished yet.
+// ================================================================
+const STU_TABS = ['summary','ranks','subjects','marks','enrollment'];
+const SP_GRADS = [['#176b4f','#3bab82'],['#0f5a6b','#39a3b8'],['#5b4691','#9a7ad0'],['#a4622c','#dea15e'],['#8a3b5c','#cf6f95'],['#33559a','#6f92d9'],['#4d6b1f','#8db44c'],['#256b63','#5cc1b4']];
+
+// The four groups a student is ranked inside. Batch is the cohort grouping.
+const SP_SCOPES = [
+  {key:'batch',      icon:'fa-users-line',        field:'batch',      test:(o, me) => o.batch === me.batch,
+   title:() => L('Batch rank','الترتيب في الدفعة'),      sub:(me) => L(`Batch ${me.batch}`, `الدفعة ${me.batch}`),
+   missing:() => L('No batch set','لم تُحدَّد دفعة')},
+  {key:'all',        icon:'fa-users',             field:null,         test:() => true,
+   title:() => L('Overall rank','الترتيب العام'),        sub:() => L('All students','كل الطلاب'), missing:() => ''},
+  {key:'gender',     icon:'fa-venus-mars',        field:'gender',     test:(o, me) => o.gender === me.gender,
+   title:() => L('Gender rank','الترتيب حسب الجنس'),     sub:(me) => me.gender === 'Female' ? L('Female students','الطالبات') : L('Male students','الطلاب الذكور'),
+   missing:() => L('No gender set','لم يُحدَّد الجنس')},
+  {key:'department', icon:'fa-building-columns',  field:'department', test:(o, me) => o.department === me.department,
+   title:() => L('Department rank','الترتيب في القسم'),   sub:(me) => me.department, missing:() => L('No department set','لم يُحدَّد قسم')},
+];
+const SP_ALL = SP_SCOPES[1];
+
+// ---------- small helpers ----------
+function spHash(str){ let h = 0; const t = String(str || ''); for(let i = 0; i < t.length; i++) h = (h * 31 + t.charCodeAt(i)) >>> 0; return h; }
+function spGrad(uid){ const g = SP_GRADS[spHash(uid) % SP_GRADS.length]; return `linear-gradient(140deg,${g[0]},${g[1]})`; }
+function spAvatar(s, cls){
+  const photo = /^(https?:|data:image\/)/i.test(s.photo || '') ? s.photo : '';
+  return `<span class="sp-avatar ${cls || ''}" style="--g:${spGrad(s.uid)}">${photo ? `<img src="${esc(photo)}" alt="" referrerpolicy="no-referrer" onerror="this.remove()">` : ''}<b>${esc(initials(s.name))}</b></span>`;
+}
+function stuLink(uid, name){
+  return uid ? `<a class="sp-namelink" href="#/students/${encodeURIComponent(uid)}">${esc(name)}</a>` : esc(name);
+}
+const spPct  = (v) => (v === null || v === undefined || Number.isNaN(v)) ? '—' : v.toFixed(1) + '%';
+const spTrim = (v) => (v === null || v === undefined || Number.isNaN(v)) ? '—' : String(+(+v).toFixed(2));
+const spBand = (p) => (p === null || p === undefined) ? 'none' : p >= 70 ? 'good' : p >= 50 ? 'warn' : 'bad';
+function spOrd(n){
+  if(lang === 'ar') return '#' + n;
+  const m = n % 100; if(m >= 11 && m <= 13) return n + 'th';
+  return n + (['th','st','nd','rd'][n % 10] || 'th');
+}
+function spDate(iso, time){
+  if(!iso) return '';
+  const d = new Date(iso); if(isNaN(d)) return '';
+  const loc = lang === 'ar' ? 'ar-u-nu-latn' : 'en-GB';
+  return d.toLocaleString(loc, time ? {day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'} : {day:'numeric', month:'short', year:'numeric'});
+}
+function spAgo(iso){
+  const d = new Date(iso); if(isNaN(d)) return '';
+  const days = Math.floor((Date.now() - d.getTime()) / 86400000);
+  if(days < 1) return L('today','اليوم');
+  if(days === 1) return L('yesterday','أمس');
+  if(days < 30) return L(`${days} days ago`, `قبل ${days} يومًا`);
+  const mo = Math.floor(days / 30.44);
+  if(mo < 12) return L(`${mo} month${mo > 1 ? 's' : ''} ago`, `قبل ${mo} شهرًا`);
+  const y = Math.floor(days / 365.25);
+  return L(`${y} year${y > 1 ? 's' : ''} ago`, `قبل ${y} سنة`);
+}
+const spNone = () => L('Not recorded','غير مسجَّل');
+const spEnrollOf = (s, slug) => (s.enrollments && s.enrollments[slug]) || null;
+
+// ---------- ranking ----------
+// entries: [{uid, st, v}] — returns this student's place inside the group (ties share a rank).
+function spRankIn(entries, s, sc){
+  if(sc.field && !s[sc.field]) return null;
+  const pool = sc.field ? entries.filter(e => sc.test(e.st, s)) : entries;
+  const me = pool.find(e => e.uid === s.uid); if(!me) return null;
+  let better = 0, sum = 0;
+  for(const e of pool){ if(e.v > me.v + 1e-9) better++; sum += e.v; }
+  return {rank: better + 1, of: pool.length, v: me.v, avg: sum / pool.length};
+}
+const spRanksFor = (entries, s) => SP_SCOPES.map(sc => ({sc, r: spRankIn(entries, s, sc)}));
+
+function spComponents(subj, mine, rows, s){
+  const defs = (subj.components || []).slice();
+  (mine ? mine.components : []).forEach(c => { if(!defs.some(d => d.key === c.key)) defs.push({key:c.key, label:c.label, max:c.max, weight:c.weight}); });
+  return defs.map(d => {
+    const f = mine ? mine.components.find(c => c.key === d.key) : null;
+    const max = (f && f.max !== null && f.max !== undefined) ? +f.max : +d.max;
+    const weight = (f && f.weight !== null && f.weight !== undefined) ? +f.weight : +d.weight;
+    const raw = (f && f.raw !== null && f.raw !== undefined && f.raw !== '') ? +f.raw : null;
+    let weighted = (f && f.weighted !== null && f.weighted !== undefined) ? +f.weighted : null;
+    if(weighted === null && raw !== null && max) weighted = raw / max * weight;
+    const pool = [];
+    rows.forEach(r => {
+      const c = r.components.find(x => x.key === d.key);
+      const cmax = c && c.max !== null && c.max !== undefined ? +c.max : +d.max;
+      if(c && c.raw !== null && c.raw !== undefined && c.raw !== '' && cmax) pool.push({uid:r.uid, st:r.st, v:(+c.raw) / cmax * 100});
+    });
+    return {
+      key:d.key, label:d.label || d.key, max, weight, raw, weighted,
+      pct: raw !== null && max ? raw / max * 100 : null,
+      classAvg: pool.length ? pool.reduce((a, x) => a + x.v, 0) / pool.length : null,
+      rank: raw !== null ? spRankIn(pool, s, SP_ALL) : null,
+    };
+  });
+}
+
+function spModel(s){
+  const byUid = new Map(allStudents.map(x => [x.uid, x]));
+  const subjRows = new Map(), agg = new Map();
+  allSubjects.forEach(subj => {
+    const rows = [], m = resultsStore.get(subj.slug);
+    if(m) m.forEach((r, uid) => {
+      const st = byUid.get(uid);
+      if(!st || r.total === null || r.total === undefined || !r.maxTotal) return;
+      const pct = r.total / r.maxTotal * 100;
+      rows.push({uid, st, v:pct, pct, total:r.total, maxTotal:r.maxTotal, complete:r.complete, components:r.components || [], updatedAt:r.updatedAt || null});
+      const a = agg.get(uid) || {sum:0, n:0}; a.sum += pct; a.n++; agg.set(uid, a);
+    });
+    subjRows.set(subj.slug, rows);
+  });
+  const entries = [];
+  agg.forEach((a, uid) => entries.push({uid, st:byUid.get(uid), v:a.sum / a.n}));
+  const mineAgg = agg.get(s.uid) || null;
+  const enrolledSet = new Set(s.subjectIds || []);
+  const items = [];
+  allSubjects.forEach(subj => {
+    const rows = subjRows.get(subj.slug) || [];
+    const mine = rows.find(r => r.uid === s.uid) || null;
+    const enrolled = enrolledSet.has(subj.slug);
+    if(!enrolled && !mine) return;
+    items.push({
+      subj, enrolled, mine, rows,
+      classAvg: rows.length ? rows.reduce((a, r) => a + r.pct, 0) / rows.length : null,
+      comps: spComponents(subj, mine, rows, s),
+      ranks: mine ? spRanksFor(rows, s) : null,
+      teacher: teacherLabel(subj.teacherUid),
+      enroll: enrolled ? spEnrollOf(s, subj.slug) : null,
+    });
+  });
+  const graded = items.filter(i => i.mine);
+  const stamps = items.filter(i => i.enroll && i.enroll.at).map(i => i.enroll.at).sort();
+  return {
+    items, graded: graded.length,
+    enrolledCount: items.filter(i => i.enrolled).length,
+    avg: mineAgg ? mineAgg.sum / mineAgg.n : null,
+    classMean: entries.length ? entries.reduce((a, e) => a + e.v, 0) / entries.length : null,
+    overall: mineAgg ? spRanksFor(entries, s) : null,
+    points: graded.reduce((a, i) => a + i.mine.total, 0),
+    maxPoints: graded.reduce((a, i) => a + i.mine.maxTotal, 0),
+    doneComps: items.reduce((a, i) => a + i.comps.filter(c => c.raw !== null).length, 0),
+    totalComps: items.reduce((a, i) => a + i.comps.length, 0),
+    firstEnroll: stamps[0] || null, lastEnroll: stamps[stamps.length - 1] || null,
+  };
+}
+
+// ---------- data loading ----------
+let spTried = false, spLoading = false;
+function spEnsureData(){
+  if(globalLoaded || spLoading) return;
+  spLoading = true; spTried = true;
+  (async () => {
+    const err = await loadGlobalResults();
+    if(err){ for(const subj of allSubjects){ try{ await ensureSubjectResults(subj.slug); }catch(e){ /* keep going */ } } }
+  })().finally(() => { spLoading = false; if(bootstrapped && route.view === 'student') renderStudentProfile(); });
+}
+
+// ---------- building blocks ----------
+function spEmpty(icon, title, text){
+  return `<div class="sp-empty"><i class="fa-solid ${icon}"></i><b>${esc(title)}</b><p>${esc(text)}</p></div>`;
+}
+function spLoadingCard(){
+  return `<div class="sp-empty"><i class="fa-solid fa-circle-notch fa-spin"></i><b>${L('Loading results…','جارٍ تحميل النتائج…')}</b><p>${L('Ranks and marks are calculated from every student’s results.','تُحسب الدرجات والترتيب من نتائج جميع الطلاب.')}</p></div>`;
+}
+function spDonut(pct){
+  const r = 54, c = 2 * Math.PI * r, p = Math.max(0, Math.min(100, pct));
+  return `<svg class="sp-donut" viewBox="0 0 140 140" role="img" aria-label="${esc(spPct(pct))}"><circle class="bg" cx="70" cy="70" r="${r}"/><circle class="fg ${spBand(pct)}" cx="70" cy="70" r="${r}" stroke-dasharray="${(c * p / 100).toFixed(1)} ${c.toFixed(1)}" transform="rotate(-90 70 70)"/><text x="70" y="72" text-anchor="middle" font-size="26" font-weight="700">${esc(pct.toFixed(1))}<tspan font-size="14">%</tspan></text><text x="70" y="92" text-anchor="middle" font-size="9.5" class="sub">${esc(L('average','المتوسط'))}</text></svg>`;
+}
+const spPctChip = (p) => `<span class="sp-pct ${spBand(p)}">${spPct(p)}</span>`;
+function spRankCell(r){
+  if(!r) return '<span class="sp-dash">—</span>';
+  const top = r.rank <= 3 && r.of > 1 ? ' top' + r.rank : '';
+  return `<span class="sp-rk${top}">${r.rank}<small> / ${r.of}</small></span>`;
+}
+
+// ---------- hero ----------
+function spHero(s, M){
+  const idx = allStudents.findIndex(x => x.uid === s.uid);
+  const prev = idx > 0 ? allStudents[idx - 1] : null;
+  const next = idx >= 0 && idx < allStudents.length - 1 ? allStudents[idx + 1] : null;
+  const g = s.gender === 'Female' ? 'f' : s.gender === 'Male' ? 'm' : '';
+  const dim = (t) => `<span class="sp-pill dim">${t}</span>`;
+  const pills = [
+    s.department ? `<span class="sp-pill"><i class="fa-solid fa-building-columns"></i>${esc(s.department)}</span>` : dim(L('No department','بلا قسم')),
+    s.batch ? `<span class="sp-pill"><i class="fa-solid fa-users-line"></i>${L('Batch','الدفعة')} ${esc(s.batch)}</span>` : dim(L('No batch','بلا دفعة')),
+    s.gender ? `<span class="sp-pill ${g}"><i class="fa-solid ${g === 'f' ? 'fa-venus' : 'fa-mars'}"></i>${s.gender === 'Female' ? L('Female','أنثى') : L('Male','ذكر')}</span>` : dim(L('No gender','بلا جنس')),
+  ].join('');
+  const contact = [
+    s.email ? `<span><i class="fa-solid fa-envelope"></i>${esc(s.email)}</span>` : '',
+    s.phone ? `<span><i class="fa-solid fa-phone"></i><bdi>${esc(s.phone)}</bdi></span>` : '',
+  ].join('');
+
+  let stats;
+  if(!M){
+    const w = '…';
+    stats = [[w, L('Average','المتوسط')], [w, L('Overall rank','الترتيب العام')], [w, L('Subjects graded','مواد لها نتائج')], [w, L('Scores entered','درجات مُدخلة')]];
+  }else{
+    const all = M.overall ? M.overall.find(x => x.sc.key === 'all').r : null;
+    stats = [
+      [M.avg !== null ? spPct(M.avg) : '—', M.graded ? L(`Average across ${M.graded} subject${M.graded > 1 ? 's' : ''}`, `المتوسط عبر ${N(M.graded, 'subject')}`) : L('No results yet','لا نتائج بعد')],
+      [all ? `${spOrd(all.rank)} / ${all.of}` : '—', L('Rank among all students','الترتيب بين كل الطلاب')],
+      [`${M.graded} / ${M.items.length}`, L('Subjects graded','مواد لها نتائج')],
+      [`${M.doneComps} / ${M.totalComps}`, L('Scores entered','درجات مُدخلة')],
+    ];
+  }
+  const joinIso = s.createdAt || (M && M.firstEnroll) || '';
+  stats.push([joinIso ? spDate(joinIso) : '—', joinIso ? (s.createdAt ? L('Account created','إنشاء الحساب') : L('First enrolled','أول تسجيل')) : L('Enrollment date not recorded','تاريخ التسجيل غير مسجَّل')]);
+
+  const nav = (st, dir) => st
+    ? `<button class="sp-ic" data-sp-go="${esc(st.uid)}" title="${esc(st.name)}" aria-label="${esc(dir === 'p' ? L('Previous student','الطالب السابق') : L('Next student','الطالب التالي'))}"><i class="fa-solid fa-chevron-${dir === 'p' ? 'left' : 'right'} sp-flip"></i></button>`
+    : `<button class="sp-ic" disabled aria-hidden="true"><i class="fa-solid fa-chevron-${dir === 'p' ? 'left' : 'right'} sp-flip"></i></button>`;
+
+  return `
+  <section class="sp-hero">
+    <div class="sp-hero-row">
+      ${spAvatar(s, 'xl')}
+      <div class="sp-id">
+        <h1>${esc(s.name || s.email || L('Unnamed student','طالب بلا اسم'))}</h1>
+        <div class="sp-chips">${pills}</div>
+        <div class="sp-contact">${contact}</div>
+      </div>
+      <div class="sp-hero-actions">
+        ${nav(prev, 'p')}${nav(next, 'n')}
+        <button class="sp-ic" data-sp-refresh title="${esc(L('Reload results','إعادة تحميل النتائج'))}" aria-label="${esc(L('Reload results','إعادة تحميل النتائج'))}"><i class="fa-solid fa-rotate"></i></button>
+        <button class="sp-ic" data-sp-edit title="${esc(L('Edit in the directory','التعديل في الدليل'))}" aria-label="${esc(L('Edit in the directory','التعديل في الدليل'))}"><i class="fa-solid fa-pen"></i></button>
+      </div>
+    </div>
+    <div class="sp-stats">${stats.map(x => `<div class="sp-stat"><b>${esc(x[0])}</b><span>${esc(x[1])}</span></div>`).join('')}</div>
+  </section>`;
+}
+
+// ---------- Summary tab ----------
+function spSummary(s, M){
+  if(!M) return spLoadingCard();
+  if(!M.graded) return spEmpty('fa-chart-simple', L('No results yet','لا توجد نتائج بعد'), L('Scores appear here as soon as a teacher enters them for this student.','ستظهر الدرجات هنا بمجرد أن يدخلها المعلم لهذا الطالب.'));
+  const graded = M.items.filter(i => i.mine).sort((a, b) => b.mine.pct - a.mine.pct);
+  const best = graded[0], low = graded.length > 1 ? graded[graded.length - 1] : null;
+  const diff = M.classMean !== null ? M.avg - M.classMean : null;
+  const facts = [
+    [L('Subjects graded','مواد لها نتائج'), `${graded.length} ${L('of','من')} ${M.items.length}`],
+    [L('Points earned','النقاط المكتسبة'), `${spTrim(M.points)} / ${spTrim(M.maxPoints)}`],
+    diff !== null ? [L('Versus all students','مقارنة بكل الطلاب'), `<span class="sp-delta ${diff >= 0 ? 'up' : 'down'}"><i class="fa-solid fa-caret-${diff >= 0 ? 'up' : 'down'}"></i> ${Math.abs(diff).toFixed(1)} ${L('pts','نقطة')}</span>`] : null,
+    [L('Strongest subject','أقوى مادة'), `${esc(best.subj.name)} · ${spPct(best.mine.pct)}`],
+    low ? [L('Lowest subject','أضعف مادة'), `${esc(low.subj.name)} · ${spPct(low.mine.pct)}`] : null,
+  ].filter(Boolean);
+
+  const bars = graded.map(i => {
+    const p = Math.max(0, Math.min(100, i.mine.pct));
+    const tick = i.classAvg !== null ? `<em style="--avg:${Math.max(0, Math.min(100, i.classAvg)).toFixed(1)}"></em>` : '';
+    return `<div class="sp-bar-row"><div class="sp-bar-top"><b>${esc(i.subj.name)}</b><span>${spPct(i.mine.pct)}</span></div>
+      <div class="sp-bar" title="${esc(L('Class average','متوسط الصف'))} ${esc(spPct(i.classAvg))}"><i class="${spBand(i.mine.pct)}" style="width:${p.toFixed(1)}%"></i>${tick}</div></div>`;
+  }).join('');
+
+  const flat = [];
+  M.items.forEach(i => i.comps.forEach(c => { if(c.pct !== null) flat.push({c, subject:i.subj.name}); }));
+  flat.sort((a, b) => b.c.pct - a.c.pct);
+  let hi = [], lo = [];
+  if(flat.length >= 2){ const k = Math.min(4, Math.floor(flat.length / 2)); hi = flat.slice(0, k); lo = flat.slice(-k).reverse(); }
+  const li = (x) => `<li><div class="t"><b>${esc(x.c.label)}</b><small>${esc(x.subject)}</small></div><span class="sp-score">${spTrim(x.c.raw)} / ${spTrim(x.c.max)}</span>${spPctChip(x.c.pct)}</li>`;
+
+  return `
+  <div class="sp-grid a">
+    <section class="card">
+      <h3 class="sp-h">${L('Overall performance','الأداء العام')}</h3>
+      <p class="sp-sub">${L('Average of the percentage scored in every subject with a result.','متوسط النسبة المئوية في كل مادة لها نتيجة.')}</p>
+      <div class="sp-donut-wrap">${spDonut(M.avg)}<dl class="sp-facts">${facts.map(f => `<div><dt>${f[0]}</dt><dd>${f[1]}</dd></div>`).join('')}</dl></div>
+    </section>
+    <section class="card">
+      <h3 class="sp-h">${L('Score by subject','الدرجة في كل مادة')}</h3>
+      <p class="sp-sub"><span class="sp-legend"><em></em>${L('The tick marks the class average.','العلامة تمثّل متوسط الصف.')}</span></p>
+      <div class="sp-bars">${bars}</div>
+    </section>
+  </div>
+  ${hi.length ? `<div class="sp-grid b">
+    <section class="card"><h3 class="sp-h">${L('Strongest assessments','أقوى التقييمات')}</h3><p class="sp-sub">${L('Best scores across all subjects.','أعلى الدرجات عبر كل المواد.')}</p><ul class="sp-list">${hi.map(li).join('')}</ul></section>
+    <section class="card"><h3 class="sp-h">${L('Needs attention','يحتاج إلى متابعة')}</h3><p class="sp-sub">${L('Lowest scores across all subjects.','أدنى الدرجات عبر كل المواد.')}</p><ul class="sp-list">${lo.map(li).join('')}</ul></section>
+  </div>` : ''}`;
+}
+
+// ---------- Ranks tab ----------
+function spRankCard(sc, s, r, hasResults){
+  const head = `<header><i class="fa-solid ${sc.icon}"></i><div><b>${esc(sc.title())}</b><span>${esc(sc.field && !s[sc.field] ? sc.missing() : sc.sub(s))}</span></div></header>`;
+  if(!r){
+    const why = (sc.field && !s[sc.field]) ? L('Set it in the directory to rank this group.','حدّده في الدليل ليُحتسب الترتيب.') : (hasResults ? '' : L('Ranks start once a result is recorded.','يبدأ الترتيب بعد تسجيل أول نتيجة.'));
+    return `<article class="sp-rank off">${head}<div class="sp-rank-num"><b>—</b></div><p class="sp-rank-why">${esc(why)}</p></article>`;
+  }
+  const pos = r.of > 1 ? (r.of - r.rank) / (r.of - 1) * 100 : 100;
+  const topPct = Math.max(1, Math.ceil(r.rank / r.of * 100));
+  const medal = r.of > 1 && r.rank <= 3 ? ['gold','silver','bronze'][r.rank - 1] : '';
+  return `<article class="sp-rank ${medal}">${head}
+    <div class="sp-rank-num"><b>${esc(spOrd(r.rank))}</b><span>${L('of','من')} ${r.of}</span></div>
+    <div class="sp-trackwrap"><div class="sp-track" style="--pos:${pos.toFixed(1)}"><i></i></div><div class="sp-track-ends"><span>${L('Lowest','الأدنى')}</span><span>${L('Highest','الأعلى')}</span></div></div>
+    <footer><span><b>${L(`Top ${topPct}%`, `أعلى ${topPct}٪`)}</b></span><span>${L('Group average','متوسط المجموعة')} <bdi>${spPct(r.avg)}</bdi></span></footer></article>`;
+}
+function spRanks(s, M){
+  if(!M) return spLoadingCard();
+  const cards = SP_SCOPES.map(sc => { const o = M.overall ? M.overall.find(x => x.sc.key === sc.key) : null; return spRankCard(sc, s, o ? o.r : null, !!M.overall); }).join('');
+  const rows = M.items.filter(i => i.mine).map(i => `<tr>
+      <td><b>${esc(i.subj.name)}</b></td><td class="num">${spPctChip(i.mine.pct)}</td>
+      ${i.ranks.map(x => `<td class="num">${spRankCell(x.r)}</td>`).join('')}</tr>`).join('');
+  return `
+  <div class="sp-ranks">${cards}</div>
+  <section class="card">
+    <h3 class="sp-h">${L('Rank in each subject','الترتيب في كل مادة')}</h3>
+    <p class="sp-sub">${L('Place among the students who have a result in that subject.','المركز بين الطلاب الذين لديهم نتيجة في المادة.')}</p>
+    ${rows ? `<div class="table-scroll"><table class="sp-tbl"><thead><tr><th>${L('Subject','المادة')}</th><th>${L('Score','الدرجة')}</th>${SP_SCOPES.map(sc => `<th>${esc(sc.key === 'all' ? L('All students','الكل') : sc.key === 'batch' ? L('Batch','الدفعة') : sc.key === 'gender' ? L('Gender','الجنس') : L('Department','القسم'))}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>`
+      : `<p class="sp-sub" style="margin:0">${L('No subject results yet.','لا توجد نتائج في المواد بعد.')}</p>`}
+  </section>
+  <p class="sp-note"><i class="fa-solid fa-circle-info"></i>${L('Overall ranks use each student’s average percentage across the subjects that have a result. Students with the same average share a rank.','يعتمد الترتيب العام على متوسط النسبة المئوية لكل طالب في المواد التي لها نتائج. الطلاب ذوو المتوسط نفسه يشتركون في المركز.')}</p>`;
+}
+
+// ---------- Subjects tab ----------
+function spSubjects(s, M){
+  if(!M) return spLoadingCard();
+  if(!M.items.length) return spEmpty('fa-book-medical', L('Not enrolled yet','غير مسجَّل بعد'), L('Enroll this student in a subject from the directory or from a subject’s Enroll tab.','سجّل هذا الطالب في مادة من الدليل أو من تبويب التسجيل في المادة.'));
+  const cards = M.items.map(i => {
+    const st = i.mine ? (i.mine.complete ? `<span class="chip">${L('Graded','مُقيَّمة')}</span>` : `<span class="chip warn">${L('Partial','جزئية')}</span>`) : `<span class="chip muted">${L('No result yet','لا نتيجة بعد')}</span>`;
+    const notEnr = i.enrolled ? '' : `<span class="chip warn">${L('Not enrolled','غير مسجَّل')}</span>`;
+    const done = i.comps.filter(c => c.raw !== null).length;
+    const p = i.mine ? Math.max(0, Math.min(100, i.mine.pct)) : 0;
+    const rk = i.ranks ? i.ranks.find(x => x.sc.key === 'all').r : null;
+    const enr = i.enroll && i.enroll.at ? spDate(i.enroll.at) : (i.enrolled ? spNone() : '—');
+    return `<article class="sp-subj">
+      <div class="sp-subj-top"><span class="sp-subj-ic">${esc(initials(i.subj.name))}</span>
+        <div class="grow"><b>${esc(i.subj.name)}</b><small>${i.teacher ? esc(i.teacher) : L('No teacher assigned','لا يوجد معلم')}</small></div>
+        <a class="sp-go" href="#/subjects/${encodeURIComponent(i.subj.slug)}/overview" title="${esc(L('Open subject','فتح المادة'))}"><i class="fa-solid fa-arrow-up-right-from-square"></i></a></div>
+      <div class="sp-subj-tags">${st}${notEnr}</div>
+      <div><div class="sp-bar-top"><span class="lbl">${L('Score','الدرجة')}</span><span>${i.mine ? `${spTrim(i.mine.total)} / ${spTrim(i.mine.maxTotal)} · ${spPct(i.mine.pct)}` : '—'}</span></div>
+        <div class="sp-bar"><i class="${spBand(i.mine ? i.mine.pct : null)}" style="width:${p.toFixed(1)}%"></i></div></div>
+      <dl class="sp-mini-facts">
+        <div><dt>${L('Assessments','التقييمات')}</dt><dd>${done} / ${i.comps.length}</dd></div>
+        <div><dt>${L('Rank','الترتيب')}</dt><dd>${rk ? `${rk.rank} / ${rk.of}` : '—'}</dd></div>
+        <div><dt>${L('Enrolled','التسجيل')}</dt><dd>${esc(enr)}</dd></div>
+      </dl>
+      <button class="linkbtn" data-sp-tab="marks">${L('See marks','عرض الدرجات')}</button>
+    </article>`;
+  }).join('');
+  return `<div class="sp-subjs">${cards}</div>`;
+}
+
+// ---------- Marks tab ----------
+function spMarks(s, M){
+  if(!M) return spLoadingCard();
+  if(!M.items.length) return spEmpty('fa-list-check', L('No subjects yet','لا توجد مواد بعد'), L('Marks are listed per subject once the student is enrolled.','تُعرض الدرجات لكل مادة بعد تسجيل الطالب.'));
+  return M.items.map(i => {
+    const m = i.mine;
+    const rk = i.ranks ? i.ranks.find(x => x.sc.key === 'all').r : null;
+    const rows = i.comps.map(c => {
+      const d = (c.pct !== null && c.classAvg !== null) ? c.pct - c.classAvg : null;
+      return `<tr>
+        <td><b>${esc(c.label)}</b></td>
+        <td class="num">${c.raw !== null ? `${spTrim(c.raw)} <small>/ ${spTrim(c.max)}</small>` : '<span class="sp-dash">—</span>'}</td>
+        <td class="num">${spTrim(c.weight)}</td>
+        <td class="num">${c.weighted !== null ? `${spTrim(c.weighted)} <small>/ ${spTrim(c.weight)}</small>` : '<span class="sp-dash">—</span>'}</td>
+        <td>${c.pct !== null ? `<div class="sp-inbar"><span class="sp-bar"><i class="${spBand(c.pct)}" style="width:${Math.min(100, c.pct).toFixed(1)}%"></i></span><b class="num">${spPct(c.pct)}</b></div>` : '<span class="sp-dash">—</span>'}</td>
+        <td class="num">${c.classAvg !== null ? spPct(c.classAvg) : '—'}${d !== null ? ` <span class="sp-delta ${d >= 0 ? 'up' : 'down'}" title="${esc(d >= 0 ? L('Above the class average','أعلى من متوسط الصف') : L('Below the class average','أدنى من متوسط الصف'))}"><i class="fa-solid fa-caret-${d >= 0 ? 'up' : 'down'}"></i></span>` : ''}</td>
+        <td class="num">${spRankCell(c.rank)}</td></tr>`;
+    }).join('');
+    const foot = m ? `<tfoot><tr><td>${L('Total','المجموع')}</td><td></td><td class="num">${spTrim(m.maxTotal)}</td><td class="num">${spTrim(m.total)} <small>/ ${spTrim(m.maxTotal)}</small></td><td class="num">${spPct(m.pct)}</td><td class="num">${spPct(i.classAvg)}</td><td class="num">${spRankCell(rk)}</td></tr></tfoot>` : '';
+    return `<section class="card sp-mk">
+      <header class="sp-mk-head">
+        <div><h3 class="sp-h">${esc(i.subj.name)}</h3><p class="sp-sub" style="margin:0">${i.teacher ? esc(i.teacher) + ' · ' : ''}${i.comps.length} ${L(i.comps.length === 1 ? 'assessment' : 'assessments', 'تقييم')}${i.enrolled ? '' : ` · <span class="chip warn">${L('Not enrolled','غير مسجَّل')}</span>`}${m && !m.complete ? ` · <span class="chip warn">${L('Partial result','نتيجة جزئية')}</span>` : ''}</p></div>
+        <div class="sp-mk-total">${m ? `<b>${spTrim(m.total)}<small> / ${spTrim(m.maxTotal)}</small></b>${spPctChip(m.pct)}` : `<span class="chip muted">${L('No result yet','لا نتيجة بعد')}</span>`}</div>
+      </header>
+      ${i.comps.length ? `<div class="table-scroll"><table class="sp-tbl"><thead><tr><th>${L('Assessment','التقييم')}</th><th>${L('Score','الدرجة')}</th><th>${L('Weight','الوزن')}</th><th>${L('Points','النقاط')}</th><th>${L('Percent','النسبة')}</th><th>${L('Class average','متوسط الصف')}</th><th>${L('Rank','الترتيب')}</th></tr></thead><tbody>${rows}</tbody>${foot}</table></div>`
+        : `<p class="sp-sub" style="margin:0">${L('This subject has no assessments defined yet.','لم تُحدَّد تقييمات لهذه المادة بعد.')}</p>`}
+    </section>`;
+  }).join('');
+}
+
+// ---------- Enrollment tab (metadata) ----------
+function spEnrollment(s, M){
+  const when = (iso, time) => iso ? `${esc(spDate(iso, time))} <small class="sp-ago">${esc(spAgo(iso))}</small>` : `<span class="sp-dash">${esc(spNone())}</span>`;
+  const first = M && M.firstEnroll, last = M && M.lastEnroll;
+  const enrolledItems = M ? M.items.filter(i => i.enrolled) : allSubjects.filter(x => (s.subjectIds || []).includes(x.slug)).map(x => ({subj:x, enroll:spEnrollOf(s, x.slug), teacher:teacherLabel(x.teacherUid), mine:null, enrolled:true}));
+  const rec = enrolledItems.filter(i => i.enroll && i.enroll.at).sort((a, b) => a.enroll.at.localeCompare(b.enroll.at));
+  const unk = enrolledItems.filter(i => !(i.enroll && i.enroll.at));
+  const node = (i, known) => `<li class="${known ? '' : 'unk'}"><i class="dot"></i>
+      <b><a class="sp-namelink" href="#/subjects/${encodeURIComponent(i.subj.slug)}/overview">${esc(i.subj.name)}</a></b>
+      <div class="when">${known ? when(i.enroll.at, true) : `<span class="sp-dash">${esc(L('Date not recorded — enrolled before tracking began','التاريخ غير مسجَّل — التسجيل سابق لبدء التتبّع'))}</span>`}</div>
+      <small>${known && i.enroll.by ? esc(L('Enrolled by', 'سجّله')) + ' ' + esc(i.enroll.by) + ' · ' : ''}${i.teacher ? esc(i.teacher) : esc(L('No teacher assigned','لا يوجد معلم'))}${i.mine && i.mine.updatedAt ? ' · ' + esc(L('Result updated','آخر تحديث للنتيجة')) + ' ' + esc(spDate(i.mine.updatedAt, true)) : ''}</small></li>`;
+  const tl = enrolledItems.length ? `<ol class="sp-tl">${rec.map(i => node(i, true)).join('')}${unk.map(i => node(i, false)).join('')}</ol>`
+    : `<p class="sp-sub" style="margin:0">${L('Not enrolled in any subject yet.','غير مسجَّل في أي مادة بعد.')}</p>`;
+  const yes = `<span class="chip">${L('Confirmed','مؤكَّدة')}</span>`, no = `<span class="chip muted">${L('Not confirmed','غير مؤكَّدة')}</span>`;
+  const dl = [
+    [L('Account created','إنشاء الحساب'), when(s.createdAt, true)],
+    [L('Created by','أنشأه'), s.createdBy ? esc(s.createdBy) : `<span class="sp-dash">${esc(spNone())}</span>`],
+    [L('Student ID','معرّف الطالب'), `<span class="mono sp-uid">${esc(s.uid)}</span>`],
+    [L('Email','البريد الإلكتروني'), s.email ? esc(s.email) : '—'],
+    [L('Phone','الهاتف'), s.phone ? `<bdi>${esc(s.phone)}</bdi>` : '—'],
+    [L('Department','القسم'), s.department ? esc(s.department) : '—'],
+    [L('Batch','الدفعة'), s.batch ? esc(s.batch) : '—'],
+    [L('Gender','الجنس'), s.gender ? esc(s.gender === 'Female' ? L('Female','أنثى') : L('Male','ذكر')) : '—'],
+    [L('ID confirmed','تأكيد الهوية'), s.idConfirmed ? yes : no],
+  ];
+  return `
+  <div class="sp-trio">
+    <div class="sp-mini-card"><span>${L('Account created','إنشاء الحساب')}</span><b>${s.createdAt ? esc(spDate(s.createdAt)) : '—'}</b><small>${s.createdAt ? esc(spAgo(s.createdAt)) : esc(spNone())}</small></div>
+    <div class="sp-mini-card"><span>${L('First enrolled','أول تسجيل')}</span><b>${first ? esc(spDate(first)) : '—'}</b><small>${first ? esc(spAgo(first)) : esc(spNone())}</small></div>
+    <div class="sp-mini-card"><span>${L('Latest enrollment','آخر تسجيل')}</span><b>${last ? esc(spDate(last)) : '—'}</b><small>${last ? esc(spAgo(last)) : esc(spNone())}</small></div>
+  </div>
+  <div class="sp-grid c">
+    <section class="card"><h3 class="sp-h">${L('Enrollment timeline','الجدول الزمني للتسجيل')}</h3><p class="sp-sub">${L('When each subject was added to this student, oldest first.','متى أُضيفت كل مادة لهذا الطالب، من الأقدم.')}</p>${tl}</section>
+    <section class="card"><h3 class="sp-h">${L('Account details','بيانات الحساب')}</h3><p class="sp-sub">${L('Identity and contact record for this student.','سجل الهوية والتواصل لهذا الطالب.')}</p><dl class="sp-dl">${dl.map(r => `<div><dt>${r[0]}</dt><dd>${r[1]}</dd></div>`).join('')}</dl></section>
+  </div>
+  ${unk.length || !s.createdAt ? `<p class="sp-note"><i class="fa-solid fa-circle-info"></i>${L('Dates are recorded from now on, when an account is created or a subject is added. Earlier activity shows as not recorded.','تُسجَّل التواريخ من الآن فصاعدًا عند إنشاء الحساب أو إضافة مادة. النشاط السابق يظهر بوصفه غير مسجَّل.')}</p>` : ''}`;
+}
+
+// ---------- page ----------
+function renderStudentProfile(){
+  const root = $('spRoot'); if(!root) return;
+  const s = studentByUid(route.uid);
+  if(!s){
+    root.innerHTML = `<div class="crumbs"><a href="#/students"><i class="fa-solid fa-arrow-left sp-flip"></i> ${L('Students','الطلاب')}</a></div>` +
+      spEmpty('fa-user-slash', L('Student not found','الطالب غير موجود'), L('This profile may have been deleted, or the link is out of date.','ربما حُذف هذا الملف أو أن الرابط قديم.'));
+    return;
+  }
+  const ready = globalLoaded || spTried;
+  if(!ready) spEnsureData();
+  const M = (globalLoaded || (ready && !spLoading)) ? spModel(s) : null;
+  const tab = STU_TABS.includes(route.tab) ? route.tab : 'summary';
+  route.tab = tab;
+  const defs = [
+    ['summary','fa-chart-simple', L('Summary','الملخص'), ''],
+    ['ranks','fa-trophy', L('Ranks','الترتيب'), ''],
+    ['subjects','fa-book-medical', L('Subjects','المواد'), M ? M.items.length : (s.subjectIds || []).length],
+    ['marks','fa-list-check', L('Marks','الدرجات'), ''],
+    ['enrollment','fa-clock-rotate-left', L('Enrollment','التسجيل'), ''],
+  ];
+  const body = {summary:spSummary, ranks:spRanks, subjects:spSubjects, marks:spMarks, enrollment:spEnrollment};
+  const warn = (M && !globalLoaded) ? `<div class="warn-box show" style="margin-bottom:14px">${L('Some results could not be loaded, so ranks may be incomplete. Try reloading.','تعذّر تحميل بعض النتائج، لذا قد يكون الترتيب ناقصًا. جرّب إعادة التحميل.')}</div>` : '';
+  root.innerHTML = `
+    <div class="crumbs"><a href="#/students"><i class="fa-solid fa-arrow-left sp-flip"></i> ${L('Students','الطلاب')}</a><span>/</span><b>${esc(s.name || s.email)}</b></div>
+    ${spHero(s, M)}
+    <div class="tabs sp-tabs" role="tablist">${defs.map(d => `<button class="tab-btn sp-tabbtn ${d[0] === tab ? 'active' : ''}" role="tab" data-sp-tab="${d[0]}"><i class="fa-solid ${d[1]}"></i> ${d[2]}${d[3] !== '' ? ` <span class="sp-count">${d[3]}</span>` : ''}</button>`).join('')}</div>
+    ${warn}
+    ${defs.map(d => `<div class="sp-panel ${d[0] === tab ? 'active' : ''}" data-panel="${d[0]}" role="tabpanel">${body[d[0]](s, M)}</div>`).join('')}`;
+}
+function spActivate(tab){
+  if(!STU_TABS.includes(tab)) tab = 'summary';
+  route.tab = tab;
+  const root = $('spRoot');
+  root.querySelectorAll('.sp-tabbtn').forEach(b => b.classList.toggle('active', b.dataset.spTab === tab));
+  root.querySelectorAll('.sp-panel').forEach(p => p.classList.toggle('active', p.dataset.panel === tab));
+  try{ history.replaceState(null, '', '#/students/' + encodeURIComponent(route.uid) + '/' + tab); }catch(e){}
+}
+$('spRoot').addEventListener('click', async (e) => {
+  const t = e.target.closest('[data-sp-tab]');
+  if(t){ spActivate(t.dataset.spTab); return; }
+  const g = e.target.closest('[data-sp-go]');
+  if(g){ go('students/' + encodeURIComponent(g.dataset.spGo) + '/' + route.tab); return; }
+  if(e.target.closest('[data-sp-edit]')){
+    const s = studentByUid(route.uid); if(!s) return;
+    go('students', () => { $('stuSearch').value = s.email || s.name; $('stuSubjFilter').value = ''; clearStudentFilters('stu'); renderAllStudentsTable(); });
+    return;
+  }
+  const r = e.target.closest('[data-sp-refresh]');
+  if(r){
+    setBusy(r, true);
+    try{ await loadAllStudents(); await loadGlobalResults(true); spTried = true; }catch(err){ console.error('Profile reload failed', err); }
+    setBusy(r, false);
+    if(route.view === 'student') renderStudentProfile();
+  }
+});
+// Text built with L() is language-specific, so redraw the profile when the language is switched.
+document.addEventListener('click', (e) => {
+  if(e.target.closest('.lang-switch button') && bootstrapped && route.view === 'student') setTimeout(renderStudentProfile, 0);
+});
+
+// Records when an account was created / when subjects were added. Best effort: a failure here
+// must never block the enrollment itself, so it only logs.
+async function stampEnrollment(uid, slugs, opts){
+  if(!uid) return;
+  const now = new Date().toISOString();
+  const by = (auth.currentUser && auth.currentUser.email) || '';
+  const payload = {};
+  if(opts && opts.created){ payload.createdAt = now; payload.createdBy = by; }
+  const list = Array.from(new Set(slugs || []));
+  if(list.length) payload.enrollments = Object.fromEntries(list.map(sl => [sl, {at: now, by}]));
+  if(!Object.keys(payload).length) return;
+  try{
+    await setDoc(doc(db, STUDENTS, uid), payload, {merge: true});
+    const s = studentByUid(uid);
+    if(s){
+      if(payload.createdAt){ s.createdAt = now; s.createdBy = by; }
+      if(payload.enrollments) s.enrollments = Object.assign({}, s.enrollments, payload.enrollments);
+    }
+  }catch(err){ console.warn('Could not record enrollment date for', uid, err); }
+}
+
+
+// ================================================================
 // Global search (subjects first)
 // ================================================================
 (function(){
@@ -3842,7 +4577,7 @@ $('ovwRefreshBtn').addEventListener('click', async () => {
     allSubjects.filter(s => (s.name + ' ' + s.slug + ' ' + teacherLabel(s.teacherUid)).toLowerCase().includes(q)).slice(0,5)
       .forEach(s => hits.push({icon:'fa-book-medical', title:s.name, sub:`Subject · ${enrolledStudents(s.slug).length} enrolled`, go:() => go('subjects/' + encodeURIComponent(s.slug) + '/overview')}));
     allStudents.filter(s => (s.name+' '+s.email).toLowerCase().includes(q)).slice(0,4)
-      .forEach(s => hits.push({icon:'fa-user-graduate', title:s.name || s.email, sub:'Student · ' + s.email, go:() => go('students', () => { $('stuSearch').value = s.email || s.name; $('stuSubjFilter').value = ''; renderAllStudentsTable(); })}));
+      .forEach(s => hits.push({icon:'fa-user-graduate', title:s.name || s.email, sub:'Student profile · ' + s.email, go:() => go('students/' + encodeURIComponent(s.uid))}));
     allTeachers.filter(t => (t.name+' '+t.email).toLowerCase().includes(q)).slice(0,3)
       .forEach(t => hits.push({icon:'fa-chalkboard-user', title:t.name || t.email, sub:'Teacher · ' + t.email, go:() => go('teachers', () => { $('teachSearch').value = t.email; renderAllTeachersTable(); })}));
     if(/overview|analytic|performance|average|rank/.test(q)) hits.unshift({icon:'fa-chart-column', title:'Open Overview', sub:'Cohort performance by subject', go:() => go('overview')});
