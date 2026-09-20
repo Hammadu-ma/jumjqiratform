@@ -718,6 +718,311 @@ th.sp-open-cell,td.sp-open-cell{width:46px;padding-inline-end:0!important}
 @media(prefers-reduced-motion:reduce){.sp-donut .fg,.sp-bar>i{animation:none}}
 </style>
 <script>try{if(localStorage.getItem("jumedLang")==="ar"){var r=document.documentElement;r.dir="rtl";r.lang="ar";r.classList.add("lang-ar")}}catch(e){}</script>
+
+<!-- Responsive overflow fix -->
+<style id="responsive-overflow-fix">
+html, body { width:100%; max-width:100%; overflow-x:hidden !important; }
+body { min-width:0 !important; }
+.app-shell, .main, .screen, .main-scroll { width:100%; max-width:100%; min-width:0 !important; box-sizing:border-box; }
+.main-scroll { overflow-x:hidden; }
+.global-topbar { max-width:100%; min-width:0; box-sizing:border-box; }
+.global-center, .command-search { min-width:0 !important; max-width:100%; }
+.screen-subjects, #screen-overview, #screen-subject { min-width:0 !important; max-width:100%; }
+#screen-overview .card, #screen-overview .grid, #screen-overview section, #screen-overview .panel { min-width:0; max-width:100%; box-sizing:border-box; }
+#screen-overview table { max-width:none; }
+#screen-overview .table-scroll, #screen-overview .sp-table-wrap, #screen-overview .table-wrap { width:100%; max-width:100%; overflow-x:auto; overscroll-behavior-x:contain; }
+#screen-overview .sp-tbl { min-width:640px; }
+#screen-overview img, #screen-overview svg, #screen-overview canvas { max-width:100%; }
+@media (max-width:860px) {
+  .main { padding-bottom:78px !important; overflow-x:hidden !important; }
+  .main-scroll { padding-left:12px !important; padding-right:12px !important; padding-bottom:90px !important; overflow-x:hidden !important; }
+  .global-topbar { overflow:hidden; }
+  #screen-overview .sp-grid, #screen-overview .sp-ranks, #screen-overview .sp-trio, #screen-overview .sp-subjs { width:100%; max-width:100%; min-width:0; }
+}
+@media (max-width:560px) {
+  #screen-overview .sp-tbl { min-width:620px; }
+  #screen-overview .sp-ranks { grid-template-columns:minmax(0,1fr); }
+  #screen-overview .sp-donut-wrap { gap:16px; }
+  #screen-overview .sp-facts { width:100%; }
+}
+
+/* ===== SUBJECT OVERVIEW LEADERBOARD / AWAITING RESULTS FIX =====
+   These two cards must never make the Overview page wider than the viewport.
+   Wide content scrolls inside its own wrapper only. */
+.sub-two,
+.sub-two > .card,
+.sub-two > .card .table-scroll,
+#ovMissingWrap,
+#ovCompWrap,
+.subject-leaderboards-scroll,
+.subject-leaderboard-card {
+  min-width: 0 !important;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.sub-two > .card {
+  width: 100%;
+  overflow: hidden;
+}
+
+/* Overview tables: keep the card visible; scroll only the table when necessary. */
+.sub-two .table-scroll {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.sub-two .table-compact table {
+  width: 100%;
+  min-width: 0 !important;
+  table-layout: auto;
+}
+
+/* Long emails/names must not force the missing-results card wider. */
+#ovMissingWrap th,
+#ovMissingWrap td,
+#ovMissingWrap td a {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+#ovMissingWrap td:nth-child(3) {
+  max-width: 180px;
+}
+
+/* Leaderboard columns stay compact on narrow screens. */
+.sub-two .table-compact th,
+.sub-two .table-compact td {
+  padding-inline: 9px;
+}
+
+/* Component leaderboards scroll as a group, not the page. */
+#ovCompWrap.subject-leaderboards-scroll {
+  display: flex;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  flex-wrap: nowrap;
+  box-sizing: border-box;
+  overscroll-behavior-x: contain;
+}
+
+#ovCompWrap .subject-leaderboard-card {
+  flex: 0 0 min(290px, calc(100vw - 56px));
+  width: min(290px, calc(100vw - 56px));
+  max-width: min(290px, calc(100vw - 56px));
+  box-sizing: border-box;
+}
+
+#ovCompWrap .subject-leaderboard-card .table-scroll {
+  width: 100%;
+  max-width: 100%;
+}
+
+@media (max-width: 1050px) {
+  .sub-two {
+    grid-template-columns: minmax(0, 1fr) !important;
+    width: 100%;
+  }
+}
+
+@media (max-width: 560px) {
+  .sub-two {
+    gap: 10px;
+  }
+
+  .sub-two > .card {
+    padding: 14px !important;
+  }
+
+  .sub-two .table-compact th,
+  .sub-two .table-compact td {
+    padding: 8px 7px;
+    font-size: 11px;
+  }
+
+  #ovMissingWrap td:nth-child(3) {
+    max-width: 140px;
+  }
+
+  #ovCompWrap .subject-leaderboard-card {
+    flex-basis: calc(100vw - 48px);
+    width: calc(100vw - 48px);
+    max-width: calc(100vw - 48px);
+  }
+}
+
+@media (max-width: 380px) {
+  .sub-two > .card {
+    padding: 12px !important;
+  }
+
+  .sub-two .table-compact th,
+  .sub-two .table-compact td {
+    padding-inline: 6px;
+  }
+}
+
+
+/* SUBJECT OVERVIEW — FULL HORIZONTAL SCROLL FOR WIDE DATA
+   Keep all text/columns at their natural widths. Do not compress.
+   Only the inner data area scrolls horizontally on narrow screens. */
+.subject-overview .leaderboard,
+.subject-overview .awaiting-results,
+.subject-overview .leaderboard-card,
+.subject-overview .awaiting-results-card,
+.subject-overview .subject-leaderboard,
+.subject-overview .awaiting-results-panel {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.subject-overview .leaderboard .table-scroll,
+.subject-overview .awaiting-results .table-scroll,
+.subject-overview .leaderboard-card .table-scroll,
+.subject-overview .awaiting-results-card .table-scroll,
+.subject-overview .subject-leaderboard-scroll,
+.subject-overview .awaiting-results-scroll {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto !important;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: auto;
+}
+
+.subject-overview .leaderboard table,
+.subject-overview .awaiting-results table,
+.subject-overview .leaderboard-card table,
+.subject-overview .awaiting-results-card table,
+.subject-overview .subject-leaderboard-scroll table,
+.subject-overview .awaiting-results-scroll table {
+  width: max-content;
+  min-width: 640px;
+  max-width: none;
+  table-layout: auto;
+}
+
+.subject-overview .leaderboard th,
+.subject-overview .leaderboard td,
+.subject-overview .awaiting-results th,
+.subject-overview .awaiting-results td,
+.subject-overview .leaderboard-card th,
+.subject-overview .leaderboard-card td,
+.subject-overview .awaiting-results-card th,
+.subject-overview .awaiting-results-card td {
+  white-space: nowrap;
+  min-width: max-content;
+}
+
+@media (max-width: 860px) {
+  .subject-overview .leaderboard,
+  .subject-overview .awaiting-results,
+  .subject-overview .leaderboard-card,
+  .subject-overview .awaiting-results-card {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .subject-overview .leaderboard .table-scroll,
+  .subject-overview .awaiting-results .table-scroll,
+  .subject-overview .leaderboard-card .table-scroll,
+  .subject-overview .awaiting-results-card .table-scroll {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: scroll !important;
+  }
+}
+
+
+/* SUBJECT OVERVIEW — PRESERVE ACTION TEXT, SCROLL THE FULL ROW
+   Do not shorten, wrap, compress, or resize action controls.
+   Give every wide row as much horizontal space as its content requires. */
+.subject-overview .leaderboard,
+.subject-overview .awaiting-results,
+.subject-overview .leaderboard-card,
+.subject-overview .awaiting-results-card {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.subject-overview .leaderboard .table-scroll,
+.subject-overview .awaiting-results .table-scroll,
+.subject-overview .leaderboard-card .table-scroll,
+.subject-overview .awaiting-results-card .table-scroll,
+.subject-overview .subject-leaderboard-scroll,
+.subject-overview .awaiting-results-scroll {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto !important;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: auto;
+}
+
+.subject-overview .leaderboard table,
+.subject-overview .awaiting-results table,
+.subject-overview .leaderboard-card table,
+.subject-overview .awaiting-results-card table,
+.subject-overview .subject-leaderboard-scroll table,
+.subject-overview .awaiting-results-scroll table {
+  width: max-content !important;
+  min-width: max-content !important;
+  max-width: none !important;
+  table-layout: auto !important;
+}
+
+/* Keep every cell and action exactly readable; let the row determine its width. */
+.subject-overview .leaderboard th,
+.subject-overview .leaderboard td,
+.subject-overview .awaiting-results th,
+.subject-overview .awaiting-results td,
+.subject-overview .leaderboard-card th,
+.subject-overview .leaderboard-card td,
+.subject-overview .awaiting-results-card th,
+.subject-overview .awaiting-results-card td {
+  white-space: nowrap !important;
+  min-width: max-content !important;
+  width: auto !important;
+}
+
+/* Action buttons/text must never be compressed or clipped. */
+.subject-overview .leaderboard button,
+.subject-overview .awaiting-results button,
+.subject-overview .leaderboard .action,
+.subject-overview .awaiting-results .action,
+.subject-overview .leaderboard .enter-result,
+.subject-overview .awaiting-results .enter-result {
+  flex: 0 0 auto !important;
+  width: max-content !important;
+  min-width: max-content !important;
+  white-space: nowrap !important;
+}
+
+@media (max-width: 860px) {
+  .subject-overview .leaderboard .table-scroll,
+  .subject-overview .awaiting-results .table-scroll,
+  .subject-overview .leaderboard-card .table-scroll,
+  .subject-overview .awaiting-results-card .table-scroll,
+  .subject-overview .subject-leaderboard-scroll,
+  .subject-overview .awaiting-results-scroll {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto !important;
+  }
+}
+
+</style>
 </head>
 <body>
 <div id="netBar" class="netbar"><span></span></div>
