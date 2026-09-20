@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JUmed — Admin</title>
+<title>JUMJ — Admin</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Amiri:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -53,7 +53,7 @@ footer{font-size:10px;color:var(--faint);line-height:1.6}code{background:var(--b
 @media(max-width:860px){.app-shell{display:block}.sidebar{position:sticky;top:0;width:100%;height:auto;min-height:64px;flex-direction:row;align-items:center}.sidebar-toggle{display:none}.sidebar-brand{border:0;border-right:1px solid rgba(255,255,255,.08);padding:12px 14px}.sidebar-brand .brand-mark{width:34px;height:34px}.sidebar-nav{flex-direction:row;overflow-x:auto;padding:8px 10px;gap:3px;scrollbar-width:none}.sidebar-nav::-webkit-scrollbar{display:none}.nav-section{display:none}.nav-item{flex:0 0 auto;padding:9px 11px}.nav-item.active:after{display:none}.sidebar-foot{display:none}.main{height:auto}.main:before{display:none}.main-scroll{padding:20px 14px 50px}.topbar{padding-bottom:18px;margin-bottom:22px}.topbar-right{display:none}.page-head{align-items:flex-start}.page-head-meta{display:none}.module-context{grid-template-columns:1fr}.module-context .field{min-width:0}.analytics-cols{grid-template-columns:1fr}.stat-grid{grid-template-columns:repeat(2,1fr)}.barchart-row{grid-template-columns:110px 1fr 55px}.card{padding:17px;border-radius:15px}}
 @media(max-width:560px){.login-visual{min-height:300px;padding:30px 24px}.login-visual h1{font-size:2.1rem}.login-grid{display:none}.login-panel{padding:30px 20px}.login-card h2{font-size:26px}.page-title{font-size:1.55rem}.tabs{margin-left:-3px;margin-right:-3px}.toolbar{align-items:stretch}.toolbar .field{width:100%;min-width:0}.toolbar .field input,.toolbar .field select{max-width:none}.toolbar-actions{width:100%}.toolbar-actions .btn{flex:1}.stat-grid{grid-template-columns:1fr 1fr;gap:8px}.stat-card{padding:13px}.stat-card .stat-value{font-size:20px}.barchart-row{grid-template-columns:85px 1fr 48px;gap:7px}.histogram-label{display:none}.indiv-comp-row{grid-template-columns:1fr}.login-brand{margin-bottom:26px}}
 
-/* ===== JUmed 2.0 PRODUCT REDESIGN ===== */
+/* ===== JUMJ 2.0 PRODUCT REDESIGN ===== */
 :root{
   --bg:#f3f1ed;--surface:#ffffff;--surface-2:#f9f8f5;--ink:#14221d;--muted:#667570;--faint:#96a39f;
   --brand:#0b6b4b;--brand-2:#064c35;--brand-soft:#e1f2ec;--brand-soft-2:#cce9df;
@@ -320,7 +320,6 @@ thead th{background:#f6f1e2}
 .login-visual p{color:#b7cfc2!important}
 .auth-splash-bg{background:radial-gradient(circle at 20% 20%,rgba(20,140,100,.22),transparent 32%),radial-gradient(circle at 82% 75%,rgba(217,180,90,.16),transparent 30%),linear-gradient(135deg,#041a15,#0a3d31 55%,#031410)!important}
 .auth-splash-bg:before{background-image:var(--pattern)!important;background-size:88px 88px!important;opacity:.45}
-.splash-bismillah{font-family:'Amiri',serif;font-size:32px;color:#e3c273;margin-bottom:22px;direction:rtl}
 .splash-brand span{color:#e3c273!important}
 
 /* hero pattern */
@@ -385,7 +384,7 @@ html.lang-ar .mono,html.lang-ar code,html.lang-ar kbd{font-family:'JetBrains Mon
 [dir=rtl] input[type=email],[dir=rtl] input[type=number],[dir=rtl] input[type=password],[dir=rtl] .mono,[dir=rtl] .stuIdInput,[dir=rtl] #lookupId,[dir=rtl] #acctLookupId,[dir=rtl] #teachLookupEmail,[dir=rtl] .comp-row input[data-f=key]{direction:ltr;text-align:left}
 [dir=rtl] .field input[type=text]::placeholder,[dir=rtl] .field textarea::placeholder{direction:rtl}
 [dir=rtl] .salam-meta{text-align:start}
-[dir=rtl] .bismillah,[dir=rtl] .splash-bismillah{direction:rtl;text-align:right}
+[dir=rtl] .bismillah{direction:rtl;text-align:right}
 [dir=rtl] .login-visual-content{text-align:right}
 [dir=rtl] .subj-avg{text-align:left}
 [dir=rtl] .lang-login{inset-inline-end:auto;inset-inline-start:26px}
@@ -393,6 +392,79 @@ html.lang-ar .mono,html.lang-ar code,html.lang-ar kbd{font-family:'JetBrains Mon
 [dir=rtl] .hero-meta,[dir=rtl] .chips{direction:rtl}
 [dir=rtl] .table-scroll table{direction:rtl}
 @media(max-width:860px){.lang-switch button{padding:5px 9px}}
+
+.subtext{font-size:10px;color:var(--faint);font-family:'JetBrains Mono',monospace;margin-top:2px;font-weight:400}
+tbody td.mono{font-size:11px}
+
+/* gender colours: pink = female, green = male */
+.gchip{display:inline-flex;align-items:center;padding:2px 10px;border-radius:99px;font-size:10px;font-weight:700;line-height:1.5;white-space:nowrap;border:1px solid transparent}
+.gchip.f{background:#fde3ee;color:#b0336a;border-color:#f6bfd6}
+.gchip.m{background:#dcf3e4;color:#1d6b3e;border-color:#b3dfc2}
+.gchip.none{background:transparent;color:#a7aaa0;padding:2px 4px}
+.stuGenderInput.g-f{background:#fde3ee!important;color:#b0336a;border-color:#f6bfd6!important;font-weight:700}
+.stuGenderInput.g-m{background:#dcf3e4!important;color:#1d6b3e;border-color:#b3dfc2!important;font-weight:700}
+tbody tr:has(.gchip.f) td:first-child{box-shadow:inset 3px 0 0 #f2a9c6}
+tbody tr:has(.gchip.m) td:first-child{box-shadow:inset 3px 0 0 #7fcf9b}
+[dir=rtl] tbody tr:has(.gchip.f) td:first-child{box-shadow:inset -3px 0 0 #f2a9c6}
+[dir=rtl] tbody tr:has(.gchip.m) td:first-child{box-shadow:inset -3px 0 0 #7fcf9b}
+tbody tr:has(.stuGenderInput.g-f) td:first-child{box-shadow:inset 3px 0 0 #f2a9c6}
+tbody tr:has(.stuGenderInput.g-m) td:first-child{box-shadow:inset 3px 0 0 #7fcf9b}
+[dir=rtl] tbody tr:has(.stuGenderInput.g-f) td:first-child{box-shadow:inset -3px 0 0 #f2a9c6}
+[dir=rtl] tbody tr:has(.stuGenderInput.g-m) td:first-child{box-shadow:inset -3px 0 0 #7fcf9b}
+
+.subjpick-list small{color:#a2a79f;font-size:10px}
+.btn-gold:disabled,.btn-gold:disabled:hover{background:#ebe6d4;color:#8c8a78;box-shadow:none;cursor:not-allowed}
+
+/* ===== HORIZONTAL SCROLLING EVERYWHERE ===== */
+:root{--sb-thumb:#c9bf9d}
+.table-scroll,.tabs,.comp-editor,.histogram,.subject-leaderboards-scroll,.crumbs,.error-box,.ok-box,.warn-box,.lookup-result,.indiv-preview,.subjpick-list,textarea,.global-search-results,.attn-list,.barchart{scrollbar-width:thin;scrollbar-color:var(--sb-thumb) transparent}
+.table-scroll::-webkit-scrollbar,.tabs::-webkit-scrollbar,.comp-editor::-webkit-scrollbar,.histogram::-webkit-scrollbar,.subject-leaderboards-scroll::-webkit-scrollbar,textarea::-webkit-scrollbar{height:9px;width:9px}
+.table-scroll::-webkit-scrollbar-thumb,.tabs::-webkit-scrollbar-thumb,.comp-editor::-webkit-scrollbar-thumb,.histogram::-webkit-scrollbar-thumb,.subject-leaderboards-scroll::-webkit-scrollbar-thumb,textarea::-webkit-scrollbar-thumb{background:var(--sb-thumb);border-radius:99px;border:2px solid transparent;background-clip:content-box}
+.table-scroll::-webkit-scrollbar-track,.tabs::-webkit-scrollbar-track,textarea::-webkit-scrollbar-track{background:transparent}
+/* every table scrolls sideways inside its card instead of squeezing or overflowing the page */
+.table-scroll{overflow-x:auto;overflow-y:auto;max-width:100%;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+.table-scroll>table{min-width:100%}
+table th,table td.mono,table td.chk{white-space:nowrap}
+tbody td input[type=text],tbody td input[type=email],tbody td input[type=number]{min-width:130px}
+.stuNameInput,.teachNameInput,.stuDeptInput{min-width:170px!important}
+.stuEmailInput,.teachEmailInput,.acctEmailInput,.teachEmailRowInput{min-width:240px!important}
+.stuPhoneInput,.teachPhoneInput,.teachPhoneRowInput,.acctPassInput,.teachPassRowInput,.stuBatchInput{min-width:120px!important}
+tbody td select{min-width:110px}
+.subjpick{min-width:210px}
+td:not([colspan]) .chips{flex-wrap:nowrap}
+td:not([colspan]) .chip{flex:0 0 auto}
+/* tab bars scroll instead of wrapping/cropping */
+.tabs{overflow-x:auto;overflow-y:hidden;flex-wrap:nowrap;max-width:100%;-webkit-overflow-scrolling:touch}
+.tabs::-webkit-scrollbar{height:5px}
+.tab-btn{flex:0 0 auto;white-space:nowrap}
+.tabs{width:max-content;max-width:100%}
+.crumbs{overflow-x:auto;white-space:nowrap;max-width:100%}
+.crumbs::-webkit-scrollbar{height:4px}
+/* long unbroken strings (emails, error text, code) scroll inside their box */
+.error-box,.ok-box,.warn-box,.lookup-result,.indiv-preview,.progress small{max-width:100%;overflow-x:auto}
+.hint,.page-sub{overflow-wrap:break-word}
+textarea{white-space:pre;overflow:auto;max-width:100%}
+.global-search-results{overflow-x:auto}
+.global-search-item b,.global-search-item small{white-space:nowrap}
+/* editors and charts */
+.comp-editor{overflow-x:auto;max-width:100%;padding-bottom:6px}
+.comp-editor .comp-row{min-width:640px}
+.histogram{overflow-x:auto;max-width:100%}
+.histogram-bar{min-width:44px}
+.barchart{overflow-x:auto;max-width:100%}
+.barchart-row{min-width:360px}
+.subject-leaderboards-scroll{overflow-x:auto;max-width:100%}
+.attn-list{max-width:100%}
+.hero-stat b{white-space:nowrap}
+.subj-hero-id h1,.crumbs b{white-space:nowrap}
+.subj-hero-id{max-width:100%;overflow-x:auto}
+.filter-row{max-width:100%}
+.toolbar-actions{max-width:100%}
+.progress{max-width:100%}
+img,svg,canvas{max-width:100%}
+
+.progress,.ok-box{transition:opacity .45s ease}
+.progress.fade-out,.ok-box.fade-out{opacity:0}
 
 </style>
 <script>try{if(localStorage.getItem("jumedLang")==="ar"){var r=document.documentElement;r.dir="rtl";r.lang="ar";r.classList.add("lang-ar")}}catch(e){}</script>
@@ -404,9 +476,8 @@ html.lang-ar .mono,html.lang-ar code,html.lang-ar kbd{font-family:'JetBrains Mon
 <div id="authChecking" class="auth-splash" aria-live="polite">
   <div class="auth-splash-bg"></div>
   <div class="auth-splash-content">
-    <div class="splash-bismillah">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
     <div class="splash-logo"><svg class="logo-svg" viewBox="0 0 48 48" aria-hidden="true"><g class="star"><rect x="7" y="7" width="34" height="34" rx="2"/><rect x="7" y="7" width="34" height="34" rx="2" transform="rotate(45 24 24)"/></g><circle class="disc" cx="24" cy="24" r="12.5"/><circle class="moon" cx="24" cy="24" r="9"/><circle class="disc" cx="27.5" cy="22" r="8"/><path class="moon" d="M31 17.5l.9 2.4 2.5.1-2 1.6.7 2.4-2.1-1.4-2.1 1.4.7-2.4-2-1.6 2.5-.1z"/></svg></div>
-    <div class="splash-brand">JU<span>med</span></div>
+    <div class="splash-brand">JU<span>MJ</span></div>
     <div class="splash-kicker">Knowledge · Trust · Excellence</div>
     <div class="splash-loader"><span></span></div>
     <div class="splash-status"><i class="fa-solid fa-shield-halved"></i><span>Preparing your workspace…</span></div>
@@ -420,7 +491,7 @@ html.lang-ar .mono,html.lang-ar code,html.lang-ar kbd{font-family:'JetBrains Mon
     <div class="login-visual-content">
       <div class="bismillah">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
       <div class="login-kicker"><i class="fa-solid fa-moon"></i> Jimma University · Medical Education</div>
-      <h1>JUmed</h1>
+      <h1>JUMJ</h1>
       <p>A platform for managing subjects, students and results with trust and clarity.</p>
     </div>
   </section>
@@ -428,7 +499,7 @@ html.lang-ar .mono,html.lang-ar code,html.lang-ar kbd{font-family:'JetBrains Mon
   <div class="lang-switch lang-login" role="group" aria-label="Language"><button type="button" data-lang="ar" class="ar">العربية</button><button type="button" data-lang="en">English</button></div>
   <div class="login-card">
     <div class="login-brand">
-      <div class="mark"><svg class="logo-svg" viewBox="0 0 48 48" aria-hidden="true"><g class="star"><rect x="7" y="7" width="34" height="34" rx="2"/><rect x="7" y="7" width="34" height="34" rx="2" transform="rotate(45 24 24)"/></g><circle class="disc" cx="24" cy="24" r="12.5"/><circle class="moon" cx="24" cy="24" r="9"/><circle class="disc" cx="27.5" cy="22" r="8"/><path class="moon" d="M31 17.5l.9 2.4 2.5.1-2 1.6.7 2.4-2.1-1.4-2.1 1.4.7-2.4-2-1.6 2.5-.1z"/></svg></div><div><div class="name">JUmed</div><span class="tag">Academic admin workspace</span></div>
+      <div class="mark"><svg class="logo-svg" viewBox="0 0 48 48" aria-hidden="true"><g class="star"><rect x="7" y="7" width="34" height="34" rx="2"/><rect x="7" y="7" width="34" height="34" rx="2" transform="rotate(45 24 24)"/></g><circle class="disc" cx="24" cy="24" r="12.5"/><circle class="moon" cx="24" cy="24" r="9"/><circle class="disc" cx="27.5" cy="22" r="8"/><path class="moon" d="M31 17.5l.9 2.4 2.5.1-2 1.6.7 2.4-2.1-1.4-2.1 1.4.7-2.4-2-1.6 2.5-.1z"/></svg></div><div><div class="name">JUMJ</div><span class="tag">Academic admin workspace</span></div>
     </div>
     <h2>Welcome back</h2>
     <p class="intro">Sign in to continue to the medical education admin console.</p>
@@ -445,7 +516,7 @@ html.lang-ar .mono,html.lang-ar code,html.lang-ar kbd{font-family:'JetBrains Mon
     </div>
     <div class="error-box" id="adminError"></div>
     <div class="ok-box" id="adminOk"></div>
-    <div class="login-foot">Authorized personnel only · JUmed administration</div>
+    <div class="login-foot">Authorized personnel only · JUMJ administration</div>
   </div>
   </section>
 </div>
@@ -460,7 +531,7 @@ html.lang-ar .mono,html.lang-ar code,html.lang-ar kbd{font-family:'JetBrains Mon
     <div class="sidebar-brand">
       <div class="brand-mark"><svg class="logo-svg" viewBox="0 0 48 48" aria-hidden="true"><g class="star"><rect x="7" y="7" width="34" height="34" rx="2"/><rect x="7" y="7" width="34" height="34" rx="2" transform="rotate(45 24 24)"/></g><circle class="disc" cx="24" cy="24" r="12.5"/><circle class="moon" cx="24" cy="24" r="9"/><circle class="disc" cx="27.5" cy="22" r="8"/><path class="moon" d="M31 17.5l.9 2.4 2.5.1-2 1.6.7 2.4-2.1-1.4-2.1 1.4.7-2.4-2-1.6 2.5-.1z"/></svg></div>
       <div class="brand-text">
-        <div class="name">JUmed</div>
+        <div class="name">JUMJ</div>
         <span class="tag">Admin console</span>
       </div>
     </div>
@@ -494,7 +565,7 @@ html.lang-ar .mono,html.lang-ar code,html.lang-ar kbd{font-family:'JetBrains Mon
     <div class="global-topbar">
       <div class="global-brandline">
         <div class="global-logo"><svg class="logo-svg" viewBox="0 0 48 48" aria-hidden="true"><g class="star"><rect x="7" y="7" width="34" height="34" rx="2"/><rect x="7" y="7" width="34" height="34" rx="2" transform="rotate(45 24 24)"/></g><circle class="disc" cx="24" cy="24" r="12.5"/><circle class="moon" cx="24" cy="24" r="9"/><circle class="disc" cx="27.5" cy="22" r="8"/><path class="moon" d="M31 17.5l.9 2.4 2.5.1-2 1.6.7 2.4-2.1-1.4-2.1 1.4.7-2.4-2-1.6 2.5-.1z"/></svg></div>
-        <div><div class="global-product">JUmed <span>ADMIN</span></div><div class="global-context">Medical Education Operations</div></div>
+        <div><div class="global-product">JUMJ <span>ADMIN</span></div><div class="global-context">Medical Education Operations</div></div>
       </div>
       <div class="global-center">
         <div class="command-search"><i class="fa-solid fa-magnifying-glass"></i><input id="globalSearch" type="search" autocomplete="off" placeholder="Search subjects, students, teachers…" aria-label="Global search"><kbd>Ctrl K</kbd><div class="global-search-results" id="globalSearchResults"></div></div>
@@ -629,13 +700,13 @@ html.lang-ar .mono,html.lang-ar code,html.lang-ar kbd{font-family:'JetBrains Mon
             <div class="sub-two">
               <div class="card">
                 <p class="card-title">Leaderboard</p>
-                <div class="table-scroll table-compact" style="margin-top:10px"><table style="min-width:420px"><thead><tr><th></th><th>Student</th><th>ID</th><th>Score</th><th>%</th></tr></thead><tbody id="ovLeaderBody"></tbody></table></div>
+                <div class="table-scroll table-compact" style="margin-top:10px"><table style="min-width:420px"><thead><tr><th></th><th>Student</th><th>Gender</th><th>Score</th><th>%</th></tr></thead><tbody id="ovLeaderBody"></tbody></table></div>
               </div>
               <div class="card">
                 <p class="card-title" id="ovMissingHeading">Awaiting results</p>
                 <p class="hint">Enrolled students with no result yet.</p>
                 <div class="ok-box" id="ovMissingOk"></div>
-                <div class="table-scroll table-compact" id="ovMissingWrap" style="max-height:340px"><table style="min-width:340px"><thead><tr><th>Name</th><th>ID</th><th></th></tr></thead><tbody id="ovMissingBody"></tbody></table></div>
+                <div class="table-scroll table-compact" id="ovMissingWrap" style="max-height:340px"><table style="min-width:340px"><thead><tr><th>Name</th><th>Gender</th><th>Email</th><th></th></tr></thead><tbody id="ovMissingBody"></tbody></table></div>
               </div>
             </div>
             <div class="card" style="margin-top:14px">
@@ -649,7 +720,7 @@ html.lang-ar .mono,html.lang-ar code,html.lang-ar kbd{font-family:'JetBrains Mon
         <div class="sub-panel" id="subTab-roster">
           <div class="card">
             <div class="toolbar">
-              <div class="filter-row" style="flex:1"><div class="field"><label for="enrSearch">Search enrolled students</label><input type="text" id="enrSearch" placeholder="ID, name or email"></div><div class="field" style="max-width:170px"><label for="enrDept">Department</label><select id="enrDept"></select></div><div class="field" style="max-width:130px"><label for="enrBatch">Batch</label><select id="enrBatch"></select></div><div class="field" style="max-width:130px"><label for="enrGender">Gender</label><select id="enrGender"></select></div><button class="btn btn-secondary btn-sm" id="enrClear" type="button" style="margin-bottom:15px">Clear filters</button></div>
+              <div class="filter-row" style="flex:1"><div class="field"><label for="enrSearch">Search enrolled students</label><input type="text" id="enrSearch" placeholder="Name or email"></div><div class="field" style="max-width:170px"><label for="enrDept">Department</label><select id="enrDept"></select></div><div class="field" style="max-width:130px"><label for="enrBatch">Batch</label><select id="enrBatch"></select></div><div class="field" style="max-width:130px"><label for="enrGender">Gender</label><select id="enrGender"></select></div><button class="btn btn-secondary btn-sm" id="enrClear" type="button" style="margin-bottom:15px">Clear filters</button></div>
               <div class="toolbar-actions">
                 <span class="summary-row" style="margin:0;align-self:center;"><b id="enrCount">0</b></span>
                 <button class="btn btn-secondary btn-sm" id="enrExportBtn"><i class="fa-solid fa-download"></i> Export CSV</button>
@@ -658,7 +729,7 @@ html.lang-ar .mono,html.lang-ar code,html.lang-ar kbd{font-family:'JetBrains Mon
             </div>
             <div class="table-scroll" style="max-height:520px;">
               <table style="min-width:720px">
-                <thead><tr><th class="chk"><input type="checkbox" id="enrSelectAll"></th><th>ID</th><th>Name</th><th>Department</th><th>Batch</th><th>Result</th></tr></thead>
+                <thead><tr><th class="chk"><input type="checkbox" id="enrSelectAll"></th><th>Name</th><th>Email</th><th>Gender</th><th>Department</th><th>Batch</th><th>Result</th></tr></thead>
                 <tbody id="enrBody"></tbody>
               </table>
             </div>
@@ -681,18 +752,21 @@ html.lang-ar .mono,html.lang-ar code,html.lang-ar kbd{font-family:'JetBrains Mon
               <div class="card">
                 <div class="toolbar">
                   <div class="filter-row" style="flex:1">
-                    <div class="field"><label for="resSearch">Search</label><input type="text" id="resSearch" placeholder="Search by ID or name"></div>
+                    <div class="field"><label for="resSearch">Search</label><input type="text" id="resSearch" placeholder="Search by name or email"></div>
                     <div class="field" style="max-width:170px"><label for="resDept">Department</label><select id="resDept"></select></div><div class="field" style="max-width:130px"><label for="resBatch">Batch</label><select id="resBatch"></select></div><div class="field" style="max-width:130px"><label for="resGender">Gender</label><select id="resGender"></select></div><button class="btn btn-secondary btn-sm" id="resClear" type="button" style="margin-bottom:15px">Clear filters</button><div class="field" style="max-width:190px"><label for="resFilter">Show</label>
                       <select id="resFilter"><option value="">All students</option><option value="missing">No result yet</option><option value="submitted">Has result</option><option value="partial">Partial only</option></select>
                     </div>
                   </div>
                   <div class="toolbar-actions">
                     <span class="summary-row" style="margin:0;align-self:center;"><b id="resCount">0</b></span>
+                    <button class="btn btn-gold btn-sm" id="resSaveAllBtn" disabled>Save all changes</button>
                     <button class="btn btn-secondary btn-sm" id="resRefreshBtn"><i class="fa-solid fa-rotate"></i> Refresh</button>
                   </div>
                 </div>
                 <div class="warn-box" id="resNoComps"></div>
+                <div class="progress hidden" id="resSaveProgress"><div class="progress-track"><span></span></div><small></small></div>
                 <div class="error-box" id="resAllError"></div>
+                <div class="ok-box" id="resAllOk"></div>
                 <div class="table-scroll" style="max-height:640px;">
                   <table>
                     <thead><tr id="allResultsHead"></tr></thead>
@@ -705,6 +779,7 @@ html.lang-ar .mono,html.lang-ar code,html.lang-ar kbd{font-family:'JetBrains Mon
             <div class="tab-panel" id="tabResBulk">
               <div class="card">
                 <p class="hint" id="bulkHint"></p>
+                <p class="hint">Students are matched by their name — add an email column if two students share the same name.</p>
                 <div class="field wide">
                   <label for="csvInput">CSV data</label>
                   <textarea id="csvInput" rows="6"></textarea>
@@ -747,8 +822,8 @@ html.lang-ar .mono,html.lang-ar code,html.lang-ar kbd{font-family:'JetBrains Mon
               <div class="card">
                 <div class="field-row">
                   <div class="field">
-                    <label for="lookupId">Student ID</label>
-                    <input type="text" id="lookupId" list="enrolledList" placeholder="Start typing an enrolled student's ID or name" autocomplete="off">
+                    <label for="lookupId">Student name or email</label>
+                    <input type="text" id="lookupId" list="enrolledList" placeholder="Start typing an enrolled student's name or email" autocomplete="off">
                     <datalist id="enrolledList"></datalist>
                   </div>
                 </div>
@@ -817,19 +892,19 @@ html.lang-ar .mono,html.lang-ar code,html.lang-ar kbd{font-family:'JetBrains Mon
             <div class="tabgroup" id="addTabGroup">
               <div class="tabs">
                 <button class="tab-btn active" data-target="tabAddSearch">Search &amp; add</button>
-                <button class="tab-btn" data-target="tabAddPaste">Paste student IDs</button>
+                <button class="tab-btn" data-target="tabAddPaste">Paste names or emails</button>
                 <button class="tab-btn" data-target="tabAddNew">New students</button>
               </div>
 
               <div class="tab-panel active" id="tabAddSearch">
                 <div class="filter-row">
-                  <div class="field"><label for="addSearch">Search</label><input type="text" id="addSearch" placeholder="ID, name or email"></div>
+                  <div class="field"><label for="addSearch">Search</label><input type="text" id="addSearch" placeholder="Name or email"></div>
                   <div class="field" style="max-width:170px"><label for="addDept">Department</label><select id="addDept"></select></div><div class="field" style="max-width:130px"><label for="addBatch">Batch</label><select id="addBatch"></select></div><div class="field" style="max-width:130px"><label for="addGender">Gender</label><select id="addGender"></select></div><div class="field" style="max-width:200px"><label for="addSubj">Enrolled in</label><select id="addSubj"></select></div><button class="btn btn-secondary btn-sm" id="addClear" type="button" style="margin-bottom:15px">Clear filters</button>
                 </div>
                 <p class="mini-note"><b id="addCount">0</b></p>
                 <div class="table-scroll" style="max-height:340px;margin-top:8px">
-                  <table style="min-width:600px">
-                    <thead><tr><th class="chk"><input type="checkbox" id="addSelectAll"></th><th>ID</th><th>Name</th><th>Department</th><th>Batch</th><th>Other subjects</th></tr></thead>
+                  <table style="min-width:680px">
+                    <thead><tr><th class="chk"><input type="checkbox" id="addSelectAll"></th><th>Name</th><th>Email</th><th>Gender</th><th>Department</th><th>Batch</th><th>Other subjects</th></tr></thead>
                     <tbody id="addBody"></tbody>
                   </table>
                 </div>
@@ -843,14 +918,14 @@ html.lang-ar .mono,html.lang-ar code,html.lang-ar kbd{font-family:'JetBrains Mon
 
               <div class="tab-panel" id="tabAddPaste">
                 <div class="field wide">
-                  <label for="pasteIds">Student IDs (one per line, or comma-separated)</label>
-                  <textarea id="pasteIds" rows="6" placeholder="RU0967/16&#10;RU0787/16&#10;RU1102/16"></textarea>
+                  <label for="pasteIds">Student names or emails (one per line)</label>
+                  <textarea id="pasteIds" rows="6" placeholder="Kadir Kemal&#10;kadir.kemal@jumj.com&#10;Sara Getu"></textarea>
                 </div>
                 <div class="btn-row"><button class="btn" id="pasteEnrollBtn">Enroll these students</button></div>
                 <div class="error-box" id="pasteError"></div>
                 <div class="ok-box" id="pasteOk"></div>
                 <div class="warn-box" id="pasteMissing"></div>
-                <div class="btn-row hidden" id="pasteCreateRow"><button class="btn btn-secondary" id="pasteCreateBtn">Create accounts for the missing IDs</button></div>
+                <div class="btn-row hidden" id="pasteCreateRow"><button class="btn btn-secondary" id="pasteCreateBtn">Create accounts for the missing students</button></div>
               </div>
 
               <div class="tab-panel" id="tabAddNew">
@@ -909,12 +984,12 @@ html.lang-ar .mono,html.lang-ar code,html.lang-ar kbd{font-family:'JetBrains Mon
           <div class="card">
             <p class="card-title">Top performers</p>
             <p class="hint">Average across all the subjects a student has results in.</p>
-            <div class="table-scroll table-compact"><table><thead><tr><th></th><th>Student</th><th>ID</th><th>Subjects</th><th>Avg %</th></tr></thead><tbody id="ovwTop"><tr><td colspan="5">Loading…</td></tr></tbody></table></div>
+            <div class="table-scroll table-compact"><table><thead><tr><th></th><th>Student</th><th>Gender</th><th>Subjects</th><th>Avg %</th></tr></thead><tbody id="ovwTop"><tr><td colspan="5">Loading…</td></tr></tbody></table></div>
           </div>
           <div class="card">
             <p class="card-title">Lowest averages</p>
             <p class="hint">Students who may need support.</p>
-            <div class="table-scroll table-compact"><table><thead><tr><th></th><th>Student</th><th>ID</th><th>Subjects</th><th>Avg %</th></tr></thead><tbody id="ovwLow"><tr><td colspan="5">Loading…</td></tr></tbody></table></div>
+            <div class="table-scroll table-compact"><table><thead><tr><th></th><th>Student</th><th>Gender</th><th>Subjects</th><th>Avg %</th></tr></thead><tbody id="ovwLow"><tr><td colspan="5">Loading…</td></tr></tbody></table></div>
           </div>
         </div>
       </div>
@@ -937,21 +1012,23 @@ html.lang-ar .mono,html.lang-ar code,html.lang-ar kbd{font-family:'JetBrains Mon
             <div class="card">
               <div class="toolbar">
                 <div class="filter-row" style="flex:1">
-                  <div class="field"><label for="stuSearch">Search</label><input type="text" id="stuSearch" placeholder="Search by ID, name, or email"></div>
+                  <div class="field"><label for="stuSearch">Search</label><input type="text" id="stuSearch" placeholder="Search by name or email"></div>
                   <div class="field" style="max-width:240px"><label for="stuSubjFilter">Enrolled in</label><select id="stuSubjFilter"></select></div><div class="field" style="max-width:170px"><label for="stuDept">Department</label><select id="stuDept"></select></div><div class="field" style="max-width:130px"><label for="stuBatch">Batch</label><select id="stuBatch"></select></div><div class="field" style="max-width:130px"><label for="stuGender">Gender</label><select id="stuGender"></select></div><button class="btn btn-secondary btn-sm" id="stuClear" type="button" style="margin-bottom:15px">Clear filters</button>
                 </div>
                 <div class="toolbar-actions">
                   <span class="summary-row" style="margin:0;align-self:center;"><b id="stuCount">0</b></span>
+                  <button class="btn btn-gold btn-sm" id="stuSaveAllBtn" disabled>Save all changes</button>
                   <button class="btn btn-danger btn-sm" id="stuDeleteBtn" disabled>Delete selected</button>
                   <button class="btn btn-secondary btn-sm" id="stuRefreshBtn"><i class="fa-solid fa-rotate"></i> Refresh</button>
                 </div>
               </div>
+              <div class="progress hidden" id="stuSaveProgress"><div class="progress-track"><span></span></div><small></small></div>
               <div class="progress hidden" id="stuDelProgress"><div class="progress-track"><span></span></div><small></small></div>
               <div class="error-box" id="stuError"></div>
               <div class="ok-box" id="stuOk"></div>
               <div class="table-scroll" style="max-height:640px;">
                 <table>
-                  <thead><tr><th class="chk"><input type="checkbox" id="stuSelectAll"></th><th>ID</th><th>Name</th><th>Email</th><th>Gender</th><th>Phone</th><th>Department</th><th>Batch</th><th>Subjects</th><th>Status</th><th></th></tr></thead>
+                  <thead><tr><th class="chk"><input type="checkbox" id="stuSelectAll"></th><th>Name</th><th>Email</th><th>Gender</th><th>Phone</th><th>Department</th><th>Batch</th><th>Subjects</th><th>Status</th><th></th></tr></thead>
                   <tbody id="allStudentsBody"><tr><td colspan="11">Loading…</td></tr></tbody>
                 </table>
               </div>
@@ -962,8 +1039,8 @@ html.lang-ar .mono,html.lang-ar code,html.lang-ar kbd{font-family:'JetBrains Mon
             <div class="card">
               <div class="field wide">
                 <label for="acctCsvInput">CSV data</label>
-                <textarea id="acctCsvInput" rows="6" placeholder="id,name,email,gender,phone,department,batch,subjects&#10;Ru0787/16,Kadir Kemal,,Male,0912345678,Medicine,2024,Anatomy;Physiology"></textarea>
-                <p class="hint" style="margin-top:8px;">Only id and name are required. subjects is a semicolon-separated list of subject names or keys. For students who already have an account, blank columns are left as they are and subjects are added to their existing ones.</p>
+                <textarea id="acctCsvInput" rows="6" placeholder="name,email,gender,phone,department,batch,subjects&#10;Kadir Kemal,,Male,0912345678,Medicine,2024,Anatomy;Physiology"></textarea>
+                <p class="hint" style="margin-top:8px;">Only name is required. email defaults to the student's name @jumj.com (for example kadir.kemal@jumj.com). gender, phone, department, batch and subjects are optional; subjects is a semicolon-separated list of subject names or keys. For students who already have an account, blank columns are left as they are and subjects are added to their existing ones.</p>
               </div>
               <div class="field" style="max-width:380px">
                 <label for="acctEnrollSubject">Also enroll every imported student in</label>
@@ -991,7 +1068,7 @@ html.lang-ar .mono,html.lang-ar code,html.lang-ar kbd{font-family:'JetBrains Mon
                 <div class="ok-box" id="acctImportOk"></div>
                 <div class="table-scroll" style="margin-top:1.1rem;max-height:560px;overflow-y:auto;">
                   <table>
-                    <thead><tr><th class="chk"><input type="checkbox" id="acctSelectAll" checked></th><th>ID</th><th>Name</th><th>Account</th><th>Subjects</th><th>Email</th><th>Password</th><th>Status</th></tr></thead>
+                    <thead><tr><th class="chk"><input type="checkbox" id="acctSelectAll" checked></th><th>Name</th><th>Account</th><th>Email</th><th>Password</th><th>Gender</th><th>Phone</th><th>Department</th><th>Batch</th><th>Subjects</th><th>Status</th></tr></thead>
                     <tbody id="acctRosterBody"></tbody>
                   </table>
                 </div>
@@ -1001,8 +1078,8 @@ html.lang-ar .mono,html.lang-ar code,html.lang-ar kbd{font-family:'JetBrains Mon
 
           <div class="tab-panel" id="tabStuIndiv">
             <div class="card">
-              <p class="hint">Look up a student ID. If no account exists yet, fill in their details to create one; if one exists you can update their details and subjects here.</p>
-              <div class="field-row"><div class="field"><label for="acctLookupId">Student ID</label><input type="text" id="acctLookupId" placeholder="e.g. RU0967/16"></div></div>
+              <p class="hint">Look up a student by name or email. If no account exists yet, fill in their details to create one; if one exists you can update their details and subjects here.</p>
+              <div class="field-row"><div class="field"><label for="acctLookupId">Student name or email</label><input type="text" id="acctLookupId" placeholder="e.g. Kadir Kemal"></div></div>
               <div class="btn-row"><button class="btn btn-secondary" id="acctLookupBtn">Find student</button></div>
               <div class="error-box" id="acctLookupError"></div>
               <div class="lookup-result hidden" id="acctLookupResult"></div>
@@ -1036,7 +1113,7 @@ html.lang-ar .mono,html.lang-ar code,html.lang-ar kbd{font-family:'JetBrains Mon
     <!-- ================= SCREEN: Teachers (directory) ================= -->
     <div class="screen" id="screen-teachers">
       <div class="main-scroll">
-        <div class="page-head"><div><p class="page-title">Teachers</p><p class="page-sub">Create teacher accounts. Teachers sign in at teacher.html and only see the subjects assigned to them — assign a teacher from the subject's Settings.</p></div><div class="page-head-meta">DIRECTORY</div></div>
+        <div class="page-head"><div><p class="page-title">Teachers</p><p class="page-sub">Create teacher accounts. Teachers sign in at teacher.html and only see the subjects assigned to them — assign subjects here or from each subject's Settings.</p></div><div class="page-head-meta">DIRECTORY</div></div>
 
         <div class="section-label">Teacher operations</div>
         <div class="tabgroup" id="teachTabGroup">
@@ -1052,9 +1129,14 @@ html.lang-ar .mono,html.lang-ar code,html.lang-ar kbd{font-family:'JetBrains Mon
                 <div class="field"><label for="teachSearch">Search</label><input type="text" id="teachSearch" placeholder="Search by name, email, or phone"></div>
                 <div class="toolbar-actions">
                   <span class="summary-row" style="margin:0;align-self:center;"><b id="teachCount">0</b></span>
+                  <button class="btn btn-gold btn-sm" id="teachSaveAllBtn" disabled>Save all changes</button>
                   <button class="btn btn-secondary btn-sm" id="teachRefreshBtn"><i class="fa-solid fa-rotate"></i> Refresh</button>
                 </div>
               </div>
+              <p class="hint" style="margin:0 0 10px">A teacher can teach several subjects — tick them under "Teaches" and press Save. A subject has one teacher, so a subject already taught by someone else is reassigned.</p>
+              <div class="progress hidden" id="teachSaveProgress"><div class="progress-track"><span></span></div><small></small></div>
+              <div class="error-box" id="teachTableError"></div>
+              <div class="ok-box" id="teachTableOk"></div>
               <div class="table-scroll" style="max-height:640px;">
                 <table>
                   <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Teaches</th><th></th><th></th><th></th></tr></thead>
@@ -1068,8 +1150,9 @@ html.lang-ar .mono,html.lang-ar code,html.lang-ar kbd{font-family:'JetBrains Mon
             <div class="card">
               <div class="field wide">
                 <label for="teachCsvInput">CSV data</label>
-                <textarea id="teachCsvInput" rows="6" placeholder="name,email,phone&#10;Dr. Sara Getu,sara.getu@med.ju,0911223344"></textarea>
+                <textarea id="teachCsvInput" rows="6" placeholder="name,email,phone,subjects&#10;Dr. Sara Getu,sara.getu@med.ju,0911223344,Anatomy;Physiology"></textarea>
               </div>
+              <p class="hint" style="margin-top:8px">Only name and email are required. subjects is optional: a semicolon-separated list of subject names — a teacher can have several. A subject already taught by someone else is reassigned.</p>
               <div class="btn-row"><button class="btn btn-secondary" id="parseTeachBulkBtn">Parse &amp; preview</button></div>
               <div class="error-box" id="teachBulkError"></div>
               <div class="ok-box" id="teachBulkOk"></div>
@@ -1090,7 +1173,7 @@ html.lang-ar .mono,html.lang-ar code,html.lang-ar kbd{font-family:'JetBrains Mon
                 <div class="ok-box" id="teachImportOk"></div>
                 <div class="table-scroll" style="margin-top:1.1rem;max-height:560px;overflow-y:auto;">
                   <table>
-                    <thead><tr><th class="chk"><input type="checkbox" id="teachSelectAll" checked></th><th>Name</th><th>Account</th><th>Email</th><th>Phone</th><th>Password</th><th>Status</th></tr></thead>
+                    <thead><tr><th class="chk"><input type="checkbox" id="teachSelectAll" checked></th><th>Name</th><th>Account</th><th>Email</th><th>Phone</th><th>Subjects</th><th>Password</th><th>Status</th></tr></thead>
                     <tbody id="teachRosterBody"></tbody>
                   </table>
                 </div>
@@ -1112,6 +1195,10 @@ html.lang-ar .mono,html.lang-ar code,html.lang-ar kbd{font-family:'JetBrains Mon
                   <div class="field"><label for="teachIndivEmail">Email</label><input type="email" id="teachIndivEmail"></div>
                   <div class="field"><label for="teachIndivPhone">Phone</label><input type="text" id="teachIndivPhone"></div>
                   <div class="field" id="teachIndivPasswordWrap"><label for="teachIndivPassword">Password (new account only)</label><input type="text" id="teachIndivPassword"></div>
+                </div>
+                <div class="field wide">
+                  <label>Subjects taught</label>
+                  <div id="teachIndivSubjects"></div>
                 </div>
                 <div class="btn-row"><button class="btn" id="saveTeachIndivBtn">Save account</button></div>
                 <div class="error-box" id="teachIndivError"></div>
@@ -1151,7 +1238,7 @@ const MODULE_RESULTS = "moduleResults";
 const MODULES = "modules";
 const SUBJECTS = "subjects";
 const TEACHERS = "teachers";
-const EMAIL_DOMAIN = "med.ju";
+const EMAIL_DOMAIN = "jumj.com";
 
 // ---- global network progress bar: every Firestore call is tracked ----
 let netCount = 0;
@@ -1175,14 +1262,22 @@ const db = getFirestore(app);
 // ================================================================
 const $ = (id) => document.getElementById(id);
 
+// Success messages clear themselves a few seconds after they appear; errors/warnings stay until dismissed or replaced.
+const OK_CLEAR_MS = 3000;
 function setBox(id, msg, kind){
   const box = $(id);
   if(!box) return;
+  clearTimeout(box._clearTimer); clearTimeout(box._fadeTimer);
   box.className = kind === 'ok' ? 'ok-box' : kind === 'warn' ? 'warn-box' : 'error-box';
   if(!msg){ box.classList.remove('show'); box.textContent=''; return; }
   box.textContent = msg;
   box.classList.add('show');
+  if(kind === 'ok'){
+    box._fadeTimer = setTimeout(() => box.classList.add('fade-out'), OK_CLEAR_MS - 450);
+    box._clearTimer = setTimeout(() => { box.classList.remove('show', 'fade-out'); box.textContent = ''; }, OK_CLEAR_MS);
+  }
 }
+
 function escapeHtml(s){
   return String(s ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 }
@@ -1193,10 +1288,33 @@ function randomPassword(len=8){
   for(let i=0;i<len;i++) out += chars[Math.floor(Math.random()*chars.length)];
   return out;
 }
-function emailForId(id){ return String(id).toLowerCase().replace(/[^a-z0-9]/g, '-') + '@' + EMAIL_DOMAIN; }
+// Student email defaults to "their name @jumj.com" (kadir.kemal@jumj.com), made unique against `taken`.
+function emailForName(name, taken){
+  const base = String(name || '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '.').replace(/^\.+|\.+$/g, '') || 'student';
+  let e = base + '@' + EMAIL_DOMAIN, n = 1;
+  while(taken && taken.has(e)) e = base + (++n) + '@' + EMAIL_DOMAIN;
+  return e;
+}
+function takenEmails(){ return new Set(allStudents.map(s => (s.email || '').toLowerCase())); }
 function slugify(str){ return String(str).toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'subject'; }
 function keyify(str){ return String(str).toLowerCase().trim().replace(/[^a-z0-9]+/g, '') || 'k'; }
-function normId(s){ return (s || '').toString().trim().toUpperCase().replace(/\s+/g, ''); }
+function normName(s){ return String(s || '').normalize('NFKC').trim().toLowerCase().replace(/\s+/g, ' '); }
+function normGender(g){
+  const t = String(g || '').trim().toLowerCase();
+  if(['m','male','ذكر'].includes(t)) return 'Male';
+  if(['f','female','أنثى','انثى'].includes(t)) return 'Female';
+  return '';
+}
+// Find a student by exact email, else by name. Returns {student} | {ambiguous:[...]} | {}
+function resolveStudent(text){
+  const t = normName(text); if(!t) return {};
+  const byE = allStudents.find(s => (s.email || '').toLowerCase() === t);
+  if(byE) return {student: byE};
+  const m = allStudents.filter(s => normName(s.name) === t);
+  if(m.length === 1) return {student: m[0]};
+  if(m.length > 1) return {ambiguous: m};
+  return {};
+}
 function num(v){
   if(v === undefined || v === null || v === '') return null;
   const n = Number(v);
@@ -1205,14 +1323,22 @@ function num(v){
 function setBusy(btn, on){ if(!btn) return; btn.disabled = on; btn.classList.toggle('is-busy', on); }
 async function withBusy(btn, fn){ setBusy(btn, true); try{ return await fn(); } finally{ setBusy(btn, false); } }
 // Determinate progress bar: <div class="progress" id=..><div class="progress-track"><span></span></div><small></small></div>
+// Progress bars hide themselves shortly after reaching 100%.
 function setProgress(id, done, total, label){
   const el = $(id); if(!el) return;
-  el.classList.remove('hidden');
+  clearTimeout(el._fadeTimer); clearTimeout(el._hideTimer);
+  el.classList.remove('hidden', 'fade-out');
   const pct = total ? Math.round(done / total * 100) : 0;
   el.querySelector('span').style.width = pct + '%';
   el.querySelector('small').textContent = (label || 'Progress') + ' — ' + done + ' / ' + total + ' (' + pct + '%)';
-  el.classList.toggle('complete', total > 0 && done >= total);
+  const complete = total > 0 && done >= total;
+  el.classList.toggle('complete', complete);
+  if(complete || total === 0){
+    el._fadeTimer = setTimeout(() => el.classList.add('fade-out'), 1500);
+    el._hideTimer = setTimeout(() => { el.classList.add('hidden'); el.classList.remove('fade-out', 'complete'); el.querySelector('span').style.width = '0'; el.querySelector('small').textContent = ''; }, 2000);
+  }
 }
+
 function loadProgress(slug, done, total){
   const pct = total ? Math.round(done / total * 100) : 0;
   document.querySelectorAll(`[data-load="${slug}"]`).forEach(el => {
@@ -1220,12 +1346,31 @@ function loadProgress(slug, done, total){
     const s = el.nextElementSibling; if(s && s.classList.contains('load-note')) s.textContent = `${done} / ${total} students`;
   });
 }
+// ---- "Save all changes" for editable tables: tracks dirty rows (tr.dirty) and drives one bulk-save button ----
+const BULK_TABLES = {
+  stu:   {body: 'allStudentsBody', btn: 'stuSaveAllBtn'},
+  teach: {body: 'allTeachersBody', btn: 'teachSaveAllBtn'},
+  res:   {body: 'allResultsBody',  btn: 'resSaveAllBtn'},
+};
+function dirtyRows(k){ return Array.from($(BULK_TABLES[k].body).querySelectorAll('tr.dirty')).filter(tr => typeof tr._save === 'function'); }
+function refreshBulkBtn(k){
+  const c = BULK_TABLES[k], b = $(c.btn); if(!b) return;
+  const n = $(c.body).querySelectorAll('tr.dirty').length;
+  b.classList.remove('is-busy'); b.disabled = !n;
+  b.textContent = n ? `Save all changes (${n})` : 'Save all changes';
+}
 function chunk(arr, size){ const out = []; for(let i=0;i<arr.length;i+=size) out.push(arr.slice(i,i+size)); return out; }
 function initials(name){
   const parts = String(name || '?').trim().split(/\s+/).filter(Boolean);
   if(!parts.length) return '?';
   return ((parts[0][0] || '') + (parts[1] ? parts[1][0] : (parts[0][1] || ''))).toUpperCase();
 }
+function genderChip(g){
+  if(g === 'Female') return '<span class="gchip f">Female</span>';
+  if(g === 'Male') return '<span class="gchip m">Male</span>';
+  return '<span class="gchip none">—</span>';
+}
+function genderOf(uid){ const s = allStudents.find(x => x.uid === uid); return s ? s.gender : ''; }
 function median(sortedArr){
   const n = sortedArr.length;
   if(!n) return null;
@@ -1473,7 +1618,6 @@ async function loadAllStudents(){
   const snap = await getDocs(collection(db, STUDENTS));
   allStudents = snap.docs.map(d => ({
     uid: d.id,
-    id: d.data().id || '',
     name: d.data().name || '',
     email: d.data().email || '',
     gender: d.data().gender || '',
@@ -1482,7 +1626,7 @@ async function loadAllStudents(){
     batch: d.data().batch || '',
     subjectIds: Array.isArray(d.data().subjectIds) ? d.data().subjectIds : [],
   }));
-  allStudents.sort((a,b) => (a.id||'').localeCompare(b.id||'', undefined, {numeric:true, sensitivity:'base'}));
+  allStudents.sort((a,b) => (a.name||'').localeCompare(b.name||'', undefined, {sensitivity:'base'}));
 }
 
 // One cross-student query to fill every subject's results (used by cards + Overview).
@@ -1783,7 +1927,7 @@ const AR = {
   'Welcome back':'السلام عليكم','Sign in to continue to the medical education admin console.':'سجّل الدخول للمتابعة إلى لوحة إدارة التعليم الطبي.',
   'A platform for managing subjects, students and results with trust and clarity.':'منصة لإدارة المواد والطلاب والنتائج بأمانة ووضوح.',
   'Admin email':'البريد الإلكتروني للمشرف','Admin password':'كلمة مرور المشرف','Sign in to workspace':'الدخول إلى مساحة العمل',
-  'Authorized personnel only · JUmed administration':'للمصرّح لهم فقط · إدارة JUmed',
+  'Authorized personnel only · JUMJ administration':'للمصرّح لهم فقط · إدارة JUMJ',
   'Sign-in failed.':'تعذّر تسجيل الدخول.','This account is not authorized for admin access.':'هذا الحساب غير مصرّح له بالدخول إلى لوحة الإدارة.',
   'Could not load data:':'تعذّر تحميل البيانات:',
   // ---- page heads
@@ -1791,7 +1935,7 @@ const AR = {
   'Everything is organised around subjects — who is enrolled, who teaches, how each is graded and how students perform. Open a subject to manage it all in one place.':'كل شيء منظَّم حول المواد: من المسجَّلون، ومن يدرّس، وكيف يُقيَّم كلٌّ منها، وكيف يؤدّي الطلاب. افتح مادة لإدارتها بالكامل في مكان واحد.',
   'See how each subject is doing at a glance — setup gaps, grading progress and cohort performance.':'اطّلع على وضع كل مادة بنظرة سريعة: الثغرات في الإعداد، وتقدّم التقييم، وأداء الدفعة.',
   "The directory of student accounts. A student's subjects decide where they appear — manage enrollment here or from each subject's Roster.":'دليل حسابات الطلاب. تحدّد مواد الطالب أين يظهر — أدِر التسجيل من هنا أو من قائمة الطلاب في كل مادة.',
-  "Create teacher accounts. Teachers sign in at teacher.html and only see the subjects assigned to them — assign a teacher from the subject's Settings.":'أنشئ حسابات المعلمين. يسجّل المعلمون الدخول عبر teacher.html ولا يرون إلا المواد المسندة إليهم — أسنِد المعلم من إعدادات المادة.',
+  "Create teacher accounts. Teachers sign in at teacher.html and only see the subjects assigned to them — assign subjects here or from each subject's Settings.":'أنشئ حسابات المعلمين. يسجّل المعلمون الدخول عبر teacher.html ولا يرون إلا المواد المسندة إليهم — أسنِد المواد من هنا أو من إعدادات كل مادة.',
   // ---- subjects screen
   'Search subjects':'بحث في المواد','Search by subject or teacher':'ابحث بالمادة أو المعلم','Refresh':'تحديث','New subject':'مادة جديدة',
   'Subject name':'اسم المادة','e.g. Anatomy':'مثال: التشريح','Assigned teacher':'المعلم المسؤول','— Unassigned —':'— غير مُسنَد —',
@@ -1835,7 +1979,7 @@ const AR = {
   'Also enroll every imported student in':'تسجيل كل طالب مستورد أيضًا في',
   "Only id and name are required. subjects is a semicolon-separated list of subject names or keys. For students who already have an account, blank columns are left as they are and subjects are added to their existing ones.":'الحقلان المطلوبان فقط: id و name. الحقل subjects قائمة مفصولة بفاصلة منقوطة لأسماء المواد أو معرّفاتها. بالنسبة للطلاب الذين لديهم حساب، تبقى الحقول الفارغة كما هي وتُضاف المواد إلى موادهم الحالية.',
   'new accounts':'حسابات جديدة','existing students':'طلاب حاليون','Regenerate new emails / passwords':'إعادة توليد البريد وكلمات المرور الجديدة','Download credentials CSV':'تنزيل بيانات الدخول CSV',
-  'Account':'الحساب','Password':'كلمة المرور','Look up a student ID. If no account exists yet, fill in their details to create one; if one exists you can update their details and subjects here.':'ابحث برقم الطالب. إن لم يوجد حساب فأدخل بياناته لإنشائه؛ وإن وُجد فيمكنك تحديث بياناته ومواده هنا.',
+  'Account':'الحساب','Password':'كلمة المرور',
   'Password (new account only)':'كلمة المرور (للحساب الجديد فقط)','Phone':'الهاتف','Save account':'حفظ الحساب','Subjects':'المواد',
   'e.g. Medicine':'مثال: الطب','e.g. 2024':'مثال: 2024','e.g. RU0967/16':'مثال: RU0967/16','Male':'ذكر','Female':'أنثى',
   // ---- teachers
@@ -1889,6 +2033,21 @@ const AR = {
   'No subjects yet.':'لا توجد مواد بعد.','Fix':'معالجة','Every subject is set up and fully graded.':'جميع المواد مُعدَّة ومُقيَّمة بالكامل.','(no name)':'(بلا اسم)','Refresh failed.':'فشل التحديث.',
   'Open Overview':'فتح نظرة عامة','Cohort performance by subject':'أداء الدفعة حسب المادة','Escape':'Esc',
   // tooltips
+  'Save all changes':'حفظ كل التغييرات','Saving':'جارٍ الحفظ',
+  'Subjects taught':'المواد التي يدرّسها',
+  'A teacher can teach several subjects — tick them under "Teaches" and press Save. A subject has one teacher, so a subject already taught by someone else is reassigned.':'يمكن للمعلم أن يدرّس عدة مواد — حدّدها ضمن «يدرّس» ثم اضغط حفظ. للمادة معلم واحد، لذا تُعاد إسناد المادة إن كان يدرّسها معلم آخر.',
+  'Only name and email are required. subjects is optional: a semicolon-separated list of subject names — a teacher can have several. A subject already taught by someone else is reassigned.':'الحقلان المطلوبان فقط: name وemail. الحقل subjects اختياري: قائمة أسماء مواد مفصولة بفاصلة منقوطة — ويمكن أن يكون للمعلم عدة مواد. تُعاد إسناد المادة إن كان يدرّسها معلم آخر.',
+  'Student name or email':'اسم الطالب أو بريده الإلكتروني',"Start typing an enrolled student's name or email":'ابدأ بكتابة اسم أو بريد طالب مسجَّل','Name or email':'الاسم أو البريد الإلكتروني','Search by name or email':'ابحث بالاسم أو البريد الإلكتروني',
+  'Paste names or emails':'لصق أسماء أو بريد','Student names or emails (one per line)':'أسماء الطلاب أو بريدهم الإلكتروني (واحد في كل سطر)','Create accounts for the missing students':'إنشاء حسابات للطلاب غير الموجودين','e.g. Kadir Kemal':'مثال: Kadir Kemal',
+  'Students are matched by their name — add an email column if two students share the same name.':'تتم مطابقة الطلاب بأسمائهم — أضف عمود email إذا اشترك طالبان في الاسم نفسه.',
+  "Only name is required. email defaults to the student's name @jumj.com (for example kadir.kemal@jumj.com). gender, phone, department, batch and subjects are optional; subjects is a semicolon-separated list of subject names or keys. For students who already have an account, blank columns are left as they are and subjects are added to their existing ones.":'الحقل المطلوب فقط: name. يُنشأ البريد الإلكتروني تلقائيًا من اسم الطالب @jumj.com (مثل kadir.kemal@jumj.com). الحقول gender وphone وdepartment وbatch وsubjects اختيارية؛ و subjects قائمة مفصولة بفاصلة منقوطة لأسماء المواد أو معرّفاتها. بالنسبة للطلاب الذين لديهم حساب، تبقى الحقول الفارغة كما هي وتُضاف المواد إلى موادهم الحالية.',
+  'Look up a student by name or email. If no account exists yet, fill in their details to create one; if one exists you can update their details and subjects here.':'ابحث عن الطالب بالاسم أو البريد الإلكتروني. إن لم يوجد حساب فأدخل بياناته لإنشائه؛ وإن وُجد فيمكنك تحديث بياناته ومواده هنا.',
+  'Enter a student name or email.':'أدخل اسم الطالب أو بريده الإلكتروني.','Paste at least one student name or email.':'الصق اسم طالب واحد أو بريده على الأقل.',
+  'Several students share this name — enter their email instead.':'يشترك عدة طلاب في هذا الاسم — أدخل بريد الطالب بدلًا منه.','Several students share this name — search by email instead.':'يشترك عدة طلاب في هذا الاسم — ابحث بالبريد الإلكتروني بدلًا منه.',
+  'Several students share this name — add an email column.':'يشترك عدة طلاب في هذا الاسم — أضف عمود email.','Several existing students share this name — add an email column.':'يشترك عدة طلاب حاليين في هذا الاسم — أضف عمود email.',
+  'CSV must include a "name" column.':'يجب أن يتضمّن ملف CSV عمود "name".','CSV must include a "name" or "email" column.':'يجب أن يتضمّن ملف CSV عمود "name" أو "email".',
+  'Email already has an account (edit the email and re-run, or it may already be this student — check by name).':'هذا البريد مرتبط بحساب بالفعل (عدّل البريد وأعد التشغيل، أو قد يكون هذا الطالب نفسه — تحقق بالاسم).',
+  "That email already has an account — if this is the same student, look them up by name instead.":'هذا البريد مرتبط بحساب بالفعل — إن كان الطالب نفسه فابحث عنه بالاسم.',
   'How many graded students fall in each 10% band.':'عدد الطلاب المقيَّمين ضمن كل نطاق من 10%.','Not every component has a score yet.':'لم تُدخَل درجة لكل مكوّن بعد.','Unassigned':'غير مُسنَد',
   'e.g. Midterm':'مثال: الاختبار النصفي','auto':'تلقائي','max':'الحد الأقصى','weight':'الوزن',
   'Deletes their profile. Does NOT delete their sign-in — remove that separately in Firebase Console → Authentication → Users.':'يحذف ملفه الشخصي فقط ولا يحذف بيانات دخوله — احذفها بشكل منفصل من Firebase Console ← Authentication ← Users.',
@@ -1930,7 +2089,7 @@ const AR_RE = [
   P('Enroll all {n} matching', (m,a) => `تسجيل كل ${a} مطابقين`),
   P('Enrolled {n} student(s) in {s}.', (m,a,s) => `تم تسجيل ${N(a,'student')} في ${s}.`),
   P('Enroll all {n} matching students in {s}?', (m,a,s) => `تسجيل كل الطلاب المطابقين (${a}) في ${s}؟`),
-  P('No account for: {s}', (m,a) => `لا يوجد حساب للأرقام: ${a}`),
+  P('No account for: {s}', (m,a) => `لا يوجد حساب لـ: ${a}`),
   P('Columns: {s}. Columns that aren\'t components of {s} yet will offer to create them. Columns missing from the file leave stored scores untouched.', (m,a,b) => `الأعمدة: ${a}. الأعمدة غير الموجودة ضمن مكوّنات ${b} سيُعرض عليك إنشاؤها. الأعمدة الناقصة من الملف تُبقي الدرجات المحفوظة كما هي.`),
   P('{s} has no grading components yet. Include a column per scored part (e.g. midterm, final) and you\'ll be asked for each one\'s max and weight.', (m,a) => `ليست لـ ${a} مكوّنات تقييم بعد. أدرج عمودًا لكل جزء مُدرَّج (مثل midterm وfinal) وسيُطلب منك الحد الأقصى والوزن لكل منها.`),
   P('{s} has no grading components yet. Define them in the Grading tab, or import a results CSV to create them from its columns.', (m,a) => `ليست لـ ${a} مكوّنات تقييم بعد. عرّفها من تبويب التقييم، أو استورد ملف نتائج CSV لإنشائها من أعمدته.`),
@@ -1940,7 +2099,7 @@ const AR_RE = [
   P('Found {n} column(s) not yet in this subject: {s}. Set max & weight for each below, then continue.', (m,a,c) => `تم العثور على ${N(a,'column')} غير موجودة في هذه المادة: ${c}. حدّد الحد الأقصى والوزن لكل منها أدناه ثم تابع.`),
   P('Enter max and weight for "{s}".', (m,a) => `أدخل الحد الأقصى والوزن لـ "${a}".`),
   P('{s} (raw, out of {d}, weight {d})', (m,a,b,c) => `${a} (الدرجة الخام من ${b}، الوزن ${c})`),
-  P('No account found for "{s}" — create this student first (Enroll → New students).', (m,a) => `لا يوجد حساب للرقم "${a}" — أنشئ هذا الطالب أولًا (التسجيل ← طلاب جدد).`),
+  P('No account found for "{s}" — create this student first (Enroll → New students).', (m,a) => `لا يوجد حساب للطالب "${a}" — أنشئ هذا الطالب أولًا (التسجيل ← طلاب جدد).`),
   P('Found {s} ({s})[[ — not enrolled in {s} yet.]]', (m,a,b,c) => `تم العثور على ${a} (${b})` + (c ? ` — غير مسجَّل في ${c} بعد.` : '')),
   P('Saved {s}\'s result for {s} and recalculated cohort stats.', (m,a,b) => `تم حفظ نتيجة ${a} في ${b} وإعادة احتساب إحصاءات الدفعة.`),
   P('{n} result(s) already recorded for this subject.', (m,a) => `يوجد ${+a === 2 ? 'نتيجتان' : N(a,'result')} مسجَّلة بالفعل لهذه المادة.`),
@@ -1960,13 +2119,22 @@ const AR_RE = [
   P('Done — {n} account(s) imported.', (m,a) => `تم — استيراد ${N(a,'account')}.`),
   P('Done — {n} account(s) imported and enrolled.', (m,a) => `تم — استيراد ${N(a,'account')} وتسجيلهم.`),
   P('Found existing student: {s} ({s}) — you can update their details below.', (m,a,b) => `تم العثور على طالب موجود: ${a} (${b}) — يمكنك تحديث بياناته أدناه.`),
-  P('No account found for "{s}" — filling this in will create a new student account.', (m,a) => `لا يوجد حساب للرقم "${a}" — سيؤدي إكمال البيانات إلى إنشاء حساب طالب جديد.`),
+  P('No account found for "{s}" — filling this in will create a new student account.', (m,a) => `لا يوجد حساب للطالب "${a}" — سيؤدي إكمال البيانات إلى إنشاء حساب طالب جديد.`),
   P('Saved {s}\'s account.', (m,a) => `تم حفظ حساب ${a}.`),
   P('{n} imported, {n} failed. Check the Status column and re-run (only unchecked/failed/new rows will be retried).', (m,a,b) => `تم استيراد ${a} وفشل ${b}. راجع عمود الحالة وأعد التشغيل (ستُعاد محاولة الصفوف غير المحدَّدة أو الفاشلة أو الجديدة فقط).`),
   P('{n} imported, {n} failed. Check the Status column and re-run.', (m,a,b) => `تم استيراد ${a} وفشل ${b}. راجع عمود الحالة وأعد التشغيل.`),
   P('of {n} teacher(s)', (m,a) => `من ${N(a,'teacher')}`),
   P('Delete {s}\'s teacher profile? This can\'t be undone.', (m,a) => `حذف الملف الشخصي للمعلم ${a}؟ لا يمكن التراجع عن ذلك.`),
   P('Note: {n} subject(s) are still assigned to them ({s}) — reassign those in each subject\'s Settings.', (m,a,b) => `ملاحظة: ما زالت ${N(a,'subject')} مسندة إليه (${b}) — أعد إسنادها من إعدادات كل مادة.`),
+  P('Saved {s} — teaching {n} subject(s).', (m,a,b) => `تم حفظ ${a} — يدرّس ${N(b,'subject')}.`),
+  P('These subjects already have a teacher and will be reassigned to {s}: {s}. Continue?', (m,a,b) => `لهذه المواد معلم بالفعل وسيُعاد إسنادها إلى ${a}: ${b}. هل تريد المتابعة؟`),
+  P('These subjects already have a teacher and will be reassigned: {s}. Continue?', (m,a) => `لهذه المواد معلم بالفعل وسيُعاد إسنادها: ${a}. هل تريد المتابعة؟`),
+  P('Note: {n} subject(s) ({s}) will be left without a teacher.', (m,a,b) => `ملاحظة: ستبقى ${N(a,'subject')} (${b}) بلا معلم.`),
+  P('Save all changes ({n})', (m,a) => `حفظ كل التغييرات (${a})`),
+  P('Saved {n} student(s).', (m,a) => `تم حفظ ${N(a,'student')}.`),
+  P('Saved {n} teacher(s).', (m,a) => `تم حفظ ${N(a,'teacher')}.`),
+  P('Saved {n} result(s).', (m,a) => `تم حفظ ${N(a,'result')}.`),
+  P('{n} saved, {n} failed.', (m,a,b) => `تم حفظ ${a} وفشل ${b}.`),
   P('Parsed {n} row(s).', (m,a) => `تم تحليل ${N(a,'row')}.`),
   P('Done — {n} teacher account(s) imported.', (m,a) => `تم — استيراد ${N(a,'account')} للمعلمين.`),
   P('Found existing teacher: {s} — you can update their details below.', (m,a) => `تم العثور على معلم موجود: ${a} — يمكنك تحديث بياناته أدناه.`),
@@ -1986,6 +2154,7 @@ const AR_RE = [
   P('Some results could not be loaded: {s}', (m,a) => `تعذّر تحميل بعض النتائج: ${a}`),
   P('Could not load data: {s}', (m,a) => `تعذّر تحميل البيانات: ${a}`),
   P('Parsed {n} row(s)', (m,a) => `تم تحليل ${N(a,'row')}`),
+  P('Parsed {n} student(s)', (m,a) => `تم تحليل ${N(a,'student')}`),
 ];
 // substring rules (Firebase / network errors)
 const AR_SUB = [
@@ -2340,7 +2509,7 @@ function renderSubOverview(){
   $('ovLeaderBody').innerHTML = top.length ? top.map((r,i) => {
     const s = studentByUid(r.uid) || {};
     const badge = r.complete ? '' : ' <span class="tag partial" title="Not every component has a score yet.">partial</span>';
-    return `<tr><td>${rankBadge(i)}</td><td>${esc(s.name || '(no name)')}${r.enrolled ? '' : ' <span class="chip warn">not enrolled</span>'}</td><td class="mono">${esc(s.id || '')}</td><td>${r.total.toFixed(2)} / ${r.maxTotal}${badge}</td><td>${r.pct.toFixed(1)}%</td></tr>`;
+    return `<tr><td>${rankBadge(i)}</td><td>${esc(s.name || '(no name)')}${r.enrolled ? '' : ' <span class="chip warn">not enrolled</span>'}</td><td>${genderChip(s.gender)}</td><td>${r.total.toFixed(2)} / ${r.maxTotal}${badge}</td><td>${r.pct.toFixed(1)}%</td></tr>`;
   }).join('') : `<tr><td colspan="5">No results yet.</td></tr>`;
   // awaiting
   const have = new Set(rows.map(r => r.uid));
@@ -2348,7 +2517,7 @@ function renderSubOverview(){
   $('ovMissingHeading').textContent = `Awaiting results (${missing.length})`;
   if(missing.length){
     $('ovMissingWrap').classList.remove('hidden'); setBox('ovMissingOk','');
-    $('ovMissingBody').innerHTML = missing.map(s => `<tr><td>${esc(s.name || '(no name)')}</td><td class="mono">${esc(s.id)}</td><td><button class="linkbtn" data-enter="${s.uid}">Enter result</button></td></tr>`).join('');
+    $('ovMissingBody').innerHTML = missing.map(s => `<tr><td>${esc(s.name || '(no name)')}</td><td>${genderChip(s.gender)}</td><td class="mono">${esc(s.email)}</td><td><button class="linkbtn" data-enter="${s.uid}">Enter result</button></td></tr>`).join('');
     $('ovMissingBody').querySelectorAll('[data-enter]').forEach(b => b.addEventListener('click', () => openIndividual(b.dataset.enter)));
   }else{
     $('ovMissingWrap').classList.add('hidden');
@@ -2367,16 +2536,16 @@ function renderSubOverview(){
     }).filter(Boolean).sort((a,b) => b.raw - a.raw).slice(0, ovTopN);
     const trs = crow.length ? crow.map((r,i) => {
       const s = studentByUid(r.uid) || {};
-      return `<tr><td>${rankBadge(i)}</td><td>${esc(s.name || '(unknown)')}</td><td>${r.raw}/${r.max}</td><td>${r.weighted !== null && r.weighted !== undefined ? r.weighted.toFixed(2) : '—'}</td></tr>`;
-    }).join('') : `<tr><td colspan="4">No scores entered yet.</td></tr>`;
-    return `<div class="subject-leaderboard-card"><h4 title="${esc(c.label)}">${esc(c.label)}</h4><div class="table-scroll table-compact"><table><thead><tr><th></th><th>Student</th><th>Raw</th><th>Weighted</th></tr></thead><tbody>${trs}</tbody></table></div></div>`;
+      return `<tr><td>${rankBadge(i)}</td><td>${esc(s.name || '(unknown)')}</td><td>${genderChip(s.gender)}</td><td>${r.raw}/${r.max}</td><td>${r.weighted !== null && r.weighted !== undefined ? r.weighted.toFixed(2) : '—'}</td></tr>`;
+    }).join('') : `<tr><td colspan="5">No scores entered yet.</td></tr>`;
+    return `<div class="subject-leaderboard-card"><h4 title="${esc(c.label)}">${esc(c.label)}</h4><div class="table-scroll table-compact"><table><thead><tr><th></th><th>Student</th><th>Gender</th><th>Raw</th><th>Weighted</th></tr></thead><tbody>${trs}</tbody></table></div></div>`;
   }).join('') : `<p class="hint" style="margin:0">This subject has no grading components yet — define them in the Grading tab.</p>`;
 }
 const OV_SKELETON = `
   <div class="card"><p class="card-title">Score distribution</p><p class="hint">How many graded students fall in each 10% band.</p><div class="histogram" id="ovHistogram"></div></div>
   <div class="sub-two">
-    <div class="card"><p class="card-title">Leaderboard</p><div class="table-scroll table-compact" style="margin-top:10px"><table style="min-width:420px"><thead><tr><th></th><th>Student</th><th>ID</th><th>Score</th><th>%</th></tr></thead><tbody id="ovLeaderBody"></tbody></table></div></div>
-    <div class="card"><p class="card-title" id="ovMissingHeading">Awaiting results</p><p class="hint">Enrolled students with no result yet.</p><div class="ok-box" id="ovMissingOk"></div><div class="table-scroll table-compact" id="ovMissingWrap" style="max-height:340px"><table style="min-width:340px"><thead><tr><th>Name</th><th>ID</th><th></th></tr></thead><tbody id="ovMissingBody"></tbody></table></div></div>
+    <div class="card"><p class="card-title">Leaderboard</p><div class="table-scroll table-compact" style="margin-top:10px"><table style="min-width:420px"><thead><tr><th></th><th>Student</th><th>Gender</th><th>Score</th><th>%</th></tr></thead><tbody id="ovLeaderBody"></tbody></table></div></div>
+    <div class="card"><p class="card-title" id="ovMissingHeading">Awaiting results</p><p class="hint">Enrolled students with no result yet.</p><div class="ok-box" id="ovMissingOk"></div><div class="table-scroll table-compact" id="ovMissingWrap" style="max-height:340px"><table style="min-width:340px"><thead><tr><th>Name</th><th>Gender</th><th>Email</th><th></th></tr></thead><tbody id="ovMissingBody"></tbody></table></div></div>
   </div>
   <div class="card" style="margin-top:14px"><p class="card-title">Top performers by component</p><div class="subject-leaderboards-scroll" id="ovCompWrap"></div></div>`;
 $('ovTopN').addEventListener('change', () => {
@@ -2394,7 +2563,7 @@ function renderRoster(){
   const subj = curSubj();
   const enrolled = enrolledStudents(subj.slug);
   const q = $('enrSearch').value.trim().toLowerCase();
-  const rows = enrolled.filter(s => (!q || (s.id + ' ' + s.name + ' ' + s.email).toLowerCase().includes(q)) && studentPasses(s, 'enr'));
+  const rows = enrolled.filter(s => (!q || (s.name + ' ' + s.email).toLowerCase().includes(q)) && studentPasses(s, 'enr'));
   const m = resultsStore.get(subj.slug) || new Map();
   const known = resultsKnown(subj.slug);
   $('enrCount').innerHTML = `<b>${rows.length}</b> of ${enrolled.length} enrolled`;
@@ -2402,8 +2571,8 @@ function renderRoster(){
     const r = m.get(s.uid);
     let resCell = known ? '<span class="chip muted">No result</span>' : '<span class="chip muted">…</span>';
     if(r && r.maxTotal) resCell = `<span class="mono">${(r.total / r.maxTotal * 100).toFixed(1)}%</span>${r.complete ? '' : ' <span class="tag partial">partial</span>'}`;
-    return `<tr data-uid="${s.uid}"><td class="chk"><input type="checkbox" class="enrChk"></td><td class="mono">${esc(s.id)}</td><td>${esc(s.name)}</td><td>${esc(s.department || '—')}</td><td>${esc(s.batch || '—')}</td><td>${resCell}</td></tr>`;
-  }).join('') : `<tr><td colspan="6">${enrolled.length ? 'No enrolled students match that search.' : 'No students enrolled yet — add some in the Enroll tab.'}</td></tr>`;
+    return `<tr data-uid="${s.uid}"><td class="chk"><input type="checkbox" class="enrChk"></td><td>${esc(s.name)}</td><td class="mono">${esc(s.email)}</td><td>${genderChip(s.gender)}</td><td>${esc(s.department || '—')}</td><td>${esc(s.batch || '—')}</td><td>${resCell}</td></tr>`;
+  }).join('') : `<tr><td colspan="7">${enrolled.length ? 'No enrolled students match that search.' : 'No students enrolled yet — add some in the Enroll tab.'}</td></tr>`;
   updateEnrRemoveBtn();
 }
 function renderEnroll(){
@@ -2440,10 +2609,10 @@ async function removeFromSubject(uids){
 $('enrExportBtn').addEventListener('click', () => {
   const subj = curSubj(); if(!subj) return;
   const m = resultsStore.get(subj.slug) || new Map();
-  const rows = [['ID','Name','Email','Department','Batch','Total','Max','Percent']];
+  const rows = [['Name','Email','Gender','Phone','Department','Batch','Total','Max','Percent']];
   enrolledStudents(subj.slug).forEach(s => {
     const r = m.get(s.uid);
-    rows.push([s.id, s.name, s.email, s.department, s.batch, r ? r.total : '', r ? r.maxTotal : '', r && r.maxTotal ? (r.total/r.maxTotal*100).toFixed(1) : '']);
+    rows.push([s.name, s.email, s.gender, s.phone, s.department, s.batch, r ? r.total : '', r ? r.maxTotal : '', r && r.maxTotal ? (r.total/r.maxTotal*100).toFixed(1) : '']);
   });
   downloadCsv(`${subj.slug}_roster.csv`, rows);
 });
@@ -2453,7 +2622,7 @@ function addCandidates(){
   const subj = curSubj();
   const q = $('addSearch').value.trim().toLowerCase(), sf = $('addSubj').value;
   return allStudents.filter(s => !isEnrolled(s, subj.slug) &&
-    (!q || (s.id + ' ' + s.name + ' ' + s.email).toLowerCase().includes(q)) &&
+    (!q || (s.name + ' ' + s.email).toLowerCase().includes(q)) &&
     studentPasses(s, 'add') &&
     (!sf || (sf === '__none' ? !s.subjectIds.some(x => subjectBySlug(x)) : s.subjectIds.includes(sf))));
 }
@@ -2462,8 +2631,8 @@ function renderAddCandidates(){
   const shown = cands.slice(0, 100);
   $('addCount').innerHTML = `${cands.length} student(s) not yet enrolled${cands.length > shown.length ? ` — showing the first ${shown.length}, narrow the filters to see others` : ''}`;
   $('addBody').innerHTML = shown.length ? shown.map(s => `
-    <tr data-uid="${s.uid}"><td class="chk"><input type="checkbox" class="addChk"></td><td class="mono">${esc(s.id)}</td><td>${esc(s.name)}</td><td>${esc(s.department || '—')}</td><td>${esc(s.batch || '—')}</td><td>${subjectChips(s.subjectIds, false)}</td></tr>`).join('')
-    : `<tr><td colspan="6">${allStudents.length ? 'Nobody left to add with these filters.' : 'No student accounts yet.'}</td></tr>`;
+    <tr data-uid="${s.uid}"><td class="chk"><input type="checkbox" class="addChk"></td><td>${esc(s.name)}</td><td class="mono">${esc(s.email)}</td><td>${genderChip(s.gender)}</td><td>${esc(s.department || '—')}</td><td>${esc(s.batch || '—')}</td><td>${subjectChips(s.subjectIds, false)}</td></tr>`).join('')
+    : `<tr><td colspan="7">${allStudents.length ? 'Nobody left to add with these filters.' : 'No student accounts yet.'}</td></tr>`;
   $('addSelectAll').checked = false;
   updateAddButtons(cands.length);
 }
@@ -2501,14 +2670,18 @@ let missingPasted = [];
 $('pasteEnrollBtn').addEventListener('click', async () => {
   const subj = curSubj(); if(!subj) return;
   setBox('pasteError',''); setBox('pasteOk',''); setBox('pasteMissing',''); $('pasteCreateRow').classList.add('hidden');
-  const tokens = $('pasteIds').value.split(/[\n,;\t]+/).map(t => t.trim()).filter(Boolean);
-  if(!tokens.length){ setBox('pasteError', 'Paste at least one student ID.'); return; }
-  const byNorm = new Map(allStudents.map(s => [normId(s.id), s]));
-  const found = [], missing = []; let already = 0;
-  new Set(tokens.map(normId)).forEach(n => {
-    const s = byNorm.get(n);
-    if(!s){ missing.push(tokens.find(t => normId(t) === n)); return; }
-    if(isEnrolled(s, subj.slug)) already++; else found.push(s.uid);
+  const tokens = $('pasteIds').value.split(/[\n;\t]+/).map(t => t.trim()).filter(Boolean);
+  if(!tokens.length){ setBox('pasteError', 'Paste at least one student name or email.'); return; }
+  const found = [], missing = [], missingPlain = [], seen = new Set(); let already = 0;
+  tokens.forEach(t => {
+    const k = normName(t); if(seen.has(k)) return; seen.add(k);
+    const r = resolveStudent(t);
+    if(!r.student){
+      missingPlain.push(t);
+      missing.push(r.ambiguous ? `${t} (${L('several students share this name — use the email', 'عدة طلاب بالاسم نفسه — استخدم البريد')})` : t);
+      return;
+    }
+    if(isEnrolled(r.student, subj.slug)) already++; else found.push(r.student.uid);
   });
   const btn = $('pasteEnrollBtn'); setBusy(btn, true);
   try{
@@ -2518,7 +2691,7 @@ $('pasteEnrollBtn').addEventListener('click', async () => {
       `Enrolled ${n} student(s)${already ? `, ${already} already enrolled` : ''}${missing.length ? `, ${missing.length} not found` : ''}.`,
       `تم تسجيل ${N(n,'student')}${already ? `، و${already} مسجَّلون سابقًا` : ''}${missing.length ? `، و${missing.length} غير موجودين` : ''}.`), 'ok');
     if(missing.length){
-      missingPasted = missing;
+      missingPasted = missingPlain;
       setBox('pasteMissing', `No account for: ${missing.join(', ')}`, 'warn');
       $('pasteCreateRow').classList.remove('hidden');
     }
@@ -2529,7 +2702,7 @@ function openStudentsBulk(slug, ids){
   go('students', () => {
     tabApi.stu.activate('tabStuBulk');
     $('acctEnrollSubject').value = slug || '';
-    if(ids && ids.length) $('acctCsvInput').value = 'id,name\n' + ids.map(i => i + ',').join('\n');
+    if(ids && ids.length) $('acctCsvInput').value = 'name\n' + ids.join('\n');
   });
 }
 $('pasteCreateBtn').addEventListener('click', () => openStudentsBulk(route.slug, missingPasted));
@@ -2541,11 +2714,11 @@ function renderResultsTab(){
   const subj = curSubj();
   const comps = subj.components || [];
   const keys = comps.map(c => c.key);
-  $('csvInput').placeholder = `id,${(keys.length ? keys : ['midterm','final']).join(',')}\nRU0967/16,${(keys.length ? keys : ['a','b']).map(() => '0').join(',')}`;
+  $('csvInput').placeholder = `name,${(keys.length ? keys : ['midterm','final']).join(',')}\nKadir Kemal,${(keys.length ? keys : ['a','b']).map(() => '0').join(',')}`;
   $('bulkHint').textContent = comps.length
-    ? `Columns: ${['id'].concat(keys).join(', ')}. Columns that aren't components of ${subj.name} yet will offer to create them. Columns missing from the file leave stored scores untouched.`
+    ? `Columns: ${['name'].concat(keys).join(', ')}. Columns that aren't components of ${subj.name} yet will offer to create them. Columns missing from the file leave stored scores untouched.`
     : `${subj.name} has no grading components yet. Include a column per scored part (e.g. midterm, final) and you'll be asked for each one's max and weight.`;
-  $('enrolledList').innerHTML = enrolledStudents(subj.slug).map(s => `<option value="${esc(s.id)}">${esc(s.name)}</option>`).join('');
+  $('enrolledList').innerHTML = enrolledStudents(subj.slug).map(s => `<option value="${esc(s.email)}">${esc(s.name)}</option>`).join('');
   renderIndivComponents();
   renderAllResultsTable();
 }
@@ -2556,13 +2729,24 @@ $('resRefreshBtn').addEventListener('click', async () => {
   await withBusy($('resRefreshBtn'), () => p); renderHero(subj); renderAllResultsTable();
 });
 $('resSearch').addEventListener('input', renderAllResultsTable);
+$('resSaveAllBtn').addEventListener('click', async () => {
+  setBox('resAllError',''); setBox('resAllOk','');
+  const subj = curSubj(); const rows = dirtyRows('res'); if(!subj || !rows.length) return;
+  const btn = $('resSaveAllBtn'); setBusy(btn, true);
+  let ok = 0, fail = 0; setProgress('resSaveProgress', 0, rows.length, 'Saving');
+  for(const tr of rows){ (await tr._save({recompute: false})) ? ok++ : fail++; setProgress('resSaveProgress', ok + fail, rows.length, 'Saving'); }
+  if(ok){ try{ await recomputeCohort(subj.slug); }catch(e){ reportCohortError(e, subj.slug); } renderHero(subj); }
+  refreshBulkBtn('res');
+  if(fail) setBox('resAllError', `${ok} saved, ${fail} failed.`); else setBox('resAllOk', `Saved ${ok} result(s).`, 'ok');
+});
 $('resFilter').addEventListener('change', renderAllResultsTable);
 
 function renderAllResultsTable(){
   const subj = curSubj(); if(!subj) return;
+  setTimeout(() => refreshBulkBtn('res'), 0);
   const comps = subj.components || [];
   const head = $('allResultsHead'), body = $('allResultsBody');
-  head.innerHTML = `<th>ID</th><th>Name</th>` +
+  head.innerHTML = `<th>Name</th><th>Gender</th>` +
     comps.map(c => `<th>${esc(c.label)} <span class="mono" style="font-weight:400;color:var(--faint);">/${c.max}</span></th>`).join('') +
     `<th>Total</th><th>Status</th><th></th>`;
   setBox('resNoComps', comps.length ? '' : `${subj.name} has no grading components yet. Define them in the Grading tab, or import a results CSV to create them from its columns.`, 'warn');
@@ -2575,7 +2759,7 @@ function renderAllResultsTable(){
   const f = $('resFilter').value;
   const enrolledCount = enrolledStudents(subj.slug).length;
   const rows = allStudents.filter(s => (isEnrolled(s, subj.slug) || m.has(s.uid)) &&
-    (!q || (s.id + ' ' + s.name).toLowerCase().includes(q)) && studentPasses(s, 'res') &&
+    (!q || (s.name + ' ' + s.email).toLowerCase().includes(q)) && studentPasses(s, 'res') &&
     (f === '' || (f === 'missing' && !m.has(s.uid)) || (f === 'submitted' && m.has(s.uid)) || (f === 'partial' && m.has(s.uid) && !m.get(s.uid).complete)));
   $('resCount').innerHTML = `<b>${rows.length}</b> student(s) · ${enrolledCount} enrolled`;
   if(!rows.length){
@@ -2596,8 +2780,8 @@ function renderAllResultsTable(){
     const notEnr = isEnrolled(s, subj.slug) ? '' : ` <button class="chip warn enrollBtn" style="cursor:pointer" title="Enroll this student in ${esc(subj.name)}">not enrolled · enroll</button>`;
     return `
     <tr data-uid="${s.uid}">
-      <td class="mono">${esc(s.id)}</td>
-      <td>${esc(s.name)}${notEnr}</td>
+      <td>${esc(s.name)}${notEnr}<div class="subtext">${esc(s.email)}</div></td>
+      <td>${genderChip(s.gender)}</td>
       ${comps.map(c => `<td><input type="number" step="any" class="resRawInput" data-key="${esc(c.key)}" value="${rawMap[c.key]}"></td>`).join('')}
       <td class="total-cell resTotal">${total}${partial}</td>
       <td class="status"></td>
@@ -2626,24 +2810,28 @@ function renderAllResultsTable(){
       const {total, complete} = computeComponents(collect(), comps);
       totalTd.innerHTML = `${total.toFixed(2)}${complete ? '' : ' <span class="tag partial" title="Not every component has a score yet — total is based on what has been entered.">partial</span>'}`;
     }));
-    saveBtn.addEventListener('click', async () => {
+    const doSave = async ({recompute = true} = {}) => {
       const {components, total, complete} = computeComponents(collect(), comps);
       saveBtn.disabled = true; saveBtn.textContent = 'Saving…'; saveBtn.classList.add('is-busy');
       statusTd.textContent = ''; statusTd.className = 'status';
       try{
         await writeResult(uid, subj, {components, total, complete});
-        try{ await recomputeCohort(subj.slug); }catch(e){ reportCohortError(e, subj.slug); }
+        if(recompute){ try{ await recomputeCohort(subj.slug); }catch(e){ reportCohortError(e, subj.slug); } }
         inputs.forEach(i => i.dataset.orig = i.value);
         tr.classList.remove('dirty');
         statusTd.textContent = 'Saved ✓'; statusTd.className = 'status done';
         saveBtn.textContent = 'Save'; saveBtn.classList.remove('is-busy');
-        renderHero(subj);
+        if(recompute) renderHero(subj);
         setTimeout(() => { statusTd.textContent=''; statusTd.className='status'; }, 2500);
+        return true;
       }catch(err){
         statusTd.textContent = err.message || 'Failed'; statusTd.className = 'status failed';
         saveBtn.disabled = false; saveBtn.textContent = 'Save'; saveBtn.classList.remove('is-busy');
+        return false;
       }
-    });
+    };
+    tr._save = doSave;
+    saveBtn.addEventListener('click', async () => { await doSave(); refreshBulkBtn('res'); });
   });
 }
 
@@ -2659,10 +2847,9 @@ $('parseBulkBtn').addEventListener('click', async () => {
   const subj = curSubj(); if(!subj) return;
   const {headers, rows} = parseCSV($('csvInput').value);
   if(!headers.length){ setBox('bulkError','Paste some CSV data first.'); return; }
-  const idIdx = headers.indexOf('id');
-  if(idIdx === -1){ setBox('bulkError','CSV must include an "id" column.'); return; }
-  const nameIdx = headers.indexOf('name');
-  pendingParse = {headers, rows, idIdx, nameIdx};
+  const nameIdx = headers.indexOf('name'), emailIdx = headers.indexOf('email');
+  if(nameIdx === -1 && emailIdx === -1){ setBox('bulkError','CSV must include a "name" or "email" column.'); return; }
+  pendingParse = {headers, rows, nameIdx, emailIdx};
   const reserved = new Set(['id','name','email']);
   const existingKeys = new Set((subj.components || []).map(c => c.key));
   const newCols = headers.filter(h => !reserved.has(h) && !existingKeys.has(keyify(h)));
@@ -2717,7 +2904,7 @@ $('saveNewCompBtn').addEventListener('click', async () => {
 });
 $('cancelNewCompBtn').addEventListener('click', () => { $('newCompWrap').classList.add('hidden'); pendingParse = null; setBox('bulkOk',''); });
 
-async function continueParse({headers, rows, idIdx, nameIdx}){
+async function continueParse({headers, rows, nameIdx, emailIdx}){
   const subj = curSubj(); if(!subj) return;
   const comps = subj.components || [];
   const compCols = comps.map(c => ({...c, col: headers.indexOf(c.key)}));
@@ -2726,18 +2913,21 @@ async function continueParse({headers, rows, idIdx, nameIdx}){
   try{
     await ensureSubjectResults(subj.slug);
     const stored = resultsStore.get(subj.slug) || new Map();
-    const byNorm = new Map(allStudents.map(s => [normId(s.id), s]));
+    const byEmail = new Map(allStudents.map(s => [(s.email || '').toLowerCase(), s]));
+    const byName = new Map(); allStudents.forEach(s => { const k = normName(s.name); if(!byName.has(k)) byName.set(k, []); byName.get(k).push(s); });
     const parsed = rows.map(cols => {
-      const id = (cols[idIdx] || '').trim();
+      const email = emailIdx !== -1 ? (cols[emailIdx] || '').trim() : '';
       const name = nameIdx !== -1 ? (cols[nameIdx] || '').trim() : '';
       const rawMap = {};
       // undefined = "not in this file" (column absent) — distinct from a blank cell (explicit clear)
       compCols.forEach(c => { rawMap[c.key] = c.col !== -1 ? cols[c.col] : undefined; });
-      return {id, name, rawMap};
-    }).filter(r => r.id);
+      return {email, name, rawMap};
+    }).filter(r => r.name || r.email);
     const errors = rows.length - parsed.length;
     roster = parsed.map(r => {
-      const st = byNorm.get(normId(r.id)) || null;
+      let st = null, ambiguous = false;
+      if(r.email) st = byEmail.get(r.email.toLowerCase()) || null;
+      else { const res = resolveStudent(r.name); st = res.student || null; ambiguous = !!res.ambiguous; }
       const rawMap = {...r.rawMap};
       missingCols.forEach(c => {
         const prev = st && stored.get(st.uid);
@@ -2746,11 +2936,11 @@ async function continueParse({headers, rows, idIdx, nameIdx}){
       });
       const {components, total, complete} = computeComponents(rawMap, comps);
       return {
-        id: r.id, name: st ? st.name : (r.name || ''), existingUid: st ? st.uid : null,
+        email: st ? st.email : r.email, gender: st ? st.gender : '', name: st ? st.name : (r.name || ''), existingUid: st ? st.uid : null,
         enrolled: st ? isEnrolled(st, subj.slug) : false,
         components, total, complete,
         status: st ? 'pending' : 'noaccount',
-        error: st ? null : 'No account — create this student first (Enroll → New students).',
+        error: st ? null : (ambiguous ? 'Several students share this name — add an email column.' : 'No account — create this student first (Enroll → New students).'),
       };
     });
     $('bulkPreviewWrap').classList.remove('hidden');
@@ -2759,15 +2949,15 @@ async function continueParse({headers, rows, idIdx, nameIdx}){
     const notEnr = roster.filter(r => r.existingUid && !r.enrolled).length;
     const cols = missingCols.map(c => c.label).join(', ');
     setBox('bulkOk', L(
-      `Parsed ${roster.length} row(s)${errors ? `, ${errors} skipped (no ID)` : ''}${noAcc ? `, ${noAcc} have no account (skipped)` : ''}${notEnr ? `, ${notEnr} aren't enrolled in ${subj.name} yet` : ''}.${missingCols.length ? ` "${cols}" wasn't in this file — existing results kept their stored value.` : ''}`,
-      `تم تحليل ${N(roster.length,'row')}${errors ? `، وتخطّي ${errors} بلا رقم` : ''}${noAcc ? `، و${noAcc} بلا حساب (تم تجاوزهم)` : ''}${notEnr ? `، و${notEnr} غير مسجَّلين في ${subj.name} بعد` : ''}.${missingCols.length ? ` العمود "${cols}" غير موجود في هذا الملف — أُبقيت النتائج الحالية بقيمها المحفوظة.` : ''}`), 'ok');
+      `Parsed ${roster.length} row(s)${errors ? `, ${errors} skipped (no name)` : ''}${noAcc ? `, ${noAcc} have no account (skipped)` : ''}${notEnr ? `, ${notEnr} aren't enrolled in ${subj.name} yet` : ''}.${missingCols.length ? ` "${cols}" wasn't in this file — existing results kept their stored value.` : ''}`,
+      `تم تحليل ${N(roster.length,'row')}${errors ? `، وتخطّي ${errors} بلا اسم` : ''}${noAcc ? `، و${noAcc} بلا حساب (تم تجاوزهم)` : ''}${notEnr ? `، و${notEnr} غير مسجَّلين في ${subj.name} بعد` : ''}.${missingCols.length ? ` العمود "${cols}" غير موجود في هذا الملف — أُبقيت النتائج الحالية بقيمها المحفوظة.` : ''}`), 'ok');
   }catch(err){ setBox('bulkError', err.message || 'Could not parse CSV.'); }
   finally{ setBusy(btn, false); }
 }
 function renderBulkTable(){
   const subj = curSubj(); const comps = subj.components || [];
   const auto = $('autoEnrollChk').checked;
-  $('bulkTableHead').innerHTML = `<th class="chk"><input type="checkbox" id="selectAll" checked></th><th>ID</th><th>Name</th>` + comps.map(c => `<th>${esc(c.label)}</th>`).join('') + `<th>Total</th><th>Enrollment</th><th>Status</th>`;
+  $('bulkTableHead').innerHTML = `<th class="chk"><input type="checkbox" id="selectAll" checked></th><th>Name</th><th>Email</th><th>Gender</th>` + comps.map(c => `<th>${esc(c.label)}</th>`).join('') + `<th>Total</th><th>Enrollment</th><th>Status</th>`;
   $('cntTotal').textContent = roster.length;
   $('cntExisting').textContent = roster.filter(r => r.existingUid).length;
   $('cntError').textContent = roster.filter(r => r.status === 'noaccount').length;
@@ -2780,7 +2970,7 @@ function renderBulkTable(){
     return `
     <tr class="${r.status==='done'?'done':r.status==='failed'||r.status==='noaccount'?'failed':'existing'}" data-i="${i}">
       <td class="chk">${r.existingUid ? `<input type="checkbox" class="rowchk" data-i="${i}" ${r.status==='done'?'disabled':'checked'}>` : ''}</td>
-      <td>${esc(r.id)}</td><td>${esc(r.name || '—')}</td>
+      <td>${esc(r.name || '—')}</td><td class="mono">${esc(r.email || '—')}</td><td>${genderChip(r.gender)}</td>
       ${r.components.map(c => `<td>${c.raw !== null ? c.raw : '—'}</td>`).join('')}
       <td>${r.total !== null ? r.total.toFixed(2) : '—'}${r.complete === false ? ' <span class="tag partial" title="Not every component has a score in this row.">partial</span>' : ''}</td>
       <td>${enr}</td>
@@ -2845,24 +3035,23 @@ function updateIndivPreview(){
   $('indivPreview').innerHTML = comps.length
     ? components.map(c => `${esc(c.label)}: ${c.raw !== null ? c.raw : '—'}/${c.max} → <b>${c.weighted !== null ? c.weighted.toFixed(2) : '—'}</b>`).join(' · ') + `<br>Total: <b>${total.toFixed(2)}</b> / ${maxTotalOf(subj)}${badge}` : '';
 }
-function findStudentForLookup(text){
-  const t = normId(text); if(!t) return null;
-  return allStudents.find(s => normId(s.id) === t) || null;
-}
+function findStudentForLookup(text){ return resolveStudent(text).student || null; }
 function runLookup(){
   setBox('lookupError',''); setBox('indivOk',''); setBox('indivError','');
   const subj = curSubj(); if(!subj) return;
   const text = $('lookupId').value.trim();
-  if(!text){ setBox('lookupError','Enter a student ID.'); return; }
-  const s = findStudentForLookup(text);
+  if(!text){ setBox('lookupError','Enter a student name or email.'); return; }
+  const res = resolveStudent(text);
+  if(res.ambiguous){ setBox('lookupError','Several students share this name — enter their email instead.'); return; }
+  const s = res.student;
   if(!s){
     indivState = null;
     $('lookupResult').textContent = `No account found for "${text}" — create this student first (Enroll → New students).`;
     $('lookupResult').classList.remove('hidden'); $('indivForm').classList.add('hidden'); return;
   }
   const enrolled = isEnrolled(s, subj.slug);
-  indivState = {uid: s.uid, id: s.id, name: s.name, email: s.email, enrolled};
-  $('lookupResult').textContent = `Found ${s.name} (${s.email || s.id})${enrolled ? '' : ` — not enrolled in ${subj.name} yet.`}`;
+  indivState = {uid: s.uid, name: s.name, email: s.email, enrolled};
+  $('lookupResult').textContent = `Found ${s.name} (${s.email})${enrolled ? '' : ` — not enrolled in ${subj.name} yet.`}`;
   $('lookupResult').classList.remove('hidden');
   $('indivName').value = s.name; $('indivEmail').value = s.email;
   $('indivEnrollWrap').classList.toggle('hidden', enrolled); $('indivEnrollChk').checked = true;
@@ -2879,7 +3068,7 @@ async function openIndividual(uid){
   const s = studentByUid(uid); if(!s) return;
   go('subjects/' + encodeURIComponent(route.slug) + '/results', () => {
     tabApi.res.activate('tabResIndiv');
-    $('lookupId').value = s.id; runLookup();
+    $('lookupId').value = s.email; runLookup();
     $('lookupId').scrollIntoView({block:'center', behavior:'smooth'});
   });
 }
@@ -3000,10 +3189,10 @@ function renderAllStudentsTable(){
   const filter = ($('stuSearch').value || '').trim().toLowerCase();
   const sf = $('stuSubjFilter').value;
   const rows = allStudents.filter(s =>
-    (!filter || (s.id+' '+s.name+' '+s.email).toLowerCase().includes(filter)) && studentPasses(s, 'stu') &&
+    (!filter || (s.name+' '+s.email).toLowerCase().includes(filter)) && studentPasses(s, 'stu') &&
     (!sf || (sf === '__none' ? !s.subjectIds.some(x => subjectBySlug(x)) : s.subjectIds.includes(sf))));
   $('stuCount').innerHTML = `<b>${rows.length}</b> of ${allStudents.length} student(s)`;
-  $('stuSelectAll').checked = false; setTimeout(() => { if(typeof updateStuDeleteBtn === 'function') updateStuDeleteBtn(); }, 0);
+  $('stuSelectAll').checked = false; setTimeout(() => { if(typeof updateStuDeleteBtn === 'function') updateStuDeleteBtn(); refreshBulkBtn('stu'); }, 0);
   const body = $('allStudentsBody');
   if(!rows.length){
     body.innerHTML = `<tr><td colspan="11">${allStudents.length ? 'No students match.' : 'No students yet — add some with Bulk import or Add individually.'}</td></tr>`;
@@ -3013,10 +3202,9 @@ function renderAllStudentsTable(){
   body.innerHTML = rows.map(s => `
     <tr data-uid="${s.uid}">
       <td class="chk"><input type="checkbox" class="stuChk"></td>
-      <td><input type="text" class="stuIdInput" value="${esc(s.id)}"></td>
       <td><input type="text" class="stuNameInput" value="${esc(s.name)}"></td>
       <td><input type="email" class="stuEmailInput" value="${esc(s.email)}"></td>
-      <td><select class="stuGenderInput">${genders.map(g => `<option value="${g}" ${s.gender===g?'selected':''}>${g||'—'}</option>`).join('')}</select></td>
+      <td><select class="stuGenderInput g-${s.gender === 'Female' ? 'f' : s.gender === 'Male' ? 'm' : 'n'}">${genders.map(g => `<option value="${g}" ${s.gender===g?'selected':''}>${g||'—'}</option>`).join('')}</select></td>
       <td><input type="text" class="stuPhoneInput" value="${esc(s.phone)}" placeholder="09…"></td>
       <td><input type="text" class="stuDeptInput" value="${esc(s.department)}" placeholder="e.g. Medicine"></td>
       <td><input type="text" class="stuBatchInput" value="${esc(s.batch)}" placeholder="e.g. 2024"></td>
@@ -3031,7 +3219,6 @@ function renderAllStudentsTable(){
     const subjCell = tr.querySelector('.stuSubjCell');
     wirePicker(subjCell);
     const read = () => ({
-      id: tr.querySelector('.stuIdInput').value.trim(),
       name: tr.querySelector('.stuNameInput').value.trim(),
       email: tr.querySelector('.stuEmailInput').value.trim(),
       gender: tr.querySelector('.stuGenderInput').value,
@@ -3045,8 +3232,10 @@ function renderAllStudentsTable(){
     tr.dataset.orig = snapshot();
     const check = () => { const d = snapshot() !== tr.dataset.orig; saveBtn.disabled = !d; tr.classList.toggle('dirty', d); };
     tr.addEventListener('input', check); tr.addEventListener('change', check);
+    const gsel = tr.querySelector('.stuGenderInput');
+    gsel.addEventListener('change', () => { gsel.className = 'stuGenderInput g-' + (gsel.value === 'Female' ? 'f' : gsel.value === 'Male' ? 'm' : 'n'); });
 
-    saveBtn.addEventListener('click', async () => {
+    const doSave = async () => {
       const vals = read();
       const rec = studentByUid(uid);
       const stale = rec ? rec.subjectIds.filter(x => !subjectBySlug(x)) : [];
@@ -3059,13 +3248,26 @@ function renderAllStudentsTable(){
         statusTd.textContent = 'Saved ✓'; statusTd.className = 'status done'; saveBtn.textContent = 'Save'; saveBtn.classList.remove('is-busy');
         renderSideSubjects();
         setTimeout(() => { statusTd.textContent=''; statusTd.className='status'; }, 2500);
+        return true;
       }catch(err){
         statusTd.textContent = err.message || 'Failed'; statusTd.className = 'status failed';
         saveBtn.disabled = false; saveBtn.textContent = 'Save'; saveBtn.classList.remove('is-busy');
+        return false;
       }
-    });
+    };
+    tr._save = doSave;
+    saveBtn.addEventListener('click', async () => { await doSave(); refreshBulkBtn('stu'); });
   });
 }
+$('stuSaveAllBtn').addEventListener('click', async () => {
+  setBox('stuError',''); setBox('stuOk','');
+  const rows = dirtyRows('stu'); if(!rows.length) return;
+  const btn = $('stuSaveAllBtn'); setBusy(btn, true);
+  let ok = 0, fail = 0; setProgress('stuSaveProgress', 0, rows.length, 'Saving');
+  for(const tr of rows){ (await tr._save()) ? ok++ : fail++; setProgress('stuSaveProgress', ok + fail, rows.length, 'Saving'); }
+  refreshBulkBtn('stu');
+  if(fail) setBox('stuError', `${ok} saved, ${fail} failed.`); else setBox('stuOk', `Saved ${ok} student(s).`, 'ok');
+});
 function updateStuDeleteBtn(){
   const n = $('allStudentsBody').querySelectorAll('.stuChk:checked').length;
   $('stuDeleteBtn').classList.remove('is-busy'); $('stuDeleteBtn').disabled = !n;
@@ -3107,40 +3309,36 @@ $('parseAcctBulkBtn').addEventListener('click', () => {
   setBox('acctBulkError',''); setBox('acctBulkOk','');
   const {headers, rows} = parseCSV($('acctCsvInput').value);
   if(!headers.length){ setBox('acctBulkError','Paste some CSV data first.'); return; }
-  const idIdx = headers.indexOf('id'), nameIdx = headers.indexOf('name');
-  if(idIdx === -1 || nameIdx === -1){ setBox('acctBulkError','CSV must include "id" and "name" columns.'); return; }
+  const nameIdx = headers.indexOf('name');
+  if(nameIdx === -1){ setBox('acctBulkError','CSV must include a "name" column.'); return; }
   const col = (n) => headers.indexOf(n);
   const emailIdx = col('email'), genderIdx = col('gender'), phoneIdx = col('phone'), deptIdx = col('department'), batchIdx = col('batch'), subjectsIdx = col('subjects');
   const enrollSlug = $('acctEnrollSubject').value;
+  const cell = (c, i) => i !== -1 ? (c[i] || '').trim() : '';
   const parsed = rows.map(c => {
     const subjectIds = subjectsIdx !== -1 ? (c[subjectsIdx] || '').split(';').map(x => resolveSubjectSlug(x.trim())).filter(Boolean) : [];
     if(enrollSlug && !subjectIds.includes(enrollSlug)) subjectIds.push(enrollSlug);
-    return {
-      id: (c[idIdx] || '').trim(), name: (c[nameIdx] || '').trim(),
-      email: emailIdx !== -1 ? (c[emailIdx] || '').trim() : '',
-      gender: genderIdx !== -1 ? (c[genderIdx] || '').trim() : '',
-      phone: phoneIdx !== -1 ? (c[phoneIdx] || '').trim() : '',
-      department: deptIdx !== -1 ? (c[deptIdx] || '').trim() : '',
-      batch: batchIdx !== -1 ? (c[batchIdx] || '').trim() : '',
-      subjectIds,
-    };
-  }).filter(r => r.id || r.name);
-  const withId = parsed.filter(r => r.id);
-  const errors = parsed.length - withId.length;
-  const byNorm = new Map(allStudents.map(s => [normId(s.id), s]));
-  acctRoster = withId.map(r => {
-    const info = byNorm.get(normId(r.id)) || null;
-    return {
-      ...r,
-      email: info ? (info.email || r.email || '') : (r.email || emailForId(r.id)),
-      password: info ? '' : randomPassword(),
-      existingUid: info ? info.uid : null,
-      status: 'pending', error: null,
-    };
+    return { name: cell(c, nameIdx), email: cell(c, emailIdx), gender: normGender(cell(c, genderIdx)), phone: cell(c, phoneIdx),
+      department: cell(c, deptIdx), batch: cell(c, batchIdx), subjectIds };
+  }).filter(r => r.name);
+  const skipped = rows.length - parsed.length;
+  const taken = takenEmails();
+  const byEmail = new Map(allStudents.map(s => [(s.email || '').toLowerCase(), s]));
+  const byName = new Map(); allStudents.forEach(s => { const k = normName(s.name); if(!byName.has(k)) byName.set(k, []); byName.get(k).push(s); });
+  acctRoster = parsed.map(r => {
+    const provided = r.email.toLowerCase();
+    let info = null, ambiguous = false;
+    if(provided) info = byEmail.get(provided) || null;
+    else { const m = byName.get(normName(r.name)) || []; if(m.length === 1) info = m[0]; else if(m.length > 1) ambiguous = true; }
+    const email = info ? info.email : (provided || emailForName(r.name, taken));
+    taken.add(email.toLowerCase());
+    return { ...r, email, password: info ? '' : randomPassword(), existingUid: info ? info.uid : null,
+      status: ambiguous ? 'failed' : 'pending', skip: ambiguous,
+      error: ambiguous ? 'Several existing students share this name — add an email column.' : null };
   });
   $('acctPreviewWrap').classList.remove('hidden');
   renderAcctTable();
-  setBox('acctBulkOk', `Parsed ${parsed.length} row(s)${errors ? `, ${errors} skipped (no ID)` : ''}.`, 'ok');
+  setBox('acctBulkOk', L(`Parsed ${acctRoster.length} student(s)${skipped ? `, ${skipped} skipped (no name)` : ''}.`, `تم تحليل ${N(acctRoster.length,'student')}${skipped ? `، وتخطّي ${skipped} بلا اسم` : ''}.`), 'ok');
 });
 function renderAcctTable(){
   $('acctCntTotal').textContent = acctRoster.length;
@@ -3151,12 +3349,16 @@ function renderAcctTable(){
   const body = $('acctRosterBody');
   body.innerHTML = acctRoster.map((r,i) => `
     <tr class="${r.status==='done'?'done':r.status==='failed'?'failed':(r.existingUid?'existing':'new')}" data-i="${i}">
-      <td class="chk"><input type="checkbox" class="acctRowchk" data-i="${i}" ${r.status==='done'?'disabled':'checked'}></td>
-      <td>${esc(r.id)}</td><td>${esc(r.name)}</td>
+      <td class="chk"><input type="checkbox" class="acctRowchk" data-i="${i}" ${(r.status==='done'||r.skip)?'disabled':'checked'}></td>
+      <td>${esc(r.name)}</td>
       <td class="tag">${r.existingUid ? 'Existing' : 'New'}</td>
-      <td>${subjectChips(r.subjectIds, false)}</td>
       <td><input type="email" class="acctEmailInput" data-i="${i}" value="${esc(r.email)}" ${r.status==='done'?'disabled':''}></td>
       <td>${r.existingUid ? '—' : `<input type="text" class="acctPassInput" data-i="${i}" value="${esc(r.password)}" ${r.status==='done'?'disabled':''}>`}</td>
+      <td>${genderChip(r.gender)}</td>
+      <td>${esc(r.phone || '—')}</td>
+      <td>${esc(r.department || '—')}</td>
+      <td>${esc(r.batch || '—')}</td>
+      <td>${subjectChips(r.subjectIds, false)}</td>
       <td class="status ${r.status}" title="${esc(r.error || '')}">${statusLabel(r)}</td>
     </tr>`).join('');
   body.querySelectorAll('.acctEmailInput').forEach(inp => inp.addEventListener('input', e => { acctRoster[+e.target.dataset.i].email = e.target.value.trim(); }));
@@ -3165,7 +3367,7 @@ function renderAcctTable(){
 $('acctSelectAll').addEventListener('change', e => $('acctRosterBody').querySelectorAll('.acctRowchk:not(:disabled)').forEach(c => c.checked = e.target.checked));
 $('acctRegenBtn').addEventListener('click', () => { acctRoster.forEach(r => { if(r.status !== 'done' && !r.existingUid) r.password = randomPassword(); }); renderAcctTable(); });
 $('acctDownloadCsvBtn').addEventListener('click', () => {
-  downloadCsv('student_accounts_credentials.csv', [['Student ID','Name','Email','Password','Account','Status'], ...acctRoster.map(r => [r.id, r.name, r.email, r.password || '', r.existingUid?'Existing':'New', r.status])]);
+  downloadCsv('student_accounts_credentials.csv', [['Name','Email','Password','Gender','Phone','Department','Batch','Account','Status'], ...acctRoster.map(r => [r.name, r.email, r.password || '', r.gender, r.phone, r.department, r.batch, r.existingUid?'Existing':'New', r.status])]);
 });
 async function createAuthUser(email, password){
   const secondary = initializeApp(firebaseConfig, 'secondary-' + Date.now() + '-' + Math.random());
@@ -3187,12 +3389,13 @@ $('runAcctImportBtn').addEventListener('click', async () => {
     try{
       let uid = r.existingUid;
       if(!uid){
+        if(!r.password || r.password.length < 6) throw new Error('Password must be at least 6 characters for a new account.');
         uid = await createAuthUser(r.email, r.password);
-        await setDoc(doc(db, STUDENTS, uid), { id: r.id, name: r.name, email: r.email, idConfirmed: false,
+        await setDoc(doc(db, STUDENTS, uid), { name: r.name, email: r.email, idConfirmed: false,
           gender: r.gender || '', phone: r.phone || '', department: r.department || '', batch: r.batch || '', subjectIds: r.subjectIds || [] });
       }else{
         // Existing student: only overwrite what the CSV actually supplied; subjects are added, never replaced.
-        const upd = { name: r.name, email: r.email };
+        const upd = { name: r.name };
         ['gender','phone','department','batch'].forEach(k => { if(r[k]) upd[k] = r[k]; });
         if(r.subjectIds && r.subjectIds.length) upd.subjectIds = arrayUnion(...r.subjectIds);
         await updateDoc(doc(db, STUDENTS, uid), upd);
@@ -3200,7 +3403,7 @@ $('runAcctImportBtn').addEventListener('click', async () => {
       r.status = 'done'; r.existingUid = uid; ok++;
     }catch(err){
       r.status = 'failed';
-      r.error = err.code === 'auth/email-already-in-use' ? 'Email already has an account (edit the email and re-run, or it may already be this student — check by ID).' : (err.message || 'Import failed.');
+      r.error = err.code === 'auth/email-already-in-use' ? 'Email already has an account (edit the email and re-run, or it may already be this student — check by name).' : (err.message || 'Import failed.');
       fail++;
     }finally{ renderAcctTable(); setProgress('acctProgress', ++n, toRun.length, 'Importing'); }
   }
@@ -3211,19 +3414,25 @@ $('runAcctImportBtn').addEventListener('click', async () => {
 });
 
 // ---------------- Individual account creation ----------------
-let acctIndivState = null;
+let acctIndivState = null, acctEmailTouched = false;
 $('acctLookupBtn').addEventListener('click', () => {
   setBox('acctLookupError','');
-  const id = $('acctLookupId').value.trim();
-  if(!id){ setBox('acctLookupError','Enter a student ID.'); return; }
-  const s = allStudents.find(x => normId(x.id) === normId(id));
+  const text = $('acctLookupId').value.trim();
+  if(!text){ setBox('acctLookupError','Enter a student name or email.'); return; }
+  const r = resolveStudent(text);
+  if(r.ambiguous){ setBox('acctLookupError','Several students share this name — search by email instead.'); return; }
+  const s = r.student;
+  acctEmailTouched = false;
   if(s){
-    acctIndivState = { existingUid: s.uid, id: s.id, name: s.name, email: s.email, gender: s.gender, phone: s.phone, department: s.department, batch: s.batch, subjectIds: s.subjectIds.slice() };
+    acctIndivState = { existingUid: s.uid, name: s.name, email: s.email, gender: s.gender, phone: s.phone, department: s.department, batch: s.batch, subjectIds: s.subjectIds.slice() };
     $('acctLookupResult').textContent = `Found existing student: ${s.name} (${s.email}) — you can update their details below.`;
     $('acctIndivPasswordWrap').classList.add('hidden');
   }else{
-    acctIndivState = { existingUid: null, id, name: '', email: emailForId(id), password: randomPassword(), gender: '', phone: '', department: '', batch: '', subjectIds: [] };
-    $('acctLookupResult').textContent = `No account found for "${id}" — filling this in will create a new student account.`;
+    const isEmail = text.includes('@');
+    const name = isEmail ? '' : text;
+    acctIndivState = { existingUid: null, name, email: isEmail ? text.toLowerCase() : emailForName(name, takenEmails()), password: randomPassword(), gender: '', phone: '', department: '', batch: '', subjectIds: [] };
+    acctEmailTouched = isEmail;
+    $('acctLookupResult').textContent = `No account found for "${text}" — filling this in will create a new student account.`;
     $('acctIndivPasswordWrap').classList.remove('hidden');
   }
   $('acctLookupResult').classList.remove('hidden');
@@ -3234,9 +3443,15 @@ $('acctLookupBtn').addEventListener('click', () => {
   $('acctIndivSubjects').innerHTML = pickerHTML(st.subjectIds); wirePicker($('acctIndivSubjects'));
   $('acctIndivForm').classList.remove('hidden');
 });
+$('acctLookupId').addEventListener('keydown', e => { if(e.key === 'Enter') $('acctLookupBtn').click(); });
+// new accounts: keep the email in step with the name (name @jumj.com) until it is edited by hand
+$('acctIndivEmail').addEventListener('input', () => { acctEmailTouched = true; });
+$('acctIndivName').addEventListener('input', () => {
+  if(acctIndivState && !acctIndivState.existingUid && !acctEmailTouched) $('acctIndivEmail').value = emailForName($('acctIndivName').value, takenEmails());
+});
 $('saveAcctIndivBtn').addEventListener('click', async () => {
   setBox('acctIndivError',''); setBox('acctIndivOk','');
-  if(!acctIndivState){ setBox('acctIndivError','Look up a student ID first.'); return; }
+  if(!acctIndivState){ setBox('acctIndivError','Look up a student first.'); return; }
   const name = $('acctIndivName').value.trim(), email = $('acctIndivEmail').value.trim(), password = $('acctIndivPassword').value.trim();
   const gender = $('acctIndivGender').value, phone = $('acctIndivPhone').value.trim();
   const department = $('acctIndivDept').value.trim(), batch = $('acctIndivBatch').value.trim();
@@ -3249,7 +3464,7 @@ $('saveAcctIndivBtn').addEventListener('click', async () => {
     let uid = acctIndivState.existingUid;
     if(!uid){
       uid = await createAuthUser(email, password);
-      await setDoc(doc(db, STUDENTS, uid), { id: acctIndivState.id, name, email, idConfirmed: false, gender, phone, department, batch, subjectIds });
+      await setDoc(doc(db, STUDENTS, uid), { name, email, idConfirmed: false, gender, phone, department, batch, subjectIds });
     }else{
       await updateDoc(doc(db, STUDENTS, uid), { name, email, gender, phone, department, batch, subjectIds });
     }
@@ -3258,19 +3473,62 @@ $('saveAcctIndivBtn').addEventListener('click', async () => {
     $('acctIndivPasswordWrap').classList.add('hidden');
     await loadAllStudents(); renderSideSubjects();
   }catch(err){
-    setBox('acctIndivError', err.code === 'auth/email-already-in-use' ? 'That email already has an account — if this is the same student, look them up by ID instead.' : (err.message || 'Save failed.'));
+    setBox('acctIndivError', err.code === 'auth/email-already-in-use' ? 'That email already has an account — if this is the same student, look them up by name instead.' : (err.message || 'Save failed.'));
   }finally{ setBusy(btn, false); }
 });
 
 // ================================================================
 // TEACHERS DIRECTORY
 // ================================================================
+// ---- Teacher ⇄ subjects. A teacher can teach many subjects; a subject has exactly one teacher. ----
+async function assignSubjects(uid, slugs, {replace = false, label = null} = {}){
+  const teacher = teacherByUid(uid);
+  const name = label || (teacher ? (teacher.name || teacher.email) : null);
+  const target = new Set((slugs || []).filter(sl => subjectBySlug(sl)));
+  const current = allSubjects.filter(s => s.teacherUid === uid).map(s => s.slug);
+  const add = [...target].filter(sl => !current.includes(sl));
+  const remove = replace ? current.filter(sl => !target.has(sl)) : [];
+  for(const sl of add){
+    const s = subjectBySlug(sl), prev = s.teacherUid;
+    await setDoc(doc(db, SUBJECTS, sl), { teacherUid: uid, teacherName: name }, {merge:true});
+    if(prev && prev !== uid) await removeTeacherSlug(prev, sl);
+    await addTeacherSlug(uid, sl);
+    s.teacherUid = uid; s.teacherName = name;
+  }
+  for(const sl of remove){
+    const s = subjectBySlug(sl);
+    await setDoc(doc(db, SUBJECTS, sl), { teacherUid: null, teacherName: null }, {merge:true});
+    await removeTeacherSlug(uid, sl);
+    s.teacherUid = null; s.teacherName = null;
+  }
+  return {added: add.length, removed: remove.length, total: target.size};
+}
+async function unassignSubjects(uid, slugs){
+  for(const sl of slugs || []){
+    const s = subjectBySlug(sl);
+    if(!s || s.teacherUid !== uid) continue;   // already moved to someone else — leave it alone
+    await setDoc(doc(db, SUBJECTS, sl), { teacherUid: null, teacherName: null }, {merge:true});
+    await removeTeacherSlug(uid, sl);
+    s.teacherUid = null; s.teacherName = null;
+  }
+}
+function reassignConflicts(uid, slugs){ return (slugs || []).map(sl => subjectBySlug(sl)).filter(s => s && s.teacherUid && s.teacherUid !== uid); }
+function conflictList(conflicts){ return conflicts.map(s => `${s.name} (${teacherLabel(s.teacherUid)})`).join(', '); }
+function teacherPickerHTML(uid, selected){
+  if(!allSubjects.length) return '<span class="chip muted">No subjects yet</span>';
+  const sel = new Set(selected || []);
+  return `<details class="subjpick"><summary>${pickerSummary(allSubjects.filter(s => sel.has(s.slug)).map(s => s.slug))}</summary><div class="subjpick-list">` +
+    allSubjects.map(s => { const other = s.teacherUid && s.teacherUid !== uid ? teacherLabel(s.teacherUid) : '';
+      return `<label><input type="checkbox" value="${esc(s.slug)}" ${sel.has(s.slug) ? 'checked' : ''}> ${esc(s.name)}${other ? ` <small>· ${esc(other)}</small>` : ''}</label>`; }).join('') + `</div></details>`;
+}
+
 function renderTeachersScreen(){ renderAllTeachersTable(); }
 function renderAllTeachersTable(){
   const filter = ($('teachSearch').value || '').trim().toLowerCase();
   const rows = allTeachers.filter(t => !filter || (t.name+' '+t.email+' '+t.phone).toLowerCase().includes(filter));
   $('teachCount').innerHTML = `<b>${rows.length}</b> of ${allTeachers.length} teacher(s)`;
   const body = $('allTeachersBody');
+  setTimeout(() => refreshBulkBtn('teach'), 0);
   if(!rows.length){
     body.innerHTML = `<tr><td colspan="7">${allTeachers.length ? 'No teachers match.' : 'No teachers yet — add one with Bulk import or Add individually.'}</td></tr>`;
     return;
@@ -3282,7 +3540,7 @@ function renderAllTeachersTable(){
       <td><input type="text" class="teachNameInput" value="${esc(t.name)}"></td>
       <td><input type="email" class="teachEmailInput" value="${esc(t.email)}"></td>
       <td><input type="text" class="teachPhoneInput" value="${esc(t.phone)}"></td>
-      <td>${slugs.length ? subjectChips(slugs) : '<span class="chip muted">No subjects</span>'}</td>
+      <td class="teachSubjCell">${teacherPickerHTML(t.uid, slugs)}</td>
       <td class="status"></td>
       <td><button class="btn btn-secondary btn-sm teachSaveBtn" disabled>Save</button></td>
       <td><button class="btn btn-danger btn-sm teachDeleteBtn" title="Deletes their profile. Does NOT delete their sign-in — remove that separately in Firebase Console → Authentication → Users.">Delete</button></td>
@@ -3290,31 +3548,46 @@ function renderAllTeachersTable(){
   }).join('');
   body.querySelectorAll('tr[data-uid]').forEach(tr => {
     const uid = tr.dataset.uid;
-    const inputs = Array.from(tr.querySelectorAll('input'));
     const saveBtn = tr.querySelector('.teachSaveBtn'), deleteBtn = tr.querySelector('.teachDeleteBtn'), statusTd = tr.querySelector('.status');
-    inputs.forEach(inp => {
-      inp.dataset.orig = inp.value;
-      inp.addEventListener('input', () => { const d = inputs.some(i => i.value !== i.dataset.orig); saveBtn.disabled = !d; tr.classList.toggle('dirty', d); });
-    });
-    saveBtn.addEventListener('click', async () => {
-      const name = tr.querySelector('.teachNameInput').value.trim(), email = tr.querySelector('.teachEmailInput').value.trim(), phone = tr.querySelector('.teachPhoneInput').value.trim();
+    const subjCell = tr.querySelector('.teachSubjCell'); wirePicker(subjCell);
+    let baseSlugs = readPicker(subjCell);
+    const diff = () => { const picked = readPicker(subjCell); return { add: picked.filter(sl => !baseSlugs.includes(sl)), remove: baseSlugs.filter(sl => !picked.includes(sl)) }; };
+    tr._diff = diff;
+    const read = () => ({ name: tr.querySelector('.teachNameInput').value.trim(), email: tr.querySelector('.teachEmailInput').value.trim(), phone: tr.querySelector('.teachPhoneInput').value.trim() });
+    const snapshot = () => JSON.stringify([read(), readPicker(subjCell).sort()]);
+    tr.dataset.orig = snapshot();
+    const check = () => { const d = snapshot() !== tr.dataset.orig; saveBtn.disabled = !d; tr.classList.toggle('dirty', d); };
+    tr.addEventListener('input', check); tr.addEventListener('change', check);
+    const doSave = async ({confirmReassign = true, rerender = true} = {}) => {
+      const vals = read(), {add, remove} = diff();
+      const conflicts = reassignConflicts(uid, add);
+      if(confirmReassign && conflicts.length && !confirm(`These subjects already have a teacher and will be reassigned to ${vals.name || vals.email}: ${conflictList(conflicts)}. Continue?`)) return false;
       saveBtn.disabled = true; saveBtn.textContent = 'Saving…'; saveBtn.classList.add('is-busy'); statusTd.textContent = ''; statusTd.className = 'status';
       try{
-        await updateDoc(doc(db, TEACHERS, uid), { name, email, phone });
-        const rec = teacherByUid(uid); if(rec) Object.assign(rec, {name, email, phone});
-        inputs.forEach(i => i.dataset.orig = i.value); tr.classList.remove('dirty');
-        statusTd.textContent = 'Saved ✓'; statusTd.className = 'status done'; saveBtn.textContent = 'Save'; saveBtn.classList.remove('is-busy');
-        setTimeout(() => { statusTd.textContent=''; statusTd.className='status'; }, 2500);
-      }catch(err){ statusTd.textContent = err.message || 'Failed'; statusTd.className = 'status failed'; saveBtn.disabled = false; saveBtn.textContent = 'Save'; saveBtn.classList.remove('is-busy'); }
-    });
+        await updateDoc(doc(db, TEACHERS, uid), vals);
+        const rec = teacherByUid(uid); if(rec) Object.assign(rec, vals);
+        await assignSubjects(uid, add, {label: vals.name || vals.email});
+        await unassignSubjects(uid, remove);
+        baseSlugs = readPicker(subjCell);
+        const total = allSubjects.filter(s => s.teacherUid === uid).length;
+        tr.dataset.orig = snapshot(); tr.classList.remove('dirty');
+        saveBtn.textContent = 'Save'; saveBtn.classList.remove('is-busy');
+        if(rerender){ renderAllTeachersTable(); setBox('teachTableOk', `Saved ${vals.name || vals.email} — teaching ${total} subject(s).`, 'ok'); }
+        else { statusTd.textContent = 'Saved ✓'; statusTd.className = 'status done'; }
+        return true;
+      }catch(err){ statusTd.textContent = err.message || 'Failed'; statusTd.className = 'status failed'; saveBtn.disabled = false; saveBtn.textContent = 'Save'; saveBtn.classList.remove('is-busy'); return false; }
+    };
+    tr._save = doSave;
+    saveBtn.addEventListener('click', async () => { setBox('teachTableError',''); setBox('teachTableOk',''); await doSave(); refreshBulkBtn('teach'); });
     deleteBtn.addEventListener('click', async () => {
       const rec = teacherByUid(uid);
       const assigned = allSubjects.filter(s => s.teacherUid === uid);
       let msg = `Delete ${rec ? (rec.name||rec.email) : uid}'s teacher profile? This can't be undone.`;
-      if(assigned.length) msg += `\n\nNote: ${assigned.length} subject(s) are still assigned to them (${assigned.map(s=>s.name).join(', ')}) — reassign those in each subject's Settings.`;
+      if(assigned.length) msg += `\n\nNote: ${assigned.length} subject(s) (${assigned.map(s=>s.name).join(', ')}) will be left without a teacher.`;
       if(!confirm(msg)) return;
       deleteBtn.disabled = true; saveBtn.disabled = true; deleteBtn.textContent = 'Deleting…'; deleteBtn.classList.add('is-busy');
       try{
+        for(const s of assigned){ await setDoc(doc(db, SUBJECTS, s.slug), { teacherUid: null, teacherName: null }, {merge:true}); s.teacherUid = null; s.teacherName = null; }
         await deleteDoc(doc(db, TEACHERS, uid));
         allTeachers = allTeachers.filter(t => t.uid !== uid);
         refreshOptions(); renderAllTeachersTable();
@@ -3323,6 +3596,18 @@ function renderAllTeachersTable(){
   });
 }
 $('teachSearch').addEventListener('input', renderAllTeachersTable);
+$('teachSaveAllBtn').addEventListener('click', async () => {
+  setBox('teachTableError',''); setBox('teachTableOk','');
+  const rows = dirtyRows('teach'); if(!rows.length) return;
+  // one confirmation for every subject that would move from another teacher
+  const conflicts = Array.from(new Map(rows.flatMap(tr => reassignConflicts(tr.dataset.uid, tr._diff().add)).map(s => [s.slug, s])).values());
+  if(conflicts.length && !confirm(`These subjects already have a teacher and will be reassigned: ${conflictList(conflicts)}. Continue?`)) return;
+  const btn = $('teachSaveAllBtn'); setBusy(btn, true);
+  let ok = 0, fail = 0; setProgress('teachSaveProgress', 0, rows.length, 'Saving');
+  for(const tr of rows){ (await tr._save({confirmReassign: false, rerender: false})) ? ok++ : fail++; setProgress('teachSaveProgress', ok + fail, rows.length, 'Saving'); }
+  if(fail){ refreshBulkBtn('teach'); setBox('teachTableError', `${ok} saved, ${fail} failed.`); }
+  else{ renderAllTeachersTable(); setBox('teachTableOk', `Saved ${ok} teacher(s).`, 'ok'); }
+});
 $('teachRefreshBtn').addEventListener('click', async () => { await withBusy($('teachRefreshBtn'), async () => { await loadAllTeachers(); await loadAllSubjects(); }); refreshUI(); });
 
 // ---------------- Teacher bulk import ----------------
@@ -3331,13 +3616,14 @@ $('parseTeachBulkBtn').addEventListener('click', async () => {
   setBox('teachBulkError',''); setBox('teachBulkOk','');
   const {headers, rows} = parseCSV($('teachCsvInput').value);
   if(!headers.length){ setBox('teachBulkError','Paste some CSV data first.'); return; }
-  const nameIdx = headers.indexOf('name'), emailIdx = headers.indexOf('email'), phoneIdx = headers.indexOf('phone');
+  const nameIdx = headers.indexOf('name'), emailIdx = headers.indexOf('email'), phoneIdx = headers.indexOf('phone'), subjIdx = headers.indexOf('subjects');
   if(nameIdx === -1 || emailIdx === -1){ setBox('teachBulkError','CSV must include "name" and "email" columns.'); return; }
-  const parsed = rows.map(c => ({ name: (c[nameIdx]||'').trim(), email: (c[emailIdx]||'').trim(), phone: phoneIdx !== -1 ? (c[phoneIdx]||'').trim() : '' })).filter(r => r.email);
+  const parsed = rows.map(c => ({ name: (c[nameIdx]||'').trim(), email: (c[emailIdx]||'').trim(), phone: phoneIdx !== -1 ? (c[phoneIdx]||'').trim() : '',
+    subjectIds: subjIdx !== -1 ? Array.from(new Set((c[subjIdx] || '').split(';').map(x => resolveSubjectSlug(x.trim())).filter(sl => sl && subjectBySlug(sl)))) : [] })).filter(r => r.email);
   const byEmail = new Map(allTeachers.map(t => [t.email.toLowerCase(), t]));
   teachRoster = parsed.map(r => {
     const info = byEmail.get(r.email.toLowerCase()) || null;
-    return { name: r.name || (info ? info.name : ''), email: r.email, phone: r.phone || (info ? info.phone : ''),
+    return { name: r.name || (info ? info.name : ''), email: r.email, phone: r.phone || (info ? info.phone : ''), subjectIds: r.subjectIds,
       password: info ? '' : randomPassword(), existingUid: info ? info.uid : null, status: 'pending', error: null };
   });
   $('teachPreviewWrap').classList.remove('hidden');
@@ -3356,6 +3642,7 @@ function renderTeachTable(){
       <td class="tag">${r.existingUid ? 'Existing' : 'New'}</td>
       <td><input type="email" class="teachEmailRowInput" data-i="${i}" value="${esc(r.email)}" ${r.status==='done'?'disabled':''}></td>
       <td><input type="text" class="teachPhoneRowInput" data-i="${i}" value="${esc(r.phone)}" ${r.status==='done'?'disabled':''}></td>
+      <td>${(r.subjectIds || []).length ? subjectChips(r.subjectIds, false) : '<span class="chip muted">None</span>'}</td>
       <td>${r.existingUid ? '—' : `<input type="text" class="teachPassRowInput" data-i="${i}" value="${esc(r.password)}" ${r.status==='done'?'disabled':''}>`}</td>
       <td class="status ${r.status}" title="${esc(r.error || '')}">${statusLabel(r)}</td>
     </tr>`).join('');
@@ -3366,13 +3653,15 @@ function renderTeachTable(){
 $('teachSelectAll').addEventListener('change', e => $('teachRosterBody').querySelectorAll('.teachRowchk:not(:disabled)').forEach(c => c.checked = e.target.checked));
 $('teachRegenBtn').addEventListener('click', () => { teachRoster.forEach(r => { if(r.status !== 'done' && !r.existingUid) r.password = randomPassword(); }); renderTeachTable(); });
 $('teachDownloadCsvBtn').addEventListener('click', () => {
-  downloadCsv('teacher_accounts_credentials.csv', [['Name','Email','Phone','Password','Account','Status'], ...teachRoster.map(r => [r.name, r.email, r.phone, r.password || '', r.existingUid?'Existing':'New', r.status])]);
+  downloadCsv('teacher_accounts_credentials.csv', [['Name','Email','Phone','Subjects','Password','Account','Status'], ...teachRoster.map(r => [r.name, r.email, r.phone, (r.subjectIds || []).map(sl => (subjectBySlug(sl) || {}).name).join('; '), r.password || '', r.existingUid?'Existing':'New', r.status])]);
 });
 $('runTeachImportBtn').addEventListener('click', async () => {
   setBox('teachImportError',''); setBox('teachImportOk','');
   const runBtn = $('runTeachImportBtn'); setBusy(runBtn, true);
   const checked = new Set(Array.from($('teachRosterBody').querySelectorAll('.teachRowchk:checked')).map(c => +c.dataset.i));
   const toRun = teachRoster.filter((r,i) => checked.has(i) && r.status !== 'done');
+  const conflicts = Array.from(new Map(toRun.flatMap(r => reassignConflicts(r.existingUid || '', r.subjectIds)).map(s => [s.slug, s])).values());
+  if(conflicts.length && !confirm(`These subjects already have a teacher and will be reassigned: ${conflictList(conflicts)}. Continue?`)){ setBusy(runBtn, false); return; }
   let ok = 0, fail = 0, n = 0; setProgress('teachProgress', 0, toRun.length, 'Importing');
   for(const r of toRun){
     r.status = 'working'; renderTeachTable();
@@ -3384,6 +3673,7 @@ $('runTeachImportBtn').addEventListener('click', async () => {
       }else{
         await updateDoc(doc(db, TEACHERS, uid), { name: r.name, phone: r.phone });
       }
+      if((r.subjectIds || []).length) await assignSubjects(uid, r.subjectIds, {label: r.name || r.email});
       r.status = 'done'; r.existingUid = uid; ok++;
     }catch(err){
       r.status = 'failed';
@@ -3394,7 +3684,7 @@ $('runTeachImportBtn').addEventListener('click', async () => {
   setBusy(runBtn, false);
   if(!fail) setBox('teachImportOk', `Done — ${ok} teacher account(s) imported.`, 'ok');
   else setBox('teachImportError', `${ok} imported, ${fail} failed. Check the Status column and re-run.`);
-  if(ok){ await loadAllTeachers(); refreshOptions(); }
+  if(ok){ await loadAllTeachers(); refreshOptions(); renderAllTeachersTable(); renderSideSubjects(); }
 });
 
 // ---------------- Individual teacher account ----------------
@@ -3405,17 +3695,18 @@ $('teachLookupBtn').addEventListener('click', () => {
   if(!email){ setBox('teachLookupError','Enter a teacher email.'); return; }
   const t = allTeachers.find(x => x.email.toLowerCase() === email);
   if(t){
-    teachIndivState = { existingUid: t.uid, name: t.name, email: t.email, phone: t.phone };
+    teachIndivState = { existingUid: t.uid, name: t.name, email: t.email, phone: t.phone, subjectIds: allSubjects.filter(s => s.teacherUid === t.uid).map(s => s.slug) };
     $('teachLookupResult').textContent = `Found existing teacher: ${t.name} — you can update their details below.`;
     $('teachIndivPasswordWrap').classList.add('hidden');
   }else{
-    teachIndivState = { existingUid: null, name: '', email, phone: '', password: randomPassword() };
+    teachIndivState = { existingUid: null, name: '', email, phone: '', password: randomPassword(), subjectIds: [] };
     $('teachLookupResult').textContent = `No account found for "${email}" — filling this in will create a new teacher account.`;
     $('teachIndivPasswordWrap').classList.remove('hidden');
   }
   $('teachLookupResult').classList.remove('hidden');
   $('teachIndivName').value = teachIndivState.name; $('teachIndivEmail').value = teachIndivState.email;
   $('teachIndivPhone').value = teachIndivState.phone || ''; $('teachIndivPassword').value = teachIndivState.password || '';
+  $('teachIndivSubjects').innerHTML = teacherPickerHTML(teachIndivState.existingUid || '', teachIndivState.subjectIds); wirePicker($('teachIndivSubjects'));
   $('teachIndivForm').classList.remove('hidden');
 });
 $('saveTeachIndivBtn').addEventListener('click', async () => {
@@ -3424,6 +3715,9 @@ $('saveTeachIndivBtn').addEventListener('click', async () => {
   const name = $('teachIndivName').value.trim(), email = $('teachIndivEmail').value.trim(), phone = $('teachIndivPhone').value.trim(), password = $('teachIndivPassword').value.trim();
   if(!name || !email){ setBox('teachIndivError','Name and email are required.'); return; }
   if(!teachIndivState.existingUid && (!password || password.length < 6)){ setBox('teachIndivError','Password must be at least 6 characters for a new account.'); return; }
+  const chosen = readPicker($('teachIndivSubjects'));
+  const conflicts = reassignConflicts(teachIndivState.existingUid || '', chosen);
+  if(conflicts.length && !confirm(`These subjects already have a teacher and will be reassigned to ${name}: ${conflictList(conflicts)}. Continue?`)) return;
   const btn = $('saveTeachIndivBtn'); setBusy(btn, true);
   try{
     let uid = teachIndivState.existingUid;
@@ -3434,6 +3728,10 @@ $('saveTeachIndivBtn').addEventListener('click', async () => {
       await updateDoc(doc(db, TEACHERS, uid), { name, phone });
     }
     teachIndivState.existingUid = uid;
+    await loadAllTeachers();
+    await assignSubjects(uid, chosen, {replace: true, label: name});
+    teachIndivState.subjectIds = chosen;
+    renderAllTeachersTable();
     setBox('teachIndivOk', `Saved ${name}'s teacher account. They can now sign in at teacher.html.`, 'ok');
     $('teachIndivPasswordWrap').classList.add('hidden');
     await loadAllTeachers(); refreshOptions();
@@ -3511,10 +3809,10 @@ function renderOverview(){
   stats.forEach(({st}) => st.rows.forEach(r => { if(!by.has(r.uid)) by.set(r.uid, []); by.get(r.uid).push(r.pct); }));
   const srows = Array.from(by.entries()).map(([uid, pcts]) => {
     const s = studentByUid(uid) || {};
-    return {name: s.name || '(no name)', id: s.id || '', count: pcts.length, avg: pcts.reduce((a,b)=>a+b,0)/pcts.length};
+    return {name: s.name || '(no name)', gender: s.gender || '', count: pcts.length, avg: pcts.reduce((a,b)=>a+b,0)/pcts.length};
   }).sort((a,b) => b.avg - a.avg);
   const n = Math.min(ovwTopN, Math.max(1, allStudents.length));
-  const line = (r, rank) => `<tr><td>${rankBadge(rank)}</td><td>${esc(r.name)}</td><td class="mono">${esc(r.id)}</td><td>${r.count}</td><td>${r.avg.toFixed(1)}%</td></tr>`;
+  const line = (r, rank) => `<tr><td>${rankBadge(rank)}</td><td>${esc(r.name)}</td><td>${genderChip(r.gender)}</td><td>${r.count}</td><td>${r.avg.toFixed(1)}%</td></tr>`;
   $('ovwTop').innerHTML = srows.length ? srows.slice(0, n).map((r,i) => line(r, i)).join('') : `<tr><td colspan="5">No results yet.</td></tr>`;
   $('ovwLow').innerHTML = srows.length ? srows.slice(-n).reverse().map((r,i) => line(r, srows.length - 1 - i)).join('') : `<tr><td colspan="5">No results yet.</td></tr>`;
 }
@@ -3543,8 +3841,8 @@ $('ovwRefreshBtn').addEventListener('click', async () => {
     const hits = [];
     allSubjects.filter(s => (s.name + ' ' + s.slug + ' ' + teacherLabel(s.teacherUid)).toLowerCase().includes(q)).slice(0,5)
       .forEach(s => hits.push({icon:'fa-book-medical', title:s.name, sub:`Subject · ${enrolledStudents(s.slug).length} enrolled`, go:() => go('subjects/' + encodeURIComponent(s.slug) + '/overview')}));
-    allStudents.filter(s => (s.id+' '+s.name+' '+s.email).toLowerCase().includes(q)).slice(0,4)
-      .forEach(s => hits.push({icon:'fa-user-graduate', title:s.name || s.id, sub:'Student · ' + (s.id || s.email), go:() => go('students', () => { $('stuSearch').value = s.id || s.name; $('stuSubjFilter').value = ''; renderAllStudentsTable(); })}));
+    allStudents.filter(s => (s.name+' '+s.email).toLowerCase().includes(q)).slice(0,4)
+      .forEach(s => hits.push({icon:'fa-user-graduate', title:s.name || s.email, sub:'Student · ' + s.email, go:() => go('students', () => { $('stuSearch').value = s.email || s.name; $('stuSubjFilter').value = ''; renderAllStudentsTable(); })}));
     allTeachers.filter(t => (t.name+' '+t.email).toLowerCase().includes(q)).slice(0,3)
       .forEach(t => hits.push({icon:'fa-chalkboard-user', title:t.name || t.email, sub:'Teacher · ' + t.email, go:() => go('teachers', () => { $('teachSearch').value = t.email; renderAllTeachersTable(); })}));
     if(/overview|analytic|performance|average|rank/.test(q)) hits.unshift({icon:'fa-chart-column', title:'Open Overview', sub:'Cohort performance by subject', go:() => go('overview')});
@@ -3666,13 +3964,34 @@ function renderSalam(){
   const chip = $('hijriChip'); if(chip) chip.innerHTML = h ? `<i class="fa-solid fa-moon"></i> ${esc(h)}` : '';
   const el = $('salamBar'); if(!el) return;
   const title = lang === 'ar' ? 'السلام عليكم ورحمة الله وبركاته' : `Welcome back, ${esc(adminName)}`;
-  const sub = lang === 'ar' ? `مرحبًا بك، ${esc(adminName)}` : 'JUmed Admin Console';
+  const sub = lang === 'ar' ? `مرحبًا بك، ${esc(adminName)}` : 'JUMJ Admin Console';
   el.innerHTML = `
     <div class="salam-title ${lang === 'ar' ? 'ar' : ''}">${title}</div>
     <div class="salam-meta"><b>${sub}</b><span>${esc(gregDate())}</span><span>${esc(h)}</span></div>`;
 }
 // initial language
 setLang(lang);
+
+// ---- bulk-save buttons follow the dirty rows of their tables ----
+Object.keys(BULK_TABLES).forEach(k => {
+  ['input','change'].forEach(ev => $(BULK_TABLES[k].body).addEventListener(ev, () => refreshBulkBtn(k)));
+});
+
+// ---- safety net: any table that is not already inside a horizontal scroller gets wrapped in one ----
+function ensureScrollable(root){
+  (root.querySelectorAll ? root : document).querySelectorAll('table').forEach(t => {
+    const p = t.parentElement; if(!p) return;
+    if(/(auto|scroll)/.test(getComputedStyle(p).overflowX)) return;
+    const w = document.createElement('div'); w.className = 'table-scroll auto-wrapped';
+    p.insertBefore(w, t); w.appendChild(t);
+  });
+}
+(function(){
+  let queued = false;
+  const run = () => { queued = false; ensureScrollable(document.body); };
+  new MutationObserver(() => { if(!queued){ queued = true; requestAnimationFrame(run); } }).observe(document.body, {childList:true, subtree:true});
+  run();
+})();
 
 </script>
 </body>
