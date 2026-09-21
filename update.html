@@ -51,7 +51,7 @@ footer{font-size:10px;color:var(--faint);line-height:1.6}code{background:var(--b
 /* mobile */
 @media(max-width:1050px){.stat-grid{grid-template-columns:repeat(3,1fr)}.login-shell{grid-template-columns:1fr}.login-visual{min-height:360px}.login-panel{min-height:calc(100vh - 360px)}}
 @media(max-width:860px){.app-shell{display:block}.sidebar{position:sticky;top:0;width:100%;height:auto;min-height:64px;flex-direction:row;align-items:center}.sidebar-toggle{display:none}.sidebar-brand{border:0;border-right:1px solid rgba(255,255,255,.08);padding:12px 14px}.sidebar-brand .brand-mark{width:34px;height:34px}.sidebar-nav{flex-direction:row;overflow-x:auto;padding:8px 10px;gap:3px;scrollbar-width:none}.sidebar-nav::-webkit-scrollbar{display:none}.nav-section{display:none}.nav-item{flex:0 0 auto;padding:9px 11px}.nav-item.active:after{display:none}.sidebar-foot{display:none}.main{height:auto}.main:before{display:none}.main-scroll{padding:20px 14px 50px}.topbar{padding-bottom:18px;margin-bottom:22px}.topbar-right{display:none}.page-head{align-items:flex-start}.page-head-meta{display:none}.module-context{grid-template-columns:1fr}.module-context .field{min-width:0}.analytics-cols{grid-template-columns:1fr}.stat-grid{grid-template-columns:repeat(2,1fr)}.barchart-row{grid-template-columns:110px 1fr 55px}.card{padding:17px;border-radius:15px}}
-@media(max-width:560px){.login-visual{min-height:300px;padding:30px 24px}.login-visual h1{font-size:2.1rem}.login-grid{display:none}.login-panel{padding:30px 20px}.login-card h2{font-size:26px}.page-title{font-size:1.55rem}.tabs{margin-left:-3px;margin-right:-3px}.toolbar{align-items:stretch}.toolbar .field{width:100%;min-width:0}.toolbar .field input,.toolbar .field select{max-width:none}.toolbar-actions{width:100%}.toolbar-actions .btn{flex:1}.stat-grid{grid-template-columns:1fr 1fr;gap:8px}.stat-card{padding:13px}.stat-card .stat-value{font-size:20px}.barchart-row{grid-template-columns:85px 1fr 48px;gap:7px}.histogram-label{display:none}.indiv-comp-row{grid-template-columns:1fr}.login-brand{margin-bottom:26px}.subject-leaderboard-card{flex-basis:225px}.subject-leaderboard-card h4{font-size:10px}.histogram-bar-inner{height:110px}}
+@media(max-width:560px){.login-visual{min-height:300px;padding:30px 24px}.login-visual h1{font-size:2.1rem}.login-grid{display:none}.login-panel{padding:30px 20px}.login-card h2{font-size:26px}.page-title{font-size:1.55rem}.tabs{margin-left:-3px;margin-right:-3px}.toolbar{align-items:stretch}.toolbar .field{width:100%;min-width:0}.toolbar .field input,.toolbar .field select{max-width:none}.toolbar-actions{width:100%}.toolbar-actions .btn{flex:1}.stat-grid{grid-template-columns:1fr 1fr;gap:8px}.stat-card{padding:13px}.stat-card .stat-value{font-size:20px}.barchart-row{grid-template-columns:85px 1fr 48px;gap:7px}.histogram-label{display:none}.indiv-comp-row{grid-template-columns:1fr}.login-brand{margin-bottom:26px}}
 
 /* ===== JUMJ 2.0 PRODUCT REDESIGN ===== */
 :root{
@@ -123,11 +123,6 @@ tr.editing td{background:transparent!important}
 tr.editing .stu-editbtn{background:var(--brand);color:#fff;border-color:var(--brand)}
 tr:not(.editing) .stuSaveBtn{display:none}
 #allStudentsBody td{vertical-align:middle}
-/* keep wide multi-column tables from blowing out mobile width */
-@media(max-width:760px){
-  #ovwBreakdownTable{min-width:0}
-  #ovwBreakdownTable .col-opt{display:none}
-}
 /* compact filters/toolbar — consistent app-wide */
 .toolbar{gap:9px;margin-bottom:13px}
 .toolbar .field,.filter-row .field{min-width:120px}
@@ -716,133 +711,17 @@ th.sp-open-cell,td.sp-open-cell{width:46px;padding-inline-end:0!important}
 }
 @media(max-width:400px){.sp-ranks{grid-template-columns:minmax(0,1fr)}}
 @media(prefers-reduced-motion:reduce){.sp-donut .fg,.sp-bar>i{animation:none}}
+
+/* ===== admin access control ===== */
+.perm-hidden{display:none!important}
+.perm-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-top:14px}
+.perm-group{border:1px solid var(--line);border-radius:14px;padding:14px 16px;background:#fbf9f1;display:flex;flex-direction:column;gap:7px}
+.perm-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:4px}
+.perm-head b{font-size:12.5px;letter-spacing:-.01em}
+.perm-item{display:flex;align-items:center;gap:9px;font-size:12px;cursor:pointer;padding:5px 2px}
+.perm-item input{width:auto!important;min-width:0!important;accent-color:var(--brand)}
 </style>
 <script>try{if(localStorage.getItem("jumedLang")==="ar"){var r=document.documentElement;r.dir="rtl";r.lang="ar";r.classList.add("lang-ar")}}catch(e){}</script>
-
-<!-- Responsive overflow fix -->
-<style id="responsive-overflow-fix">
-html, body { width:100%; max-width:100%; overflow-x:hidden !important; }
-body { min-width:0 !important; }
-.app-shell, .main, .screen, .main-scroll { width:100%; max-width:100%; min-width:0 !important; box-sizing:border-box; }
-.main-scroll { overflow-x:hidden; }
-.global-topbar { max-width:100%; min-width:0; box-sizing:border-box; }
-.global-center, .command-search { min-width:0 !important; max-width:100%; }
-.screen-subjects, #screen-overview, #screen-subject { min-width:0 !important; max-width:100%; }
-#screen-overview .card, #screen-overview .grid, #screen-overview section, #screen-overview .panel { min-width:0; max-width:100%; box-sizing:border-box; }
-#screen-overview table { max-width:none; }
-#screen-overview .table-scroll, #screen-overview .sp-table-wrap, #screen-overview .table-wrap { width:100%; max-width:100%; overflow-x:auto; overscroll-behavior-x:contain; }
-#screen-overview .sp-tbl { min-width:640px; }
-#screen-overview img, #screen-overview svg, #screen-overview canvas { max-width:100%; }
-@media (max-width:860px) {
-  .main { padding-bottom:78px !important; overflow-x:hidden !important; }
-  .main-scroll { padding-left:12px !important; padding-right:12px !important; padding-bottom:90px !important; overflow-x:hidden !important; }
-  .global-topbar { overflow:hidden; }
-  #screen-overview .sp-grid, #screen-overview .sp-ranks, #screen-overview .sp-trio, #screen-overview .sp-subjs { width:100%; max-width:100%; min-width:0; }
-}
-@media (max-width:560px) {
-  #screen-overview .sp-tbl { min-width:620px; }
-  #screen-overview .sp-ranks { grid-template-columns:minmax(0,1fr); }
-  #screen-overview .sp-donut-wrap { gap:16px; }
-  #screen-overview .sp-facts { width:100%; }
-}
-
-/* ===== SUBJECT OVERVIEW DATA TABLES — NATURAL WIDTH + INNER SCROLL =====
-   Keep all table content relaxed at its natural size.
-   The card stays inside the viewport; only the table surface scrolls horizontally. */
-.sub-two,
-.sub-two > .card,
-.sub-two .table-scroll,
-#ovMissingWrap {
-  min-width: 0 !important;
-  max-width: 100%;
-  box-sizing: border-box;
-}
-
-.sub-two > .card {
-  width: 100%;
-  overflow: hidden;
-}
-
-/* The wrapper is the viewport; the table is intentionally wider when needed. */
-.sub-two .table-scroll {
-  width: 100%;
-  overflow-x: auto !important;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior-x: contain;
-  scrollbar-width: auto;
-}
-
-/* IMPORTANT: never squeeze Overview table columns to the card width. */
-.sub-two .table-compact table {
-  width: max-content !important;
-  min-width: max-content !important;
-  max-width: none !important;
-  table-layout: auto !important;
-}
-
-/* Preserve every label, email, name and action at its natural width. */
-.sub-two .table-compact th,
-.sub-two .table-compact td {
-  width: auto !important;
-  min-width: max-content !important;
-  max-width: none !important;
-  white-space: nowrap !important;
-  overflow: visible !important;
-  overflow-wrap: normal !important;
-  word-break: normal !important;
-}
-
-/* Keep the existing Enter result action completely relaxed. */
-#ovMissingBody .linkbtn,
-#ovMissingBody button[data-enter] {
-  display: inline-block;
-  width: max-content;
-  min-width: max-content;
-  white-space: nowrap !important;
-  flex: 0 0 auto;
-}
-
-/* Do not let the table safety rules turn these two tables back into fluid/compressed tables. */
-#ovLeaderBody,
-#ovMissingBody {
-  white-space: nowrap;
-}
-
-#ovLeaderBody td,
-#ovMissingBody td {
-  white-space: nowrap !important;
-}
-
-@media (max-width: 1050px) {
-  .sub-two {
-    grid-template-columns: minmax(0, 1fr) !important;
-    width: 100%;
-  }
-
-  .sub-two > .card {
-    min-width: 0 !important;
-  }
-}
-
-@media (max-width: 560px) {
-  .sub-two {
-    gap: 10px;
-  }
-
-  /* Preserve the normal table/text sizing on mobile. Do not compress content. */
-  .sub-two .table-scroll {
-    width: 100%;
-    max-width: 100%;
-    overflow-x: auto !important;
-  }
-
-  .sub-two .table-compact table {
-    width: max-content !important;
-    min-width: max-content !important;
-  }
-}
-</style>
 </head>
 <body>
 <div id="netBar" class="netbar"><span></span></div>
@@ -912,20 +791,24 @@ body { min-width:0 !important; }
     </div>
     <nav class="sidebar-nav" id="sideNav">
       <div class="nav-section">Workspace</div>
-      <a class="nav-item" href="#/subjects" data-route="subjects" title="Subjects">
+      <a class="nav-item" href="#/subjects" data-route="subjects" data-perm-any="subject." title="Subjects">
         <span class="nav-icon"><i class="fa-solid fa-book-medical"></i></span><span class="nav-label">Subjects</span>
       </a>
-      <a class="nav-item" href="#/overview" data-route="overview" title="Overview">
+      <a class="nav-item" href="#/overview" data-route="overview" data-perm="subject.overview" title="Overview">
         <span class="nav-icon"><i class="fa-solid fa-chart-column"></i></span><span class="nav-label">Overview</span>
       </a>
-      <div class="nav-section" id="sideSubjectsLabel" style="margin-top:14px">Your subjects</div>
-      <div id="sideSubjects"></div>
-      <div class="nav-section" style="margin-top:14px">Directory</div>
-      <a class="nav-item" href="#/students" data-route="students" title="Students">
+      <div class="nav-section" id="sideSubjectsLabel" data-perm-any="subject." style="margin-top:14px">Your subjects</div>
+      <div id="sideSubjects" data-perm-any="subject."></div>
+      <div class="nav-section" id="sideDirLabel" style="margin-top:14px">Directory</div>
+      <a class="nav-item" href="#/students" data-route="students" data-perm-any="students." title="Students">
         <span class="nav-icon"><i class="fa-solid fa-user-graduate"></i></span><span class="nav-label">Students</span>
       </a>
-      <a class="nav-item" href="#/teachers" data-route="teachers" title="Teachers">
+      <a class="nav-item" href="#/teachers" data-route="teachers" data-perm-any="teachers." title="Teachers">
         <span class="nav-icon"><i class="fa-solid fa-chalkboard-user"></i></span><span class="nav-label">Teachers</span>
+      </a>
+      <div class="nav-section" id="sideAdminLabel" data-perm="admins.manage" style="margin-top:14px">Administration</div>
+      <a class="nav-item" href="#/admins" data-route="admins" data-perm="admins.manage" title="Admins">
+        <span class="nav-icon"><i class="fa-solid fa-user-shield"></i></span><span class="nav-label">Admins</span>
       </a>
     </nav>
     <div class="sidebar-foot">
@@ -966,7 +849,7 @@ body { min-width:0 !important; }
           <div class="toolbar-actions">
             <span class="summary-row" style="margin:0;align-self:center;"><b id="subjCount">0</b></span>
             <button class="btn btn-secondary btn-sm" id="subjRefreshBtn"><i class="fa-solid fa-rotate"></i> Refresh</button>
-            <button class="btn btn-gold" id="toggleNewSubjBtn"><i class="fa-solid fa-plus"></i> New subject</button>
+            <button class="btn btn-gold" id="toggleNewSubjBtn" data-perm="subject.settings"><i class="fa-solid fa-plus"></i> New subject</button>
           </div>
         </div>
 
@@ -997,7 +880,7 @@ body { min-width:0 !important; }
 
         <div class="subj-grid" id="subjGrid"></div>
 
-        <details class="maint" id="maintBox">
+        <details class="maint" id="maintBox" data-perm="subject.settings">
           <summary><i class="fa-solid fa-screwdriver-wrench"></i> &nbsp;Maintenance</summary>
           <div class="maint-body">
             <p class="hint">Rebuilds every teacher's list of accessible subjects from the subjects table. Run once after upgrading, or any time teacher access looks out of sync.</p>
@@ -1075,13 +958,13 @@ body { min-width:0 !important; }
             <div class="sub-two">
               <div class="card">
                 <p class="card-title">Leaderboard</p>
-                <div class="table-scroll table-compact" style="margin-top:10px"><table><thead><tr><th></th><th>Student</th><th>Gender</th><th>Score</th><th>%</th></tr></thead><tbody id="ovLeaderBody"></tbody></table></div>
+                <div class="table-scroll table-compact" style="margin-top:10px"><table style="min-width:420px"><thead><tr><th></th><th>Student</th><th>Gender</th><th>Score</th><th>%</th></tr></thead><tbody id="ovLeaderBody"></tbody></table></div>
               </div>
               <div class="card">
                 <p class="card-title" id="ovMissingHeading">Awaiting results</p>
                 <p class="hint">Enrolled students with no result yet.</p>
                 <div class="ok-box" id="ovMissingOk"></div>
-                <div class="table-scroll table-compact" id="ovMissingWrap" style="max-height:340px"><table><thead><tr><th>Name</th><th>Gender</th><th>Email</th><th></th></tr></thead><tbody id="ovMissingBody"></tbody></table></div>
+                <div class="table-scroll table-compact" id="ovMissingWrap" style="max-height:340px"><table style="min-width:340px"><thead><tr><th>Name</th><th>Gender</th><th>Email</th><th></th></tr></thead><tbody id="ovMissingBody"></tbody></table></div>
               </div>
             </div>
             <div class="card" style="margin-top:14px">
@@ -1300,14 +1183,14 @@ body { min-width:0 !important; }
                 <div class="error-box" id="pasteError"></div>
                 <div class="ok-box" id="pasteOk"></div>
                 <div class="warn-box" id="pasteMissing"></div>
-                <div class="btn-row hidden" id="pasteCreateRow"><button class="btn btn-secondary" id="pasteCreateBtn">Create accounts for the missing students</button></div>
+                <div class="btn-row hidden" id="pasteCreateRow"><button class="btn btn-secondary" id="pasteCreateBtn" data-perm="students.bulk">Create accounts for the missing students</button></div>
               </div>
 
               <div class="tab-panel" id="tabAddNew">
                 <p class="hint">Students who don't have an account yet can be imported from a CSV. Every imported student is enrolled in this subject automatically.</p>
                 <div class="btn-row">
-                  <button class="btn" id="newStuBulkBtn"><i class="fa-solid fa-file-csv"></i> Bulk import into this subject</button>
-                  <button class="btn btn-secondary" id="newStuOneBtn"><i class="fa-solid fa-user-plus"></i> Add one student</button>
+                  <button class="btn" id="newStuBulkBtn" data-perm="students.bulk"><i class="fa-solid fa-file-csv"></i> Bulk import into this subject</button>
+                  <button class="btn btn-secondary" id="newStuOneBtn" data-perm="students.individual"><i class="fa-solid fa-user-plus"></i> Add one student</button>
                 </div>
               </div>
             </div>
@@ -1348,8 +1231,8 @@ body { min-width:0 !important; }
         <div class="card" style="margin-top:14px">
           <p class="card-title" style="margin-bottom:.9rem">Subject breakdown</p>
           <div class="table-scroll">
-            <table id="ovwBreakdownTable">
-              <thead><tr><th>Subject</th><th class="col-opt">Teacher</th><th>Enrolled</th><th class="col-opt">Graded</th><th>Completion</th><th>Avg %</th><th class="col-opt">Median %</th><th class="col-opt">Highest %</th><th class="col-opt">Lowest %</th></tr></thead>
+            <table>
+              <thead><tr><th>Subject</th><th>Teacher</th><th>Enrolled</th><th>Graded</th><th>Completion</th><th>Avg %</th><th>Median %</th><th>Highest %</th><th>Lowest %</th></tr></thead>
               <tbody id="ovwTableBody"><tr><td colspan="9">Loading…</td></tr></tbody>
             </table>
           </div>
@@ -1453,6 +1336,7 @@ body { min-width:0 !important; }
 
           <div class="tab-panel" id="tabStuIndiv">
             <div class="card">
+              <p class="hint">Look up a student by name or email. If no account exists yet, fill in their details to create one; if one exists you can update their details and subjects here.</p>
               <div class="field-row"><div class="field"><label for="acctLookupId">Student name or email</label><input type="text" id="acctLookupId" placeholder="e.g. Kadir Kemal"></div></div>
               <div class="btn-row"><button class="btn btn-secondary" id="acctLookupBtn">Find student</button></div>
               <div class="error-box" id="acctLookupError"></div>
@@ -1487,6 +1371,57 @@ body { min-width:0 !important; }
     <!-- ================= SCREEN: Teachers (directory) ================= -->
     <div class="screen" id="screen-student">
       <div class="main-scroll"><div id="spRoot"></div></div>
+    </div>
+
+    <!-- ================= SCREEN: Admins ================= -->
+    <div class="screen" id="screen-admins">
+      <div class="main-scroll">
+        <div class="page-head"><div><p class="page-title">Admins</p><p class="page-sub">Create admin accounts and choose exactly what each admin can open. Anything left unticked is hidden from that admin.</p></div><div class="page-head-meta">ADMINISTRATION</div></div>
+
+        <div class="toolbar">
+          <span></span>
+          <div class="toolbar-actions">
+            <span class="summary-row" style="margin:0;align-self:center;"><b id="adminsCount">0</b></span>
+            <button class="btn btn-secondary btn-sm" id="adminsRefreshBtn"><i class="fa-solid fa-rotate"></i> Refresh</button>
+            <button class="btn btn-gold" id="newAdminBtn"><i class="fa-solid fa-plus"></i> New admin</button>
+          </div>
+        </div>
+        <div class="error-box" id="adminsError"></div>
+        <div class="ok-box" id="adminsOk"></div>
+
+        <div class="card hidden" id="adminEditor" style="margin-bottom:16px;">
+          <div class="section-label" id="adminEditorTitle">New admin</div>
+          <div class="field-row">
+            <div class="field"><label for="admName">Name</label><input type="text" id="admName"></div>
+            <div class="field"><label for="admEmail">Email</label><input type="email" id="admEmail"></div>
+            <div class="field" id="admPasswordWrap"><label for="admPassword">Password (new admin only)</label>
+              <div style="display:flex;gap:8px"><input type="text" id="admPassword"><button class="btn btn-secondary btn-sm" id="admGenBtn" type="button">Generate</button></div>
+            </div>
+          </div>
+          <div class="section-label" style="margin-top:6px">Permissions</div>
+          <p class="hint">Tick what this admin is allowed to open. Anything unticked is hidden from them.</p>
+          <div class="btn-row" style="margin-top:0"><button class="btn btn-secondary btn-sm" id="admAllBtn" type="button">Select all</button><button class="btn btn-secondary btn-sm" id="admNoneBtn" type="button">Clear all</button></div>
+          <div class="perm-grid" id="admPermGroups"></div>
+          <div class="btn-row"><button class="btn btn-gold" id="admSaveBtn">Save admin</button><button class="btn btn-secondary" id="admCancelBtn">Cancel</button></div>
+          <div class="error-box" id="admError"></div>
+        </div>
+
+        <div class="card">
+          <div class="table-scroll">
+            <table>
+              <thead><tr><th>Name</th><th>Email</th><th>Access</th><th>Role</th><th></th><th></th></tr></thead>
+              <tbody id="adminsBody"><tr><td colspan="6">Loading…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= SCREEN: No access ================= -->
+    <div class="screen" id="screen-noaccess">
+      <div class="main-scroll">
+        <div class="card"><div class="empty-state" style="border:0"><b>No access yet</b>Your account is signed in but has no permissions assigned. Ask a super admin to grant you access.</div></div>
+      </div>
     </div>
 
     <div class="screen" id="screen-teachers">
@@ -1594,7 +1529,7 @@ body { min-width:0 !important; }
 <script type="module">
 import { initializeApp, deleteApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
 import {
-  getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword
+  getAuth, initializeAuth, inMemoryPersistence, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
 import {
   getFirestore, doc, setDoc as _setDoc, updateDoc as _updateDoc, getDoc as _getDoc, deleteDoc as _deleteDoc, collection, getDocs as _getDocs,
@@ -1631,7 +1566,12 @@ const deleteDoc = (...a) => track(_deleteDoc(...a));
 const getDocs = (...a) => track(_getDocs(...a));
 const writeBatch = (...a) => { const b = _writeBatch(...a); const c = b.commit.bind(b); b.commit = () => track(c()); return b; };
 
-const app = initializeApp(firebaseConfig);
+// The admin console runs in its OWN named Firebase app. Firebase stores a login session under
+// "firebase:authUser:<apiKey>:<appName>", so a dedicated name keeps the admin session in a separate slot from the
+// student/teacher portals (which use the default app on the same origin). Signing in or out there can no longer replace
+// or end an admin session, and the admin console never touches theirs.
+const ADMIN_APP_NAME = 'jumj-admin';
+const app = initializeApp(firebaseConfig, ADMIN_APP_NAME);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
@@ -1832,6 +1772,7 @@ function wireTabGroup(groupId){
   if(!group) return {activate(){}};
   const btns = Array.from(group.querySelectorAll(':scope > .tabs > .tab-btn'));
   const activate = (targetId) => {
+    if(PERM_BY_TAB[targetId] && !can(PERM_BY_TAB[targetId])) return;   // admin may not open this tab
     btns.forEach(b => b.classList.toggle('active', b.dataset.target === targetId));
     group.querySelectorAll(':scope > .tab-panel').forEach(p => p.classList.toggle('active', p.id === targetId));
   };
@@ -2053,12 +1994,8 @@ async function ensureSubjectResults(slug, force=false){
   if(!subj) return 'cached';
   const p = (async () => {
     const m = new Map(); let firstErr = null;
-    // IMPORTANT: only fetch result documents for students enrolled in THIS subject.
-    // The old code iterated over allStudents, causing every subject opening to
-    // issue one module-result read for every student in the entire school.
-    const enrolled = enrolledStudents(slug);
     let doneCount = 0;
-    for(const group of chunk(enrolled, 30)){
+    for(const group of chunk(allStudents, 30)){
       const pairs = await Promise.all(group.map(async s => {
         try{
           const snap = await getDoc(doc(db, STUDENTS, s.uid, MODULE_RESULTS, slug));
@@ -2066,7 +2003,7 @@ async function ensureSubjectResults(slug, force=false){
         }catch(e){ firstErr = firstErr || e; return [s.uid, null]; }
       }));
       pairs.forEach(([uid, data]) => { if(data) m.set(uid, normResult(data, subj)); });
-      doneCount += group.length; loadProgress(slug, doneCount, enrolled.length);
+      doneCount += group.length; loadProgress(slug, doneCount, allStudents.length);
     }
     if(firstErr) return {error: firstErr};
     resultsStore.set(slug, m);
@@ -2221,7 +2158,7 @@ function parseRoute(){
   const view = parts[0] || 'subjects';
   if(view === 'students' && parts[1]) return {view:'student', slug:null, uid:parts[1], tab: STU_TABS.includes(parts[2]) ? parts[2] : 'summary'};
   if(view === 'subjects' && parts[1]) return {view:'subject', slug:parts[1], tab: SUB_TABS.includes(parts[2]) ? parts[2] : 'overview'};
-  if(['subjects','overview','students','teachers'].includes(view)) return {view, slug:null, tab:'overview'};
+  if(['subjects','overview','students','teachers','admins','noaccess'].includes(view)) return {view, slug:null, tab:'overview'};
   return {view:'subjects', slug:null, tab:'overview'};
 }
 function go(path, after){
@@ -2244,6 +2181,9 @@ let lastRouteKey = '';
 function renderRoute(){
   if(!bootstrapped) return;
   const r = parseRoute();
+  const redirect = guardRoute(r);
+  if(redirect){ history.replaceState(null, '', '#/' + redirect); return renderRoute(); }
+  applyAccessUI();
   const key = r.view + '/' + (r.slug || r.uid || '');
   const changedScreen = key !== lastRouteKey;
   lastRouteKey = key;
@@ -2254,7 +2194,7 @@ function renderRoute(){
   refreshOptions();
   renderSideSubjects();
   if(typeof renderSalam === 'function') renderSalam();
-  const renderers = {subjects: renderSubjectsScreen, subject: renderSubjectScreen, overview: renderOverview, students: renderStudentsScreen, student: renderStudentProfile, teachers: renderTeachersScreen};
+  const renderers = {admins: renderAdminsScreen, noaccess: () => {}, subjects: renderSubjectsScreen, subject: renderSubjectScreen, overview: renderOverview, students: renderStudentsScreen, student: renderStudentProfile, teachers: renderTeachersScreen};
   renderers[r.view]();
   if(changedScreen) $('mainScroll').scrollTop = 0;
   if(pendingAfterRoute){ const f = pendingAfterRoute; pendingAfterRoute = null; f(); }
@@ -2433,6 +2373,17 @@ const AR = {
   'No subjects yet.':'لا توجد مواد بعد.','Fix':'معالجة','Every subject is set up and fully graded.':'جميع المواد مُعدَّة ومُقيَّمة بالكامل.','(no name)':'(بلا اسم)','Refresh failed.':'فشل التحديث.',
   'Open Overview':'فتح نظرة عامة','Cohort performance by subject':'أداء الدفعة حسب المادة','Escape':'Esc',
   // tooltips
+  'Administration':'الإدارة','ADMINISTRATION':'الإدارة','Admins':'المشرفون','Admin':'مشرف','Super admin':'مشرف رئيسي','You':'أنت','Full access':'وصول كامل','No access':'بلا وصول','Access':'الوصول','Role':'الدور',
+  'Create admin accounts and choose exactly what each admin can open. Anything left unticked is hidden from that admin.':'أنشئ حسابات المشرفين وحدّد بدقة ما يمكن لكل مشرف فتحه. كل ما لم يُحدَّد يكون مخفيًا عن ذلك المشرف.',
+  'New admin':'مشرف جديد','Edit access':'تعديل الصلاحيات','Password (new admin only)':'كلمة المرور (للمشرف الجديد فقط)','Generate':'توليد','Permissions':'الصلاحيات',
+  'Tick what this admin is allowed to open. Anything unticked is hidden from them.':'حدّد ما يُسمح لهذا المشرف بفتحه. كل ما لم يُحدَّد يكون مخفيًا عنه.',
+  'Select all':'تحديد الكل','Clear all':'إلغاء تحديد الكل','All':'الكل','Access to subjects':'الوصول إلى المواد','Manage admins':'إدارة المشرفين','Save admin':'حفظ المشرف','admin(s)':'مشرف',
+  'No admins found.':'لم يُعثر على مشرفين.','Enter a name.':'أدخل الاسم.','Enter a valid email.':'أدخل بريدًا إلكترونيًا صحيحًا.','Password must be at least 6 characters.':'يجب ألا تقل كلمة المرور عن 6 أحرف.',
+  'You cannot remove your own admin-management access.':'لا يمكنك إزالة صلاحية إدارة المشرفين عن حسابك.','You cannot delete your own admin access.':'لا يمكنك حذف صلاحيات حسابك.',
+  'That email already has an account (it may be a student or teacher account). Use a different email.':'هذا البريد مرتبط بحساب بالفعل (قد يكون حساب طالب أو معلم). استخدم بريدًا آخر.',
+  'Could not save admin.':'تعذّر حفظ المشرف.','Could not delete admin.':'تعذّر حذف المشرف.','No access yet':'لا وصول بعد',
+  'Your account is signed in but has no permissions assigned. Ask a super admin to grant you access.':'حسابك مسجَّل الدخول لكن لم تُسنَد إليه أي صلاحيات. اطلب من مشرف رئيسي منحك الوصول.',
+  'Could not verify your access — check your connection and try again.':'تعذّر التحقق من صلاحياتك — تحقق من اتصالك وحاول مجددًا.',
   'Save all changes':'حفظ كل التغييرات','Saving':'جارٍ الحفظ',
   'Subjects taught':'المواد التي يدرّسها',
   'A teacher can teach several subjects — tick them under "Teaches" and press Save. A subject has one teacher, so a subject already taught by someone else is reassigned.':'يمكن للمعلم أن يدرّس عدة مواد — حدّدها ضمن «يدرّس» ثم اضغط حفظ. للمادة معلم واحد، لذا تُعاد إسناد المادة إن كان يدرّسها معلم آخر.',
@@ -2441,6 +2392,7 @@ const AR = {
   'Paste names or emails':'لصق أسماء أو بريد','Student names or emails (one per line)':'أسماء الطلاب أو بريدهم الإلكتروني (واحد في كل سطر)','Create accounts for the missing students':'إنشاء حسابات للطلاب غير الموجودين','e.g. Kadir Kemal':'مثال: Kadir Kemal',
   'Students are matched by their name — add an email column if two students share the same name.':'تتم مطابقة الطلاب بأسمائهم — أضف عمود email إذا اشترك طالبان في الاسم نفسه.',
   "Only name is required. email defaults to the student's name @jumj.com (for example kadir.kemal@jumj.com). gender, phone, department, batch and subjects are optional; subjects is a semicolon-separated list of subject names or keys. For students who already have an account, blank columns are left as they are and subjects are added to their existing ones.":'الحقل المطلوب فقط: name. يُنشأ البريد الإلكتروني تلقائيًا من اسم الطالب @jumj.com (مثل kadir.kemal@jumj.com). الحقول gender وphone وdepartment وbatch وsubjects اختيارية؛ و subjects قائمة مفصولة بفاصلة منقوطة لأسماء المواد أو معرّفاتها. بالنسبة للطلاب الذين لديهم حساب، تبقى الحقول الفارغة كما هي وتُضاف المواد إلى موادهم الحالية.',
+  'Look up a student by name or email. If no account exists yet, fill in their details to create one; if one exists you can update their details and subjects here.':'ابحث عن الطالب بالاسم أو البريد الإلكتروني. إن لم يوجد حساب فأدخل بياناته لإنشائه؛ وإن وُجد فيمكنك تحديث بياناته ومواده هنا.',
   'Enter a student name or email.':'أدخل اسم الطالب أو بريده الإلكتروني.','Paste at least one student name or email.':'الصق اسم طالب واحد أو بريده على الأقل.',
   'Several students share this name — enter their email instead.':'يشترك عدة طلاب في هذا الاسم — أدخل بريد الطالب بدلًا منه.','Several students share this name — search by email instead.':'يشترك عدة طلاب في هذا الاسم — ابحث بالبريد الإلكتروني بدلًا منه.',
   'Several students share this name — add an email column.':'يشترك عدة طلاب في هذا الاسم — أضف عمود email.','Several existing students share this name — add an email column.':'يشترك عدة طلاب حاليين في هذا الاسم — أضف عمود email.',
@@ -2461,6 +2413,14 @@ function P(tpl, fn){
 }
 const T = (s) => tr(s);
 const AR_RE = [
+  P('Students {n}/{n}', (m,a,b) => `الطلاب ${a}/${b}`),
+  P('Teachers {n}/{n}', (m,a,b) => `المعلمون ${a}/${b}`),
+  P('Subjects {n}/{n}', (m,a,b) => `المواد ${a}/${b}`),
+  P('Could not load admins: {s}', (m,a) => `تعذّر تحميل المشرفين: ${a}`),
+  P('Delete {s}\'s admin access? They will no longer be able to open the console. (Their sign-in account itself is not deleted.)', (m,a) => `حذف صلاحيات المشرف ${a}؟ لن يتمكن بعد ذلك من فتح لوحة الإدارة. (لا يُحذف حساب دخوله نفسه.)`),
+  P('Removed {s}.', (m,a) => `تمت إزالة ${a}.`),
+  P('Saved {s}\'s access.', (m,a) => `تم حفظ صلاحيات ${a}.`),
+  P('Created admin {s}.', (m,a) => `تم إنشاء المشرف ${a}.`),
   P('{n} / {n} students', (m,a,b) => `${a} / ${b} طالب`),
   P('{s} — {n} / {n} ({n}%)', (m,l,a,b,c) => `${T(l)} — ${a} / ${b} (${c}%)`),
   P('Total marks for this subject (sum of weights): {n}', (m,a) => `إجمالي درجات المادة (مجموع الأوزان): ${a}`),
@@ -2891,8 +2851,8 @@ function renderSubOverview(){
   const body = $('ovBody');
   if(loading){ body.innerHTML = `<div class="card"><div class="loading-row"><span class="spin"></span> Loading results…<div class="progress-track" data-load="${subj.slug}" style="max-width:320px;margin:12px auto 0"><span></span></div><small class="load-note"></small></div></div>`; return; }
   if(!st.rows.length && !st.enrolled){
-    body.innerHTML = `<div class="card"><div class="empty-state" style="border:0"><b>No students enrolled yet</b>Add students in the Enroll tab, then record results.<div class="btn-row" style="justify-content:center;margin-top:14px"><button class="btn" id="ovGoRoster">Go to Enroll</button></div></div></div>`;
-    $('ovGoRoster').addEventListener('click', () => go('subjects/' + encodeURIComponent(subj.slug) + '/enroll'));
+    body.innerHTML = `<div class="card"><div class="empty-state" style="border:0"><b>No students enrolled yet</b>Add students in the Enroll tab, then record results.${can('subject.enroll') ? `<div class="btn-row" style="justify-content:center;margin-top:14px"><button class="btn" id="ovGoRoster">Go to Enroll</button></div>` : ''}</div></div>`;
+    if($('ovGoRoster')) $('ovGoRoster').addEventListener('click', () => go('subjects/' + encodeURIComponent(subj.slug) + '/enroll'));
     return;
   }
   body.innerHTML = OV_SKELETON;
@@ -2916,7 +2876,7 @@ function renderSubOverview(){
   $('ovMissingHeading').textContent = `Awaiting results (${missing.length})`;
   if(missing.length){
     $('ovMissingWrap').classList.remove('hidden'); setBox('ovMissingOk','');
-    $('ovMissingBody').innerHTML = missing.map(s => `<tr><td>${stuLink(s.uid, s.name || '(no name)')}</td><td>${genderChip(s.gender)}</td><td class="mono">${esc(s.email)}</td><td><button class="linkbtn" data-enter="${s.uid}">Enter result</button></td></tr>`).join('');
+    $('ovMissingBody').innerHTML = missing.map(s => `<tr><td>${stuLink(s.uid, s.name || '(no name)')}</td><td>${genderChip(s.gender)}</td><td class="mono">${esc(s.email)}</td><td>${can('subject.results') ? `<button class="linkbtn" data-enter="${s.uid}">Enter result</button>` : ''}</td></tr>`).join('');
     $('ovMissingBody').querySelectorAll('[data-enter]').forEach(b => b.addEventListener('click', () => openIndividual(b.dataset.enter)));
   }else{
     $('ovMissingWrap').classList.add('hidden');
@@ -2943,8 +2903,8 @@ function renderSubOverview(){
 const OV_SKELETON = `
   <div class="card"><p class="card-title">Score distribution</p><p class="hint">How many graded students fall in each 10% band.</p><div class="histogram" id="ovHistogram"></div></div>
   <div class="sub-two">
-    <div class="card"><p class="card-title">Leaderboard</p><div class="table-scroll table-compact" style="margin-top:10px"><table><thead><tr><th></th><th>Student</th><th>Gender</th><th>Score</th><th>%</th></tr></thead><tbody id="ovLeaderBody"></tbody></table></div></div>
-    <div class="card"><p class="card-title" id="ovMissingHeading">Awaiting results</p><p class="hint">Enrolled students with no result yet.</p><div class="ok-box" id="ovMissingOk"></div><div class="table-scroll table-compact" id="ovMissingWrap" style="max-height:340px"><table><thead><tr><th>Name</th><th>Gender</th><th>Email</th><th></th></tr></thead><tbody id="ovMissingBody"></tbody></table></div></div>
+    <div class="card"><p class="card-title">Leaderboard</p><div class="table-scroll table-compact" style="margin-top:10px"><table style="min-width:420px"><thead><tr><th></th><th>Student</th><th>Gender</th><th>Score</th><th>%</th></tr></thead><tbody id="ovLeaderBody"></tbody></table></div></div>
+    <div class="card"><p class="card-title" id="ovMissingHeading">Awaiting results</p><p class="hint">Enrolled students with no result yet.</p><div class="ok-box" id="ovMissingOk"></div><div class="table-scroll table-compact" id="ovMissingWrap" style="max-height:340px"><table style="min-width:340px"><thead><tr><th>Name</th><th>Gender</th><th>Email</th><th></th></tr></thead><tbody id="ovMissingBody"></tbody></table></div></div>
   </div>
   <div class="card" style="margin-top:14px"><p class="card-title">Top performers by component</p><div class="subject-leaderboards-scroll" id="ovCompWrap"></div></div>`;
 $('ovTopN').addEventListener('change', () => {
@@ -3176,7 +3136,7 @@ function renderAllResultsTable(){
     const live = computeComponents(rawMap, comps);
     const total = hasAny ? live.total.toFixed(2) : '—';
     const partial = (hasAny && !live.complete) ? ' <span class="tag partial" title="Not every component has a score yet — total is based on what has been entered.">partial</span>' : '';
-    const notEnr = isEnrolled(s, subj.slug) ? '' : ` <button class="chip warn enrollBtn" style="cursor:pointer" title="Enroll this student in ${esc(subj.name)}">not enrolled · enroll</button>`;
+    const notEnr = isEnrolled(s, subj.slug) ? '' : !can('subject.enroll') ? ' <span class="chip warn">not enrolled</span>' : ` <button class="chip warn enrollBtn" style="cursor:pointer" title="Enroll this student in ${esc(subj.name)}">not enrolled · enroll</button>`;
     return `
     <tr data-uid="${s.uid}">
       <td>${stuLink(s.uid, s.name)}${notEnr}<div class="subtext">${esc(s.email)}</div></td>
@@ -3355,7 +3315,7 @@ async function continueParse({headers, rows, nameIdx, emailIdx}){
 }
 function renderBulkTable(){
   const subj = curSubj(); const comps = subj.components || [];
-  const auto = $('autoEnrollChk').checked;
+  const auto = $('autoEnrollChk').checked && can('subject.enroll');
   $('bulkTableHead').innerHTML = `<th class="chk"><input type="checkbox" id="selectAll" checked></th><th>Name</th><th>Email</th><th>Gender</th>` + comps.map(c => `<th>${esc(c.label)}</th>`).join('') + `<th>Total</th><th>Enrollment</th><th>Status</th>`;
   $('cntTotal').textContent = roster.length;
   $('cntExisting').textContent = roster.filter(r => r.existingUid).length;
@@ -3386,7 +3346,7 @@ $('runImportBtn').addEventListener('click', async () => {
   const runBtn = $('runImportBtn'); setBusy(runBtn, true);
   const checked = new Set(Array.from($('rosterBody').querySelectorAll('.rowchk:checked')).map(c => +c.dataset.i));
   const toRun = roster.filter((r,i) => checked.has(i) && r.status !== 'done' && r.existingUid);
-  const autoEnroll = $('autoEnrollChk').checked;
+  const autoEnroll = $('autoEnrollChk').checked && can('subject.enroll');
   let ok = 0, fail = 0, enrolledNow = 0;
   try{
     if(autoEnroll){
@@ -3453,7 +3413,7 @@ function runLookup(){
   $('lookupResult').textContent = `Found ${s.name} (${s.email})${enrolled ? '' : ` — not enrolled in ${subj.name} yet.`}`;
   $('lookupResult').classList.remove('hidden');
   $('indivName').value = s.name; $('indivEmail').value = s.email;
-  $('indivEnrollWrap').classList.toggle('hidden', enrolled); $('indivEnrollChk').checked = true;
+  $('indivEnrollWrap').classList.toggle('hidden', enrolled || !can('subject.enroll')); $('indivEnrollChk').checked = true;
   renderIndivComponents();
   const rec = (resultsStore.get(subj.slug) || new Map()).get(s.uid);
   if(rec) (rec.components || []).forEach(c => { const el = $('indivRaw_' + c.key); if(el) el.value = (c.raw !== null && c.raw !== undefined) ? c.raw : ''; });
@@ -3481,7 +3441,7 @@ $('saveIndivBtn').addEventListener('click', async () => {
   const {components, total, complete} = computeComponents(rawMap, comps);
   const btn = $('saveIndivBtn'); setBusy(btn, true);
   try{
-    if(!indivState.enrolled && $('indivEnrollChk').checked){
+    if(!indivState.enrolled && $('indivEnrollChk').checked && can('subject.enroll')){
       await enrollStudents(subj.slug, [indivState.uid]);
       indivState.enrolled = true; $('indivEnrollWrap').classList.add('hidden'); renderSideSubjects();
     }
@@ -3793,8 +3753,10 @@ $('acctDownloadCsvBtn').addEventListener('click', () => {
   downloadCsv('student_accounts_credentials.csv', [['Name','Email','Password','Gender','Phone','Department','Batch','Account','Status'], ...acctRoster.map(r => [r.name, r.email, r.password || '', r.gender, r.phone, r.department, r.batch, r.existingUid?'Existing':'New', r.status])]);
 });
 async function createAuthUser(email, password){
-  const secondary = initializeApp(firebaseConfig, 'secondary-' + Date.now() + '-' + Math.random());
-  const secondaryAuth = getAuth(secondary);
+  // Throw-away app used only to create an account. In-memory persistence: nothing is ever written to localStorage/IndexedDB,
+  // so provisioning a student/teacher/admin cannot leave a session behind or collide with any other stored session.
+  const secondary = initializeApp(firebaseConfig, 'provision-' + Date.now() + '-' + Math.random());
+  const secondaryAuth = initializeAuth(secondary, { persistence: inMemoryPersistence });
   try{
     const cred = await createUserWithEmailAndPassword(secondaryAuth, email, password);
     await signOut(secondaryAuth).catch(()=>{});
@@ -4227,11 +4189,11 @@ function renderOverview(){
   $('ovwTableBody').innerHTML = stats.length ? stats.map(({s, st}) => `
     <tr class="rowlink" data-slug="${esc(s.slug)}">
       <td><b>${esc(s.name)}</b></td>
-      <td class="col-opt">${s.teacherUid ? esc(teacherLabel(s.teacherUid)) : '<span class="chip warn">Unassigned</span>'}</td>
+      <td>${s.teacherUid ? esc(teacherLabel(s.teacherUid)) : '<span class="chip warn">Unassigned</span>'}</td>
       <td class="mono">${st.enrolled}</td>
-      <td class="mono col-opt">${globalLoaded ? `${st.submittedEnrolled} / ${st.enrolled}` : '—'}</td>
+      <td class="mono">${globalLoaded ? `${st.submittedEnrolled} / ${st.enrolled}` : '—'}</td>
       <td>${globalLoaded && st.completion !== null ? st.completion.toFixed(0) + '%' : '—'}</td>
-      <td>${fmtPct(st.avg)}</td><td class="col-opt">${fmtPct(st.median)}</td><td class="col-opt">${fmtPct(st.max)}</td><td class="col-opt">${fmtPct(st.min)}</td>
+      <td>${fmtPct(st.avg)}</td><td>${fmtPct(st.median)}</td><td>${fmtPct(st.max)}</td><td>${fmtPct(st.min)}</td>
     </tr>`).join('') : `<tr><td colspan="9">No subjects yet.</td></tr>`;
   $('ovwTableBody').querySelectorAll('.rowlink').forEach(el => el.addEventListener('click', () => openFrom(el)));
 
@@ -4767,13 +4729,13 @@ async function stampEnrollment(uid, slugs, opts){
     q = q.trim().toLowerCase();
     if(!q){ results.classList.remove('show'); results.innerHTML = ''; return; }
     const hits = [];
-    allSubjects.filter(s => (s.name + ' ' + s.slug + ' ' + teacherLabel(s.teacherUid)).toLowerCase().includes(q)).slice(0,5)
+    (canAny('subject.') ? allSubjects : []).filter(s => (s.name + ' ' + s.slug + ' ' + teacherLabel(s.teacherUid)).toLowerCase().includes(q)).slice(0,5)
       .forEach(s => hits.push({icon:'fa-book-medical', title:s.name, sub:`Subject · ${enrolledStudents(s.slug).length} enrolled`, go:() => go('subjects/' + encodeURIComponent(s.slug) + '/overview')}));
-    allStudents.filter(s => (s.name+' '+s.email).toLowerCase().includes(q)).slice(0,4)
+    (can('students.all') ? allStudents : []).filter(s => (s.name+' '+s.email).toLowerCase().includes(q)).slice(0,4)
       .forEach(s => hits.push({avatar: spAvatar(s, 'sm'), title:s.name || s.email, sub:'Student profile · ' + s.email, go:() => go('students/' + encodeURIComponent(s.uid))}));
-    allTeachers.filter(t => (t.name+' '+t.email).toLowerCase().includes(q)).slice(0,3)
+    (canAny('teachers.') ? allTeachers : []).filter(t => (t.name+' '+t.email).toLowerCase().includes(q)).slice(0,3)
       .forEach(t => hits.push({icon:'fa-chalkboard-user', title:t.name || t.email, sub:'Teacher · ' + t.email, go:() => go('teachers', () => { $('teachSearch').value = t.email; renderAllTeachersTable(); })}));
-    if(/overview|analytic|performance|average|rank/.test(q)) hits.unshift({icon:'fa-chart-column', title:'Open Overview', sub:'Cohort performance by subject', go:() => go('overview')});
+    if(can('subject.overview') && /overview|analytic|performance|average|rank/.test(q)) hits.unshift({icon:'fa-chart-column', title:'Open Overview', sub:'Cohort performance by subject', go:() => go('overview')});
     results.innerHTML = hits.length ? hits.slice(0,8).map((h,i) => `<div class="global-search-item" data-i="${i}">${h.avatar || `<i class="fa-solid ${h.icon}"></i>`}<div><b>${esc(h.title)}</b><small>${esc(h.sub)}</small></div></div>`).join('') : '<div class="notification-empty">No matches</div>';
     results.classList.add('show');
     results.querySelectorAll('.global-search-item').forEach((el,i) => el.onclick = () => { results.classList.remove('show'); input.value = ''; hits[i].go(); });
@@ -4800,18 +4762,256 @@ async function stampEnrollment(uid, slugs, opts){
   let stored = null; try{ stored = localStorage.getItem('jumedAdminSidebarCollapsed'); }catch(e){}
   if(stored === '1') setCollapsed(true);
   toggleBtn.addEventListener('click', () => setCollapsed(!sidebar.classList.contains('collapsed')));
-  const scrollEl = $('mainScroll');
-  let lastY = scrollEl.scrollTop;
+  const scrollEl = $('mainScroll'); let hideTimer;
   scrollEl.addEventListener('scroll', () => {
     if(window.innerWidth > 860) return;
-    const y = Math.max(0, scrollEl.scrollTop);
-    const delta = y - lastY;
-    if(y < 24) sidebar.classList.remove('nav-faded');
-    else if(delta > 4) sidebar.classList.add('nav-faded');
-    else if(delta < -4) sidebar.classList.remove('nav-faded');
-    lastY = y;
+    sidebar.classList.add('nav-faded'); clearTimeout(hideTimer);
+    hideTimer = setTimeout(() => sidebar.classList.remove('nav-faded'), 650);
   }, {passive:true});
 })();
+
+
+// ================================================================
+// Admin access control — who can open what
+// Stored on /admins/{uid}.permissions as { students:{all,bulk,individual}, teachers:{…}, subject:{overview,roster,results,grading,settings,enroll}, admins:{manage} }.
+// An admin document WITHOUT a `permissions` field (created before this feature) keeps full access, so nobody is locked out.
+// ================================================================
+const PERM_GROUPS = [
+  {id:'students', title:'Student operations', short:'Students', items:[['students.all','All students'],['students.bulk','Bulk import'],['students.individual','Add individually']]},
+  {id:'teachers', title:'Teacher operations', short:'Teachers', items:[['teachers.all','All teachers'],['teachers.bulk','Bulk import'],['teachers.individual','Add individually']]},
+  {id:'subject',  title:'Access to subjects', short:'Subjects', items:[['subject.overview','Overview'],['subject.roster','Roster'],['subject.results','Results'],['subject.grading','Grading'],['subject.settings','Settings'],['subject.enroll','Enroll']]},
+  {id:'admins',   title:'Administration',     short:'Admins',   items:[['admins.manage','Manage admins']]},
+];
+const ALL_PERMS = PERM_GROUPS.flatMap(g => g.items.map(i => i[0]));
+const PERM_BY_TAB = {
+  tabStuAll:'students.all', tabStuBulk:'students.bulk', tabStuIndiv:'students.individual',
+  tabTeachAll:'teachers.all', tabTeachBulk:'teachers.bulk', tabTeachIndiv:'teachers.individual',
+};
+let access = {legacy:true, perms:new Set(ALL_PERMS)};
+
+function permsFromDoc(data){
+  if(!data || !data.permissions || typeof data.permissions !== 'object') return null;   // legacy admin → full access
+  const set = new Set();
+  PERM_GROUPS.forEach(g => {
+    const grp = data.permissions[g.id];
+    if(grp && typeof grp === 'object') g.items.forEach(([key]) => { if(grp[key.split('.')[1]] === true) set.add(key); });
+  });
+  return set;
+}
+function permsToDoc(set){
+  const out = {};
+  PERM_GROUPS.forEach(g => { out[g.id] = {}; g.items.forEach(([key]) => { out[g.id][key.split('.')[1]] = set.has(key); }); });
+  return out;
+}
+function setAccess(data){
+  const p = permsFromDoc(data);
+  access = {legacy: p === null, perms: p === null ? new Set(ALL_PERMS) : p};
+}
+function can(perm){ return access.perms.has(perm); }
+function canAny(prefix){ return ALL_PERMS.some(k => k.startsWith(prefix) && access.perms.has(k)); }
+
+function firstAllowedPath(){
+  if(canAny('subject.')) return 'subjects';
+  if(canAny('students.')) return 'students';
+  if(canAny('teachers.')) return 'teachers';
+  if(can('admins.manage')) return 'admins';
+  return 'noaccess';
+}
+// Returns the path to redirect to when the route is not allowed, otherwise null.
+function guardRoute(r){
+  switch(r.view){
+    case 'noaccess': { const p = firstAllowedPath(); return p === 'noaccess' ? null : p; }
+    case 'subjects': return canAny('subject.') ? null : firstAllowedPath();
+    case 'overview': return can('subject.overview') ? null : (canAny('subject.') ? 'subjects' : firstAllowedPath());
+    case 'subject': {
+      if(!canAny('subject.')) return firstAllowedPath();
+      if(can('subject.' + r.tab)) return null;
+      const t = SUB_TABS.find(x => can('subject.' + x));
+      return 'subjects/' + encodeURIComponent(r.slug) + '/' + t;
+    }
+    case 'students': return canAny('students.') ? null : firstAllowedPath();
+    case 'student': return can('students.all') ? null : (canAny('students.') ? 'students' : firstAllowedPath());
+    case 'teachers': return canAny('teachers.') ? null : firstAllowedPath();
+    case 'admins': return can('admins.manage') ? null : firstAllowedPath();
+  }
+  return null;
+}
+// Hide everything the signed-in admin may not use (nav items, tabs, buttons).
+function applyAccessUI(){
+  document.querySelectorAll('[data-perm]').forEach(el => el.classList.toggle('perm-hidden', !can(el.dataset.perm)));
+  document.querySelectorAll('[data-perm-any]').forEach(el => el.classList.toggle('perm-hidden', !canAny(el.dataset.permAny)));
+  $('sideDirLabel').classList.toggle('perm-hidden', !(canAny('students.') || canAny('teachers.')));
+  $('subTabs').querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('perm-hidden', !can('subject.' + b.dataset.tab)));
+  Object.entries(PERM_BY_TAB).forEach(([tabId, perm]) => {
+    const btn = document.querySelector(`.tab-btn[data-target="${tabId}"]`);
+    if(btn) btn.classList.toggle('perm-hidden', !can(perm));
+  });
+  [['stuTabGroup', tabApi.stu], ['teachTabGroup', tabApi.teach]].forEach(([gid, api]) => {
+    const g = $(gid); if(!g) return;
+    const btns = Array.from(g.querySelectorAll(':scope > .tabs > .tab-btn'));
+    const active = btns.find(b => b.classList.contains('active'));
+    if(!active || active.classList.contains('perm-hidden')){
+      const first = btns.find(b => !b.classList.contains('perm-hidden'));
+      if(first) api.activate(first.dataset.target);
+    }
+  });
+  const ae = $('autoEnrollChk');
+  if(ae){ const ok = can('subject.enroll'); const lab = ae.closest('label'); if(lab) lab.classList.toggle('perm-hidden', !ok); if(!ok) ae.checked = false; }
+}
+// Links to a student's profile do nothing for admins without "All students".
+document.addEventListener('click', (e) => {
+  const a = e.target.closest && e.target.closest('a[href^="#/students/"]');
+  if(a && !can('students.all')){ e.preventDefault(); e.stopPropagation(); }
+}, true);
+
+// ---- read /admins/{uid} without ever signing someone out because of a network hiccup ----
+async function fetchAdminRecord(uid){
+  for(let i = 0; i < 3; i++){
+    try{
+      const snap = await getDoc(doc(db, 'admins', uid));
+      return snap.exists() ? {status:'ok', data:snap.data()} : {status:'none'};
+    }catch(err){
+      if(err && err.code === 'permission-denied') return {status:'none'};
+      await new Promise(r => setTimeout(r, 500 * (i + 1)));
+    }
+  }
+  return {status:'error'};
+}
+// Re-read the admin's own record when the tab regains focus: revoked access signs out, changed permissions apply immediately.
+async function recheckAccess(){
+  const u = auth.currentUser; if(!u) return;
+  const rec = await fetchAdminRecord(u.uid);
+  if(rec.status === 'error') return;
+  if(rec.status === 'none'){ await signOut(auth).catch(()=>{}); return; }
+  const before = JSON.stringify([...access.perms].sort());
+  setAccess(rec.data);
+  if(JSON.stringify([...access.perms].sort()) !== before) refreshUI();
+}
+document.addEventListener('visibilitychange', () => { if(!document.hidden && bootstrapped) recheckAccess(); });
+
+// ================================================================
+// Admins screen — create admins and choose what each may open
+// ================================================================
+let allAdmins = [], adminsLoaded = false, adminEditing = null;
+async function loadAdmins(){
+  const snap = await getDocs(collection(db, 'admins'));
+  allAdmins = snap.docs.map(d => ({uid: d.id, ...d.data()}));
+  allAdmins.sort((a,b) => String(a.name || a.email || a.uid).localeCompare(String(b.name || b.email || b.uid), undefined, {sensitivity:'base'}));
+  adminsLoaded = true;
+}
+function adminPerms(a){ const p = permsFromDoc(a); return p === null ? new Set(ALL_PERMS) : p; }
+function accessChips(a){
+  const p = adminPerms(a);
+  if(ALL_PERMS.every(k => p.has(k))) return '<span class="chip gold">Full access</span>';
+  const chips = [];
+  PERM_GROUPS.forEach(g => {
+    const n = g.items.filter(([k]) => p.has(k)).length;
+    if(!n) return;
+    chips.push(g.id === 'admins' ? '<span class="chip">Manage admins</span>' : `<span class="chip">${g.short} ${n}/${g.items.length}</span>`);
+  });
+  return chips.length ? `<span class="chips">${chips.join('')}</span>` : '<span class="chip danger">No access</span>';
+}
+function renderAdminsScreen(){
+  if(!adminsLoaded && !renderAdminsScreen._loading){
+    renderAdminsScreen._loading = true;
+    loadAdmins().catch(err => setBox('adminsError', 'Could not load admins: ' + (err.message || err)))
+      .finally(() => { renderAdminsScreen._loading = false; if(route.view === 'admins') renderAdminsScreen(); });
+  }
+  $('adminsCount').innerHTML = `<b>${allAdmins.length}</b> admin(s)`;
+  const me = auth.currentUser ? auth.currentUser.uid : null;
+  $('adminsBody').innerHTML = allAdmins.length ? allAdmins.map(a => {
+    const isMe = a.uid === me;
+    const manager = adminPerms(a).has('admins.manage');
+    return `<tr data-uid="${esc(a.uid)}">
+      <td>${esc(a.name || '—')} ${isMe ? '<span class="chip gold">You</span>' : ''}</td>
+      <td class="mono">${esc(a.email || a.uid)}</td>
+      <td>${accessChips(a)}</td>
+      <td>${manager ? '<span class="chip">Super admin</span>' : '<span class="chip muted">Admin</span>'}</td>
+      <td><button class="btn btn-secondary btn-sm admEdit">Edit access</button></td>
+      <td><button class="btn btn-danger btn-sm admDelete" ${isMe ? 'disabled' : ''}>Delete</button></td>
+    </tr>`;
+  }).join('') : `<tr><td colspan="6">${adminsLoaded ? 'No admins found.' : 'Loading…'}</td></tr>`;
+}
+function renderPermGroups(selected){
+  $('admPermGroups').innerHTML = PERM_GROUPS.map(g => `
+    <div class="perm-group" data-group="${g.id}">
+      <div class="perm-head"><b>${g.title}</b><span><button type="button" class="linkbtn" data-all="${g.id}">All</button> · <button type="button" class="linkbtn" data-none="${g.id}">None</button></span></div>
+      ${g.items.map(([k, label]) => `<label class="perm-item"><input type="checkbox" data-perm-key="${k}" ${selected.has(k) ? 'checked' : ''}> ${label}</label>`).join('')}
+    </div>`).join('');
+}
+function readPermGroups(){ return new Set(Array.from($('admPermGroups').querySelectorAll('input[data-perm-key]:checked')).map(i => i.dataset.permKey)); }
+function openAdminEditor(a){
+  adminEditing = a || null;
+  $('adminEditor').classList.remove('hidden');
+  $('adminEditorTitle').textContent = a ? 'Edit access' : 'New admin';
+  $('admName').value = a ? (a.name || '') : '';
+  $('admEmail').value = a ? (a.email || '') : '';
+  $('admEmail').disabled = !!(a && a.email);
+  $('admPasswordWrap').classList.toggle('hidden', !!a);
+  $('admPassword').value = a ? '' : randomPassword(10);
+  renderPermGroups(a ? adminPerms(a) : new Set());
+  setBox('admError',''); setBox('adminsOk','');
+  $('adminEditor').scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+function closeAdminEditor(){ $('adminEditor').classList.add('hidden'); adminEditing = null; }
+$('newAdminBtn').addEventListener('click', () => openAdminEditor(null));
+$('admCancelBtn').addEventListener('click', closeAdminEditor);
+$('admGenBtn').addEventListener('click', () => { $('admPassword').value = randomPassword(10); });
+$('admAllBtn').addEventListener('click', () => renderPermGroups(new Set(ALL_PERMS)));
+$('admNoneBtn').addEventListener('click', () => renderPermGroups(new Set()));
+$('admPermGroups').addEventListener('click', (e) => {
+  const all = e.target.closest('[data-all]'), none = e.target.closest('[data-none]');
+  const gid = all ? all.dataset.all : none ? none.dataset.none : null; if(!gid) return;
+  $('admPermGroups').querySelectorAll(`.perm-group[data-group="${gid}"] input[data-perm-key]`).forEach(i => i.checked = !!all);
+});
+$('adminsRefreshBtn').addEventListener('click', async () => {
+  setBox('adminsError',''); 
+  await withBusy($('adminsRefreshBtn'), async () => { try{ await loadAdmins(); }catch(err){ setBox('adminsError', 'Could not load admins: ' + (err.message || err)); } });
+  renderAdminsScreen();
+});
+$('adminsBody').addEventListener('click', async (e) => {
+  const tr = e.target.closest('tr[data-uid]'); if(!tr) return;
+  const a = allAdmins.find(x => x.uid === tr.dataset.uid); if(!a) return;
+  if(e.target.closest('.admEdit')){ openAdminEditor(a); return; }
+  if(e.target.closest('.admDelete')){
+    setBox('adminsError',''); setBox('adminsOk','');
+    if(a.uid === (auth.currentUser && auth.currentUser.uid)){ setBox('adminsError', 'You cannot delete your own admin access.'); return; }
+    if(!confirm(`Delete ${a.name || a.email || a.uid}'s admin access? They will no longer be able to open the console. (Their sign-in account itself is not deleted.)`)) return;
+    try{ await deleteDoc(doc(db, 'admins', a.uid)); await loadAdmins(); renderAdminsScreen(); setBox('adminsOk', `Removed ${a.name || a.email || a.uid}.`, 'ok'); }
+    catch(err){ setBox('adminsError', err.message || 'Could not delete admin.'); }
+  }
+});
+$('admSaveBtn').addEventListener('click', async () => {
+  setBox('admError',''); setBox('adminsOk',''); setBox('adminsError','');
+  const name = $('admName').value.trim(), email = $('admEmail').value.trim().toLowerCase(), password = $('admPassword').value.trim();
+  const perms = readPermGroups();
+  const role = perms.has('admins.manage') ? 'super' : 'admin';
+  if(!name && !adminEditing){ setBox('admError', 'Enter a name.'); return; }
+  const me = auth.currentUser ? auth.currentUser.uid : null;
+  const btn = $('admSaveBtn');
+  try{
+    if(adminEditing){
+      if(adminEditing.uid === me && !perms.has('admins.manage')){ setBox('admError', 'You cannot remove your own admin-management access.'); return; }
+      setBusy(btn, true);
+      const payload = {role, permissions: permsToDoc(perms)};
+      if(name) payload.name = name;
+      if(!adminEditing.email && email) payload.email = email;
+      await setDoc(doc(db, 'admins', adminEditing.uid), payload, {merge:true});
+      if(adminEditing.uid === me){ setAccess({permissions: payload.permissions}); }
+      setBox('adminsOk', `Saved ${name || adminEditing.name || adminEditing.email || adminEditing.uid}'s access.`, 'ok');
+    }else{
+      if(!/^\S+@\S+\.\S+$/.test(email)){ setBox('admError', 'Enter a valid email.'); return; }
+      if(password.length < 6){ setBox('admError', 'Password must be at least 6 characters.'); return; }
+      setBusy(btn, true);
+      const uid = await createAuthUser(email, password);
+      await setDoc(doc(db, 'admins', uid), {name, email, role, permissions: permsToDoc(perms), createdAt: new Date().toISOString(), createdBy: me});
+      setBox('adminsOk', `Created admin ${name}.`, 'ok');
+    }
+    await loadAdmins(); closeAdminEditor(); renderAdminsScreen(); refreshUI();
+  }catch(err){
+    setBox('admError', err && err.code === 'auth/email-already-in-use' ? 'That email already has an account (it may be a student or teacher account). Use a different email.' : (err.message || 'Could not save admin.'));
+  }finally{ setBusy(btn, false); }
+});
 
 // ================================================================
 // Admin auth + bootstrap
@@ -4828,21 +5028,31 @@ adminSignInBtn.addEventListener('click', async () => {
 [adminEmailInput, adminPasswordInput].forEach(inp => inp.addEventListener('keydown', e => { if(e.key === 'Enter') adminSignInBtn.click(); }));
 $('adminSignOutBtn').addEventListener('click', async () => { await signOut(auth).catch(()=>{}); });
 
-onAuthStateChanged(auth, async (user) => {
+let authRetryTimer = null;
+async function handleAuthUser(user, attempt = 0){
+  clearTimeout(authRetryTimer);
   authChecking.classList.add('hidden');
   if(user){
-    // Signed in is not enough — this exact account needs an /admins/{uid} doc.
-    let authorized = false;
-    try{ authorized = (await getDoc(doc(db, 'admins', user.uid))).exists(); }catch(err){ authorized = false; }
-    if(!authorized){
-      await signOut(auth).catch(()=>{});
+    // Signed in is not enough — this exact account needs an /admins/{uid} document.
+    const rec = await fetchAdminRecord(user.uid);
+    if(rec.status === 'error'){
+      // A network problem must never sign an admin out: keep the session and retry.
+      appShell.classList.add('hidden'); loginScreen.classList.remove('hidden');
+      setBox('adminError', 'Could not verify your access — check your connection and try again.');
+      setBusy(adminSignInBtn, false);
+      if(attempt < 6) authRetryTimer = setTimeout(() => { if(auth.currentUser) handleAuthUser(auth.currentUser, attempt + 1); }, 5000);
+      return;
+    }
+    if(rec.status === 'none'){
+      await signOut(auth).catch(()=>{});   // only the admin app's own session — student/teacher sessions live elsewhere
       appShell.classList.add('hidden'); loginScreen.classList.remove('hidden');
       setBox('adminError', 'This account is not authorized for admin access.');
       setBusy(adminSignInBtn, false); return;
     }
+    setAccess(rec.data);
     loginScreen.classList.add('hidden'); appShell.classList.remove('hidden');
     $('sidebarUserEmail').textContent = user.email;
-    { const p = (user.email || 'admin').split('@')[0]; adminName = p.charAt(0).toUpperCase() + p.slice(1); }
+    { const p = (user.email || 'admin').split('@')[0]; adminName = (rec.data && rec.data.name) ? rec.data.name : p.charAt(0).toUpperCase() + p.slice(1); }
     $('adminAvatar').textContent = ((user.email || 'A').split('@')[0] || 'A').slice(0,1).toUpperCase();
     adminEmailInput.value = ''; adminPasswordInput.value = '';
     setBox('adminError',''); setBox('adminOk','');
@@ -4860,15 +5070,18 @@ onAuthStateChanged(auth, async (user) => {
         else if(route.view === 'subjects') renderSubjectsScreen();
         else if(route.view === 'overview') renderOverview();
       });
-    }
+    }else{ refreshUI(); }
     setBusy(adminSignInBtn, false);
   }else{
     bootstrapped = false; lastRouteKey = ''; wsSlug = null;
     resultsStore.clear(); loadedSubjects.clear(); globalLoaded = false; globalTried = false;
+    allAdmins = []; adminsLoaded = false; closeAdminEditor();
+    access = {legacy:false, perms:new Set()};
     appShell.classList.add('hidden'); loginScreen.classList.remove('hidden');
     setBusy(adminSignInBtn, false);
   }
-});
+}
+onAuthStateChanged(auth, (user) => { handleAuthUser(user); });
 
 // ---- filter wiring ----
 (function(){
