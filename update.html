@@ -720,6 +720,13 @@ th.sp-open-cell,td.sp-open-cell{width:46px;padding-inline-end:0!important}
 .perm-head b{font-size:12.5px;letter-spacing:-.01em}
 .perm-item{display:flex;align-items:center;gap:9px;font-size:12px;cursor:pointer;padding:5px 2px}
 .perm-item input{width:auto!important;min-width:0!important;accent-color:var(--brand)}
+
+/* ===== overview cards: never wider than the page; their tables scroll inside ===== */
+.main-scroll>*,.sub-panel>*,.sub-two>*,.analytics-cols>*,.card{min-width:0;max-width:100%}
+.sub-two,.analytics-cols{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+@media(max-width:1050px){.sub-two,.analytics-cols{grid-template-columns:minmax(0,1fr)!important}}
+.card .table-scroll,.card .subject-leaderboards-scroll{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.card .table-scroll>table{width:100%}
 </style>
 <script>try{if(localStorage.getItem("jumedLang")==="ar"){var r=document.documentElement;r.dir="rtl";r.lang="ar";r.classList.add("lang-ar")}}catch(e){}</script>
 </head>
@@ -1870,7 +1877,7 @@ const SUB_TABS = ['overview','roster','results','grading','settings','enroll'];
 const subjectBySlug = (slug) => allSubjects.find(s => s.slug === slug) || null;
 const studentByUid = (uid) => allStudents.find(s => s.uid === uid) || null;
 const teacherByUid = (uid) => allTeachers.find(t => t.uid === uid) || null;
-const teacherLabel = (uid) => { const t = teacherByUid(uid); return t ? (t.name || t.email) : ''; };
+const teacherLabel = (uid) => { const t = teacherByUid(uid); if(t) return t.name || t.email; const s = allSubjects.find(x => x.teacherUid === uid && x.teacherName); return s ? s.teacherName : ''; };
 const isEnrolled = (s, slug) => (s.subjectIds || []).includes(slug);
 const enrolledStudents = (slug) => allStudents.filter(s => isEnrolled(s, slug));
 const maxTotalOf = (subj) => (subj.components || []).reduce((a,c) => a + (Number(c.weight) || 0), 0);
@@ -1922,11 +1929,13 @@ function subjectStats(slug){
 // Data loading
 // ================================================================
 async function loadAllTeachers(){
+  if(!canReadTeachersData()){ allTeachers = []; return; }   // this admin's permissions don't include teacher data (matches firestore.rules)
   const snap = await getDocs(collection(db, TEACHERS));
   allTeachers = snap.docs.map(d => ({ uid: d.id, name: d.data().name || '', email: d.data().email || '', phone: d.data().phone || '' }));
   allTeachers.sort((a,b) => (a.name||'').localeCompare(b.name||''));
 }
 async function loadAllSubjects(){
+  if(!canReadSubjectsData()){ allSubjects = []; return; }
   const snap = await getDocs(collection(db, SUBJECTS));
   allSubjects = snap.docs.map(d => {
     const data = d.data();
@@ -1935,6 +1944,7 @@ async function loadAllSubjects(){
   allSubjects.sort((a,b) => (a.name||'').localeCompare(b.name||''));
 }
 async function loadAllStudents(){
+  if(!canReadStudentsData()){ allStudents = []; return; }
   const snap = await getDocs(collection(db, STUDENTS));
   allStudents = snap.docs.map(d => ({
     uid: d.id,
@@ -1956,6 +1966,7 @@ async function loadAllStudents(){
 
 // One cross-student query to fill every subject's results (used by cards + Overview).
 async function loadGlobalResults(force=false){
+  if(!canReadResultsData()){ globalLoaded = true; return null; }
   try{
     const snap = await getDocs(collectionGroup(db, MODULE_RESULTS));
     const known = new Set(allStudents.map(s => s.uid));
@@ -1992,6 +2003,7 @@ async function ensureSubjectResults(slug, force=false){
   if(inflight.has(slug)) return inflight.get(slug);
   const subj = subjectBySlug(slug);
   if(!subj) return 'cached';
+  if(!canReadResultsData()){ resultsStore.set(slug, new Map()); loadedSubjects.add(slug); return 'fresh'; }
   const p = (async () => {
     const m = new Map(); let firstErr = null;
     let doneCount = 0;
@@ -4809,6 +4821,11 @@ function setAccess(data){
 }
 function can(perm){ return access.perms.has(perm); }
 function canAny(prefix){ return ALL_PERMS.some(k => k.startsWith(prefix) && access.perms.has(k)); }
+// What each admin may READ — kept identical to firestore.rules (mayReadStudents / mayReadResults / mayReadTeachers / mayReadSubjects).
+function canReadStudentsData(){ return canAny('students.') || can('subject.overview') || can('subject.roster') || can('subject.results') || can('subject.enroll') || can('subject.settings'); }
+function canReadResultsData(){ return can('students.all') || can('subject.overview') || can('subject.roster') || can('subject.results') || can('subject.settings'); }
+function canReadTeachersData(){ return canAny('teachers.') || can('subject.settings'); }
+function canReadSubjectsData(){ return canAny('subject.') || canAny('teachers.') || canAny('students.'); }
 
 function firstAllowedPath(){
   if(canAny('subject.')) return 'subjects';
