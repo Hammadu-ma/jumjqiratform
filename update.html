@@ -913,6 +913,10 @@ tr.brk td{background:#fbf3dc}
 .attn-fs-body thead th{position:sticky;top:0;background:#fff;text-align:start;padding:10px 14px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);border-bottom:1px solid var(--line-strong)}
 .attn-fs-body tbody td{padding:13px 14px;font-size:13px;border-bottom:1px solid var(--line);vertical-align:middle}
 .attn-fs-body tbody tr:nth-child(even) td{background:#fbfbf7}
+
+/* ---- collapsible table toolbars: hidden until toggled, then shown in their normal spot ---- */
+.tbl-toggle-btn{margin-bottom:14px}
+.tbl-toggle-btn.active{background:var(--brand-soft);color:var(--brand-2);border-color:#cdeae0}
 </style>
 <script>try{if(localStorage.getItem("jumedLang")==="ar"){var r=document.documentElement;r.dir="rtl";r.lang="ar";r.classList.add("lang-ar")}}catch(e){}</script>
 </head>
@@ -2771,6 +2775,7 @@ const AR = {
   'Admin console':'لوحة الإدارة','Workspace':'مساحة العمل','Subjects':'المواد','Overview':'نظرة عامة','Your subjects':'موادك','Directory':'الدليل',
   'Students':'الطلاب','Teachers':'المعلمون','Sign out':'تسجيل الخروج','JUMJ Operations':'عمليات JUMJ','ADMIN':'الإدارة',
   'Collapse sidebar':'طيّ الشريط الجانبي','Expand sidebar':'توسيع الشريط الجانبي','Global search':'بحث شامل',
+  'Toolbar':'شريط الأدوات',
   'Search subjects, students, teachers…':'ابحث عن مادة أو طالب أو معلم…','Language':'اللغة',
   'JUMJ':'JUMJ','Academic admin workspace':'مساحة الإدارة الأكاديمية',
   'Knowledge · Trust · Excellence':'العلم · الأمانة · الإتقان','Preparing your workspace…':'جارٍ تجهيز مساحة العمل بإذن الله…',
@@ -7260,9 +7265,30 @@ function ensureScrollable(root){
     p.insertBefore(w, t); w.appendChild(t);
   });
 }
+// ---- every table toolbar (search/filter/actions bar) starts collapsed behind a small toggle
+// button; the toolbar itself is untouched, so switching it on just reveals it in its normal
+// spot in the page — nothing is rebuilt, nothing moves.
+function ensureToolbarToggle(root){
+  (root.querySelectorAll ? root : document).querySelectorAll('.toolbar').forEach(tb => {
+    if(tb.dataset.tglWrapped) return;
+    tb.dataset.tglWrapped = '1';
+    tb.classList.add('hidden', 'tbl-toolbar-panel');
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'btn btn-secondary btn-sm tbl-toggle-btn';
+    btn.innerHTML = '<i class="fa-solid fa-sliders"></i> <span>Toolbar</span>';
+    btn.setAttribute('aria-expanded', 'false');
+    btn.addEventListener('click', () => {
+      const nowHidden = tb.classList.toggle('hidden');
+      btn.classList.toggle('active', !nowHidden);
+      btn.setAttribute('aria-expanded', String(!nowHidden));
+    });
+    tb.parentElement.insertBefore(btn, tb);
+  });
+}
 (function(){
   let queued = false;
-  const run = () => { queued = false; ensureScrollable(document.body); };
+  const run = () => { queued = false; ensureScrollable(document.body); ensureToolbarToggle(document.body); };
   new MutationObserver(() => { if(!queued){ queued = true; requestAnimationFrame(run); } }).observe(document.body, {childList:true, subtree:true});
   run();
 })();
