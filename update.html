@@ -864,9 +864,9 @@ tr.brk td{background:#fbf3dc}
 .tt-pdf-size-head b{color:var(--gold);font-weight:800;font-size:12.5px}
 .tt-pdf-size-item input[type="range"]{width:100%;accent-color:var(--gold);cursor:pointer;display:block}
 /* generic table export (results / students) — width and font size are adjustable via --pdf-table-width (%) and --pdf-font-scale */
-.pdf-doc .pdf-plain-table{width:calc(var(--pdf-table-width,78)*1%);margin:0 auto;border-collapse:separate;border-spacing:0;border-radius:14px;overflow:hidden;border:1px solid #e7e3d6}
-.pdf-doc .pdf-plain-table thead th{background:var(--pdf-b);color:#fff;padding:15px 18px;text-align:start;font-size:calc(17px * var(--pdf-font-scale,1));font-weight:700;white-space:nowrap}
-.pdf-doc .pdf-plain-table tbody td{padding:14px 18px;font-size:calc(16px * var(--pdf-font-scale,1));line-height:1.4;border-top:1px solid #ece7d8;vertical-align:middle;color:#1c2b26}
+.pdf-doc .pdf-plain-table{width:calc(var(--pdf-table-width,78)*1%);margin:0 auto;border-collapse:separate;border-spacing:0;border-radius:14px;overflow:hidden;border:1px solid #e7e3d6;table-layout:fixed}
+.pdf-doc .pdf-plain-table thead th{background:var(--pdf-b);color:#fff;padding:15px 18px;text-align:start;font-size:calc(17px * var(--pdf-font-scale,1));font-weight:700;white-space:normal;word-break:break-word;overflow-wrap:anywhere;line-height:1.3}
+.pdf-doc .pdf-plain-table tbody td{padding:14px 18px;font-size:calc(16px * var(--pdf-font-scale,1));line-height:1.4;border-top:1px solid #ece7d8;vertical-align:middle;color:#1c2b26;white-space:normal;word-break:break-word;overflow-wrap:anywhere}
 .pdf-doc .pdf-plain-table tbody tr:nth-child(even) td{background:#fbfbf7}
 .pdf-doc .pdf-plain-table td span,.pdf-doc .pdf-plain-table td a{color:inherit;text-decoration:none}
 .pdf-doc .pdf-plain-table .subtext{font-size:calc(13.5px * var(--pdf-font-scale,1));color:#84948d}
@@ -6160,22 +6160,33 @@ async function tblGeneratePdf(){
         root.innerHTML = ''; root.appendChild(page);
         await new Promise(r => setTimeout(r, 30));
 
-        const canvas = await html2canvas(page, {scale: 3, backgroundColor: '#f6f2e6', useCORS: true});
+        const scale = 3;
+        const canvas = await html2canvas(page, {scale, backgroundColor: '#f6f2e6', useCORS: true});
         const pxPerMm = canvas.width / contentW;
         const pageContentPx = Math.floor(contentH * pxPerMm);
-        const totalPages = Math.max(1, Math.ceil(canvas.height / pageContentPx));
-        for(let i = 0; i < totalPages; i++){
+        // Row bottoms (in canvas px, relative to the top of `page`) — page breaks snap to these so a
+        // row is never sliced in half across two PDF pages. This matters most at large text sizes,
+        // where rows are tall enough that a plain fixed-height cut would otherwise land mid-row.
+        const pageTop = page.getBoundingClientRect().top;
+        const rowEdges = Array.from(sec.table.querySelectorAll('tr'))
+          .map(tr => Math.round((tr.getBoundingClientRect().bottom - pageTop) * scale))
+          .sort((a, b) => a - b);
+        let sy = 0;
+        while(sy < canvas.height){
+          const idealEnd = Math.min(sy + pageContentPx, canvas.height);
+          let end = rowEdges.filter(p => p > sy && p <= idealEnd).pop();
+          if(end === undefined || end <= sy) end = idealEnd; // a single row taller than one page — cut it as a last resort
+          const sh = end - sy;
           if(!pdf) pdf = new jsPDF({orientation: 'landscape', unit: 'mm', format: 'a4'});
           else pdf.addPage('a4', 'landscape');
           pdf.setFillColor(246, 242, 230); pdf.rect(0, 0, pw, ph, 'F');
-          const sy = i * pageContentPx;
-          const sh = Math.min(pageContentPx, canvas.height - sy);
           const slice = document.createElement('canvas');
           slice.width = canvas.width; slice.height = sh;
           slice.getContext('2d').drawImage(canvas, 0, sy, canvas.width, sh, 0, 0, canvas.width, sh);
           const img = slice.toDataURL('image/jpeg', 0.98);
           const h = sh / pxPerMm;
           pdf.addImage(img, 'JPEG', margin, margin, contentW, h);
+          sy = end;
         }
       }
       const fname = (title || 'export').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').slice(0, 60) || 'export';
@@ -6662,9 +6673,12 @@ function logAdminAction(action, target, details){
   }).catch(err => console.error('Could not write admin log', err))
     .finally(() => { adminLogsLoaded = false; refreshAdminLogBadge(); });
 }
+// Counts every log entry written after the admin last opened the activity log — including the
+// admin's own actions, so the bell always reflects "how many entries have you not looked at yet",
+// not just other people's. (Previously this excluded the signed-in admin's own actions, which meant
+// the badge number never appeared at all for a lone admin doing all the work.)
 function unseenAdminLogCount(){
-  const me = auth.currentUser ? auth.currentUser.uid : null;
-  return allAdminLogs.filter(l => l.actorUid !== me && String(l.createdAt || '') > (myLogSeenAt || '')).length;
+  return allAdminLogs.filter(l => String(l.createdAt || '') > (myLogSeenAt || '')).length;
 }
 async function refreshAdminLogBadge(){
   if(!can('admins.log')) return;
@@ -6692,11 +6706,10 @@ function renderAdminLogScreen(){
       .finally(() => { renderAdminLogScreen._loading = false; if(route.view === 'admins') renderAdminLogScreen(); refreshAdminLogBadge(); });
   }
   const el = $('admLogCount'); if(el) el.innerHTML = `<b>${allAdminLogs.length}</b> entr${allAdminLogs.length === 1 ? 'y' : 'ies'}`;
-  const me = auth.currentUser ? auth.currentUser.uid : null;
   const body = $('admLogBody'); if(!body) return;
   body.innerHTML = allAdminLogs.length ? allAdminLogs.slice(0, 300).map(l => {
     const when = l.createdAt ? new Date(l.createdAt).toLocaleString() : '—';
-    const isNew = l.actorUid !== me && String(l.createdAt || '') > (myLogSeenAt || '');
+    const isNew = String(l.createdAt || '') > (myLogSeenAt || '');
     return `<tr class="${isNew ? 'dirty' : ''}">
       <td class="mono">${esc(when)}</td>
       <td>${esc(l.actorName || l.actorEmail || l.actorUid || '—')}</td>
