@@ -837,6 +837,9 @@ tr.brk td{background:#fbf3dc}
 .pdf-slim-head{display:flex;align-items:baseline;gap:10px;padding:10px 16px;margin:0 0 18px;border-radius:12px;background:var(--pdf-soft);border-inline-start:4px solid var(--pdf-b)}
 .pdf-slim-head .pdf-slim-title{font-size:15px;font-weight:800;color:var(--pdf-a)}
 .pdf-slim-head .pdf-slim-page{font-size:11px;font-weight:700;color:var(--pdf-b);opacity:.75;margin-inline-start:auto}
+/* the table sits inside this wrapper; when its width is turned down, the freed space must show plain,
+   flat page background only — no stray border, shadow, or off-color strip left behind */
+.pdf-tablewrap{display:flex;justify-content:center;background:transparent;width:100%}
 /* logo dropzone in the export modal */
 .tt-pdf-logo-drop{position:relative;display:flex;align-items:center;justify-content:center;height:96px;border:1.5px dashed #cabe98;border-radius:12px;background:#fbf9f1;cursor:pointer;overflow:hidden;transition:border-color .15s,background .15s}
 .tt-pdf-logo-drop:hover,.tt-pdf-logo-drop.drag{border-color:#a8801f;background:#f8efd6}
@@ -1882,8 +1885,8 @@ tr.brk td{background:#fbf3dc}
                 <input type="range" id="ttPdfWidth" min="60" max="100" step="2" value="100">
               </div>
               <div class="tt-pdf-size-item">
-                <div class="tt-pdf-size-head"><span>Text size</span><b id="ttPdfFontVal">110%</b></div>
-                <input type="range" id="ttPdfFontSize" min="80" max="160" step="5" value="110">
+                <div class="tt-pdf-size-head"><span>Text size</span><b id="ttPdfFontVal">130%</b></div>
+                <input type="range" id="ttPdfFontSize" min="80" max="220" step="5" value="130">
               </div>
             </div>
           </div>
@@ -1922,12 +1925,12 @@ tr.brk td{background:#fbf3dc}
           <div class="field"><label>Table size</label>
             <div class="tt-pdf-size-row">
               <div class="tt-pdf-size-item">
-                <div class="tt-pdf-size-head"><span>Table width</span><b id="tblPdfWidthVal">78%</b></div>
-                <input type="range" id="tblPdfWidth" min="40" max="100" step="2" value="78">
+                <div class="tt-pdf-size-head"><span>Table width</span><b id="tblPdfWidthVal">88%</b></div>
+                <input type="range" id="tblPdfWidth" min="40" max="100" step="2" value="88">
               </div>
               <div class="tt-pdf-size-item">
-                <div class="tt-pdf-size-head"><span>Text size</span><b id="tblPdfFontVal">115%</b></div>
-                <input type="range" id="tblPdfFontSize" min="85" max="170" step="5" value="115">
+                <div class="tt-pdf-size-head"><span>Text size</span><b id="tblPdfFontVal">140%</b></div>
+                <input type="range" id="tblPdfFontSize" min="85" max="220" step="5" value="140">
               </div>
             </div>
             <p class="hint" style="margin:6px 0 0">Drag to fit more on a page or make the text bigger and easier to read — this only affects the exported PDF.</p>
@@ -5755,7 +5758,7 @@ async function ttGeneratePdf(){
     const root = $('ttPdfExportRoot');
     root.className = 'pdf-doc pdf-theme-' + theme;
     root.style.setProperty('--pdf-table-width', $('ttPdfWidth').value || 100);
-    root.style.setProperty('--pdf-font-scale', (+$('ttPdfFontSize').value || 110) / 100);
+    root.style.setProperty('--pdf-font-scale', (+$('ttPdfFontSize').value || 130) / 100);
     root.dir = document.documentElement.dir; root.lang = document.documentElement.lang;
     const { jsPDF } = window.jspdf;
     let pdf = null;
@@ -5797,8 +5800,8 @@ async function ttGeneratePdf(){
         page.querySelector('.pdf-tablewrap').appendChild(clonedTable);
         root.innerHTML = ''; root.appendChild(page);
         await new Promise(r => setTimeout(r, 30));
-        const canvas = await html2canvas(page, {scale: 2, backgroundColor: '#f6f2e6', useCORS: true});
-        const img = canvas.toDataURL('image/jpeg', 0.95);
+        const canvas = await html2canvas(page, {scale: 3, backgroundColor: '#f6f2e6', useCORS: true});
+        const img = canvas.toDataURL('image/jpeg', 0.98);
         const pw = 297, ph = 210, ratio = canvas.width / canvas.height;
         let w = pw - 14, h = w / ratio;
         if(h > ph - 14){ h = ph - 14; w = h * ratio; }
@@ -6113,8 +6116,8 @@ async function tblGeneratePdf(){
   await withBusy(btn, async () => {
     const root = $('tblPdfExportRoot');
     root.className = 'pdf-doc pdf-theme-' + theme;
-    root.style.setProperty('--pdf-table-width', $('tblPdfWidth').value || 78);
-    root.style.setProperty('--pdf-font-scale', (+$('tblPdfFontSize').value || 115) / 100);
+    root.style.setProperty('--pdf-table-width', $('tblPdfWidth').value || 88);
+    root.style.setProperty('--pdf-font-scale', (+$('tblPdfFontSize').value || 140) / 100);
     root.dir = document.documentElement.dir; root.lang = document.documentElement.lang;
     const { jsPDF } = window.jspdf;
     const issued = new Date().toLocaleDateString(lang === 'ar' ? 'ar-u-nu-latn' : 'en-GB', {day: '2-digit', month: 'short', year: 'numeric'});
@@ -6157,7 +6160,7 @@ async function tblGeneratePdf(){
         root.innerHTML = ''; root.appendChild(page);
         await new Promise(r => setTimeout(r, 30));
 
-        const canvas = await html2canvas(page, {scale: 2, backgroundColor: '#f6f2e6', useCORS: true});
+        const canvas = await html2canvas(page, {scale: 3, backgroundColor: '#f6f2e6', useCORS: true});
         const pxPerMm = canvas.width / contentW;
         const pageContentPx = Math.floor(contentH * pxPerMm);
         const totalPages = Math.max(1, Math.ceil(canvas.height / pageContentPx));
@@ -6170,7 +6173,7 @@ async function tblGeneratePdf(){
           const slice = document.createElement('canvas');
           slice.width = canvas.width; slice.height = sh;
           slice.getContext('2d').drawImage(canvas, 0, sy, canvas.width, sh, 0, 0, canvas.width, sh);
-          const img = slice.toDataURL('image/jpeg', 0.95);
+          const img = slice.toDataURL('image/jpeg', 0.98);
           const h = sh / pxPerMm;
           pdf.addImage(img, 'JPEG', margin, margin, contentW, h);
         }
