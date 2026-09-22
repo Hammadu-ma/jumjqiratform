@@ -5566,18 +5566,25 @@ function spAttnOpenFullscreen(s){
   $('attnFsBody').innerHTML = `<table><thead><tr><th>${L('Date','التاريخ')}</th><th>${L('Subject','المادة')}</th><th>${L('Session','الحصة')}</th><th>${L('Group','المجموعة')}</th><th>${L('Status','الحالة')}</th></tr></thead><tbody>${spAttnFsRows(AM)}</tbody></table>`;
   attnFsShow();
 }
-// Subject "take attendance" screen — moves the actual live card (date picker, session box,
-// roster, save button and all its existing event handlers) into the overlay rather than
-// rebuilding it, so marking attendance works exactly the same in full screen.
+// Subject "take attendance" screen — moves only the roster table itself (still the real,
+// still-wired-up node, so clicking a status still works and Firestore still has the marks the
+// moment they're clicked) into the overlay. No date picker, no session box, no save/mark-all
+// row — just the table, full width, scrollable. The date/session context goes in the title bar
+// as plain text since it's informational, not a control.
+let attnFsWrapOrigStyle = null;
 function attnTakeOpenFullscreen(){
   const subj = curSubj(); if(!subj) return;
-  const card = document.querySelector('#subTab-attendance > .card'); if(!card) return;
-  attnFsReturnParent = card.parentElement;
-  attnFsReturnNext = card.nextElementSibling;
+  const wrap = $('attnTableWrap'); if(!wrap || wrap.classList.contains('hidden')) return;
+  attnFsReturnParent = wrap.parentElement;
+  attnFsReturnNext = wrap.nextElementSibling;
+  attnFsWrapOrigStyle = wrap.getAttribute('style');
+  wrap.style.maxHeight = 'none';
+  const session = attnSessions.find(x => attnSessionKey(x) === attnSessionId);
+  const dateLabel = $('attnDate').value ? spDate($('attnDate').value) : '';
   $('attnFsTitle').textContent = subj.name;
-  $('attnFsSub').textContent = L('Taking attendance','تسجيل الحضور');
+  $('attnFsSub').textContent = [dateLabel, session ? `${session.periodLabel} · ${ttFmtTime(session.start)}–${ttFmtTime(session.end)}` : ''].filter(Boolean).join(' · ');
   $('attnFsBody').innerHTML = '';
-  $('attnFsBody').appendChild(card);
+  $('attnFsBody').appendChild(wrap);
   attnFsShow();
 }
 $('attnTakeFsBtn').addEventListener('click', attnTakeOpenFullscreen);
@@ -5589,10 +5596,11 @@ function spAttnCloseFullscreen(){
   if(attnFsReturnParent){
     const node = $('attnFsBody').firstElementChild;
     if(node){
+      if(attnFsWrapOrigStyle === null) node.removeAttribute('style'); else node.setAttribute('style', attnFsWrapOrigStyle);
       if(attnFsReturnNext && attnFsReturnNext.parentElement === attnFsReturnParent) attnFsReturnParent.insertBefore(node, attnFsReturnNext);
       else attnFsReturnParent.appendChild(node);
     }
-    attnFsReturnParent = null; attnFsReturnNext = null;
+    attnFsReturnParent = null; attnFsReturnNext = null; attnFsWrapOrigStyle = null;
   }
 }
 $('attnFsClose').addEventListener('click', spAttnCloseFullscreen);
