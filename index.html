@@ -839,20 +839,17 @@ tr.brk td{background:#fbf3dc}
 .tt-pdf-logo-remove:hover{background:rgba(20,20,20,.8)}
 .tt-pdf-toggle{display:flex;align-items:center;gap:9px;font-size:12.5px;font-weight:600;color:#4a4638;cursor:pointer;user-select:none}
 .tt-pdf-toggle input{width:16px;height:16px;accent-color:#a8801f}
-.tt-dialog-wide{padding:28px 32px}
-.tt-dialog-wide .tt-dialog-head b{font-size:17px}
-.tt-dialog-wide .field{margin-bottom:16px}
-.tt-pdf-cols-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:9px 16px;padding:13px 15px;border:1px solid #e8e4d9;border-radius:10px;background:#fbfaf7}
+.tt-pdf-cols-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px 14px;padding:11px 13px;border:1px solid #e8e4d9;border-radius:10px;background:#fbfaf7}
 .tt-pdf-cols-grid .tt-pdf-toggle{font-weight:500}
 .tt-pdf-colbar{display:flex;gap:12px;margin-top:6px}
 .tt-pdf-colbar button{background:none;border:0;padding:0;font-size:11px;font-weight:700;color:var(--brand);cursor:pointer;text-decoration:underline}
 /* generic table export (results / students) */
 .pdf-doc .pdf-plain-table{width:100%;border-collapse:separate;border-spacing:0;border-radius:14px;overflow:hidden;border:1px solid #e7e3d6}
-.pdf-doc .pdf-plain-table thead th{background:var(--pdf-b);color:#fff;padding:15px 18px;text-align:start;font-size:17px;font-weight:700;white-space:nowrap}
-.pdf-doc .pdf-plain-table tbody td{padding:14px 18px;font-size:16px;line-height:1.4;border-top:1px solid #ece7d8;vertical-align:middle;color:#1c2b26}
+.pdf-doc .pdf-plain-table thead th{background:var(--pdf-b);color:#fff;padding:10px 12px;text-align:start;font-size:12.5px;font-weight:700;white-space:nowrap}
+.pdf-doc .pdf-plain-table tbody td{padding:9px 12px;font-size:12px;border-top:1px solid #ece7d8;vertical-align:middle;color:#1c2b26}
 .pdf-doc .pdf-plain-table tbody tr:nth-child(even) td{background:#fbfbf7}
 .pdf-doc .pdf-plain-table td span,.pdf-doc .pdf-plain-table td a{color:inherit;text-decoration:none}
-.pdf-doc .pdf-plain-table .subtext{font-size:13.5px;color:#84948d}
+.pdf-doc .pdf-plain-table .subtext{font-size:10.5px;color:#84948d}
 .pdf-doc .tt-grid{width:100%;border-collapse:separate;border-spacing:0;border-radius:14px;overflow:hidden;border:1px solid #e7e3d6;min-width:0}
 .pdf-doc .tt-grid thead th{background:var(--pdf-b);color:#fff;padding:12px 8px}
 .pdf-doc .tt-grid thead th.tt-corner{background:var(--pdf-a)}
@@ -1131,7 +1128,6 @@ tr.brk td{background:#fbf3dc}
               <div class="toolbar-actions">
                 <span class="summary-row" style="margin:0;align-self:center;"><b id="enrCount">0</b></span>
                 <button class="btn btn-secondary btn-sm" id="enrExportBtn"><i class="fa-solid fa-download"></i> Export CSV</button>
-                <button class="btn btn-secondary btn-sm" id="enrPdfBtn"><i class="fa-solid fa-file-pdf"></i> Export PDF</button>
                 <button class="btn btn-danger btn-sm" id="enrRemoveBtn" disabled>Remove selected</button>
               </div>
             </div>
@@ -1741,7 +1737,7 @@ tr.brk td{background:#fbf3dc}
                   <button class="btn btn-secondary btn-sm" id="teachRefreshBtn"><i class="fa-solid fa-rotate"></i> Refresh</button>
                 </div>
               </div>
-              <p class="hint" style="margin:0 0 10px">A teacher can teach several subjects — tick them under "Teaches" and press Save. A subject has one teacher, so a subject already taught by someone else is reassigned.</p>
+              <p class="hint" style="margin:0 0 10px">A teacher can teach multi subjects"Teaches" and press Save. A subject has one teacher, so a subject already taught by someone else is reassigned.</p>
               <div class="progress hidden" id="teachSaveProgress"><div class="progress-track"><span></span></div><small></small></div>
               <div class="error-box" id="teachTableError"></div>
               <div class="ok-box" id="teachTableOk"></div>
@@ -1868,7 +1864,7 @@ tr.brk td{background:#fbf3dc}
 
       <!-- export a results/students table to a designed PDF -->
       <div class="tt-modal hidden" id="tblPdfModal">
-        <div class="tt-dialog tt-dialog-wide" role="dialog" aria-modal="true" style="width:min(820px,96vw)">
+        <div class="tt-dialog" role="dialog" aria-modal="true" style="width:min(540px,100%)">
           <div class="tt-dialog-head"><b id="tblPdfHeadTitle">Export as PDF</b><small>Customize the banner before exporting — this won't change what's saved.</small></div>
           <div class="field"><label for="tblPdfTitle">Banner title</label><input type="text" id="tblPdfTitle" maxlength="80"></div>
           <div class="field"><label for="tblPdfSubtitle">Banner subtitle</label><input type="text" id="tblPdfSubtitle" maxlength="120"></div>
@@ -1898,11 +1894,6 @@ tr.brk td{background:#fbf3dc}
           <div class="field hidden" id="tblPdfGroupField">
             <label for="tblPdfGroupBy">Split into separate tables by</label>
             <select id="tblPdfGroupBy"></select>
-            <div class="hidden" id="tblPdfGroupValsWrap" style="margin-top:10px">
-              <label id="tblPdfGroupValsLabel">Which values to include</label>
-              <div class="tt-pdf-cols-grid" id="tblPdfGroupVals"></div>
-              <div class="tt-pdf-colbar"><button type="button" id="tblPdfGroupValsAll">Select all</button><button type="button" id="tblPdfGroupValsNone">Select none</button></div>
-            </div>
           </div>
           <p class="hint" id="tblPdfScope"></p>
           <div class="error-box" id="tblPdfError"></div>
@@ -1930,7 +1921,6 @@ const firebaseConfig = {
   appId: "1:955465380633:web:0983b9d40465b5a02b8b88",
   measurementId: "G-DHF10HRN1E"
 };
-
 
 const STUDENTS = "students";
 const MODULE_RESULTS = "moduleResults";
@@ -2831,7 +2821,7 @@ const AR = {
   'Could not verify your access — check your connection and try again.':'تعذّر التحقق من صلاحياتك — تحقق من اتصالك وحاول مجددًا.',
   'Save all changes':'حفظ كل التغييرات','Saving':'جارٍ الحفظ',
   'Subjects taught':'المواد التي يدرّسها',
-  'A teacher can teach several subjects — tick them under "Teaches" and press Save. A subject has one teacher, so a subject already taught by someone else is reassigned.':'يمكن للمعلم أن يدرّس عدة مواد — حدّدها ضمن «يدرّس» ثم اضغط حفظ. للمادة معلم واحد، لذا تُعاد إسناد المادة إن كان يدرّسها معلم آخر.',
+  'A teacher can teach multi subjects':'يمكن للمعلم أن يدرّس عدة مواد.',
   'Only name and email are required. subjects is optional: a semicolon-separated list of subject names — a teacher can have several. A subject already taught by someone else is reassigned.':'الحقلان المطلوبان فقط: name وemail. الحقل subjects اختياري: قائمة أسماء مواد مفصولة بفاصلة منقوطة — ويمكن أن يكون للمعلم عدة مواد. تُعاد إسناد المادة إن كان يدرّسها معلم آخر.',
   'Student name or email':'اسم الطالب أو بريده الإلكتروني',"Start typing an enrolled student's name or email":'ابدأ بكتابة اسم أو بريد طالب مسجَّل','Name or email':'الاسم أو البريد الإلكتروني','Search by name or email':'ابحث بالاسم أو البريد الإلكتروني',
   'Paste names or emails':'لصق أسماء أو بريد','Student names or emails (one per line)':'أسماء الطلاب أو بريدهم الإلكتروني (واحد في كل سطر)','Create accounts for the missing students':'إنشاء حسابات للطلاب غير الموجودين','e.g. Kadir Kemal':'مثال: Kadir Kemal',
@@ -5779,7 +5769,7 @@ $('ttPdfModal').addEventListener('click', (e) => { if(e.target === $('ttPdfModal
 $('ttPdfGenerate').addEventListener('click', ttGeneratePdf);
 
 // ---------------------------------------------------------------- generic table PDF export (Results / Students)
-let tblPdfKind = null; // 'results' | 'students' | 'roster'
+let tblPdfKind = null; // 'results' | 'students'
 let tblPdfLogoDataUrl = null;
 function tblPdfSetLogo(dataUrl){
   tblPdfLogoDataUrl = dataUrl || null;
@@ -5824,9 +5814,9 @@ function openResPdfModal(){
   setBox('tblPdfError', '');
   $('tblPdfModal').classList.remove('hidden');
 }
-// Column-pickable PDF exports (student directory + per-subject roster): which data columns exist, how to
-// read a plain-text value out of a row, and where each export's rows come from. No avatar and no gender
-// color coding in any of these — exported tables are plain text only.
+// Students PDF export: which data columns exist, how to read a plain-text value from a student record,
+// and the column-picker / group-by controls in the export modal. No avatar and no gender color coding —
+// exported tables are plain text only.
 const STU_PDF_COLUMNS = [
   {key:'name',       label:() => L('Name','الاسم')},
   {key:'email',      label:() => L('Email','البريد الإلكتروني')},
@@ -5836,6 +5826,7 @@ const STU_PDF_COLUMNS = [
   {key:'batch',      label:() => L('Batch','الدفعة')},
   {key:'subjects',   label:() => L('Subjects','المواد')},
 ];
+let tblPdfStuCols = new Set(STU_PDF_COLUMNS.map(c => c.key)); // which columns are included — remembered for the session
 function tblPdfStuCellValue(s, key){
   switch(key){
     case 'name': return s.name || '';
@@ -5848,99 +5839,23 @@ function tblPdfStuCellValue(s, key){
     default: return '';
   }
 }
-const ROSTER_PDF_COLUMNS = [
-  {key:'name',       label:() => L('Name','الاسم')},
-  {key:'email',      label:() => L('Email','البريد الإلكتروني')},
-  {key:'gender',     label:() => L('Gender','الجنس')},
-  {key:'phone',      label:() => L('Phone','الهاتف')},
-  {key:'department', label:() => L('Department','القسم')},
-  {key:'batch',      label:() => L('Batch','الدفعة')},
-  {key:'result',     label:() => L('Result','النتيجة')},
-];
-function tblPdfRosterResultText(uid, m, known){
-  const r = m.get(uid);
-  if(r && r.maxTotal) return (r.total / r.maxTotal * 100).toFixed(1) + '%' + (r.complete ? '' : ' ' + L('(partial)', '(جزئي)'));
-  return known ? L('No result', 'لا نتيجة') : L('…', '…');
-}
-function tblPdfRosterCellValue(item, key){
-  return key === 'result' ? item.resultText : tblPdfStuCellValue(item.s, key);
-}
-// Which export "kind" reads from which screen, what columns it offers, and how to turn a row into a cell value.
-const PDF_EXPORTS = {
-  students: {
-    columns: STU_PDF_COLUMNS,
-    getRows(){ return Array.from($('allStudentsBody').querySelectorAll('tr[data-uid]')).map(tr => studentByUid(tr.dataset.uid)).filter(Boolean); },
-    cellValue: (s, key) => tblPdfStuCellValue(s, key),
-  },
-  roster: {
-    columns: ROSTER_PDF_COLUMNS,
-    getRows(){
-      const subj = curSubj(); if(!subj) return [];
-      const m = resultsStore.get(subj.slug) || new Map();
-      const known = resultsKnown(subj.slug);
-      return Array.from($('enrBody').querySelectorAll('tr[data-uid]')).map(tr => {
-        const s = studentByUid(tr.dataset.uid); if(!s) return null;
-        return {s, resultText: tblPdfRosterResultText(tr.dataset.uid, m, known)};
-      }).filter(Boolean);
-    },
-    cellValue: (item, key) => tblPdfRosterCellValue(item, key),
-  },
-};
-let tblPdfColsByKind = {students: new Set(STU_PDF_COLUMNS.map(c => c.key)), roster: new Set(ROSTER_PDF_COLUMNS.map(c => c.key))}; // remembered per kind, for the session
-function tblPdfActiveExport(){ return PDF_EXPORTS[tblPdfKind] || null; }
-function tblPdfRenderCols(){
-  const cfg = tblPdfActiveExport(); if(!cfg) return;
-  const cols = tblPdfColsByKind[tblPdfKind];
-  $('tblPdfCols').innerHTML = cfg.columns.map(c => `
-    <label class="tt-pdf-toggle"><input type="checkbox" class="tblPdfColChk" value="${c.key}" ${cols.has(c.key) ? 'checked' : ''}> ${esc(c.label())}</label>
+function tblPdfRenderStuCols(){
+  $('tblPdfCols').innerHTML = STU_PDF_COLUMNS.map(c => `
+    <label class="tt-pdf-toggle"><input type="checkbox" class="tblPdfColChk" value="${c.key}" ${tblPdfStuCols.has(c.key) ? 'checked' : ''}> ${esc(c.label())}</label>
   `).join('');
 }
 function tblPdfRenderGroupBy(){
-  const cfg = tblPdfActiveExport(); if(!cfg) return;
   const sel = $('tblPdfGroupBy'), cur = sel.value;
   sel.innerHTML = `<option value="">${esc(L('No grouping — one table', 'بدون تجميع — جدول واحد'))}</option>` +
-    cfg.columns.map(c => `<option value="${c.key}">${esc(L('One table per ', 'جدول لكل '))}${esc(c.label())}</option>`).join('');
+    STU_PDF_COLUMNS.map(c => `<option value="${c.key}">${esc(L('One table per ', 'جدول لكل '))}${esc(c.label())}</option>`).join('');
   if(Array.from(sel.options).some(o => o.value === cur)) sel.value = cur;
 }
-// Once a "split by" column is picked, this shows every value actually present for that column (e.g. every
-// department, every subject, every batch) so the admin can choose which specific one(s) to export — not
-// just export one table per value automatically. Selection defaults to "all" so behavior is unchanged
-// until the admin narrows it down. Re-picking the group-by column resets the selection back to "all".
-let tblPdfGroupVals = null;    // Set of selected values, or null when nothing to pick from
-let tblPdfGroupValsKey = null; // which group-by column tblPdfGroupVals belongs to
-function tblPdfRenderGroupVals(resetSelection){
-  const cfg = tblPdfActiveExport();
-  const groupKey = $('tblPdfGroupBy').value;
-  const wrap = $('tblPdfGroupValsWrap');
-  if(!cfg || !groupKey){
-    wrap.classList.add('hidden'); $('tblPdfGroupVals').innerHTML = '';
-    tblPdfGroupVals = null; tblPdfGroupValsKey = null;
-    return;
-  }
-  const col = cfg.columns.find(c => c.key === groupKey);
-  const values = Array.from(new Set(cfg.getRows().map(row => cfg.cellValue(row, groupKey) || L('—', '—'))))
-    .sort((a, b) => String(a).localeCompare(String(b), undefined, {numeric: true}));
-  if(resetSelection || tblPdfGroupValsKey !== groupKey){ tblPdfGroupVals = new Set(values); tblPdfGroupValsKey = groupKey; }
-  $('tblPdfGroupValsLabel').textContent = col ? L('Which ', 'أيّ ') + col.label() + L(' to include', ' يتم تضمينها') : L('Which values to include', 'القيم المطلوب تضمينها');
-  $('tblPdfGroupVals').innerHTML = values.map(v => `
-    <label class="tt-pdf-toggle"><input type="checkbox" class="tblPdfGroupValChk" value="${esc(v)}" ${tblPdfGroupVals.has(v) ? 'checked' : ''}> ${esc(v)}</label>
-  `).join('');
-  wrap.classList.remove('hidden');
-}
-$('tblPdfGroupBy').addEventListener('change', () => tblPdfRenderGroupVals(true));
-$('tblPdfGroupVals').addEventListener('change', (e) => {
-  if(!e.target.classList.contains('tblPdfGroupValChk') || !tblPdfGroupVals) return;
-  if(e.target.checked) tblPdfGroupVals.add(e.target.value); else tblPdfGroupVals.delete(e.target.value);
-});
-$('tblPdfGroupValsAll').addEventListener('click', () => tblPdfRenderGroupVals(true));
-$('tblPdfGroupValsNone').addEventListener('click', () => { if(!tblPdfGroupVals) return; tblPdfGroupVals.clear(); tblPdfRenderGroupVals(false); });
 $('tblPdfCols').addEventListener('change', (e) => {
-  if(!e.target.classList.contains('tblPdfColChk') || !tblPdfColsByKind[tblPdfKind]) return;
-  const cols = tblPdfColsByKind[tblPdfKind];
-  if(e.target.checked) cols.add(e.target.value); else cols.delete(e.target.value);
+  if(!e.target.classList.contains('tblPdfColChk')) return;
+  if(e.target.checked) tblPdfStuCols.add(e.target.value); else tblPdfStuCols.delete(e.target.value);
 });
-$('tblPdfColsAll').addEventListener('click', () => { const cfg = tblPdfActiveExport(); if(!cfg) return; tblPdfColsByKind[tblPdfKind] = new Set(cfg.columns.map(c => c.key)); tblPdfRenderCols(); });
-$('tblPdfColsNone').addEventListener('click', () => { if(!tblPdfActiveExport()) return; tblPdfColsByKind[tblPdfKind] = new Set(); tblPdfRenderCols(); });
+$('tblPdfColsAll').addEventListener('click', () => { tblPdfStuCols = new Set(STU_PDF_COLUMNS.map(c => c.key)); tblPdfRenderStuCols(); });
+$('tblPdfColsNone').addEventListener('click', () => { tblPdfStuCols = new Set(); tblPdfRenderStuCols(); });
 
 function openStuPdfModal(){
   const rowCount = $('allStudentsBody').querySelectorAll('tr[data-uid]').length;
@@ -5952,25 +5867,8 @@ function openStuPdfModal(){
   $('tblPdfFooter').value = tblPdfDefaultFooter();
   $('tblPdfScope').textContent = `${L('Exporting', 'تصدير')} ${rowCount} ${L('student(s) currently shown.', 'طالب/طلاب معروضين حاليًا.')}`;
   tblPdfSetLogo(tblPdfLogoDataUrl);
-  tblPdfRenderCols();
-  tblPdfRenderGroupBy(); $('tblPdfGroupBy').value = ''; tblPdfRenderGroupVals();
-  $('tblPdfColsField').classList.remove('hidden'); $('tblPdfGroupField').classList.remove('hidden');
-  setBox('tblPdfError', '');
-  $('tblPdfModal').classList.remove('hidden');
-}
-function openEnrPdfModal(){
-  const subj = curSubj(); if(!subj) return;
-  const rowCount = $('enrBody').querySelectorAll('tr[data-uid]').length;
-  if(!rowCount){ setBox('enrError', 'Nothing to export yet.'); return; }
-  tblPdfKind = 'roster';
-  $('tblPdfHeadTitle').textContent = L('Export roster as PDF', 'تصدير قائمة الطلاب كملف PDF');
-  $('tblPdfTitle').value = subj.name;
-  $('tblPdfSubtitle').value = L('Roster', 'قائمة الطلاب');
-  $('tblPdfFooter').value = tblPdfDefaultFooter();
-  $('tblPdfScope').textContent = `${L('Exporting', 'تصدير')} ${rowCount} ${L('student(s) currently shown.', 'طالب/طلاب معروضين حاليًا.')}`;
-  tblPdfSetLogo(tblPdfLogoDataUrl);
-  tblPdfRenderCols();
-  tblPdfRenderGroupBy(); $('tblPdfGroupBy').value = ''; tblPdfRenderGroupVals();
+  tblPdfRenderStuCols();
+  tblPdfRenderGroupBy(); $('tblPdfGroupBy').value = '';
   $('tblPdfColsField').classList.remove('hidden'); $('tblPdfGroupField').classList.remove('hidden');
   setBox('tblPdfError', '');
   $('tblPdfModal').classList.remove('hidden');
@@ -5980,7 +5878,6 @@ $('tblPdfCancel').addEventListener('click', closeTblPdfModal);
 $('tblPdfModal').addEventListener('click', (e) => { if(e.target === $('tblPdfModal')) closeTblPdfModal(); });
 $('resPdfBtn').addEventListener('click', openResPdfModal);
 $('stuPdfBtn').addEventListener('click', openStuPdfModal);
-$('enrPdfBtn').addEventListener('click', openEnrPdfModal);
 
 // Cleans a cloned <table> for print: strips checkboxes/buttons, bakes form values into plain text, drops empty action columns.
 function tblPdfCleanTable(table){
@@ -6009,23 +5906,23 @@ function tblPdfCleanTable(table){
   return table;
 }
 
-// Builds a plain-text table for export: only the picked columns, no avatar, no gender color coding —
-// every cell is just text, same as any other export column. Works for any column-pickable export kind.
-function tblPdfBuildTable(rows, cols, cellValue){
+// Builds a plain-text students table for export: only the picked columns, no avatar, no gender color coding —
+// every cell is just text, same as any other export column.
+function tblPdfBuildStuTable(rows, cols){
   const table = document.createElement('table');
   table.className = 'pdf-plain-table';
   table.innerHTML = `<thead><tr>${cols.map(c => `<th>${esc(c.label())}</th>`).join('')}</tr></thead>` +
-    `<tbody>${rows.map(row => `<tr>${cols.map(c => `<td>${esc(cellValue(row, c.key))}</td>`).join('')}</tr>`).join('')}</tbody>`;
+    `<tbody>${rows.map(s => `<tr>${cols.map(c => `<td>${esc(tblPdfStuCellValue(s, c.key))}</td>`).join('')}</tr>`).join('')}</tbody>`;
   return table;
 }
-// Splits rows into groups by one column's value (e.g. one table per Department). No grouping → a single group.
-function tblPdfGroupRows(rows, groupKey, cellValue){
+// Splits student rows into groups by one column's value (e.g. one table per Department). No grouping → a single group.
+function tblPdfGroupStuRows(rows, groupKey){
   if(!groupKey) return [{label: '', rows}];
   const map = new Map();
-  rows.forEach(row => {
-    const v = cellValue(row, groupKey) || L('—', '—');
+  rows.forEach(s => {
+    const v = tblPdfStuCellValue(s, groupKey) || L('—', '—');
     if(!map.has(v)) map.set(v, []);
-    map.get(v).push(row);
+    map.get(v).push(s);
   });
   return Array.from(map.entries())
     .sort((a, b) => String(a[0]).localeCompare(String(b[0]), undefined, {numeric: true}))
@@ -6037,21 +5934,15 @@ async function tblGeneratePdf(){
   setBox('tblPdfError', '');
   if(typeof html2canvas === 'undefined' || !window.jspdf){ setBox('tblPdfError', 'Could not load the PDF engine — check your connection and try again.'); return; }
 
-  // sections: one {label, table} per exported table. Students/roster may split into several (grouped); results is always one.
+  // sections: one {label, table} per exported table. Students may split into several (grouped); results is always one.
   let sections;
-  const cfg = tblPdfActiveExport();
-  if(cfg){
-    const rows = cfg.getRows();
-    if(!rows.length){ setBox('tblPdfError', 'Nothing to export yet.'); return; }
-    const cols = cfg.columns.filter(c => tblPdfColsByKind[tblPdfKind].has(c.key));
+  if(tblPdfKind === 'students'){
+    const stuRows = Array.from($('allStudentsBody').querySelectorAll('tr[data-uid]')).map(tr => studentByUid(tr.dataset.uid)).filter(Boolean);
+    if(!stuRows.length){ setBox('tblPdfError', 'Nothing to export yet.'); return; }
+    const cols = STU_PDF_COLUMNS.filter(c => tblPdfStuCols.has(c.key));
     if(!cols.length){ setBox('tblPdfError', 'Pick at least one column.'); return; }
     const groupKey = $('tblPdfGroupBy').value || '';
-    let groups = tblPdfGroupRows(rows, groupKey, cfg.cellValue);
-    if(groupKey && tblPdfGroupVals && tblPdfGroupValsKey === groupKey){
-      groups = groups.filter(g => tblPdfGroupVals.has(g.label));
-      if(!groups.length){ setBox('tblPdfError', 'Pick at least one value to include.'); return; }
-    }
-    sections = groups.map(g => ({label: g.label, table: tblPdfBuildTable(g.rows, cols, cfg.cellValue)}));
+    sections = tblPdfGroupStuRows(stuRows, groupKey).map(g => ({label: g.label, table: tblPdfBuildStuTable(g.rows, cols)}));
   }else{
     const sourceTable = document.querySelector('#tabResAll table');
     if(!sourceTable){ setBox('tblPdfError', 'Nothing to export yet.'); return; }
