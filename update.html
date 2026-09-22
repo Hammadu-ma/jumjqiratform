@@ -788,6 +788,14 @@ tr.brk td{background:#fbf3dc}
 .tt-modal{position:fixed;inset:0;background:rgba(6,20,16,.55);display:grid;place-items:center;z-index:9999;padding:16px}
 .tt-dialog{background:#fffdf7;border-radius:18px;padding:22px 24px;width:min(460px,100%);max-height:92vh;overflow:auto;box-shadow:0 30px 70px rgba(0,0,0,.35)}
 .tt-dialog-head{display:flex;flex-direction:column;gap:2px;margin-bottom:14px}
+/* on small screens, every .tt-modal (timetable editor + both PDF export dialogs) becomes a bottom sheet */
+@media(max-width:640px){
+  .tt-modal{align-items:flex-end;justify-content:stretch;padding:0}
+  .tt-dialog{width:100%;max-width:100%;border-radius:20px 20px 0 0;max-height:86vh;padding:14px 18px calc(18px + env(safe-area-inset-bottom,0px));box-shadow:0 -12px 40px rgba(0,0,0,.28);animation:tt-sheet-up .22s ease-out}
+  .tt-dialog::before{content:'';display:block;width:38px;height:4px;border-radius:99px;background:#e3ddcc;margin:0 auto 14px}
+  .tt-dialog-wide{padding:14px 18px calc(18px + env(safe-area-inset-bottom,0px))}
+}
+@keyframes tt-sheet-up{from{transform:translateY(28px);opacity:.4}to{transform:translateY(0);opacity:1}}
 .tt-dialog-head b{font-size:15px}.tt-dialog-head small{color:var(--muted);font-size:12px}
 @media(max-width:860px){.tt-cell{min-width:150px}}
 @media print{
@@ -846,20 +854,29 @@ tr.brk td{background:#fbf3dc}
 .tt-pdf-cols-grid .tt-pdf-toggle{font-weight:500}
 .tt-pdf-colbar{display:flex;gap:12px;margin-top:6px}
 .tt-pdf-colbar button{background:none;border:0;padding:0;font-size:11px;font-weight:700;color:var(--brand);cursor:pointer;text-decoration:underline}
-/* generic table export (results / students) */
-.pdf-doc .pdf-plain-table{width:100%;border-collapse:separate;border-spacing:0;border-radius:14px;overflow:hidden;border:1px solid #e7e3d6}
-.pdf-doc .pdf-plain-table thead th{background:var(--pdf-b);color:#fff;padding:15px 18px;text-align:start;font-size:17px;font-weight:700;white-space:nowrap}
-.pdf-doc .pdf-plain-table tbody td{padding:14px 18px;font-size:16px;line-height:1.4;border-top:1px solid #ece7d8;vertical-align:middle;color:#1c2b26}
+/* resizable table width / font size controls in the PDF export modals */
+.tt-pdf-size-row{display:flex;gap:20px;flex-wrap:wrap;padding:13px 15px;border:1px solid #e8e4d9;border-radius:10px;background:#fbfaf7}
+.tt-pdf-size-item{flex:1;min-width:170px}
+.tt-pdf-size-head{display:flex;justify-content:space-between;align-items:baseline;font-size:11.5px;font-weight:600;color:#4a4638;margin-bottom:7px}
+.tt-pdf-size-head b{color:var(--gold);font-weight:800;font-size:12.5px}
+.tt-pdf-size-item input[type="range"]{width:100%;accent-color:var(--gold);cursor:pointer;display:block}
+/* generic table export (results / students) — width and font size are adjustable via --pdf-table-width (%) and --pdf-font-scale */
+.pdf-doc .pdf-plain-table{width:calc(var(--pdf-table-width,78)*1%);margin:0 auto;border-collapse:separate;border-spacing:0;border-radius:14px;overflow:hidden;border:1px solid #e7e3d6}
+.pdf-doc .pdf-plain-table thead th{background:var(--pdf-b);color:#fff;padding:15px 18px;text-align:start;font-size:calc(17px * var(--pdf-font-scale,1));font-weight:700;white-space:nowrap}
+.pdf-doc .pdf-plain-table tbody td{padding:14px 18px;font-size:calc(16px * var(--pdf-font-scale,1));line-height:1.4;border-top:1px solid #ece7d8;vertical-align:middle;color:#1c2b26}
 .pdf-doc .pdf-plain-table tbody tr:nth-child(even) td{background:#fbfbf7}
 .pdf-doc .pdf-plain-table td span,.pdf-doc .pdf-plain-table td a{color:inherit;text-decoration:none}
-.pdf-doc .pdf-plain-table .subtext{font-size:13.5px;color:#84948d}
-.pdf-doc .tt-grid{width:100%;border-collapse:separate;border-spacing:0;border-radius:14px;overflow:hidden;border:1px solid #e7e3d6;min-width:0}
-.pdf-doc .tt-grid thead th{background:var(--pdf-b);color:#fff;padding:12px 8px}
+.pdf-doc .pdf-plain-table .subtext{font-size:calc(13.5px * var(--pdf-font-scale,1));color:#84948d}
+.pdf-doc .tt-grid{width:calc(var(--pdf-table-width,100)*1%);margin:0 auto;border-collapse:separate;border-spacing:0;border-radius:14px;overflow:hidden;border:1px solid #e7e3d6;min-width:0}
+.pdf-doc .tt-grid thead th{background:var(--pdf-b);color:#fff;padding:12px 8px;font-size:calc(12px * var(--pdf-font-scale,1))}
 .pdf-doc .tt-grid thead th.tt-corner{background:var(--pdf-a)}
 .pdf-doc .tt-period{background:var(--pdf-soft)!important}
+.pdf-doc .tt-period b{font-size:calc(13px * var(--pdf-font-scale,1))}
+.pdf-doc .tt-period small{font-size:calc(11px * var(--pdf-font-scale,1))}
 .pdf-doc tbody tr:nth-child(even) .tt-cell{background:#fbfbf7}
 .pdf-doc .tt-cell{min-width:0;height:auto;min-height:60px}
-.pdf-doc .tt-entry{box-shadow:0 1px 3px rgba(0,0,0,.08);padding-inline-end:8px}
+.pdf-doc .tt-entry{box-shadow:0 1px 3px rgba(0,0,0,.08);padding-inline-end:8px;font-size:calc(11.5px * var(--pdf-font-scale,1))}
+.pdf-doc .tt-entry small{font-size:calc(10.5px * var(--pdf-font-scale,1))}
 .pdf-doc .tt-break td{background:linear-gradient(135deg,var(--pdf-soft),#fff);color:var(--pdf-b)}
 .pdf-footer{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:18px;padding-top:14px;border-top:2px solid var(--pdf-soft);font-size:11.5px;color:#7a887f;font-weight:600}
 .pdf-footer b{color:var(--pdf-b);font-weight:800;letter-spacing:.04em}
@@ -1858,6 +1875,18 @@ tr.brk td{background:#fbf3dc}
               <button type="button" class="tt-pdf-logo-remove hidden" id="ttPdfLogoRemove" title="Remove logo"><i class="fa-solid fa-xmark"></i></button>
             </div>
           </div>
+          <div class="field"><label>Table size</label>
+            <div class="tt-pdf-size-row">
+              <div class="tt-pdf-size-item">
+                <div class="tt-pdf-size-head"><span>Table width</span><b id="ttPdfWidthVal">100%</b></div>
+                <input type="range" id="ttPdfWidth" min="60" max="100" step="2" value="100">
+              </div>
+              <div class="tt-pdf-size-item">
+                <div class="tt-pdf-size-head"><span>Text size</span><b id="ttPdfFontVal">110%</b></div>
+                <input type="range" id="ttPdfFontSize" min="80" max="160" step="5" value="110">
+              </div>
+            </div>
+          </div>
           <label class="tt-pdf-toggle"><input type="checkbox" id="ttPdfHeaderEvery"> Repeat the full banner on every table (otherwise only the first page gets it)</label>
           <p class="hint" id="ttPdfScope"></p>
           <div class="error-box" id="ttPdfError"></div>
@@ -1889,6 +1918,19 @@ tr.brk td{background:#fbf3dc}
               <img id="tblPdfLogoPreview" class="hidden" alt="Logo">
               <button type="button" class="tt-pdf-logo-remove hidden" id="tblPdfLogoRemove" title="Remove logo"><i class="fa-solid fa-xmark"></i></button>
             </div>
+          </div>
+          <div class="field"><label>Table size</label>
+            <div class="tt-pdf-size-row">
+              <div class="tt-pdf-size-item">
+                <div class="tt-pdf-size-head"><span>Table width</span><b id="tblPdfWidthVal">78%</b></div>
+                <input type="range" id="tblPdfWidth" min="40" max="100" step="2" value="78">
+              </div>
+              <div class="tt-pdf-size-item">
+                <div class="tt-pdf-size-head"><span>Text size</span><b id="tblPdfFontVal">115%</b></div>
+                <input type="range" id="tblPdfFontSize" min="85" max="170" step="5" value="115">
+              </div>
+            </div>
+            <p class="hint" style="margin:6px 0 0">Drag to fit more on a page or make the text bigger and easier to read — this only affects the exported PDF.</p>
           </div>
           <div class="field hidden" id="tblPdfColsField">
             <label>Columns to include</label>
@@ -5679,6 +5721,8 @@ $('ttPdfLogoRemove').addEventListener('click', (e) => { e.stopPropagation(); ttP
 ['dragenter','dragover'].forEach(ev => $('ttPdfLogoDrop').addEventListener(ev, (e) => { e.preventDefault(); $('ttPdfLogoDrop').classList.add('drag'); }));
 ['dragleave','drop'].forEach(ev => $('ttPdfLogoDrop').addEventListener(ev, (e) => { e.preventDefault(); $('ttPdfLogoDrop').classList.remove('drag'); }));
 $('ttPdfLogoDrop').addEventListener('drop', (e) => ttPdfReadLogoFile(e.dataTransfer.files && e.dataTransfer.files[0]));
+$('ttPdfWidth').addEventListener('input', (e) => { $('ttPdfWidthVal').textContent = e.target.value + '%'; });
+$('ttPdfFontSize').addEventListener('input', (e) => { $('ttPdfFontVal').textContent = e.target.value + '%'; });
 function openTtPdfModal(){
   if(!ttConfig){ return; }
   if(ttMode === 'teacher' && !ttTeacherSel){ setBox('ttError', 'Choose a teacher first.'); return; }
@@ -5710,6 +5754,8 @@ async function ttGeneratePdf(){
   await withBusy(btn, async () => {
     const root = $('ttPdfExportRoot');
     root.className = 'pdf-doc pdf-theme-' + theme;
+    root.style.setProperty('--pdf-table-width', $('ttPdfWidth').value || 100);
+    root.style.setProperty('--pdf-font-scale', (+$('ttPdfFontSize').value || 110) / 100);
     root.dir = document.documentElement.dir; root.lang = document.documentElement.lang;
     const { jsPDF } = window.jspdf;
     let pdf = null;
@@ -5803,6 +5849,8 @@ $('tblPdfLogoRemove').addEventListener('click', (e) => { e.stopPropagation(); tb
 ['dragenter','dragover'].forEach(ev => $('tblPdfLogoDrop').addEventListener(ev, (e) => { e.preventDefault(); $('tblPdfLogoDrop').classList.add('drag'); }));
 ['dragleave','drop'].forEach(ev => $('tblPdfLogoDrop').addEventListener(ev, (e) => { e.preventDefault(); $('tblPdfLogoDrop').classList.remove('drag'); }));
 $('tblPdfLogoDrop').addEventListener('drop', (e) => tblPdfReadLogoFile(e.dataTransfer.files && e.dataTransfer.files[0]));
+$('tblPdfWidth').addEventListener('input', (e) => { $('tblPdfWidthVal').textContent = e.target.value + '%'; });
+$('tblPdfFontSize').addEventListener('input', (e) => { $('tblPdfFontVal').textContent = e.target.value + '%'; });
 
 function tblPdfDefaultFooter(){
   const d = new Date().toLocaleDateString(lang === 'ar' ? 'ar-u-nu-latn' : 'en-GB', {day: '2-digit', month: 'short', year: 'numeric'});
@@ -6065,6 +6113,8 @@ async function tblGeneratePdf(){
   await withBusy(btn, async () => {
     const root = $('tblPdfExportRoot');
     root.className = 'pdf-doc pdf-theme-' + theme;
+    root.style.setProperty('--pdf-table-width', $('tblPdfWidth').value || 78);
+    root.style.setProperty('--pdf-font-scale', (+$('tblPdfFontSize').value || 115) / 100);
     root.dir = document.documentElement.dir; root.lang = document.documentElement.lang;
     const { jsPDF } = window.jspdf;
     const issued = new Date().toLocaleDateString(lang === 'ar' ? 'ar-u-nu-latn' : 'en-GB', {day: '2-digit', month: 'short', year: 'numeric'});
