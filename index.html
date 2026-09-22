@@ -788,6 +788,14 @@ tr.brk td{background:#fbf3dc}
 .tt-modal{position:fixed;inset:0;background:rgba(6,20,16,.55);display:grid;place-items:center;z-index:9999;padding:16px}
 .tt-dialog{background:#fffdf7;border-radius:18px;padding:22px 24px;width:min(460px,100%);max-height:92vh;overflow:auto;box-shadow:0 30px 70px rgba(0,0,0,.35)}
 .tt-dialog-head{display:flex;flex-direction:column;gap:2px;margin-bottom:14px}
+/* on small screens, every .tt-modal (timetable editor + both PDF export dialogs) becomes a bottom sheet */
+@media(max-width:640px){
+  .tt-modal{align-items:flex-end;justify-content:stretch;padding:0}
+  .tt-dialog{width:100%;max-width:100%;border-radius:20px 20px 0 0;max-height:86vh;padding:14px 18px calc(18px + env(safe-area-inset-bottom,0px));box-shadow:0 -12px 40px rgba(0,0,0,.28);animation:tt-sheet-up .22s ease-out}
+  .tt-dialog::before{content:'';display:block;width:38px;height:4px;border-radius:99px;background:#e3ddcc;margin:0 auto 14px}
+  .tt-dialog-wide{padding:14px 18px calc(18px + env(safe-area-inset-bottom,0px))}
+}
+@keyframes tt-sheet-up{from{transform:translateY(28px);opacity:.4}to{transform:translateY(0);opacity:1}}
 .tt-dialog-head b{font-size:15px}.tt-dialog-head small{color:var(--muted);font-size:12px}
 @media(max-width:860px){.tt-cell{min-width:150px}}
 @media print{
@@ -818,17 +826,20 @@ tr.brk td{background:#fbf3dc}
 .pdf-banner-logo{width:72px;height:72px;flex:0 0 auto;border-radius:18px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.4);display:grid;place-items:center;position:relative;z-index:1;overflow:hidden}
 .pdf-banner-logo img{width:100%;height:100%;object-fit:contain;padding:6px;background:#fff}
 .pdf-banner-text{position:relative;z-index:1;flex:1;min-width:0}
-.pdf-eyebrow{font-size:12px;letter-spacing:.16em;text-transform:uppercase;opacity:.88;font-weight:700;margin-bottom:5px}
-.pdf-title{font-size:29px;font-weight:800;letter-spacing:-.02em;line-height:1.18;margin-bottom:5px;word-break:break-word}
-.pdf-subtitle{font-size:15px;opacity:.92;font-weight:600}
+.pdf-eyebrow{font-size:calc(12px * var(--pdf-font-scale,1));letter-spacing:.16em;text-transform:uppercase;opacity:.88;font-weight:700;margin-bottom:5px}
+.pdf-title{font-size:calc(29px * var(--pdf-font-scale,1));font-weight:800;letter-spacing:-.02em;line-height:1.18;margin-bottom:5px;word-break:break-word}
+.pdf-subtitle{font-size:calc(15px * var(--pdf-font-scale,1));opacity:.92;font-weight:600}
 .pdf-banner-badge{position:relative;z-index:1;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.4);border-radius:12px;padding:10px 18px;text-align:center;flex:0 0 auto}
-.pdf-banner-badge b{display:block;font-size:15px;white-space:nowrap}
-.pdf-banner-badge small{display:block;font-size:10px;opacity:.85;text-transform:uppercase;letter-spacing:.08em;margin-top:3px}
-.pdf-section-title{font-size:19px;font-weight:800;margin:0 0 3px;color:var(--pdf-b)}
-.pdf-section-meta{font-size:12.5px;color:#66756f;margin-bottom:14px;font-weight:600}
+.pdf-banner-badge b{display:block;font-size:calc(15px * var(--pdf-font-scale,1));white-space:nowrap}
+.pdf-banner-badge small{display:block;font-size:calc(10px * var(--pdf-font-scale,1));opacity:.85;text-transform:uppercase;letter-spacing:.08em;margin-top:3px}
+.pdf-section-title{font-size:calc(19px * var(--pdf-font-scale,1));font-weight:800;margin:0 0 3px;color:var(--pdf-b)}
+.pdf-section-meta{font-size:calc(12.5px * var(--pdf-font-scale,1));color:#66756f;margin-bottom:14px;font-weight:600}
 .pdf-slim-head{display:flex;align-items:baseline;gap:10px;padding:10px 16px;margin:0 0 18px;border-radius:12px;background:var(--pdf-soft);border-inline-start:4px solid var(--pdf-b)}
-.pdf-slim-head .pdf-slim-title{font-size:15px;font-weight:800;color:var(--pdf-a)}
-.pdf-slim-head .pdf-slim-page{font-size:11px;font-weight:700;color:var(--pdf-b);opacity:.75;margin-inline-start:auto}
+.pdf-slim-head .pdf-slim-title{font-size:calc(15px * var(--pdf-font-scale,1));font-weight:800;color:var(--pdf-a)}
+.pdf-slim-head .pdf-slim-page{font-size:calc(11px * var(--pdf-font-scale,1));font-weight:700;color:var(--pdf-b);opacity:.75;margin-inline-start:auto}
+/* the table always fills the full width of the page normally — the size control scales the whole
+   document (banner, headings, table, footer) together instead of narrowing the table into the middle */
+.pdf-tablewrap{width:100%}
 /* logo dropzone in the export modal */
 .tt-pdf-logo-drop{position:relative;display:flex;align-items:center;justify-content:center;height:96px;border:1.5px dashed #cabe98;border-radius:12px;background:#fbf9f1;cursor:pointer;overflow:hidden;transition:border-color .15s,background .15s}
 .tt-pdf-logo-drop:hover,.tt-pdf-logo-drop.drag{border-color:#a8801f;background:#f8efd6}
@@ -839,26 +850,38 @@ tr.brk td{background:#fbf3dc}
 .tt-pdf-logo-remove:hover{background:rgba(20,20,20,.8)}
 .tt-pdf-toggle{display:flex;align-items:center;gap:9px;font-size:12.5px;font-weight:600;color:#4a4638;cursor:pointer;user-select:none}
 .tt-pdf-toggle input{width:16px;height:16px;accent-color:#a8801f}
-.tt-pdf-cols-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px 14px;padding:11px 13px;border:1px solid #e8e4d9;border-radius:10px;background:#fbfaf7}
+.tt-dialog-wide{padding:28px 32px}
+.tt-dialog-wide .tt-dialog-head b{font-size:17px}
+.tt-dialog-wide .field{margin-bottom:16px}
+.tt-pdf-cols-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:9px 16px;padding:13px 15px;border:1px solid #e8e4d9;border-radius:10px;background:#fbfaf7}
 .tt-pdf-cols-grid .tt-pdf-toggle{font-weight:500}
 .tt-pdf-colbar{display:flex;gap:12px;margin-top:6px}
 .tt-pdf-colbar button{background:none;border:0;padding:0;font-size:11px;font-weight:700;color:var(--brand);cursor:pointer;text-decoration:underline}
-/* generic table export (results / students) */
-.pdf-doc .pdf-plain-table{width:100%;border-collapse:separate;border-spacing:0;border-radius:14px;overflow:hidden;border:1px solid #e7e3d6}
-.pdf-doc .pdf-plain-table thead th{background:var(--pdf-b);color:#fff;padding:10px 12px;text-align:start;font-size:12.5px;font-weight:700;white-space:nowrap}
-.pdf-doc .pdf-plain-table tbody td{padding:9px 12px;font-size:12px;border-top:1px solid #ece7d8;vertical-align:middle;color:#1c2b26}
+/* resizable size control in the PDF export modals — scales the whole document's text together */
+.tt-pdf-size-row{padding:13px 15px;border:1px solid #e8e4d9;border-radius:10px;background:#fbfaf7}
+.tt-pdf-size-head{display:flex;justify-content:space-between;align-items:baseline;font-size:11.5px;font-weight:600;color:#4a4638;margin-bottom:7px}
+.tt-pdf-size-head b{color:var(--gold);font-weight:800;font-size:12.5px}
+.tt-pdf-size-row input[type="range"]{width:100%;accent-color:var(--gold);cursor:pointer;display:block}
+/* generic table export (results / students) — the table always fills the page width normally;
+   the size slider scales the banner, headings, table and footer text together */
+.pdf-doc .pdf-plain-table{width:100%;border-collapse:separate;border-spacing:0;border-radius:14px;overflow:hidden;border:1px solid #e7e3d6;table-layout:fixed}
+.pdf-doc .pdf-plain-table thead th{background:var(--pdf-b);color:#fff;padding:15px 18px;text-align:start;font-size:calc(17px * var(--pdf-font-scale,1));font-weight:700;white-space:normal;word-break:break-word;overflow-wrap:anywhere;line-height:1.3}
+.pdf-doc .pdf-plain-table tbody td{padding:14px 18px;font-size:calc(16px * var(--pdf-font-scale,1));line-height:1.4;border-top:1px solid #ece7d8;vertical-align:middle;color:#1c2b26;white-space:normal;word-break:break-word;overflow-wrap:anywhere}
 .pdf-doc .pdf-plain-table tbody tr:nth-child(even) td{background:#fbfbf7}
 .pdf-doc .pdf-plain-table td span,.pdf-doc .pdf-plain-table td a{color:inherit;text-decoration:none}
-.pdf-doc .pdf-plain-table .subtext{font-size:10.5px;color:#84948d}
+.pdf-doc .pdf-plain-table .subtext{font-size:calc(13.5px * var(--pdf-font-scale,1));color:#84948d}
 .pdf-doc .tt-grid{width:100%;border-collapse:separate;border-spacing:0;border-radius:14px;overflow:hidden;border:1px solid #e7e3d6;min-width:0}
-.pdf-doc .tt-grid thead th{background:var(--pdf-b);color:#fff;padding:12px 8px}
+.pdf-doc .tt-grid thead th{background:var(--pdf-b);color:#fff;padding:12px 8px;font-size:calc(12px * var(--pdf-font-scale,1))}
 .pdf-doc .tt-grid thead th.tt-corner{background:var(--pdf-a)}
 .pdf-doc .tt-period{background:var(--pdf-soft)!important}
+.pdf-doc .tt-period b{font-size:calc(13px * var(--pdf-font-scale,1))}
+.pdf-doc .tt-period small{font-size:calc(11px * var(--pdf-font-scale,1))}
 .pdf-doc tbody tr:nth-child(even) .tt-cell{background:#fbfbf7}
 .pdf-doc .tt-cell{min-width:0;height:auto;min-height:60px}
-.pdf-doc .tt-entry{box-shadow:0 1px 3px rgba(0,0,0,.08);padding-inline-end:8px}
+.pdf-doc .tt-entry{box-shadow:0 1px 3px rgba(0,0,0,.08);padding-inline-end:8px;font-size:calc(11.5px * var(--pdf-font-scale,1))}
+.pdf-doc .tt-entry small{font-size:calc(10.5px * var(--pdf-font-scale,1))}
 .pdf-doc .tt-break td{background:linear-gradient(135deg,var(--pdf-soft),#fff);color:var(--pdf-b)}
-.pdf-footer{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:18px;padding-top:14px;border-top:2px solid var(--pdf-soft);font-size:11.5px;color:#7a887f;font-weight:600}
+.pdf-footer{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:18px;padding-top:14px;border-top:2px solid var(--pdf-soft);font-size:calc(11.5px * var(--pdf-font-scale,1));color:#7a887f;font-weight:600}
 .pdf-footer b{color:var(--pdf-b);font-weight:800;letter-spacing:.04em}
 </style>
 <script>try{if(localStorage.getItem("jumedLang")==="ar"){var r=document.documentElement;r.dir="rtl";r.lang="ar";r.classList.add("lang-ar")}}catch(e){}</script>
@@ -1128,6 +1151,7 @@ tr.brk td{background:#fbf3dc}
               <div class="toolbar-actions">
                 <span class="summary-row" style="margin:0;align-self:center;"><b id="enrCount">0</b></span>
                 <button class="btn btn-secondary btn-sm" id="enrExportBtn"><i class="fa-solid fa-download"></i> Export CSV</button>
+                <button class="btn btn-secondary btn-sm" id="enrPdfBtn"><i class="fa-solid fa-file-pdf"></i> Export PDF</button>
                 <button class="btn btn-danger btn-sm" id="enrRemoveBtn" disabled>Remove selected</button>
               </div>
             </div>
@@ -1737,7 +1761,7 @@ tr.brk td{background:#fbf3dc}
                   <button class="btn btn-secondary btn-sm" id="teachRefreshBtn"><i class="fa-solid fa-rotate"></i> Refresh</button>
                 </div>
               </div>
-              <p class="hint" style="margin:0 0 10px">A teacher can teach multi subjects"Teaches" and press Save. A subject has one teacher, so a subject already taught by someone else is reassigned.</p>
+              <p class="hint" style="margin:0 0 10px">A teacher can teach several subjects — tick them under "Teaches" and press Save. A subject has one teacher, so a subject already taught by someone else is reassigned.</p>
               <div class="progress hidden" id="teachSaveProgress"><div class="progress-track"><span></span></div><small></small></div>
               <div class="error-box" id="teachTableError"></div>
               <div class="ok-box" id="teachTableOk"></div>
@@ -1854,6 +1878,13 @@ tr.brk td{background:#fbf3dc}
               <button type="button" class="tt-pdf-logo-remove hidden" id="ttPdfLogoRemove" title="Remove logo"><i class="fa-solid fa-xmark"></i></button>
             </div>
           </div>
+          <div class="field"><label>PDF size</label>
+            <div class="tt-pdf-size-row">
+              <div class="tt-pdf-size-head"><span>Text &amp; layout size</span><b id="ttPdfFontVal">130%</b></div>
+              <input type="range" id="ttPdfFontSize" min="80" max="220" step="5" value="130">
+            </div>
+            <p class="hint" style="margin:6px 0 0">Scales the banner, headings, table and footer together. The table always fills the page width.</p>
+          </div>
           <label class="tt-pdf-toggle"><input type="checkbox" id="ttPdfHeaderEvery"> Repeat the full banner on every table (otherwise only the first page gets it)</label>
           <p class="hint" id="ttPdfScope"></p>
           <div class="error-box" id="ttPdfError"></div>
@@ -1864,7 +1895,7 @@ tr.brk td{background:#fbf3dc}
 
       <!-- export a results/students table to a designed PDF -->
       <div class="tt-modal hidden" id="tblPdfModal">
-        <div class="tt-dialog" role="dialog" aria-modal="true" style="width:min(540px,100%)">
+        <div class="tt-dialog tt-dialog-wide" role="dialog" aria-modal="true" style="width:min(820px,96vw)">
           <div class="tt-dialog-head"><b id="tblPdfHeadTitle">Export as PDF</b><small>Customize the banner before exporting — this won't change what's saved.</small></div>
           <div class="field"><label for="tblPdfTitle">Banner title</label><input type="text" id="tblPdfTitle" maxlength="80"></div>
           <div class="field"><label for="tblPdfSubtitle">Banner subtitle</label><input type="text" id="tblPdfSubtitle" maxlength="120"></div>
@@ -1886,6 +1917,13 @@ tr.brk td{background:#fbf3dc}
               <button type="button" class="tt-pdf-logo-remove hidden" id="tblPdfLogoRemove" title="Remove logo"><i class="fa-solid fa-xmark"></i></button>
             </div>
           </div>
+          <div class="field"><label>PDF size</label>
+            <div class="tt-pdf-size-row">
+              <div class="tt-pdf-size-head"><span>Text &amp; layout size</span><b id="tblPdfFontVal">140%</b></div>
+              <input type="range" id="tblPdfFontSize" min="85" max="220" step="5" value="140">
+            </div>
+            <p class="hint" style="margin:6px 0 0">Scales the banner, headings, table and footer together — the table always fills the page width. This only affects the exported PDF.</p>
+          </div>
           <div class="field hidden" id="tblPdfColsField">
             <label>Columns to include</label>
             <div class="tt-pdf-cols-grid" id="tblPdfCols"></div>
@@ -1894,6 +1932,11 @@ tr.brk td{background:#fbf3dc}
           <div class="field hidden" id="tblPdfGroupField">
             <label for="tblPdfGroupBy">Split into separate tables by</label>
             <select id="tblPdfGroupBy"></select>
+            <div class="hidden" id="tblPdfGroupValsWrap" style="margin-top:10px">
+              <label id="tblPdfGroupValsLabel">Which values to include</label>
+              <div class="tt-pdf-cols-grid" id="tblPdfGroupVals"></div>
+              <div class="tt-pdf-colbar"><button type="button" id="tblPdfGroupValsAll">Select all</button><button type="button" id="tblPdfGroupValsNone">Select none</button></div>
+            </div>
           </div>
           <p class="hint" id="tblPdfScope"></p>
           <div class="error-box" id="tblPdfError"></div>
@@ -2821,13 +2864,13 @@ const AR = {
   'Could not verify your access — check your connection and try again.':'تعذّر التحقق من صلاحياتك — تحقق من اتصالك وحاول مجددًا.',
   'Save all changes':'حفظ كل التغييرات','Saving':'جارٍ الحفظ',
   'Subjects taught':'المواد التي يدرّسها',
-  'A teacher can teach multi subjects':'يمكن للمعلم أن يدرّس عدة مواد.',
+  'A teacher can teach several subjects — tick them under "Teaches" and press Save. A subject has one teacher, so a subject already taught by someone else is reassigned.':'يمكن للمعلم أن يدرّس عدة مواد — حدّدها ضمن «يدرّس» ثم اضغط حفظ. للمادة معلم واحد، لذا تُعاد إسناد المادة إن كان يدرّسها معلم آخر.',
   'Only name and email are required. subjects is optional: a semicolon-separated list of subject names — a teacher can have several. A subject already taught by someone else is reassigned.':'الحقلان المطلوبان فقط: name وemail. الحقل subjects اختياري: قائمة أسماء مواد مفصولة بفاصلة منقوطة — ويمكن أن يكون للمعلم عدة مواد. تُعاد إسناد المادة إن كان يدرّسها معلم آخر.',
   'Student name or email':'اسم الطالب أو بريده الإلكتروني',"Start typing an enrolled student's name or email":'ابدأ بكتابة اسم أو بريد طالب مسجَّل','Name or email':'الاسم أو البريد الإلكتروني','Search by name or email':'ابحث بالاسم أو البريد الإلكتروني',
   'Paste names or emails':'لصق أسماء أو بريد','Student names or emails (one per line)':'أسماء الطلاب أو بريدهم الإلكتروني (واحد في كل سطر)','Create accounts for the missing students':'إنشاء حسابات للطلاب غير الموجودين','e.g. Kadir Kemal':'مثال: Kadir Kemal',
   'Students are matched by their name — add an email column if two students share the same name.':'تتم مطابقة الطلاب بأسمائهم — أضف عمود email إذا اشترك طالبان في الاسم نفسه.',
   "Only name is required. email defaults to the student's name @jumj.com (for example kadir.kemal@jumj.com). gender, phone, department, batch and subjects are optional; subjects is a semicolon-separated list of subject names or keys. For students who already have an account, blank columns are left as they are and subjects are added to their existing ones.":'الحقل المطلوب فقط: name. يُنشأ البريد الإلكتروني تلقائيًا من اسم الطالب @jumj.com (مثل kadir.kemal@jumj.com). الحقول gender وphone وdepartment وbatch وsubjects اختيارية؛ و subjects قائمة مفصولة بفاصلة منقوطة لأسماء المواد أو معرّفاتها. بالنسبة للطلاب الذين لديهم حساب، تبقى الحقول الفارغة كما هي وتُضاف المواد إلى موادهم الحالية.',
-  'Look up a student by name or email.':'ابحث عن الطالب بالاسم أو البريد الإلكتروني. .',
+  'Look up a student by name or email. If no account exists yet, fill in their details to create one; if one exists you can update their details and subjects here.':'ابحث عن الطالب بالاسم أو البريد الإلكتروني. إن لم يوجد حساب فأدخل بياناته لإنشائه؛ وإن وُجد فيمكنك تحديث بياناته ومواده هنا.',
   'Enter a student name or email.':'أدخل اسم الطالب أو بريده الإلكتروني.','Paste at least one student name or email.':'الصق اسم طالب واحد أو بريده على الأقل.',
   'Several students share this name — enter their email instead.':'يشترك عدة طلاب في هذا الاسم — أدخل بريد الطالب بدلًا منه.','Several students share this name — search by email instead.':'يشترك عدة طلاب في هذا الاسم — ابحث بالبريد الإلكتروني بدلًا منه.',
   'Several students share this name — add an email column.':'يشترك عدة طلاب في هذا الاسم — أضف عمود email.','Several existing students share this name — add an email column.':'يشترك عدة طلاب حاليين في هذا الاسم — أضف عمود email.',
@@ -5670,6 +5713,7 @@ $('ttPdfLogoRemove').addEventListener('click', (e) => { e.stopPropagation(); ttP
 ['dragenter','dragover'].forEach(ev => $('ttPdfLogoDrop').addEventListener(ev, (e) => { e.preventDefault(); $('ttPdfLogoDrop').classList.add('drag'); }));
 ['dragleave','drop'].forEach(ev => $('ttPdfLogoDrop').addEventListener(ev, (e) => { e.preventDefault(); $('ttPdfLogoDrop').classList.remove('drag'); }));
 $('ttPdfLogoDrop').addEventListener('drop', (e) => ttPdfReadLogoFile(e.dataTransfer.files && e.dataTransfer.files[0]));
+$('ttPdfFontSize').addEventListener('input', (e) => { $('ttPdfFontVal').textContent = e.target.value + '%'; });
 function openTtPdfModal(){
   if(!ttConfig){ return; }
   if(ttMode === 'teacher' && !ttTeacherSel){ setBox('ttError', 'Choose a teacher first.'); return; }
@@ -5701,6 +5745,7 @@ async function ttGeneratePdf(){
   await withBusy(btn, async () => {
     const root = $('ttPdfExportRoot');
     root.className = 'pdf-doc pdf-theme-' + theme;
+    root.style.setProperty('--pdf-font-scale', (+$('ttPdfFontSize').value || 130) / 100);
     root.dir = document.documentElement.dir; root.lang = document.documentElement.lang;
     const { jsPDF } = window.jspdf;
     let pdf = null;
@@ -5742,8 +5787,8 @@ async function ttGeneratePdf(){
         page.querySelector('.pdf-tablewrap').appendChild(clonedTable);
         root.innerHTML = ''; root.appendChild(page);
         await new Promise(r => setTimeout(r, 30));
-        const canvas = await html2canvas(page, {scale: 2, backgroundColor: '#f6f2e6', useCORS: true});
-        const img = canvas.toDataURL('image/jpeg', 0.95);
+        const canvas = await html2canvas(page, {scale: 3, backgroundColor: '#f6f2e6', useCORS: true});
+        const img = canvas.toDataURL('image/jpeg', 0.98);
         const pw = 297, ph = 210, ratio = canvas.width / canvas.height;
         let w = pw - 14, h = w / ratio;
         if(h > ph - 14){ h = ph - 14; w = h * ratio; }
@@ -5769,7 +5814,7 @@ $('ttPdfModal').addEventListener('click', (e) => { if(e.target === $('ttPdfModal
 $('ttPdfGenerate').addEventListener('click', ttGeneratePdf);
 
 // ---------------------------------------------------------------- generic table PDF export (Results / Students)
-let tblPdfKind = null; // 'results' | 'students'
+let tblPdfKind = null; // 'results' | 'students' | 'roster'
 let tblPdfLogoDataUrl = null;
 function tblPdfSetLogo(dataUrl){
   tblPdfLogoDataUrl = dataUrl || null;
@@ -5794,6 +5839,7 @@ $('tblPdfLogoRemove').addEventListener('click', (e) => { e.stopPropagation(); tb
 ['dragenter','dragover'].forEach(ev => $('tblPdfLogoDrop').addEventListener(ev, (e) => { e.preventDefault(); $('tblPdfLogoDrop').classList.add('drag'); }));
 ['dragleave','drop'].forEach(ev => $('tblPdfLogoDrop').addEventListener(ev, (e) => { e.preventDefault(); $('tblPdfLogoDrop').classList.remove('drag'); }));
 $('tblPdfLogoDrop').addEventListener('drop', (e) => tblPdfReadLogoFile(e.dataTransfer.files && e.dataTransfer.files[0]));
+$('tblPdfFontSize').addEventListener('input', (e) => { $('tblPdfFontVal').textContent = e.target.value + '%'; });
 
 function tblPdfDefaultFooter(){
   const d = new Date().toLocaleDateString(lang === 'ar' ? 'ar-u-nu-latn' : 'en-GB', {day: '2-digit', month: 'short', year: 'numeric'});
@@ -5814,9 +5860,9 @@ function openResPdfModal(){
   setBox('tblPdfError', '');
   $('tblPdfModal').classList.remove('hidden');
 }
-// Students PDF export: which data columns exist, how to read a plain-text value from a student record,
-// and the column-picker / group-by controls in the export modal. No avatar and no gender color coding —
-// exported tables are plain text only.
+// Column-pickable PDF exports (student directory + per-subject roster): which data columns exist, how to
+// read a plain-text value out of a row, and where each export's rows come from. No avatar and no gender
+// color coding in any of these — exported tables are plain text only.
 const STU_PDF_COLUMNS = [
   {key:'name',       label:() => L('Name','الاسم')},
   {key:'email',      label:() => L('Email','البريد الإلكتروني')},
@@ -5826,7 +5872,6 @@ const STU_PDF_COLUMNS = [
   {key:'batch',      label:() => L('Batch','الدفعة')},
   {key:'subjects',   label:() => L('Subjects','المواد')},
 ];
-let tblPdfStuCols = new Set(STU_PDF_COLUMNS.map(c => c.key)); // which columns are included — remembered for the session
 function tblPdfStuCellValue(s, key){
   switch(key){
     case 'name': return s.name || '';
@@ -5839,23 +5884,99 @@ function tblPdfStuCellValue(s, key){
     default: return '';
   }
 }
-function tblPdfRenderStuCols(){
-  $('tblPdfCols').innerHTML = STU_PDF_COLUMNS.map(c => `
-    <label class="tt-pdf-toggle"><input type="checkbox" class="tblPdfColChk" value="${c.key}" ${tblPdfStuCols.has(c.key) ? 'checked' : ''}> ${esc(c.label())}</label>
+const ROSTER_PDF_COLUMNS = [
+  {key:'name',       label:() => L('Name','الاسم')},
+  {key:'email',      label:() => L('Email','البريد الإلكتروني')},
+  {key:'gender',     label:() => L('Gender','الجنس')},
+  {key:'phone',      label:() => L('Phone','الهاتف')},
+  {key:'department', label:() => L('Department','القسم')},
+  {key:'batch',      label:() => L('Batch','الدفعة')},
+  {key:'result',     label:() => L('Result','النتيجة')},
+];
+function tblPdfRosterResultText(uid, m, known){
+  const r = m.get(uid);
+  if(r && r.maxTotal) return (r.total / r.maxTotal * 100).toFixed(1) + '%' + (r.complete ? '' : ' ' + L('(partial)', '(جزئي)'));
+  return known ? L('No result', 'لا نتيجة') : L('…', '…');
+}
+function tblPdfRosterCellValue(item, key){
+  return key === 'result' ? item.resultText : tblPdfStuCellValue(item.s, key);
+}
+// Which export "kind" reads from which screen, what columns it offers, and how to turn a row into a cell value.
+const PDF_EXPORTS = {
+  students: {
+    columns: STU_PDF_COLUMNS,
+    getRows(){ return Array.from($('allStudentsBody').querySelectorAll('tr[data-uid]')).map(tr => studentByUid(tr.dataset.uid)).filter(Boolean); },
+    cellValue: (s, key) => tblPdfStuCellValue(s, key),
+  },
+  roster: {
+    columns: ROSTER_PDF_COLUMNS,
+    getRows(){
+      const subj = curSubj(); if(!subj) return [];
+      const m = resultsStore.get(subj.slug) || new Map();
+      const known = resultsKnown(subj.slug);
+      return Array.from($('enrBody').querySelectorAll('tr[data-uid]')).map(tr => {
+        const s = studentByUid(tr.dataset.uid); if(!s) return null;
+        return {s, resultText: tblPdfRosterResultText(tr.dataset.uid, m, known)};
+      }).filter(Boolean);
+    },
+    cellValue: (item, key) => tblPdfRosterCellValue(item, key),
+  },
+};
+let tblPdfColsByKind = {students: new Set(STU_PDF_COLUMNS.map(c => c.key)), roster: new Set(ROSTER_PDF_COLUMNS.map(c => c.key))}; // remembered per kind, for the session
+function tblPdfActiveExport(){ return PDF_EXPORTS[tblPdfKind] || null; }
+function tblPdfRenderCols(){
+  const cfg = tblPdfActiveExport(); if(!cfg) return;
+  const cols = tblPdfColsByKind[tblPdfKind];
+  $('tblPdfCols').innerHTML = cfg.columns.map(c => `
+    <label class="tt-pdf-toggle"><input type="checkbox" class="tblPdfColChk" value="${c.key}" ${cols.has(c.key) ? 'checked' : ''}> ${esc(c.label())}</label>
   `).join('');
 }
 function tblPdfRenderGroupBy(){
+  const cfg = tblPdfActiveExport(); if(!cfg) return;
   const sel = $('tblPdfGroupBy'), cur = sel.value;
   sel.innerHTML = `<option value="">${esc(L('No grouping — one table', 'بدون تجميع — جدول واحد'))}</option>` +
-    STU_PDF_COLUMNS.map(c => `<option value="${c.key}">${esc(L('One table per ', 'جدول لكل '))}${esc(c.label())}</option>`).join('');
+    cfg.columns.map(c => `<option value="${c.key}">${esc(L('One table per ', 'جدول لكل '))}${esc(c.label())}</option>`).join('');
   if(Array.from(sel.options).some(o => o.value === cur)) sel.value = cur;
 }
-$('tblPdfCols').addEventListener('change', (e) => {
-  if(!e.target.classList.contains('tblPdfColChk')) return;
-  if(e.target.checked) tblPdfStuCols.add(e.target.value); else tblPdfStuCols.delete(e.target.value);
+// Once a "split by" column is picked, this shows every value actually present for that column (e.g. every
+// department, every subject, every batch) so the admin can choose which specific one(s) to export — not
+// just export one table per value automatically. Selection defaults to "all" so behavior is unchanged
+// until the admin narrows it down. Re-picking the group-by column resets the selection back to "all".
+let tblPdfGroupVals = null;    // Set of selected values, or null when nothing to pick from
+let tblPdfGroupValsKey = null; // which group-by column tblPdfGroupVals belongs to
+function tblPdfRenderGroupVals(resetSelection){
+  const cfg = tblPdfActiveExport();
+  const groupKey = $('tblPdfGroupBy').value;
+  const wrap = $('tblPdfGroupValsWrap');
+  if(!cfg || !groupKey){
+    wrap.classList.add('hidden'); $('tblPdfGroupVals').innerHTML = '';
+    tblPdfGroupVals = null; tblPdfGroupValsKey = null;
+    return;
+  }
+  const col = cfg.columns.find(c => c.key === groupKey);
+  const values = Array.from(new Set(cfg.getRows().map(row => cfg.cellValue(row, groupKey) || L('—', '—'))))
+    .sort((a, b) => String(a).localeCompare(String(b), undefined, {numeric: true}));
+  if(resetSelection || tblPdfGroupValsKey !== groupKey){ tblPdfGroupVals = new Set(values); tblPdfGroupValsKey = groupKey; }
+  $('tblPdfGroupValsLabel').textContent = col ? L('Which ', 'أيّ ') + col.label() + L(' to include', ' يتم تضمينها') : L('Which values to include', 'القيم المطلوب تضمينها');
+  $('tblPdfGroupVals').innerHTML = values.map(v => `
+    <label class="tt-pdf-toggle"><input type="checkbox" class="tblPdfGroupValChk" value="${esc(v)}" ${tblPdfGroupVals.has(v) ? 'checked' : ''}> ${esc(v)}</label>
+  `).join('');
+  wrap.classList.remove('hidden');
+}
+$('tblPdfGroupBy').addEventListener('change', () => tblPdfRenderGroupVals(true));
+$('tblPdfGroupVals').addEventListener('change', (e) => {
+  if(!e.target.classList.contains('tblPdfGroupValChk') || !tblPdfGroupVals) return;
+  if(e.target.checked) tblPdfGroupVals.add(e.target.value); else tblPdfGroupVals.delete(e.target.value);
 });
-$('tblPdfColsAll').addEventListener('click', () => { tblPdfStuCols = new Set(STU_PDF_COLUMNS.map(c => c.key)); tblPdfRenderStuCols(); });
-$('tblPdfColsNone').addEventListener('click', () => { tblPdfStuCols = new Set(); tblPdfRenderStuCols(); });
+$('tblPdfGroupValsAll').addEventListener('click', () => tblPdfRenderGroupVals(true));
+$('tblPdfGroupValsNone').addEventListener('click', () => { if(!tblPdfGroupVals) return; tblPdfGroupVals.clear(); tblPdfRenderGroupVals(false); });
+$('tblPdfCols').addEventListener('change', (e) => {
+  if(!e.target.classList.contains('tblPdfColChk') || !tblPdfColsByKind[tblPdfKind]) return;
+  const cols = tblPdfColsByKind[tblPdfKind];
+  if(e.target.checked) cols.add(e.target.value); else cols.delete(e.target.value);
+});
+$('tblPdfColsAll').addEventListener('click', () => { const cfg = tblPdfActiveExport(); if(!cfg) return; tblPdfColsByKind[tblPdfKind] = new Set(cfg.columns.map(c => c.key)); tblPdfRenderCols(); });
+$('tblPdfColsNone').addEventListener('click', () => { if(!tblPdfActiveExport()) return; tblPdfColsByKind[tblPdfKind] = new Set(); tblPdfRenderCols(); });
 
 function openStuPdfModal(){
   const rowCount = $('allStudentsBody').querySelectorAll('tr[data-uid]').length;
@@ -5867,8 +5988,25 @@ function openStuPdfModal(){
   $('tblPdfFooter').value = tblPdfDefaultFooter();
   $('tblPdfScope').textContent = `${L('Exporting', 'تصدير')} ${rowCount} ${L('student(s) currently shown.', 'طالب/طلاب معروضين حاليًا.')}`;
   tblPdfSetLogo(tblPdfLogoDataUrl);
-  tblPdfRenderStuCols();
-  tblPdfRenderGroupBy(); $('tblPdfGroupBy').value = '';
+  tblPdfRenderCols();
+  tblPdfRenderGroupBy(); $('tblPdfGroupBy').value = ''; tblPdfRenderGroupVals();
+  $('tblPdfColsField').classList.remove('hidden'); $('tblPdfGroupField').classList.remove('hidden');
+  setBox('tblPdfError', '');
+  $('tblPdfModal').classList.remove('hidden');
+}
+function openEnrPdfModal(){
+  const subj = curSubj(); if(!subj) return;
+  const rowCount = $('enrBody').querySelectorAll('tr[data-uid]').length;
+  if(!rowCount){ setBox('enrError', 'Nothing to export yet.'); return; }
+  tblPdfKind = 'roster';
+  $('tblPdfHeadTitle').textContent = L('Export roster as PDF', 'تصدير قائمة الطلاب كملف PDF');
+  $('tblPdfTitle').value = subj.name;
+  $('tblPdfSubtitle').value = L('Roster', 'قائمة الطلاب');
+  $('tblPdfFooter').value = tblPdfDefaultFooter();
+  $('tblPdfScope').textContent = `${L('Exporting', 'تصدير')} ${rowCount} ${L('student(s) currently shown.', 'طالب/طلاب معروضين حاليًا.')}`;
+  tblPdfSetLogo(tblPdfLogoDataUrl);
+  tblPdfRenderCols();
+  tblPdfRenderGroupBy(); $('tblPdfGroupBy').value = ''; tblPdfRenderGroupVals();
   $('tblPdfColsField').classList.remove('hidden'); $('tblPdfGroupField').classList.remove('hidden');
   setBox('tblPdfError', '');
   $('tblPdfModal').classList.remove('hidden');
@@ -5878,6 +6016,7 @@ $('tblPdfCancel').addEventListener('click', closeTblPdfModal);
 $('tblPdfModal').addEventListener('click', (e) => { if(e.target === $('tblPdfModal')) closeTblPdfModal(); });
 $('resPdfBtn').addEventListener('click', openResPdfModal);
 $('stuPdfBtn').addEventListener('click', openStuPdfModal);
+$('enrPdfBtn').addEventListener('click', openEnrPdfModal);
 
 // Cleans a cloned <table> for print: strips checkboxes/buttons, bakes form values into plain text, drops empty action columns.
 function tblPdfCleanTable(table){
@@ -5906,23 +6045,23 @@ function tblPdfCleanTable(table){
   return table;
 }
 
-// Builds a plain-text students table for export: only the picked columns, no avatar, no gender color coding —
-// every cell is just text, same as any other export column.
-function tblPdfBuildStuTable(rows, cols){
+// Builds a plain-text table for export: only the picked columns, no avatar, no gender color coding —
+// every cell is just text, same as any other export column. Works for any column-pickable export kind.
+function tblPdfBuildTable(rows, cols, cellValue){
   const table = document.createElement('table');
   table.className = 'pdf-plain-table';
   table.innerHTML = `<thead><tr>${cols.map(c => `<th>${esc(c.label())}</th>`).join('')}</tr></thead>` +
-    `<tbody>${rows.map(s => `<tr>${cols.map(c => `<td>${esc(tblPdfStuCellValue(s, c.key))}</td>`).join('')}</tr>`).join('')}</tbody>`;
+    `<tbody>${rows.map(row => `<tr>${cols.map(c => `<td>${esc(cellValue(row, c.key))}</td>`).join('')}</tr>`).join('')}</tbody>`;
   return table;
 }
-// Splits student rows into groups by one column's value (e.g. one table per Department). No grouping → a single group.
-function tblPdfGroupStuRows(rows, groupKey){
+// Splits rows into groups by one column's value (e.g. one table per Department). No grouping → a single group.
+function tblPdfGroupRows(rows, groupKey, cellValue){
   if(!groupKey) return [{label: '', rows}];
   const map = new Map();
-  rows.forEach(s => {
-    const v = tblPdfStuCellValue(s, groupKey) || L('—', '—');
+  rows.forEach(row => {
+    const v = cellValue(row, groupKey) || L('—', '—');
     if(!map.has(v)) map.set(v, []);
-    map.get(v).push(s);
+    map.get(v).push(row);
   });
   return Array.from(map.entries())
     .sort((a, b) => String(a[0]).localeCompare(String(b[0]), undefined, {numeric: true}))
@@ -5934,15 +6073,21 @@ async function tblGeneratePdf(){
   setBox('tblPdfError', '');
   if(typeof html2canvas === 'undefined' || !window.jspdf){ setBox('tblPdfError', 'Could not load the PDF engine — check your connection and try again.'); return; }
 
-  // sections: one {label, table} per exported table. Students may split into several (grouped); results is always one.
+  // sections: one {label, table} per exported table. Students/roster may split into several (grouped); results is always one.
   let sections;
-  if(tblPdfKind === 'students'){
-    const stuRows = Array.from($('allStudentsBody').querySelectorAll('tr[data-uid]')).map(tr => studentByUid(tr.dataset.uid)).filter(Boolean);
-    if(!stuRows.length){ setBox('tblPdfError', 'Nothing to export yet.'); return; }
-    const cols = STU_PDF_COLUMNS.filter(c => tblPdfStuCols.has(c.key));
+  const cfg = tblPdfActiveExport();
+  if(cfg){
+    const rows = cfg.getRows();
+    if(!rows.length){ setBox('tblPdfError', 'Nothing to export yet.'); return; }
+    const cols = cfg.columns.filter(c => tblPdfColsByKind[tblPdfKind].has(c.key));
     if(!cols.length){ setBox('tblPdfError', 'Pick at least one column.'); return; }
     const groupKey = $('tblPdfGroupBy').value || '';
-    sections = tblPdfGroupStuRows(stuRows, groupKey).map(g => ({label: g.label, table: tblPdfBuildStuTable(g.rows, cols)}));
+    let groups = tblPdfGroupRows(rows, groupKey, cfg.cellValue);
+    if(groupKey && tblPdfGroupVals && tblPdfGroupValsKey === groupKey){
+      groups = groups.filter(g => tblPdfGroupVals.has(g.label));
+      if(!groups.length){ setBox('tblPdfError', 'Pick at least one value to include.'); return; }
+    }
+    sections = groups.map(g => ({label: g.label, table: tblPdfBuildTable(g.rows, cols, cfg.cellValue)}));
   }else{
     const sourceTable = document.querySelector('#tabResAll table');
     if(!sourceTable){ setBox('tblPdfError', 'Nothing to export yet.'); return; }
@@ -5957,6 +6102,7 @@ async function tblGeneratePdf(){
   await withBusy(btn, async () => {
     const root = $('tblPdfExportRoot');
     root.className = 'pdf-doc pdf-theme-' + theme;
+    root.style.setProperty('--pdf-font-scale', (+$('tblPdfFontSize').value || 140) / 100);
     root.dir = document.documentElement.dir; root.lang = document.documentElement.lang;
     const { jsPDF } = window.jspdf;
     const issued = new Date().toLocaleDateString(lang === 'ar' ? 'ar-u-nu-latn' : 'en-GB', {day: '2-digit', month: 'short', year: 'numeric'});
@@ -5999,22 +6145,33 @@ async function tblGeneratePdf(){
         root.innerHTML = ''; root.appendChild(page);
         await new Promise(r => setTimeout(r, 30));
 
-        const canvas = await html2canvas(page, {scale: 2, backgroundColor: '#f6f2e6', useCORS: true});
+        const scale = 3;
+        const canvas = await html2canvas(page, {scale, backgroundColor: '#f6f2e6', useCORS: true});
         const pxPerMm = canvas.width / contentW;
         const pageContentPx = Math.floor(contentH * pxPerMm);
-        const totalPages = Math.max(1, Math.ceil(canvas.height / pageContentPx));
-        for(let i = 0; i < totalPages; i++){
+        // Row bottoms (in canvas px, relative to the top of `page`) — page breaks snap to these so a
+        // row is never sliced in half across two PDF pages. This matters most at large text sizes,
+        // where rows are tall enough that a plain fixed-height cut would otherwise land mid-row.
+        const pageTop = page.getBoundingClientRect().top;
+        const rowEdges = Array.from(sec.table.querySelectorAll('tr'))
+          .map(tr => Math.round((tr.getBoundingClientRect().bottom - pageTop) * scale))
+          .sort((a, b) => a - b);
+        let sy = 0;
+        while(sy < canvas.height){
+          const idealEnd = Math.min(sy + pageContentPx, canvas.height);
+          let end = rowEdges.filter(p => p > sy && p <= idealEnd).pop();
+          if(end === undefined || end <= sy) end = idealEnd; // a single row taller than one page — cut it as a last resort
+          const sh = end - sy;
           if(!pdf) pdf = new jsPDF({orientation: 'landscape', unit: 'mm', format: 'a4'});
           else pdf.addPage('a4', 'landscape');
           pdf.setFillColor(246, 242, 230); pdf.rect(0, 0, pw, ph, 'F');
-          const sy = i * pageContentPx;
-          const sh = Math.min(pageContentPx, canvas.height - sy);
           const slice = document.createElement('canvas');
           slice.width = canvas.width; slice.height = sh;
           slice.getContext('2d').drawImage(canvas, 0, sy, canvas.width, sh, 0, 0, canvas.width, sh);
-          const img = slice.toDataURL('image/jpeg', 0.95);
+          const img = slice.toDataURL('image/jpeg', 0.98);
           const h = sh / pxPerMm;
           pdf.addImage(img, 'JPEG', margin, margin, contentW, h);
+          sy = end;
         }
       }
       const fname = (title || 'export').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').slice(0, 60) || 'export';
@@ -6501,9 +6658,12 @@ function logAdminAction(action, target, details){
   }).catch(err => console.error('Could not write admin log', err))
     .finally(() => { adminLogsLoaded = false; refreshAdminLogBadge(); });
 }
+// Counts every log entry written after the admin last opened the activity log — including the
+// admin's own actions, so the bell always reflects "how many entries have you not looked at yet",
+// not just other people's. (Previously this excluded the signed-in admin's own actions, which meant
+// the badge number never appeared at all for a lone admin doing all the work.)
 function unseenAdminLogCount(){
-  const me = auth.currentUser ? auth.currentUser.uid : null;
-  return allAdminLogs.filter(l => l.actorUid !== me && String(l.createdAt || '') > (myLogSeenAt || '')).length;
+  return allAdminLogs.filter(l => String(l.createdAt || '') > (myLogSeenAt || '')).length;
 }
 async function refreshAdminLogBadge(){
   if(!can('admins.log')) return;
@@ -6531,11 +6691,10 @@ function renderAdminLogScreen(){
       .finally(() => { renderAdminLogScreen._loading = false; if(route.view === 'admins') renderAdminLogScreen(); refreshAdminLogBadge(); });
   }
   const el = $('admLogCount'); if(el) el.innerHTML = `<b>${allAdminLogs.length}</b> entr${allAdminLogs.length === 1 ? 'y' : 'ies'}`;
-  const me = auth.currentUser ? auth.currentUser.uid : null;
   const body = $('admLogBody'); if(!body) return;
   body.innerHTML = allAdminLogs.length ? allAdminLogs.slice(0, 300).map(l => {
     const when = l.createdAt ? new Date(l.createdAt).toLocaleString() : '—';
-    const isNew = l.actorUid !== me && String(l.createdAt || '') > (myLogSeenAt || '');
+    const isNew = String(l.createdAt || '') > (myLogSeenAt || '');
     return `<tr class="${isNew ? 'dirty' : ''}">
       <td class="mono">${esc(when)}</td>
       <td>${esc(l.actorName || l.actorEmail || l.actorUid || '—')}</td>
