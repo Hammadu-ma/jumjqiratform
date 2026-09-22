@@ -447,6 +447,23 @@ tbody tr:has(.gchip.f) td:first-child{box-shadow:inset 3px 0 0 #f2a9c6}
 tbody tr:has(.gchip.m) td:first-child{box-shadow:inset 3px 0 0 var(--brand)}
 [dir=rtl] tbody tr:has(.gchip.f) td:first-child{box-shadow:inset -3px 0 0 #f2a9c6}
 [dir=rtl] tbody tr:has(.gchip.m) td:first-child{box-shadow:inset -3px 0 0 var(--brand)}
+/* attendance — gated by whether the timetable actually schedules the subject that day */
+.attn-toolbar{display:flex;flex-wrap:wrap;align-items:flex-end;gap:14px;margin-bottom:16px}
+.attn-date-row{display:flex;align-items:center;gap:6px}.attn-date-row input{flex:1;min-width:0}.attn-date-row .btn{padding:9px 10px}
+.attn-cancel-toggle{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:650;color:#7a4a17;background:var(--warn-soft);border:1px solid #f0d9b3;padding:8px 12px;border-radius:9px;cursor:pointer;white-space:nowrap}
+.attn-cancel-toggle input{width:15px;height:15px;accent-color:#a86d19}
+.attn-session-box{padding:12px 16px;border-radius:12px;background:var(--brand-soft);border:1px solid var(--brand-soft-2);font-size:12.5px;color:var(--brand-2);font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.attn-session-box:empty{display:none}
+.attn-session-box.none{background:#fdf1e4;border-color:#f0d9b3;color:#9b5e14}
+.attn-session-box.cancelled{background:#f5eee0;border-color:#e3d3ab;color:#7a5a1e}
+.attn-seg{display:inline-flex;border:1px solid var(--line-strong);border-radius:99px;overflow:hidden}
+.attn-seg button{border:0;background:#fff;padding:6px 12px;font-size:10.5px;font-weight:700;cursor:pointer;color:#6c7570;transition:.15s ease}
+.attn-seg button:hover{background:var(--surface-2)}
+.attn-seg button+button{border-left:1px solid var(--line-strong)}
+.attn-seg button.active[data-v="present"]{background:#1c7a52;color:#fff}
+.attn-seg button.active[data-v="absent"]{background:#c0453f;color:#fff}
+.attn-seg button.active[data-v="late"]{background:#c08a2a;color:#fff}
+.attn-seg button.active[data-v="excused"]{background:#5c6b95;color:#fff}
 tbody tr:has(.stuGenderInput.g-f) td:first-child{box-shadow:inset 3px 0 0 #f2a9c6}
 tbody tr:has(.stuGenderInput.g-m) td:first-child{box-shadow:inset 3px 0 0 var(--brand)}
 [dir=rtl] tbody tr:has(.stuGenderInput.g-f) td:first-child{box-shadow:inset -3px 0 0 #f2a9c6}
@@ -883,6 +900,19 @@ tr.brk td{background:#fbf3dc}
 .pdf-doc .tt-break td{background:linear-gradient(135deg,var(--pdf-soft),#fff);color:var(--pdf-b)}
 .pdf-footer{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:18px;padding-top:14px;border-top:2px solid var(--pdf-soft);font-size:calc(11.5px * var(--pdf-font-scale,1));color:#7a887f;font-weight:600}
 .pdf-footer b{color:var(--pdf-b);font-weight:800;letter-spacing:.04em}
+
+/* ---- Attendance: distraction-free full-screen table ---- */
+.attn-tab-head{display:flex;justify-content:flex-end;margin-bottom:10px}
+.attn-fs-overlay{position:fixed;inset:0;z-index:9999;background:#fff;display:flex;flex-direction:column}
+.attn-fs-overlay.hidden{display:none}
+.attn-fs-bar{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:18px 26px;border-bottom:1px solid var(--line);flex:0 0 auto}
+.attn-fs-bar h2{margin:0;font-size:18px;letter-spacing:-.02em;color:var(--ink)}
+.attn-fs-bar p{margin:4px 0 0;font-size:12.5px;color:var(--muted)}
+.attn-fs-body{flex:1 1 auto;overflow:auto;padding:0 26px 26px}
+.attn-fs-body table{width:100%;border-collapse:separate;border-spacing:0}
+.attn-fs-body thead th{position:sticky;top:0;background:#fff;text-align:start;padding:10px 14px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);border-bottom:1px solid var(--line-strong)}
+.attn-fs-body tbody td{padding:13px 14px;font-size:13px;border-bottom:1px solid var(--line);vertical-align:middle}
+.attn-fs-body tbody tr:nth-child(even) td{background:#fbfbf7}
 </style>
 <script>try{if(localStorage.getItem("jumedLang")==="ar"){var r=document.documentElement;r.dir="rtl";r.lang="ar";r.classList.add("lang-ar")}}catch(e){}</script>
 </head>
@@ -1101,6 +1131,7 @@ tr.brk td{background:#fbf3dc}
         <div class="tabs" id="subTabs">
           <button class="tab-btn" data-tab="overview"><i class="fa-solid fa-chart-simple"></i> Overview</button>
           <button class="tab-btn" data-tab="roster"><i class="fa-solid fa-users"></i> Roster</button>
+          <button class="tab-btn" data-tab="attendance"><i class="fa-solid fa-clipboard-check"></i> Attendance</button>
           <button class="tab-btn" data-tab="results"><i class="fa-solid fa-list-check"></i> Results</button>
           <button class="tab-btn" data-tab="grading"><i class="fa-solid fa-scale-balanced"></i> Grading</button>
           <button class="tab-btn" data-tab="settings"><i class="fa-solid fa-gear"></i> Settings</button>
@@ -1165,6 +1196,41 @@ tr.brk td{background:#fbf3dc}
             <div class="ok-box" id="enrOk"></div>
           </div>
 
+        </div>
+
+        <!-- ---- Attendance ---- -->
+        <div class="sub-panel" id="subTab-attendance">
+          <div class="card">
+            <div class="attn-toolbar">
+              <div class="field" style="max-width:190px;margin:0">
+                <label for="attnDate">Date</label>
+                <div class="attn-date-row">
+                  <button class="btn btn-secondary btn-sm" id="attnPrevBtn" type="button" title="Previous scheduled session"><i class="fa-solid fa-chevron-left"></i></button>
+                  <input type="date" id="attnDate">
+                  <button class="btn btn-secondary btn-sm" id="attnNextBtn" type="button" title="Next scheduled session"><i class="fa-solid fa-chevron-right"></i></button>
+                </div>
+              </div>
+              <div class="field hidden" id="attnSessionWrap" style="max-width:300px;margin:0"><label for="attnSessionSel">Session</label><select id="attnSessionSel"></select></div>
+              <div class="toolbar-actions" style="margin-inline-start:auto">
+                <label class="attn-cancel-toggle hidden" id="attnCancelWrap"><input type="checkbox" id="attnCancelChk"> Class cancelled</label>
+                <button class="btn btn-secondary btn-sm" id="attnTakeFsBtn" type="button" title="Full screen"><i class="fa-solid fa-expand"></i></button>
+                <button class="btn btn-secondary btn-sm" id="attnMarkAllBtn" type="button" disabled>Mark all present</button>
+                <button class="btn btn-gold btn-sm" id="attnSaveBtn" type="button" disabled><i class="fa-solid fa-floppy-disk"></i> Save attendance</button>
+              </div>
+            </div>
+            <p class="hint" style="margin:0 0 12px">Use the arrows to jump between the days this subject actually has a session — non-teaching days are skipped.</p>
+            <div class="attn-session-box" id="attnSessionBox"></div>
+            <div class="field hidden" id="attnCancelReasonWrap"><label for="attnCancelReason">Reason (optional)</label><input type="text" id="attnCancelReason" placeholder="e.g. Public holiday, teacher unavailable…"></div>
+            <div class="summary-row" id="attnSummary" style="margin:14px 0"></div>
+            <div class="table-scroll hidden" id="attnTableWrap" style="max-height:520px;">
+              <table style="min-width:600px">
+                <thead><tr><th>Name</th><th>Department</th><th>Batch</th><th>Status</th></tr></thead>
+                <tbody id="attnBody"></tbody>
+              </table>
+            </div>
+            <div class="error-box" id="attnError"></div>
+            <div class="ok-box" id="attnOk"></div>
+          </div>
         </div>
 
         <!-- ---- Results ---- -->
@@ -2293,7 +2359,7 @@ const route = {view:'subjects', slug:null, tab:'overview'};
 let pendingAfterRoute = null;
 let wsSlug = null; // subject the workspace is currently showing
 
-const SUB_TABS = ['overview','roster','results','grading','settings','enroll'];
+const SUB_TABS = ['overview','roster','attendance','results','grading','settings','enroll'];
 
 const subjectBySlug = (slug) => allSubjects.find(s => s.slug === slug) || null;
 const studentByUid = (uid) => allStudents.find(s => s.uid === uid) || null;
@@ -3302,8 +3368,10 @@ function resetWorkspace(){
   ['enrSearch','addSearch','resSearch','csvInput','pasteIds','lookupId'].forEach(id => { const el = $(id); if(el) el.value = ''; });
   $('resFilter').value = ''; ['stu','enr','add','res'].forEach(clearStudentFilters);
   ['bulkPreviewWrap','newCompWrap','indivForm','lookupResult','indivEnrollWrap','pasteCreateRow'].forEach(id => $(id).classList.add('hidden'));
-  ['bulkError','bulkOk','importError','importOk','lookupError','indivError','indivOk','enrError','enrOk','addError','addOk','pasteError','pasteOk','pasteMissing','setError','setOk','delError','gradeError','gradeOk','gradeWarn','ovError','resAllError','resNoComps'].forEach(id => setBox(id, ''));
+  ['bulkError','bulkOk','importError','importOk','lookupError','indivError','indivOk','enrError','enrOk','addError','addOk','pasteError','pasteOk','pasteMissing','setError','setOk','delError','gradeError','gradeOk','gradeWarn','ovError','resAllError','resNoComps','attnError','attnOk'].forEach(id => setBox(id, ''));
   $('enrSelectAll').checked = false; $('addSelectAll').checked = false;
+  attnSessions = []; attnSessionId = null; attnRecords = {}; attnDocId = null; attnLoadedKey = null; attnCancelled = false;
+  $('attnDate').value = ''; $('attnCancelChk').checked = false; $('attnCancelReason').value = '';
   tabApi.res.activate('tabResAll'); tabApi.add.activate('tabAddSearch');
 }
 
@@ -3328,7 +3396,7 @@ function renderSubjectScreen(){
   });
 }
 function renderActiveTab(){
-  const fn = {overview: renderSubOverview, roster: renderRoster, results: renderResultsTab, grading: renderGrading, settings: renderSettings, enroll: renderEnroll}[route.tab];
+  const fn = {overview: renderSubOverview, roster: renderRoster, attendance: renderAttendance, results: renderResultsTab, grading: renderGrading, settings: renderSettings, enroll: renderEnroll}[route.tab];
   if(fn) fn();
 }
 
@@ -3592,6 +3660,195 @@ function openStudentsBulk(slug, ids){
 $('pasteCreateBtn').addEventListener('click', () => openStudentsBulk(route.slug, missingPasted));
 $('newStuBulkBtn').addEventListener('click', () => openStudentsBulk(route.slug, []));
 $('newStuOneBtn').addEventListener('click', () => go('students', () => tabApi.stu.activate('tabStuIndiv')));
+
+// ================================================================
+// Attendance — only takeable for a date/session the timetable actually schedules this subject on.
+// One Firestore doc per subject + date + timetable session, holding a status per enrolled student.
+// Requires the "Attendance" permission (subject.attendance) like every other subject tab.
+// ================================================================
+const ATTENDANCE = 'attendance';
+const ATTN_STATUSES = [
+  {key:'present', label:() => L('Present', 'حاضر')},
+  {key:'absent',  label:() => L('Absent', 'غائب')},
+  {key:'late',    label:() => L('Late', 'متأخر')},
+  {key:'excused', label:() => L('Excused', 'بعذر')},
+];
+let attnSessions = [];     // every timetable session found for the picked date
+let attnSessionId = null;  // key of the picked session (tableId_periodId)
+let attnRecords = {};      // uid -> status, for the currently loaded session
+let attnDocId = null;      // Firestore doc id the loaded session's attendance is saved under
+let attnLoadedKey = null;  // slug|date|sessionId already loaded into attnRecords, to avoid redundant reloads
+let attnCancelled = false; // whether the loaded session is marked as a cancelled class
+function attnDateStr(d){ return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+// Every timetable session (across every timetable table) that teaches this subject on the given date's weekday.
+// A date with no scheduled session for this subject simply returns [] — that's what keeps attendance from
+// ever being taken (or counted) on a day the subject doesn't actually meet.
+function attnSessionsFor(slug, dateStr){
+  if(!ttConfig || !ttTables.length || !dateStr) return [];
+  const d = new Date(dateStr + 'T00:00:00'); if(isNaN(d)) return [];
+  const dayKey = TT_DAYS[d.getDay()];
+  if(!ttConfig.days.includes(dayKey)) return [];
+  const out = [];
+  ttTables.forEach(t => {
+    ttConfig.periods.filter(p => p.kind === 'class').forEach(p => {
+      const slot = t.slots[ttSlotKey(dayKey, p.id)] || [];
+      if(slot.some(e => e.subject === slug)){
+        out.push({tableId: t.id, tableName: t.name, department: t.department, batch: t.batch, periodId: p.id, periodLabel: p.label, start: p.start, end: p.end});
+      }
+    });
+  });
+  return out.sort((a, b) => ttMin(a.start) - ttMin(b.start));
+}
+const attnSessionKey = (s) => s.tableId + '_' + s.periodId;
+const attnDocIdFor = (slug, dateStr, s) => `${slug}__${dateStr}__${s.tableId}__${s.periodId}`;
+// Walks day-by-day (skipping non-teaching days entirely) to find the closest date, in the given direction,
+// that actually has a scheduled session — this is what "Previous/Next session" jump to.
+function attnFindAdjacentSessionDate(slug, fromDateStr, dir){
+  const d = new Date(fromDateStr + 'T00:00:00'); if(isNaN(d)) return null;
+  for(let i = 0; i < 120; i++){
+    d.setDate(d.getDate() + dir);
+    const ds = attnDateStr(d);
+    if(attnSessionsFor(slug, ds).length) return ds;
+  }
+  return null;
+}
+function attnStudentsFor(subj, session){
+  let list = enrolledStudents(subj.slug);
+  if(session.department) list = list.filter(s => s.department === session.department);
+  if(session.batch) list = list.filter(s => s.batch === session.batch);
+  return list.slice().sort((a, b) => (a.name || '').localeCompare(b.name || '', undefined, {sensitivity: 'base'}));
+}
+function attnSegHTML(cur){
+  return `<div class="attn-seg">${ATTN_STATUSES.map(st => `<button type="button" data-v="${st.key}" class="${cur === st.key ? 'active' : ''}">${esc(st.label())}</button>`).join('')}</div>`;
+}
+function attnRenderSummary(list){
+  const counts = {present: 0, absent: 0, late: 0, excused: 0};
+  list.forEach(s => { const v = attnRecords[s.uid] || 'present'; if(counts[v] != null) counts[v]++; });
+  $('attnSummary').innerHTML = ATTN_STATUSES.map(st => `<span>${esc(st.label())}: <b>${counts[st.key]}</b></span>`).join('');
+}
+function attnRenderRows(subj, session){
+  const list = attnStudentsFor(subj, session);
+  $('attnBody').innerHTML = list.length ? list.map(s => `
+    <tr data-uid="${esc(s.uid)}">
+      <td>${stuLink(s.uid, s.name)}</td>
+      <td>${esc(s.department || '—')}</td>
+      <td>${esc(s.batch || '—')}</td>
+      <td>${attnSegHTML(attnRecords[s.uid] || 'present')}</td>
+    </tr>`).join('') : `<tr><td colspan="4" class="mini-note">${esc(L('No enrolled students match this session.', 'لا يوجد طلاب مسجَّلون مطابقون لهذه الحصة.'))}</td></tr>`;
+  attnRenderSummary(list);
+}
+// Shows/hides the parts of the screen that only make sense when the class actually happened —
+// hidden while "Class cancelled" is checked, since there's nothing to mark attendance for then.
+function attnApplyCancelUI(){
+  const cancelled = $('attnCancelChk').checked;
+  $('attnCancelReasonWrap').classList.toggle('hidden', !cancelled);
+  $('attnTableWrap').classList.toggle('hidden', cancelled);
+  $('attnSummary').classList.toggle('hidden', cancelled);
+  $('attnMarkAllBtn').classList.toggle('hidden', cancelled);
+  $('attnSessionBox').classList.toggle('cancelled', cancelled);
+}
+async function renderAttendance(){
+  const subj = curSubj(); if(!subj) return;
+  setBox('attnError', ''); setBox('attnOk', '');
+  if(!$('attnDate').value) $('attnDate').value = attnDateStr(new Date());
+  const box = $('attnSessionBox'), sessWrap = $('attnSessionWrap'), sessSel = $('attnSessionSel');
+  // The timetable has to be loaded before we can know whether a session exists at all.
+  if(!ttLoaded){
+    box.className = 'attn-session-box'; box.textContent = L('Loading the timetable…', 'جارٍ تحميل الجدول…');
+    try{ await ttLoad(); }catch(err){ setBox('attnError', 'Could not load the timetable: ' + (err.message || err)); }
+    if(route.view !== 'subject' || route.tab !== 'attendance' || route.slug !== subj.slug) return;
+  }
+  attnSessions = attnSessionsFor(subj.slug, $('attnDate').value);
+  if(!attnSessions.length){
+    sessWrap.classList.add('hidden');
+    box.className = 'attn-session-box none';
+    box.innerHTML = `<i class="fa-solid fa-calendar-xmark"></i> ${esc(L('No class session for this subject on this date, according to the timetable.', 'لا توجد حصة لهذه المادة في هذا التاريخ وفق الجدول الدراسي.'))}`;
+    $('attnCancelWrap').classList.add('hidden'); $('attnCancelReasonWrap').classList.add('hidden');
+    $('attnTableWrap').classList.add('hidden'); $('attnSummary').innerHTML = ''; $('attnSummary').classList.remove('hidden');
+    $('attnMarkAllBtn').disabled = true; $('attnMarkAllBtn').classList.remove('hidden'); $('attnSaveBtn').disabled = true;
+    attnSessionId = null; attnRecords = {}; attnDocId = null; attnLoadedKey = null; attnCancelled = false;
+    return;
+  }
+  $('attnCancelWrap').classList.remove('hidden');
+  if(attnSessions.length > 1){
+    sessWrap.classList.remove('hidden');
+    sessSel.innerHTML = attnSessions.map(s => `<option value="${esc(attnSessionKey(s))}">${esc(s.periodLabel)} · ${esc(ttFmtTime(s.start))}–${esc(ttFmtTime(s.end))}${s.tableName ? ' · ' + esc(s.tableName) : ''}</option>`).join('');
+    sessSel.value = attnSessions.some(s => attnSessionKey(s) === attnSessionId) ? attnSessionId : attnSessionKey(attnSessions[0]);
+  }else{
+    sessWrap.classList.add('hidden');
+  }
+  const chosen = attnSessions.find(s => attnSessionKey(s) === sessSel.value) || attnSessions[0];
+  attnSessionId = attnSessionKey(chosen);
+  $('attnSaveBtn').disabled = false;
+
+  const loadKey = subj.slug + '|' + $('attnDate').value + '|' + attnSessionId;
+  if(attnLoadedKey !== loadKey){
+    attnDocId = attnDocIdFor(subj.slug, $('attnDate').value, chosen);
+    attnRecords = {}; attnCancelled = false; $('attnCancelReason').value = '';
+    try{
+      const snap = await getDoc(doc(db, ATTENDANCE, attnDocId));
+      if(snap.exists()){ const data = snap.data(); attnRecords = {...(data.records || {})}; attnCancelled = !!data.cancelled; $('attnCancelReason').value = data.cancelReason || ''; }
+    }catch(err){ setBox('attnError', 'Could not load saved attendance: ' + (err.message || err)); }
+    if(route.view !== 'subject' || route.tab !== 'attendance' || route.slug !== subj.slug) return;
+    attnLoadedKey = loadKey;
+  }
+  $('attnCancelChk').checked = attnCancelled;
+  box.className = 'attn-session-box' + (attnCancelled ? ' cancelled' : '');
+  box.innerHTML = attnCancelled
+    ? `<i class="fa-solid fa-ban"></i> ${esc(L('Marked as cancelled:', 'حُدِّدت كملغاة:'))} <b>${esc(chosen.periodLabel)}</b> · ${esc(ttFmtTime(chosen.start))}–${esc(ttFmtTime(chosen.end))}${chosen.tableName ? ' · ' + esc(chosen.tableName) : ''}`
+    : `<i class="fa-solid fa-circle-check"></i> ${esc(L('Scheduled session:', 'الحصة المجدولة:'))} <b>${esc(chosen.periodLabel)}</b> · ${esc(ttFmtTime(chosen.start))}–${esc(ttFmtTime(chosen.end))}${chosen.tableName ? ' · ' + esc(chosen.tableName) : ''}`;
+  attnApplyCancelUI();
+  $('attnMarkAllBtn').disabled = false;
+  attnRenderRows(subj, chosen);
+}
+$('attnDate').addEventListener('change', () => { attnLoadedKey = null; renderAttendance(); });
+$('attnSessionSel').addEventListener('change', () => { attnLoadedKey = null; renderAttendance(); });
+$('attnPrevBtn').addEventListener('click', () => {
+  const subj = curSubj(); if(!subj) return;
+  const d = attnFindAdjacentSessionDate(subj.slug, $('attnDate').value || attnDateStr(new Date()), -1);
+  if(!d){ setBox('attnError', 'No earlier scheduled session found.'); return; }
+  $('attnDate').value = d; attnLoadedKey = null; renderAttendance();
+});
+$('attnNextBtn').addEventListener('click', () => {
+  const subj = curSubj(); if(!subj) return;
+  const d = attnFindAdjacentSessionDate(subj.slug, $('attnDate').value || attnDateStr(new Date()), 1);
+  if(!d){ setBox('attnError', 'No later scheduled session found.'); return; }
+  $('attnDate').value = d; attnLoadedKey = null; renderAttendance();
+});
+$('attnCancelChk').addEventListener('change', () => { attnApplyCancelUI(); });
+$('attnBody').addEventListener('click', (e) => {
+  const b = e.target.closest('.attn-seg button'); if(!b) return;
+  const tr = b.closest('tr[data-uid]'); if(!tr) return;
+  attnRecords[tr.dataset.uid] = b.dataset.v;
+  tr.querySelectorAll('.attn-seg button').forEach(x => x.classList.toggle('active', x === b));
+  const subj = curSubj(), session = attnSessions.find(s => attnSessionKey(s) === attnSessionId);
+  if(subj && session) attnRenderSummary(attnStudentsFor(subj, session));
+});
+$('attnMarkAllBtn').addEventListener('click', () => {
+  const subj = curSubj(), session = attnSessions.find(s => attnSessionKey(s) === attnSessionId); if(!subj || !session) return;
+  attnStudentsFor(subj, session).forEach(s => { attnRecords[s.uid] = 'present'; });
+  attnRenderRows(subj, session);
+});
+$('attnSaveBtn').addEventListener('click', async () => {
+  const subj = curSubj(); const session = attnSessions.find(s => attnSessionKey(s) === attnSessionId);
+  if(!subj || !session || !attnDocId) return;
+  setBox('attnError', ''); setBox('attnOk', '');
+  const cancelled = $('attnCancelChk').checked;
+  await withBusy($('attnSaveBtn'), async () => {
+    try{
+      await setDoc(doc(db, ATTENDANCE, attnDocId), {
+        subjectSlug: subj.slug, subjectName: subj.name, date: $('attnDate').value,
+        tableId: session.tableId, tableName: session.tableName || '', department: session.department || '', batch: session.batch || '',
+        periodId: session.periodId, periodLabel: session.periodLabel, start: session.start, end: session.end,
+        cancelled, cancelReason: cancelled ? ($('attnCancelReason').value || '').trim().slice(0, 200) : '',
+        records: cancelled ? {} : attnRecords, updatedAt: new Date().toISOString(),
+        markedByUid: auth.currentUser ? auth.currentUser.uid : null, markedByName: adminName,
+      }, {merge: true});
+      attnCancelled = cancelled;
+      setBox('attnOk', cancelled ? 'Session marked as cancelled.' : 'Attendance saved.');
+    }catch(err){ setBox('attnError', 'Could not save attendance: ' + (err.message || err)); }
+  });
+});
 
 // ---------------- Results tab ----------------
 function renderResultsTab(){
@@ -4771,7 +5028,7 @@ $('ovwRefreshBtn').addEventListener('click', async () => {
 // (allStudents, allSubjects, resultsStore) — no extra queries except
 // the one-time cohort results load if it has not finished yet.
 // ================================================================
-const STU_TABS = ['summary','ranks','subjects','marks','enrollment'];
+const STU_TABS = ['summary','ranks','subjects','attendance','marks','enrollment'];
 const SP_GRADS = [['#176b4f','#3bab82'],['#0f5a6b','#39a3b8'],['#5b4691','#9a7ad0'],['#a4622c','#dea15e'],['#8a3b5c','#cf6f95'],['#33559a','#6f92d9'],['#4d6b1f','#8db44c'],['#256b63','#5cc1b4']];
 
 // The four groups a student is ranked inside. Batch is the cohort grouping.
@@ -4926,6 +5183,61 @@ function spEnsureData(){
     const err = await loadGlobalResults();
     if(err){ for(const subj of allSubjects){ try{ await ensureSubjectResults(subj.slug); }catch(e){ /* keep going */ } } }
   })().finally(() => { spLoading = false; if(bootstrapped && route.view === 'student') renderStudentProfile(); });
+}
+
+// ---------- attendance data (per-student, across every subject they're enrolled in) ----------
+// Attendance docs are keyed by subject+date+session, not by student, so there's no single doc to
+// fetch here — instead we query the collection by subjectSlug (chunked for Firestore's 10-item
+// "in" limit) and keep only the sessions where this student's uid appears in that doc's `records` map.
+let spAttnData = new Map();     // uid -> {items, error}
+let spAttnLoading = new Set();  // uids currently being fetched
+function spAttnEnsure(s){
+  if(spAttnData.has(s.uid) || spAttnLoading.has(s.uid)) return;
+  const slugs = Array.from(new Set(s.subjectIds || []));
+  if(!slugs.length){ spAttnData.set(s.uid, {items: [], error: null}); return; }
+  spAttnLoading.add(s.uid);
+  (async () => {
+    const items = [];
+    try{
+      for(let i = 0; i < slugs.length; i += 10){
+        const chunk = slugs.slice(i, i + 10);
+        const qs = await getDocs(query(collection(db, ATTENDANCE), where('subjectSlug', 'in', chunk)));
+        qs.forEach(docSnap => {
+          const data = docSnap.data();
+          if(data.cancelled) return;
+          const status = (data.records || {})[s.uid];
+          if(!status) return;
+          items.push({
+            date: data.date, subjectSlug: data.subjectSlug,
+            subjectName: data.subjectName || (subjectBySlug(data.subjectSlug) || {}).name || data.subjectSlug,
+            periodLabel: data.periodLabel || '', start: data.start || '', end: data.end || '',
+            tableName: data.tableName || '', status,
+          });
+        });
+      }
+      items.sort((a, b) => b.date.localeCompare(a.date) || (a.start || '').localeCompare(b.start || ''));
+      spAttnData.set(s.uid, {items, error: null});
+    }catch(err){
+      spAttnData.set(s.uid, {items: [], error: err.message || String(err)});
+    }finally{
+      spAttnLoading.delete(s.uid);
+      if(bootstrapped && route.view === 'student' && route.uid === s.uid) renderStudentProfile();
+    }
+  })();
+}
+function spAttnModel(s){
+  const cached = spAttnData.get(s.uid);
+  if(!cached) return null;
+  const bySubj = new Map();
+  cached.items.forEach(it => {
+    if(!bySubj.has(it.subjectSlug)) bySubj.set(it.subjectSlug, {subjectSlug: it.subjectSlug, subjectName: it.subjectName, items: []});
+    bySubj.get(it.subjectSlug).items.push(it);
+  });
+  const counts = {present: 0, absent: 0, late: 0, excused: 0};
+  cached.items.forEach(it => { if(counts[it.status] != null) counts[it.status]++; });
+  const total = cached.items.length;
+  const rate = total ? (total - counts.absent) / total * 100 : null;
+  return {error: cached.error, items: cached.items, total, counts, rate, subjects: Array.from(bySubj.values()).sort((a, b) => a.subjectName.localeCompare(b.subjectName, undefined, {sensitivity:'base'}))};
 }
 
 // ---------- building blocks ----------
@@ -5179,6 +5491,109 @@ function spEnrollment(s, M){
   ${unk.length || !s.createdAt ? `<p class="sp-note"><i class="fa-solid fa-circle-info"></i>${L('Dates are recorded from now on, when an account is created or a subject is added. Earlier activity shows as not recorded.','تُسجَّل التواريخ من الآن فصاعدًا عند إنشاء الحساب أو إضافة مادة. النشاط السابق يظهر بوصفه غير مسجَّل.')}</p>` : ''}`;
 }
 
+// ---------- Attendance tab ----------
+const spAttnLabel = (key) => (ATTN_STATUSES.find(x => x.key === key) || {label: () => key}).label();
+const spAttnChipClass = {present:'', late:'warn', excused:'gold', absent:'danger'};
+function spAttnChip(status){
+  return `<span class="chip ${spAttnChipClass[status] || 'muted'}">${esc(spAttnLabel(status))}</span>`;
+}
+function spAttendance(s, _M){
+  spAttnEnsure(s);
+  const AM = spAttnModel(s);
+  if(!AM) return spLoadingCard();
+  if(AM.error) return spEmpty('fa-triangle-exclamation', L('Could not load attendance','تعذّر تحميل الحضور'), AM.error);
+  if(!AM.total) return spEmpty('fa-clipboard-check', L('No attendance recorded yet','لا يوجد حضور مسجَّل بعد'), L('Sessions taken for this student\'s subjects will appear here.','ستظهر هنا الحصص التي أُخذ فيها الحضور لمواد هذا الطالب.'));
+  const fsBtn = `<div class="attn-tab-head"><button class="btn btn-secondary btn-sm" data-attn-fs="${esc(s.uid)}"><i class="fa-solid fa-expand"></i> ${L('Full screen','ملء الشاشة')}</button></div>`;
+  const trio = `<div class="sp-trio">
+    <div class="sp-mini-card"><span>${L('Attendance rate','معدل الحضور')}</span><b>${spPctChip(AM.rate)}</b><small>${L('present, late or excused','حاضر أو متأخر أو بعذر')}</small></div>
+    <div class="sp-mini-card"><span>${L('Sessions recorded','الحصص المسجَّلة')}</span><b>${AM.total}</b><small>${L(`across ${AM.subjects.length} subject${AM.subjects.length === 1 ? '' : 's'}`, `عبر ${N(AM.subjects.length, 'subject')}`)}</small></div>
+    <div class="sp-mini-card"><span>${L('Absences','الغياب')}</span><b>${AM.counts.absent}</b><small>${ATTN_STATUSES.filter(x => x.key !== 'absent').map(x => `${esc(x.label())}: ${AM.counts[x.key]}`).join(' · ')}</small></div>
+  </div>`;
+  const subjCards = AM.subjects.map(sub => {
+    const counts = {present:0, absent:0, late:0, excused:0};
+    sub.items.forEach(it => { if(counts[it.status] != null) counts[it.status]++; });
+    const rate = sub.items.length ? (sub.items.length - counts.absent) / sub.items.length * 100 : null;
+    const rows = sub.items.map(it => `<tr>
+        <td>${esc(spDate(it.date))}</td>
+        <td>${esc(it.periodLabel)}${it.start ? ` <small class="sp-ago">${esc(ttFmtTime(it.start))}${it.end ? '–' + esc(ttFmtTime(it.end)) : ''}</small>` : ''}</td>
+        <td>${it.tableName ? esc(it.tableName) : '<span class="sp-dash">—</span>'}</td>
+        <td>${spAttnChip(it.status)}</td></tr>`).join('');
+    return `<section class="card sp-mk">
+      <header class="sp-mk-head">
+        <div><h3 class="sp-h">${esc(sub.subjectName)}</h3><p class="sp-sub" style="margin:0">${L(`${sub.items.length} session${sub.items.length === 1 ? '' : 's'}`, `${sub.items.length} حصة`)}</p></div>
+        <div class="sp-mk-total">${spPctChip(rate)}</div>
+      </header>
+      <div class="table-scroll"><table class="sp-tbl"><thead><tr><th>${L('Date','التاريخ')}</th><th>${L('Session','الحصة')}</th><th>${L('Group','المجموعة')}</th><th>${L('Status','الحالة')}</th></tr></thead><tbody>${rows}</tbody></table></div>
+    </section>`;
+  }).join('');
+  return fsBtn + trio + subjCards;
+}
+
+// ---------- Attendance: distraction-free full-screen table ----------
+// A plain, chrome-free view of every recorded session for one student — no sidebar, no tabs,
+// no hero, nothing but a title line and the table. Layered over the whole app via a fixed
+// overlay, and also asks the browser for real full-screen where that's available.
+function spAttnFsRows(AM){
+  return AM.items.map(it => `<tr>
+      <td>${esc(spDate(it.date))}</td>
+      <td>${esc(it.subjectName)}</td>
+      <td>${esc(it.periodLabel)}${it.start ? ` <small class="sp-ago">${esc(ttFmtTime(it.start))}${it.end ? '–' + esc(ttFmtTime(it.end)) : ''}</small>` : ''}</td>
+      <td>${it.tableName ? esc(it.tableName) : '<span class="sp-dash">—</span>'}</td>
+      <td>${spAttnChip(it.status)}</td></tr>`).join('');
+}
+// The overlay body can hold either freshly-built read-only HTML (student history) or a live,
+// still-wired-up node moved in from elsewhere (the subject's take-attendance card) — in the
+// second case these remember where to put it back on close.
+let attnFsReturnParent = null, attnFsReturnNext = null;
+function attnFsShow(){
+  const ov = $('attnFsOverlay');
+  ov.classList.remove('hidden');
+  if(ov.requestFullscreen) ov.requestFullscreen().catch(() => {});
+  else if(ov.webkitRequestFullscreen) ov.webkitRequestFullscreen();
+}
+function spAttnOpenFullscreen(s){
+  if(!s) return;
+  const AM = spAttnModel(s);
+  if(!AM || !AM.total) return;
+  attnFsReturnParent = null; attnFsReturnNext = null;
+  $('attnFsTitle').textContent = s.name || s.email || '';
+  $('attnFsSub').innerHTML = `${L(`${AM.total} session${AM.total === 1 ? '' : 's'}`, `${AM.total} حصة`)} · ${spPct(AM.rate)} ${L('attendance','حضور')}`;
+  $('attnFsBody').innerHTML = `<table><thead><tr><th>${L('Date','التاريخ')}</th><th>${L('Subject','المادة')}</th><th>${L('Session','الحصة')}</th><th>${L('Group','المجموعة')}</th><th>${L('Status','الحالة')}</th></tr></thead><tbody>${spAttnFsRows(AM)}</tbody></table>`;
+  attnFsShow();
+}
+// Subject "take attendance" screen — moves the actual live card (date picker, session box,
+// roster, save button and all its existing event handlers) into the overlay rather than
+// rebuilding it, so marking attendance works exactly the same in full screen.
+function attnTakeOpenFullscreen(){
+  const subj = curSubj(); if(!subj) return;
+  const card = document.querySelector('#subTab-attendance > .card'); if(!card) return;
+  attnFsReturnParent = card.parentElement;
+  attnFsReturnNext = card.nextElementSibling;
+  $('attnFsTitle').textContent = subj.name;
+  $('attnFsSub').textContent = L('Taking attendance','تسجيل الحضور');
+  $('attnFsBody').innerHTML = '';
+  $('attnFsBody').appendChild(card);
+  attnFsShow();
+}
+$('attnTakeFsBtn').addEventListener('click', attnTakeOpenFullscreen);
+function spAttnCloseFullscreen(){
+  const ov = $('attnFsOverlay');
+  ov.classList.add('hidden');
+  if(document.fullscreenElement) document.exitFullscreen().catch(() => {});
+  else if(document.webkitFullscreenElement && document.webkitExitFullscreen) document.webkitExitFullscreen();
+  if(attnFsReturnParent){
+    const node = $('attnFsBody').firstElementChild;
+    if(node){
+      if(attnFsReturnNext && attnFsReturnNext.parentElement === attnFsReturnParent) attnFsReturnParent.insertBefore(node, attnFsReturnNext);
+      else attnFsReturnParent.appendChild(node);
+    }
+    attnFsReturnParent = null; attnFsReturnNext = null;
+  }
+}
+$('attnFsClose').addEventListener('click', spAttnCloseFullscreen);
+document.addEventListener('keydown', (e) => { if(e.key === 'Escape' && !$('attnFsOverlay').classList.contains('hidden')) spAttnCloseFullscreen(); });
+document.addEventListener('fullscreenchange', () => { if(!document.fullscreenElement && !$('attnFsOverlay').classList.contains('hidden')) spAttnCloseFullscreen(); });
+
 // ---------- page ----------
 function renderStudentProfile(){
   const root = $('spRoot'); if(!root) return;
@@ -5197,10 +5612,11 @@ function renderStudentProfile(){
     ['summary','fa-chart-simple', L('Summary','الملخص'), ''],
     ['ranks','fa-trophy', L('Ranks','الترتيب'), ''],
     ['subjects','fa-book-medical', L('Subjects','المواد'), M ? M.items.length : (s.subjectIds || []).length],
+    ['attendance','fa-clipboard-check', L('Attendance','الحضور'), (() => { const AM = spAttnModel(s); return AM ? AM.total : ''; })()],
     ['marks','fa-list-check', L('Marks','الدرجات'), ''],
     ['enrollment','fa-clock-rotate-left', L('Enrollment','التسجيل'), ''],
   ];
-  const body = {summary:spSummary, ranks:spRanks, subjects:spSubjects, marks:spMarks, enrollment:spEnrollment};
+  const body = {summary:spSummary, ranks:spRanks, subjects:spSubjects, attendance:spAttendance, marks:spMarks, enrollment:spEnrollment};
   const warn = (M && !globalLoaded) ? `<div class="warn-box show" style="margin-bottom:14px">${L('Some results could not be loaded, so ranks may be incomplete. Try reloading.','تعذّر تحميل بعض النتائج، لذا قد يكون الترتيب ناقصًا. جرّب إعادة التحميل.')}</div>` : '';
   root.innerHTML = `
     <div class="crumbs"><a href="#/students"><i class="fa-solid fa-arrow-left sp-flip"></i> ${L('Students','الطلاب')}</a><span>/</span><b>${esc(s.name || s.email)}</b></div>
@@ -5230,10 +5646,12 @@ $('spRoot').addEventListener('click', async (e) => {
   const r = e.target.closest('[data-sp-refresh]');
   if(r){
     setBusy(r, true);
-    try{ await loadAllStudents(); await loadGlobalResults(true); spTried = true; }catch(err){ console.error('Profile reload failed', err); }
+    try{ await loadAllStudents(); await loadGlobalResults(true); spTried = true; spAttnData.delete(route.uid); }catch(err){ console.error('Profile reload failed', err); }
     setBusy(r, false);
     if(route.view === 'student') renderStudentProfile();
   }
+  const fs = e.target.closest('[data-attn-fs]');
+  if(fs){ spAttnOpenFullscreen(studentByUid(fs.dataset.attnFs)); return; }
 });
 // Text built with L() is language-specific, so redraw the profile when the language is switched.
 document.addEventListener('click', (e) => {
@@ -6349,7 +6767,7 @@ $('ttSaveConfigBtn').addEventListener('click', async () => {
 const PERM_GROUPS = [
   {id:'students', title:'Student operations', short:'Students', items:[['students.all','All students'],['students.bulk','Bulk import'],['students.individual','Add individually']]},
   {id:'teachers', title:'Teacher operations', short:'Teachers', items:[['teachers.all','All teachers'],['teachers.bulk','Bulk import'],['teachers.individual','Add individually']]},
-  {id:'subject',  title:'Access to subjects', short:'Subjects', items:[['subject.overview','Overview'],['subject.roster','Roster'],['subject.results','Results'],['subject.grading','Grading'],['subject.settings','Settings'],['subject.enroll','Enroll']]},
+  {id:'subject',  title:'Access to subjects', short:'Subjects', items:[['subject.overview','Overview'],['subject.roster','Roster'],['subject.attendance','Attendance'],['subject.results','Results'],['subject.grading','Grading'],['subject.settings','Settings'],['subject.enroll','Enroll']]},
   {id:'timetable', title:'Timetable', short:'Timetable', items:[['timetable.view','View timetables'],['timetable.edit','Edit timetables'],['timetable.config','Configure days & periods']]},
   {id:'admins',   title:'Administration',     short:'Admins',   items:[['admins.manage','Manage admins'],['admins.log','View admin activity log']]},
 ];
@@ -6850,5 +7268,14 @@ function ensureScrollable(root){
 })();
 
 </script>
+
+<!-- ============ Attendance: clean full-screen table (no sidebar, no tabs, no hero) ============ -->
+<div id="attnFsOverlay" class="attn-fs-overlay hidden">
+  <div class="attn-fs-bar">
+    <div><h2 id="attnFsTitle"></h2><p id="attnFsSub"></p></div>
+    <button class="btn btn-secondary btn-sm" id="attnFsClose"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <div class="attn-fs-body" id="attnFsBody"></div>
+</div>
 </body>
 </html>
