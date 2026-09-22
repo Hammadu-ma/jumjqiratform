@@ -8,6 +8,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Amiri:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 :root{
   --bg:#f8f7f3; --surface:#fff; --surface-2:#fbfaf7; --ink:#17231f; --muted:#667570; --faint:#9aa8a3;
@@ -80,6 +82,8 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.34;ba
 .global-product{font-size:12px;font-weight:850;letter-spacing:-.02em}.global-product span{font-size:8px;letter-spacing:.13em;color:#a27b28;margin-left:4px}.global-context{font-size:9px;color:#8a9097;margin-top:1px}
 .command-search{height:38px;max-width:580px;margin:auto;display:flex;align-items:center;gap:10px;padding:0 12px;border:1px solid #e4dfd4;background:#faf9f6;border-radius:10px;color:#9aa6a2;font-size:11px}.command-search i{color:#648077}.command-search kbd{margin-left:auto;font-size:9px;border:1px solid #d5dedb;background:#fff;border-radius:5px;padding:3px 6px;color:#8a9097}
 .global-actions{display:flex;align-items:center;gap:9px}.admin-avatar{width:34px;height:34px;border-radius:10px;background:#dbeee8;color:#07543a;display:grid;place-items:center;font-size:11px;font-weight:850;border:1px solid #c8e2d9}
+.icon-btn{position:relative;width:34px;height:34px;border-radius:10px;display:grid;place-items:center;color:#50615b;background:#fff;border:1px solid var(--line-strong);text-decoration:none;cursor:pointer;transition:.15s ease}.icon-btn:hover{background:var(--surface-2);color:var(--brand-2)}
+.notif-badge{position:absolute;top:-5px;right:-5px;min-width:16px;height:16px;padding:0 4px;border-radius:99px;background:var(--danger);color:#fff;font-size:9px;font-weight:800;line-height:16px;text-align:center;border:2px solid var(--surface)}
 .main-scroll{max-width:1500px;padding:38px clamp(22px,3.5vw,52px) 80px}.screen.active{animation:screenIn .24s ease-out}@keyframes screenIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
 .page-head{margin-bottom:30px;align-items:flex-start}.page-title{font-size:clamp(2rem,3.1vw,3rem);line-height:1.02;letter-spacing:-.065em;font-weight:850;margin-bottom:9px}.page-sub{font-size:12px;max-width:680px;color:#71807b}.page-head-meta{padding-top:8px;font-size:9px;letter-spacing:.15em;font-weight:800;color:#98a4a0}
 .section-label{font-size:9px;letter-spacing:.16em;color:#828990;margin-bottom:10px}.tabs{gap:3px;border:0;background:#edeae2;padding:4px;border-radius:11px;margin-bottom:18px;width:max-content;max-width:100%}.tab-btn{padding:8px 14px;border:0!important;border-radius:8px;font-size:11px;color:#70807b}.tab-btn.active{background:#fff;color:#0b6b4b;box-shadow:0 1px 3px rgba(0,0,0,.08)}
@@ -161,7 +165,7 @@ tr:not(.editing) .stuSaveBtn{display:none}
   .global-topbar{height:58px;padding:0 12px;grid-template-columns:auto 1fr auto;gap:8px}
   .global-brandline{min-width:0}.global-logo{width:30px!important;height:30px!important}.global-product{font-size:10px!important}.global-context{display:none!important}
   .global-center{display:block!important;min-width:0}.command-search{height:36px!important;max-width:none!important;padding:0 9px!important}.command-search kbd{display:none}
-  .global-actions{gap:5px}.admin-avatar{width:31px!important;height:31px!important}
+  .global-actions{gap:5px}.admin-avatar{width:31px!important;height:31px!important}.icon-btn{width:31px!important;height:31px!important}
   .main-scroll{padding:20px 12px 90px!important}
   .page-head{display:block!important;margin-bottom:16px!important}.page-title{font-size:27px!important}.page-sub{font-size:11px!important}
   .card{border-radius:15px!important;padding:13px!important}.toolbar{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:10px!important}
@@ -731,6 +735,134 @@ th.sp-open-cell,td.sp-open-cell{width:46px;padding-inline-end:0!important}
 /* card numbers load lazily */
 .subj-card.no-anim{animation:none}
 .subj-card.is-loading .subj-avg,.subj-card.is-loading .subj-metrics div:nth-child(2) b{color:transparent;background:linear-gradient(90deg,#ece6d2,#f7f2e3,#ece6d2);background-size:200% 100%;animation:shimmer 1.2s linear infinite;border-radius:6px}
+
+/* ===== timetable ===== */
+.seg{display:inline-flex;background:#ebe4d0;border-radius:10px;padding:3px;gap:2px}
+.seg button{border:0;background:transparent;font-weight:700;font-size:12px;padding:8px 16px;border-radius:8px;cursor:pointer;color:#5c5a4c;font-family:inherit}
+.seg button.active{background:#0a3d31;color:#fff}
+.tt-check{display:flex;gap:8px;align-items:center;font-size:12px;margin:10px 0;cursor:pointer;text-transform:none;letter-spacing:0}
+.tt-check input{width:auto!important;min-width:0!important}
+.tt-config-grid{display:grid;grid-template-columns:minmax(0,260px) minmax(0,1fr);gap:24px;align-items:start}
+@media(max-width:900px){.tt-config-grid{grid-template-columns:minmax(0,1fr)}}
+.tt-days{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.tt-dayrow{display:flex;justify-content:space-between;align-items:center;border:1px solid var(--line);border-radius:10px;padding:8px 12px;background:#fbf9f1}
+.tt-dayrow.off{opacity:.55}
+.tt-dayrow label{display:flex;gap:9px;align-items:center;font-size:13px;font-weight:600;cursor:pointer}
+.tt-dayrow input{width:auto!important;min-width:0!important}
+.tt-mv{display:flex;gap:6px;align-items:center;white-space:nowrap}
+.tt-mv .linkbtn{font-size:15px;padding:2px 6px}.tt-mv .linkbtn:disabled{opacity:.3;cursor:default}
+tr.brk td{background:#fbf3dc}
+.tt-palette{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.tt-chip{--h:200;display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:start;cursor:grab;background:hsl(var(--h) 55% 94%);border:1px solid hsl(var(--h) 40% 78%);border-inline-start:4px solid hsl(var(--h) 50% 45%);border-radius:10px;padding:7px 12px;font-family:inherit;min-width:130px}
+.tt-chip b{font-size:12px;color:#1c2b26}.tt-chip small{font-size:10px;color:#5d6a64}
+.tt-chip.active{outline:2px solid #0a3d31;box-shadow:0 6px 16px rgba(10,61,49,.18)}
+.tt-noteacher{color:#b3641b;font-weight:700}
+.tt-brushnote{display:flex;gap:10px;align-items:center;margin-top:8px}
+.tt-title{font-weight:800;font-size:1.05rem;letter-spacing:-.02em;margin-bottom:12px}
+.tt-section+.tt-section{margin-top:30px;padding-top:24px;border-top:2px dashed var(--line-strong)}
+.tt-grid{border-collapse:separate;border-spacing:0;width:100%;min-width:640px}
+.tt-grid th,.tt-grid td{border-bottom:1px solid var(--line);border-inline-end:1px solid var(--line)}
+.tt-grid thead th{position:sticky;top:0;background:#f6f1e2;padding:10px 8px;text-align:center;font-size:11px;text-transform:uppercase;letter-spacing:.08em;z-index:2}
+.tt-grid .tt-corner{text-align:start}
+.tt-period{position:sticky;inset-inline-start:0;background:#fbf8ee;z-index:1;text-align:start;padding:8px 12px;min-width:120px;white-space:nowrap}
+.tt-period b{display:block;font-size:12px}.tt-period small{font-size:10px;color:var(--muted);font-weight:500}
+.tt-cell{min-width:170px;height:78px;padding:6px;vertical-align:top;background:#fffdf8;position:relative}
+.tt-cell.editable{cursor:pointer}
+.tt-cell.editable:hover{background:#f7f3e4}
+.tt-cell.brush{cursor:copy}
+.tt-cell.drop{background:#e1f1e8;outline:2px dashed #0b6b4c;outline-offset:-3px}
+.tt-cell.tt-free{background:repeating-linear-gradient(135deg,#fbfaf3,#fbfaf3 8px,#f5f1e2 8px,#f5f1e2 16px)}
+.tt-add{position:absolute;inset:0;display:grid;place-items:center;font-size:20px;color:#bdb5a0;opacity:0;transition:.15s;pointer-events:none}
+.tt-cell.editable:hover .tt-add{opacity:1}
+.tt-entry{--h:200;position:relative;background:hsl(var(--h) 55% 93%);border:1px solid hsl(var(--h) 40% 78%);border-inline-start:4px solid hsl(var(--h) 50% 45%);border-radius:10px;padding:6px 26px 6px 8px;margin-bottom:5px;font-size:11.5px;line-height:1.35;cursor:pointer;text-align:start}
+[dir=rtl] .tt-entry{padding:6px 8px 6px 26px}
+.tt-entry b{display:block;color:#1c2b26}.tt-entry small{display:block;color:#56645e;font-size:10.5px}
+.tt-room{color:#6b6a55!important}
+.tt-entry.tt-conflict{border-color:#d9534f;background:#fdecea;box-shadow:0 0 0 1px #d9534f}
+.tt-entry.tt-missing{opacity:.6;border-style:dashed}
+.tt-warn{position:absolute;top:5px;inset-inline-end:6px;color:#d9534f;font-size:11px}
+.tt-x{position:absolute;top:3px;inset-inline-end:4px;border:0;background:rgba(255,255,255,.85);border-radius:6px;font-size:14px;line-height:1;width:20px;height:20px;cursor:pointer;color:#8b4a4a;opacity:0;transition:.15s}
+.tt-entry:hover .tt-x{opacity:1}
+.tt-entry:hover .tt-warn{display:none}
+.tt-break td{background:repeating-linear-gradient(135deg,#faf2d8,#faf2d8 10px,#f6ebc8 10px,#f6ebc8 20px);text-align:center;font-size:11px;font-weight:700;color:#8a6b1c;letter-spacing:.14em;text-transform:uppercase;height:34px}
+.tt-modal{position:fixed;inset:0;background:rgba(6,20,16,.55);display:grid;place-items:center;z-index:9999;padding:16px}
+.tt-dialog{background:#fffdf7;border-radius:18px;padding:22px 24px;width:min(460px,100%);max-height:92vh;overflow:auto;box-shadow:0 30px 70px rgba(0,0,0,.35)}
+.tt-dialog-head{display:flex;flex-direction:column;gap:2px;margin-bottom:14px}
+.tt-dialog-head b{font-size:15px}.tt-dialog-head small{color:var(--muted);font-size:12px}
+@media(max-width:860px){.tt-cell{min-width:150px}}
+@media print{
+  body *{visibility:hidden}
+  #ttGridWrap,#ttGridWrap *{visibility:visible}
+  #ttGridWrap{position:absolute;inset:0 auto auto 0;width:100%;border:0;box-shadow:none;background:#fff}
+  .tt-x,.tt-add{display:none!important}
+  .tt-grid thead th,.tt-period{position:static}
+  .table-scroll{overflow:visible!important}
+}
+
+/* ===== timetable PDF export ===== */
+#ttPdfExportRoot{position:fixed;left:-99999px;top:0;z-index:-1;pointer-events:none}
+#tblPdfExportRoot{position:fixed;left:-99999px;top:0;z-index:-1;pointer-events:none}
+.pdf-theme-emerald{--pdf-a:#0e3c2d;--pdf-b:#176b4f;--pdf-c:#c99a2e;--pdf-soft:#eaf5ef}
+.pdf-theme-ocean{--pdf-a:#0b3554;--pdf-b:#12608f;--pdf-c:#57c2e0;--pdf-soft:#e9f4fa}
+.pdf-theme-royal{--pdf-a:#3a1660;--pdf-b:#6c33a6;--pdf-c:#d9a6ff;--pdf-soft:#f4ecfb}
+.pdf-theme-sunset{--pdf-a:#7a2323;--pdf-b:#c85a2e;--pdf-c:#ffce7a;--pdf-soft:#fdf1e6}
+.pdf-theme-slate{--pdf-a:#1c242b;--pdf-b:#3d4a56;--pdf-c:#9db3c2;--pdf-soft:#eef1f3}
+.pdf-doc{width:1520px;background:#f3eee1;color:#1c2b26;font-family:'Inter',sans-serif;padding:26px}
+.pdf-doc[dir="rtl"]{font-family:'IBM Plex Sans Arabic','Inter',sans-serif}
+.pdf-page{width:100%;background:#f6f2e6;position:relative;isolation:isolate}
+.pdf-page::before{content:'';position:absolute;inset:0;z-index:0;background-image:var(--pattern);background-size:88px 88px;opacity:.35;mask-image:radial-gradient(ellipse at center,black 55%,transparent 96%)}
+.pdf-page>*{position:relative;z-index:1}
+.pdf-banner{position:relative;overflow:hidden;border-radius:22px;padding:32px 40px;margin:0 0 24px;background:linear-gradient(135deg,var(--pdf-a),var(--pdf-b));color:#fff;display:flex;align-items:center;gap:24px}
+.pdf-banner::before{content:'';position:absolute;top:-70px;inset-inline-end:-60px;width:230px;height:230px;border-radius:50%;background:rgba(255,255,255,.10)}
+.pdf-banner::after{content:'';position:absolute;bottom:-100px;inset-inline-start:140px;width:270px;height:270px;border-radius:50%;background:rgba(255,255,255,.07)}
+.pdf-banner-logo{width:72px;height:72px;flex:0 0 auto;border-radius:18px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.4);display:grid;place-items:center;position:relative;z-index:1;overflow:hidden}
+.pdf-banner-logo img{width:100%;height:100%;object-fit:contain;padding:6px;background:#fff}
+.pdf-banner-text{position:relative;z-index:1;flex:1;min-width:0}
+.pdf-eyebrow{font-size:12px;letter-spacing:.16em;text-transform:uppercase;opacity:.88;font-weight:700;margin-bottom:5px}
+.pdf-title{font-size:29px;font-weight:800;letter-spacing:-.02em;line-height:1.18;margin-bottom:5px;word-break:break-word}
+.pdf-subtitle{font-size:15px;opacity:.92;font-weight:600}
+.pdf-banner-badge{position:relative;z-index:1;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.4);border-radius:12px;padding:10px 18px;text-align:center;flex:0 0 auto}
+.pdf-banner-badge b{display:block;font-size:15px;white-space:nowrap}
+.pdf-banner-badge small{display:block;font-size:10px;opacity:.85;text-transform:uppercase;letter-spacing:.08em;margin-top:3px}
+.pdf-section-title{font-size:19px;font-weight:800;margin:0 0 3px;color:var(--pdf-b)}
+.pdf-section-meta{font-size:12.5px;color:#66756f;margin-bottom:14px;font-weight:600}
+.pdf-slim-head{display:flex;align-items:baseline;gap:10px;padding:10px 16px;margin:0 0 18px;border-radius:12px;background:var(--pdf-soft);border-inline-start:4px solid var(--pdf-b)}
+.pdf-slim-head .pdf-slim-title{font-size:15px;font-weight:800;color:var(--pdf-a)}
+.pdf-slim-head .pdf-slim-page{font-size:11px;font-weight:700;color:var(--pdf-b);opacity:.75;margin-inline-start:auto}
+/* logo dropzone in the export modal */
+.tt-pdf-logo-drop{position:relative;display:flex;align-items:center;justify-content:center;height:96px;border:1.5px dashed #cabe98;border-radius:12px;background:#fbf9f1;cursor:pointer;overflow:hidden;transition:border-color .15s,background .15s}
+.tt-pdf-logo-drop:hover,.tt-pdf-logo-drop.drag{border-color:#a8801f;background:#f8efd6}
+.tt-pdf-logo-empty{display:flex;flex-direction:column;align-items:center;gap:5px;color:#8a7f61;font-size:11.5px;font-weight:600}
+.tt-pdf-logo-empty i{font-size:18px;color:#a8801f}
+.tt-pdf-logo-drop img{max-width:100%;max-height:100%;object-fit:contain;padding:8px}
+.tt-pdf-logo-remove{position:absolute;top:6px;inset-inline-end:6px;width:22px;height:22px;border-radius:50%;border:none;background:rgba(20,20,20,.55);color:#fff;display:grid;place-items:center;cursor:pointer;font-size:10px}
+.tt-pdf-logo-remove:hover{background:rgba(20,20,20,.8)}
+.tt-pdf-toggle{display:flex;align-items:center;gap:9px;font-size:12.5px;font-weight:600;color:#4a4638;cursor:pointer;user-select:none}
+.tt-pdf-toggle input{width:16px;height:16px;accent-color:#a8801f}
+.tt-dialog-wide{padding:28px 32px}
+.tt-dialog-wide .tt-dialog-head b{font-size:17px}
+.tt-dialog-wide .field{margin-bottom:16px}
+.tt-pdf-cols-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:9px 16px;padding:13px 15px;border:1px solid #e8e4d9;border-radius:10px;background:#fbfaf7}
+.tt-pdf-cols-grid .tt-pdf-toggle{font-weight:500}
+.tt-pdf-colbar{display:flex;gap:12px;margin-top:6px}
+.tt-pdf-colbar button{background:none;border:0;padding:0;font-size:11px;font-weight:700;color:var(--brand);cursor:pointer;text-decoration:underline}
+/* generic table export (results / students) */
+.pdf-doc .pdf-plain-table{width:100%;border-collapse:separate;border-spacing:0;border-radius:14px;overflow:hidden;border:1px solid #e7e3d6}
+.pdf-doc .pdf-plain-table thead th{background:var(--pdf-b);color:#fff;padding:15px 18px;text-align:start;font-size:17px;font-weight:700;white-space:nowrap}
+.pdf-doc .pdf-plain-table tbody td{padding:14px 18px;font-size:16px;line-height:1.4;border-top:1px solid #ece7d8;vertical-align:middle;color:#1c2b26}
+.pdf-doc .pdf-plain-table tbody tr:nth-child(even) td{background:#fbfbf7}
+.pdf-doc .pdf-plain-table td span,.pdf-doc .pdf-plain-table td a{color:inherit;text-decoration:none}
+.pdf-doc .pdf-plain-table .subtext{font-size:13.5px;color:#84948d}
+.pdf-doc .tt-grid{width:100%;border-collapse:separate;border-spacing:0;border-radius:14px;overflow:hidden;border:1px solid #e7e3d6;min-width:0}
+.pdf-doc .tt-grid thead th{background:var(--pdf-b);color:#fff;padding:12px 8px}
+.pdf-doc .tt-grid thead th.tt-corner{background:var(--pdf-a)}
+.pdf-doc .tt-period{background:var(--pdf-soft)!important}
+.pdf-doc tbody tr:nth-child(even) .tt-cell{background:#fbfbf7}
+.pdf-doc .tt-cell{min-width:0;height:auto;min-height:60px}
+.pdf-doc .tt-entry{box-shadow:0 1px 3px rgba(0,0,0,.08);padding-inline-end:8px}
+.pdf-doc .tt-break td{background:linear-gradient(135deg,var(--pdf-soft),#fff);color:var(--pdf-b)}
+.pdf-footer{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:18px;padding-top:14px;border-top:2px solid var(--pdf-soft);font-size:11.5px;color:#7a887f;font-weight:600}
+.pdf-footer b{color:var(--pdf-b);font-weight:800;letter-spacing:.04em}
 </style>
 <script>try{if(localStorage.getItem("jumedLang")==="ar"){var r=document.documentElement;r.dir="rtl";r.lang="ar";r.classList.add("lang-ar")}}catch(e){}</script>
 </head>
@@ -747,7 +879,7 @@ th.sp-open-cell,td.sp-open-cell{width:46px;padding-inline-end:0!important}
     <div class="splash-loader"><span></span></div>
     <div class="splash-status"><i class="fa-solid fa-shield-halved"></i><span>Preparing your workspace…</span></div>
   </div>
-  <div class="splash-footer">Jimma University · Medical Education</div>
+  <div class="splash-footer">JUMJ</div>
 </div>
 
 <!-- ============ Login screen (shown only when signed out) ============ -->
@@ -755,7 +887,7 @@ th.sp-open-cell,td.sp-open-cell{width:46px;padding-inline-end:0!important}
   <section class="login-visual">
     <div class="login-visual-content">
       <div class="bismillah">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
-      <div class="login-kicker"><i class="fa-solid fa-moon"></i> Jimma University · Medical Education</div>
+      <div class="login-kicker"><i class="fa-solid fa-moon"></i> JUMJ</div>
       <h1>JUMJ</h1>
       <p>A platform for managing subjects, students and results with trust and clarity.</p>
     </div>
@@ -767,7 +899,7 @@ th.sp-open-cell,td.sp-open-cell{width:46px;padding-inline-end:0!important}
       <div class="mark"><svg class="logo-svg" viewBox="0 0 48 48" aria-hidden="true"><g class="star"><rect x="7" y="7" width="34" height="34" rx="2"/><rect x="7" y="7" width="34" height="34" rx="2" transform="rotate(45 24 24)"/></g><circle class="disc" cx="24" cy="24" r="12.5"/><circle class="moon" cx="24" cy="24" r="9"/><circle class="disc" cx="27.5" cy="22" r="8"/><path class="moon" d="M31 17.5l.9 2.4 2.5.1-2 1.6.7 2.4-2.1-1.4-2.1 1.4.7-2.4-2-1.6 2.5-.1z"/></svg></div><div><div class="name">JUMJ</div><span class="tag">Academic admin workspace</span></div>
     </div>
     <h2>Welcome back</h2>
-    <p class="intro">Sign in to continue to the medical education admin console.</p>
+    <p class="intro">Sign in to continue to the JUMJ admin console.</p>
     <div class="field">
       <label for="adminEmail">Admin email</label>
       <input type="email" id="adminEmail" autocomplete="username" style="max-width:none;">
@@ -805,6 +937,9 @@ th.sp-open-cell,td.sp-open-cell{width:46px;padding-inline-end:0!important}
       <a class="nav-item" href="#/subjects" data-route="subjects" data-perm-any="subject." title="Subjects">
         <span class="nav-icon"><i class="fa-solid fa-book-medical"></i></span><span class="nav-label">Subjects</span>
       </a>
+      <a class="nav-item" href="#/timetable" data-route="timetable" data-perm-any="timetable." title="Timetable">
+        <span class="nav-icon"><i class="fa-solid fa-calendar-week"></i></span><span class="nav-label">Timetable</span>
+      </a>
       <a class="nav-item" href="#/overview" data-route="overview" data-perm="subject.overview" title="Overview">
         <span class="nav-icon"><i class="fa-solid fa-chart-column"></i></span><span class="nav-label">Overview</span>
       </a>
@@ -834,7 +969,7 @@ th.sp-open-cell,td.sp-open-cell{width:46px;padding-inline-end:0!important}
     <div class="global-topbar">
       <div class="global-brandline">
         <div class="global-logo"><svg class="logo-svg" viewBox="0 0 48 48" aria-hidden="true"><g class="star"><rect x="7" y="7" width="34" height="34" rx="2"/><rect x="7" y="7" width="34" height="34" rx="2" transform="rotate(45 24 24)"/></g><circle class="disc" cx="24" cy="24" r="12.5"/><circle class="moon" cx="24" cy="24" r="9"/><circle class="disc" cx="27.5" cy="22" r="8"/><path class="moon" d="M31 17.5l.9 2.4 2.5.1-2 1.6.7 2.4-2.1-1.4-2.1 1.4.7-2.4-2-1.6 2.5-.1z"/></svg></div>
-        <div><div class="global-product">JUMJ <span>ADMIN</span></div><div class="global-context">Medical Education Operations</div></div>
+        <div><div class="global-product">JUMJ <span>ADMIN</span></div><div class="global-context">JUMJ Operations</div></div>
       </div>
       <div class="global-center">
         <div class="command-search"><i class="fa-solid fa-magnifying-glass"></i><input id="globalSearch" type="search" autocomplete="off" placeholder="Search subjects, students, teachers…" aria-label="Global search"><kbd>Ctrl K</kbd><div class="global-search-results" id="globalSearchResults"></div></div>
@@ -842,6 +977,9 @@ th.sp-open-cell,td.sp-open-cell{width:46px;padding-inline-end:0!important}
       <div class="global-actions">
         <div class="lang-switch" role="group" aria-label="Language"><button type="button" data-lang="ar" class="ar">العربية</button><button type="button" data-lang="en">English</button></div>
         <div class="hijri-chip" id="hijriChip"></div>
+        <a class="icon-btn" id="admLogBell" href="#/admins" data-perm="admins.log" title="Admin activity log">
+          <i class="fa-solid fa-bell"></i><span class="notif-badge hidden" id="admLogBellBadge">0</span>
+        </a>
         <div class="admin-avatar" id="adminAvatar">A</div>
       </div>
     </div>
@@ -993,6 +1131,7 @@ th.sp-open-cell,td.sp-open-cell{width:46px;padding-inline-end:0!important}
               <div class="toolbar-actions">
                 <span class="summary-row" style="margin:0;align-self:center;"><b id="enrCount">0</b></span>
                 <button class="btn btn-secondary btn-sm" id="enrExportBtn"><i class="fa-solid fa-download"></i> Export CSV</button>
+                <button class="btn btn-secondary btn-sm" id="enrPdfBtn"><i class="fa-solid fa-file-pdf"></i> Export PDF</button>
                 <button class="btn btn-danger btn-sm" id="enrRemoveBtn" disabled>Remove selected</button>
               </div>
             </div>
@@ -1029,6 +1168,7 @@ th.sp-open-cell,td.sp-open-cell{width:46px;padding-inline-end:0!important}
                   <div class="toolbar-actions">
                     <span class="summary-row" style="margin:0;align-self:center;"><b id="resCount">0</b></span>
                     <button class="btn btn-gold btn-sm" id="resSaveAllBtn" disabled>Save all changes</button>
+                    <button class="btn btn-secondary btn-sm" id="resPdfBtn"><i class="fa-solid fa-file-pdf"></i> Export PDF</button>
                     <button class="btn btn-secondary btn-sm" id="resRefreshBtn"><i class="fa-solid fa-rotate"></i> Refresh</button>
                   </div>
                 </div>
@@ -1289,6 +1429,7 @@ th.sp-open-cell,td.sp-open-cell{width:46px;padding-inline-end:0!important}
                   <span class="summary-row" style="margin:0;align-self:center;"><b id="stuCount">0</b></span>
                   <button class="btn btn-gold btn-sm" id="stuSaveAllBtn" disabled>Save all changes</button>
                   <button class="btn btn-danger btn-sm" id="stuDeleteBtn" disabled>Delete selected</button>
+                  <button class="btn btn-secondary btn-sm" id="stuPdfBtn"><i class="fa-solid fa-file-pdf"></i> Export PDF</button>
                   <button class="btn btn-secondary btn-sm" id="stuRefreshBtn"><i class="fa-solid fa-rotate"></i> Refresh</button>
                 </div>
               </div>
@@ -1385,45 +1526,187 @@ th.sp-open-cell,td.sp-open-cell{width:46px;padding-inline-end:0!important}
       <div class="main-scroll"><div id="spRoot"></div></div>
     </div>
 
+    <!-- ================= SCREEN: Timetable ================= -->
+    <div class="screen" id="screen-timetable">
+      <div class="main-scroll">
+        <div class="page-head"><div><p class="page-title">Timetable</p><p class="page-sub">Choose the days and periods once, then drop subjects into the grid — each subject brings its teacher automatically.</p></div><div class="page-head-meta">SCHEDULE</div></div>
+
+        <div class="error-box" id="ttError"></div>
+        <div class="ok-box" id="ttOk"></div>
+        <div class="card hidden" id="ttLoading"><div class="loading-row"><span class="spin"></span> Loading…</div></div>
+
+        <div id="ttBody">
+          <div class="toolbar tt-toolbar">
+            <div class="filter-row" style="flex:1">
+              <div class="field" id="ttSelectWrap" style="max-width:340px"><label for="ttSelect">Timetable</label><select id="ttSelect"></select></div>
+              <div class="field hidden" id="ttTeacherWrap" style="max-width:280px"><label for="ttTeacher">Teacher</label><select id="ttTeacher"></select></div>
+              <div class="field" style="max-width:230px"><label>View</label>
+                <div class="seg" id="ttMode"><button type="button" data-mode="class" class="active">Group</button><button type="button" data-mode="teacher">Teacher</button></div>
+              </div>
+            </div>
+            <div class="toolbar-actions">
+              <span class="chip hidden" id="ttSaveState"></span>
+              <span class="chip warn hidden" id="ttConflictChip"></span>
+              <button class="btn btn-secondary btn-sm" id="ttPrintBtn"><i class="fa-solid fa-print"></i> Print</button>
+              <button class="btn btn-gold btn-sm" id="ttPdfBtn"><i class="fa-solid fa-file-pdf"></i> Export PDF</button>
+              <button class="btn btn-secondary btn-sm" id="ttRefreshBtn"><i class="fa-solid fa-rotate"></i> Refresh</button>
+              <button class="btn btn-secondary btn-sm" id="ttSettingsBtn" data-perm="timetable.config">Timetable settings</button>
+              <button class="btn btn-secondary btn-sm" id="ttConfigBtn" data-perm="timetable.config"><i class="fa-solid fa-sliders"></i> Days &amp; periods</button>
+              <button class="btn btn-gold btn-sm" id="ttNewBtn" data-perm="timetable.config"><i class="fa-solid fa-plus"></i> New timetable</button>
+            </div>
+          </div>
+
+          <!-- create / edit a timetable -->
+          <div class="card hidden" id="ttFormCard" style="margin-bottom:16px">
+            <div class="section-label" id="ttFormTitle">New timetable</div>
+            <div class="field-row">
+              <div class="field"><label for="ttFormName">Name</label><input type="text" id="ttFormName" placeholder="e.g. Year 1 — Medicine"></div>
+              <div class="field"><label for="ttFormDept">Department</label><select id="ttFormDept"></select></div>
+              <div class="field"><label for="ttFormBatch">Batch</label><select id="ttFormBatch"></select></div>
+            </div>
+            <div class="btn-row">
+              <button class="btn btn-gold" id="ttFormSave">Create</button>
+              <button class="btn btn-secondary" id="ttFormDup">Duplicate</button>
+              <button class="btn btn-danger" id="ttFormDel">Delete</button>
+              <button class="btn btn-secondary" id="ttFormClose">Close</button>
+            </div>
+            <div class="error-box" id="ttFormError"></div>
+          </div>
+
+          <!-- days, periods and options -->
+          <div class="card hidden" id="ttConfigCard" style="margin-bottom:16px">
+            <div class="section-label">Days &amp; periods</div>
+            <div class="tt-config-grid">
+              <div>
+                <p class="card-title">Irshad days</p>
+                <p class="hint">Tick the days that have classes and put them in order.</p>
+                <div class="btn-row" style="margin-top:0" id="ttPresets"></div>
+                <div class="tt-days" id="ttDaysList"></div>
+              </div>
+              <div>
+                <p class="card-title">Periods &amp; breaks</p>
+                <div class="table-scroll"><table style="min-width:520px">
+                  <thead><tr><th>Label</th><th>Start</th><th>End</th><th>Type</th><th></th></tr></thead>
+                  <tbody id="ttPeriodsBody"></tbody>
+                </table></div>
+                <div class="btn-row"><button class="btn btn-secondary btn-sm" id="ttAddPeriodBtn" type="button">+ Add period</button><button class="btn btn-secondary btn-sm" id="ttAddBreakBtn" type="button">+ Add break</button></div>
+                <details class="maint" style="margin-top:12px">
+                  <summary>Generate schedule</summary>
+                  <div class="maint-body">
+                    <p class="hint">Builds the periods for you. Subjects already scheduled stay where they are.</p>
+                    <div class="field-row">
+                      <div class="field"><label for="ttGenStart">First period starts</label><input type="time" id="ttGenStart" value="08:00"></div>
+                      <div class="field"><label for="ttGenMinutes">Period length (minutes)</label><input type="number" id="ttGenMinutes" value="45" min="5"></div>
+                      <div class="field"><label for="ttGenCount">Number of periods</label><input type="number" id="ttGenCount" value="6" min="1" max="20"></div>
+                    </div>
+                    <div class="field-row">
+                      <div class="field"><label for="ttGenBreakAfter">Break after period</label><input type="number" id="ttGenBreakAfter" value="3" min="0"></div>
+                      <div class="field"><label for="ttGenBreakMin">Break length (minutes)</label><input type="number" id="ttGenBreakMin" value="15" min="0"></div>
+                      <div class="field"><label for="ttGenLunchAfter">Lunch after period</label><input type="number" id="ttGenLunchAfter" value="0" min="0"></div>
+                      <div class="field"><label for="ttGenLunchMin">Lunch length (minutes)</label><input type="number" id="ttGenLunchMin" value="0" min="0"></div>
+                    </div>
+                    <div class="btn-row"><button class="btn btn-secondary" id="ttGenBtn" type="button">Generate</button></div>
+                  </div>
+                </details>
+              </div>
+            </div>
+            <div class="field-row" style="margin-top:14px">
+              <div class="field"><label for="ttMaxPerCell">Max subjects per period</label><select id="ttMaxPerCell"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select></div>
+              <div class="field"><label for="ttHour12">Time format</label><select id="ttHour12"><option value="24">24-hour</option><option value="12">12-hour</option></select></div>
+              <div class="field"><label class="tt-check"><input type="checkbox" id="ttShowTeacher"> Show teacher</label><label class="tt-check"><input type="checkbox" id="ttShowRoom"> Show room</label></div>
+            </div>
+            <div class="btn-row"><button class="btn btn-gold" id="ttSaveConfigBtn">Save configuration</button><button class="btn btn-secondary" id="ttCancelConfigBtn">Cancel</button></div>
+            <div class="error-box" id="ttConfigError"></div>
+          </div>
+
+          <!-- subject palette -->
+          <div class="card" id="ttPaletteCard" data-perm="timetable.edit" style="margin-bottom:16px">
+            <div class="card-head" style="margin-bottom:6px">
+              <div><p class="card-title">Subjects</p><p class="hint" style="margin:0">Drag a subject into a period, or click a subject and then click cells to paint it. Click any entry to edit it.</p></div>
+              <div class="field" style="max-width:240px;margin:0"><input type="text" id="ttPaletteSearch" placeholder="Search subjects"></div>
+            </div>
+            <div class="tt-brushnote hidden" id="ttBrushNote"><span class="chip gold"><b id="ttBrushName"></b></span> <button type="button" class="linkbtn" id="ttBrushClear">Stop painting</button></div>
+            <div class="tt-palette" id="ttPalette"></div>
+          </div>
+
+          <div class="card hidden" id="ttEmpty"><div class="empty-state" style="border:0"><b>No timetable yet</b>Create your first timetable to start scheduling subjects.<div class="btn-row" style="justify-content:center;margin-top:14px"><button class="btn btn-gold" id="ttEmptyCreate">Create timetable</button></div></div></div>
+
+          <div class="card" id="ttGridWrap">
+            <div id="ttGridSections"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- ================= SCREEN: Admins ================= -->
     <div class="screen" id="screen-admins">
       <div class="main-scroll">
-        <div class="page-head"><div><p class="page-title">Admins</p><p class="page-sub">Create admin accounts and choose exactly what each admin can open. Anything left unticked is hidden from that admin.</p></div><div class="page-head-meta">ADMINISTRATION</div></div>
+        <div class="page-head"><div><p class="page-title">Admins</p><p class="page-sub">Create admin accounts and choose exactly what each admin can open. Anything left unticked is hidden from that admin. Other super admins can't be edited or deleted here, and you can't delete yourself or remove your own "Manage admins" permission.</p></div><div class="page-head-meta">ADMINISTRATION</div></div>
 
-        <div class="toolbar">
-          <span></span>
-          <div class="toolbar-actions">
-            <span class="summary-row" style="margin:0;align-self:center;"><b id="adminsCount">0</b></span>
-            <button class="btn btn-secondary btn-sm" id="adminsRefreshBtn"><i class="fa-solid fa-rotate"></i> Refresh</button>
-            <button class="btn btn-gold" id="newAdminBtn"><i class="fa-solid fa-plus"></i> New admin</button>
+        <div class="tabgroup" id="admTabGroup">
+          <div class="tabs">
+            <button class="tab-btn active" data-target="tabAdmManage">Manage admins</button>
+            <button class="tab-btn" data-target="tabAdmLog" data-perm="admins.log">Activity log</button>
           </div>
-        </div>
-        <div class="error-box" id="adminsError"></div>
-        <div class="ok-box" id="adminsOk"></div>
 
-        <div class="card hidden" id="adminEditor" style="margin-bottom:16px;">
-          <div class="section-label" id="adminEditorTitle">New admin</div>
-          <div class="field-row">
-            <div class="field"><label for="admName">Name</label><input type="text" id="admName"></div>
-            <div class="field"><label for="admEmail">Email</label><input type="email" id="admEmail"></div>
-            <div class="field" id="admPasswordWrap"><label for="admPassword">Password (new admin only)</label>
-              <div style="display:flex;gap:8px"><input type="text" id="admPassword"><button class="btn btn-secondary btn-sm" id="admGenBtn" type="button">Generate</button></div>
+          <div class="tab-panel active" id="tabAdmManage">
+            <div class="toolbar">
+              <span></span>
+              <div class="toolbar-actions">
+                <span class="summary-row" style="margin:0;align-self:center;"><b id="adminsCount">0</b></span>
+                <button class="btn btn-secondary btn-sm" id="adminsRefreshBtn"><i class="fa-solid fa-rotate"></i> Refresh</button>
+                <button class="btn btn-gold" id="newAdminBtn"><i class="fa-solid fa-plus"></i> New admin</button>
+              </div>
+            </div>
+            <div class="error-box" id="adminsError"></div>
+            <div class="ok-box" id="adminsOk"></div>
+
+            <div class="card hidden" id="adminEditor" style="margin-bottom:16px;">
+              <div class="section-label" id="adminEditorTitle">New admin</div>
+              <div class="field-row">
+                <div class="field"><label for="admName">Name</label><input type="text" id="admName"></div>
+                <div class="field"><label for="admEmail">Email</label><input type="email" id="admEmail"></div>
+                <div class="field" id="admPasswordWrap"><label for="admPassword">Password (new admin only)</label>
+                  <div style="display:flex;gap:8px"><input type="text" id="admPassword"><button class="btn btn-secondary btn-sm" id="admGenBtn" type="button">Generate</button></div>
+                </div>
+              </div>
+              <div class="section-label" style="margin-top:6px">Permissions</div>
+              <p class="hint">Tick what this admin is allowed to open. Anything unticked is hidden from them.</p>
+              <div class="btn-row" style="margin-top:0"><button class="btn btn-secondary btn-sm" id="admAllBtn" type="button">Select all</button><button class="btn btn-secondary btn-sm" id="admNoneBtn" type="button">Clear all</button></div>
+              <div class="perm-grid" id="admPermGroups"></div>
+              <div class="btn-row"><button class="btn btn-gold" id="admSaveBtn">Save admin</button><button class="btn btn-secondary" id="admCancelBtn">Cancel</button></div>
+              <div class="error-box" id="admError"></div>
+            </div>
+
+            <div class="card">
+              <div class="table-scroll">
+                <table>
+                  <thead><tr><th>Name</th><th>Email</th><th>Access</th><th>Role</th><th></th><th></th></tr></thead>
+                  <tbody id="adminsBody"><tr><td colspan="6">Loading…</td></tr></tbody>
+                </table>
+              </div>
             </div>
           </div>
-          <div class="section-label" style="margin-top:6px">Permissions</div>
-          <p class="hint">Tick what this admin is allowed to open. Anything unticked is hidden from them.</p>
-          <div class="btn-row" style="margin-top:0"><button class="btn btn-secondary btn-sm" id="admAllBtn" type="button">Select all</button><button class="btn btn-secondary btn-sm" id="admNoneBtn" type="button">Clear all</button></div>
-          <div class="perm-grid" id="admPermGroups"></div>
-          <div class="btn-row"><button class="btn btn-gold" id="admSaveBtn">Save admin</button><button class="btn btn-secondary" id="admCancelBtn">Cancel</button></div>
-          <div class="error-box" id="admError"></div>
-        </div>
 
-        <div class="card">
-          <div class="table-scroll">
-            <table>
-              <thead><tr><th>Name</th><th>Email</th><th>Access</th><th>Role</th><th></th><th></th></tr></thead>
-              <tbody id="adminsBody"><tr><td colspan="6">Loading…</td></tr></tbody>
-            </table>
+          <div class="tab-panel" id="tabAdmLog" data-perm="admins.log">
+            <p class="hint">Every admin created, edited or deleted, and by whom. Visible to super admins with the "View admin activity log" permission.</p>
+            <div class="toolbar">
+              <span></span>
+              <div class="toolbar-actions">
+                <span class="summary-row" style="margin:0;align-self:center;"><b id="admLogCount">0</b></span>
+                <button class="btn btn-secondary btn-sm" id="admLogRefreshBtn"><i class="fa-solid fa-rotate"></i> Refresh</button>
+                <button class="btn btn-danger btn-sm" id="admLogClearBtn"><i class="fa-solid fa-trash"></i> Clear log</button>
+              </div>
+            </div>
+            <div class="error-box" id="admLogError"></div>
+            <div class="card">
+              <div class="table-scroll">
+                <table>
+                  <thead><tr><th>When</th><th>Admin</th><th>Action</th><th>Details</th></tr></thead>
+                  <tbody id="admLogBody"><tr><td colspan="4">Loading…</td></tr></tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -1538,6 +1821,96 @@ th.sp-open-cell,td.sp-open-cell{width:46px;padding-inline-end:0!important}
   </main>
 </div>
 
+      <!-- add / edit an entry -->
+      <div class="tt-modal hidden" id="ttModal">
+        <div class="tt-dialog" role="dialog" aria-modal="true">
+          <div class="tt-dialog-head"><b id="ttModalTitle"></b><small id="ttModalTime"></small></div>
+          <div class="field"><label for="ttmSubject">Subject</label><select id="ttmSubject"></select></div>
+          <div class="field"><label for="ttmTeacher">Teacher</label><select id="ttmTeacher"></select></div>
+          <div class="field" id="ttmRoomWrap"><label for="ttmRoom">Room</label><input type="text" id="ttmRoom" maxlength="40"></div>
+          <div class="field"><label for="ttmNote">Note (optional)</label><input type="text" id="ttmNote" maxlength="200"></div>
+          <div class="error-box" id="ttmError"></div>
+          <div class="btn-row"><button class="btn btn-gold" id="ttmSave">Save</button><button class="btn btn-danger" id="ttmDelete">Remove</button><button class="btn btn-secondary" id="ttmCancel">Cancel</button></div>
+        </div>
+      </div>
+
+      <!-- export timetable(s) to a designed PDF -->
+      <div class="tt-modal hidden" id="ttPdfModal">
+        <div class="tt-dialog" role="dialog" aria-modal="true" style="width:min(540px,100%)">
+          <div class="tt-dialog-head"><b>Export timetable as PDF</b><small>Customize the banner before exporting — this won't change what's saved.</small></div>
+          <div class="field"><label for="ttPdfTitle">Banner title</label><input type="text" id="ttPdfTitle" maxlength="80"></div>
+          <div class="field"><label for="ttPdfSubtitle">Banner subtitle</label><input type="text" id="ttPdfSubtitle" maxlength="120"></div>
+          <div class="field"><label for="ttPdfFooter">Footer note</label><input type="text" id="ttPdfFooter" maxlength="120"></div>
+          <div class="field"><label for="ttPdfTheme">Color theme</label>
+            <select id="ttPdfTheme">
+              <option value="emerald">Emerald &amp; Gold</option>
+              <option value="ocean">Ocean Blue</option>
+              <option value="royal">Royal Purple</option>
+              <option value="sunset">Sunset Coral</option>
+              <option value="slate">Slate Charcoal</option>
+            </select>
+          </div>
+          <div class="field"><label>Logo</label>
+            <div class="tt-pdf-logo-drop" id="ttPdfLogoDrop">
+              <input type="file" id="ttPdfLogoInput" accept="image/*" hidden>
+              <div class="tt-pdf-logo-empty" id="ttPdfLogoEmpty"><i class="fa-solid fa-cloud-arrow-up"></i><span>Click or drop a logo</span></div>
+              <img id="ttPdfLogoPreview" class="hidden" alt="Logo">
+              <button type="button" class="tt-pdf-logo-remove hidden" id="ttPdfLogoRemove" title="Remove logo"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+          </div>
+          <label class="tt-pdf-toggle"><input type="checkbox" id="ttPdfHeaderEvery"> Repeat the full banner on every table (otherwise only the first page gets it)</label>
+          <p class="hint" id="ttPdfScope"></p>
+          <div class="error-box" id="ttPdfError"></div>
+          <div class="btn-row"><button class="btn btn-gold" id="ttPdfGenerate"><i class="fa-solid fa-file-pdf"></i> Generate PDF</button><button class="btn btn-secondary" id="ttPdfCancel">Cancel</button></div>
+        </div>
+      </div>
+      <div id="ttPdfExportRoot" aria-hidden="true"></div>
+
+      <!-- export a results/students table to a designed PDF -->
+      <div class="tt-modal hidden" id="tblPdfModal">
+        <div class="tt-dialog tt-dialog-wide" role="dialog" aria-modal="true" style="width:min(820px,96vw)">
+          <div class="tt-dialog-head"><b id="tblPdfHeadTitle">Export as PDF</b><small>Customize the banner before exporting — this won't change what's saved.</small></div>
+          <div class="field"><label for="tblPdfTitle">Banner title</label><input type="text" id="tblPdfTitle" maxlength="80"></div>
+          <div class="field"><label for="tblPdfSubtitle">Banner subtitle</label><input type="text" id="tblPdfSubtitle" maxlength="120"></div>
+          <div class="field"><label for="tblPdfFooter">Footer note</label><input type="text" id="tblPdfFooter" maxlength="120"></div>
+          <div class="field"><label for="tblPdfTheme">Color theme</label>
+            <select id="tblPdfTheme">
+              <option value="emerald">Emerald &amp; Gold</option>
+              <option value="ocean">Ocean Blue</option>
+              <option value="royal">Royal Purple</option>
+              <option value="sunset">Sunset Coral</option>
+              <option value="slate">Slate Charcoal</option>
+            </select>
+          </div>
+          <div class="field"><label>Logo</label>
+            <div class="tt-pdf-logo-drop" id="tblPdfLogoDrop">
+              <input type="file" id="tblPdfLogoInput" accept="image/*" hidden>
+              <div class="tt-pdf-logo-empty" id="tblPdfLogoEmpty"><i class="fa-solid fa-cloud-arrow-up"></i><span>Click or drop a logo</span></div>
+              <img id="tblPdfLogoPreview" class="hidden" alt="Logo">
+              <button type="button" class="tt-pdf-logo-remove hidden" id="tblPdfLogoRemove" title="Remove logo"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+          </div>
+          <div class="field hidden" id="tblPdfColsField">
+            <label>Columns to include</label>
+            <div class="tt-pdf-cols-grid" id="tblPdfCols"></div>
+            <div class="tt-pdf-colbar"><button type="button" id="tblPdfColsAll">Select all</button><button type="button" id="tblPdfColsNone">Select none</button></div>
+          </div>
+          <div class="field hidden" id="tblPdfGroupField">
+            <label for="tblPdfGroupBy">Split into separate tables by</label>
+            <select id="tblPdfGroupBy"></select>
+            <div class="hidden" id="tblPdfGroupValsWrap" style="margin-top:10px">
+              <label id="tblPdfGroupValsLabel">Which values to include</label>
+              <div class="tt-pdf-cols-grid" id="tblPdfGroupVals"></div>
+              <div class="tt-pdf-colbar"><button type="button" id="tblPdfGroupValsAll">Select all</button><button type="button" id="tblPdfGroupValsNone">Select none</button></div>
+            </div>
+          </div>
+          <p class="hint" id="tblPdfScope"></p>
+          <div class="error-box" id="tblPdfError"></div>
+          <div class="btn-row"><button class="btn btn-gold" id="tblPdfGenerate"><i class="fa-solid fa-file-pdf"></i> Generate PDF</button><button class="btn btn-secondary" id="tblPdfCancel">Cancel</button></div>
+        </div>
+      </div>
+      <div id="tblPdfExportRoot" aria-hidden="true"></div>
+
 <script type="module">
 import { initializeApp, deleteApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
 import {
@@ -1545,17 +1918,17 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
 import {
   getFirestore, doc, setDoc as _setDoc, updateDoc as _updateDoc, getDoc as _getDoc, deleteDoc as _deleteDoc, collection, getDocs as _getDocs,
-  query, where, collectionGroup, writeBatch as _writeBatch, arrayUnion, arrayRemove
+  query, where, collectionGroup, writeBatch as _writeBatch, arrayUnion, arrayRemove, addDoc as _addDoc
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBcbw0Ac74NPoIN7vtDwj74MfIpqLDTO6c",
-  authDomain: "where-technology-d6b2b.firebaseapp.com",
-  projectId: "where-technology-d6b2b",
-  storageBucket: "where-technology-d6b2b.firebasestorage.app",
-  messagingSenderId: "955465380633",
-  appId: "1:955465380633:web:0983b9d40465b5a02b8b88",
-  measurementId: "G-DHF10HRN1E"
+  apiKey: "AIzaSyC5jJppRaYhXw-J2bwrqdAxY0fyJsgiHZs",
+  authDomain: "ethiowhere.firebaseapp.com",
+  projectId: "ethiowhere",
+  storageBucket: "ethiowhere.firebasestorage.app",
+  messagingSenderId: "437239697706",
+  appId: "1:437239697706:web:865192832f1b3709224e53",
+  measurementId: "G-XQYDVYPSM7"
 };
 
 const STUDENTS = "students";
@@ -1564,6 +1937,7 @@ const MODULES = "modules";
 const SUBJECTS = "subjects";
 const TEACHERS = "teachers";
 const EMAIL_DOMAIN = "jumj.com";
+const ADMIN_LOGS = "adminLogs";   // one doc per admin-management action — see "Admin activity log" section below
 
 // ---- global network progress bar: every Firestore call is tracked ----
 let netCount = 0;
@@ -1576,6 +1950,7 @@ const updateDoc = (...a) => track(_updateDoc(...a));
 const getDoc = (...a) => track(_getDoc(...a));
 const deleteDoc = (...a) => track(_deleteDoc(...a));
 const getDocs = (...a) => track(_getDocs(...a));
+const addDoc = (...a) => track(_addDoc(...a));
 const writeBatch = (...a) => { const b = _writeBatch(...a); const c = b.commit.bind(b); b.commit = () => track(c()); return b; };
 
 // The admin console runs in its OWN named Firebase app. Firebase stores a login session under
@@ -1796,7 +2171,14 @@ const tabApi = {
   teach: wireTabGroup('teachTabGroup'),
   res: wireTabGroup('resTabGroup'),
   add: wireTabGroup('addTabGroup'),
+  adm: wireTabGroup('admTabGroup'),
 };
+// Opening the activity log tab marks it seen (clears the notification bell) and (re)renders it.
+{
+  const admLogTabBtn = document.querySelector('#admTabGroup [data-target="tabAdmLog"]');
+  if(admLogTabBtn) admLogTabBtn.addEventListener('click', () => { renderAdminLogScreen(); markAdminLogSeen(); });
+}
+$('admLogBell').addEventListener('click', () => { tabApi.adm.activate('tabAdmLog'); renderAdminLogScreen(); markAdminLogSeen(); });
 
 // ---- Grading component editor (reused when creating a subject and in the Grading tab) ----
 function createCompEditor(editorEl, totalEl){
@@ -2089,6 +2471,7 @@ async function enrollStudents(slug, uids){
     await stampEnrollmentGroup(group, slug);
     if(loadedSubjects.has(slug)) await fetchResultsFor(slug, group);   // pick up any results these students already have
   }
+  if(todo.length){ const subj = subjectBySlug(slug); logAdminAction('subject.updated', {uid: slug, name: subj && subj.name}, `Enrolled ${todo.length} student(s) in ${(subj && subj.name) || slug}.`); }
   return todo.length;
 }
 // Best-effort: remember when (and by whom) each student was added to a subject.
@@ -2110,6 +2493,7 @@ async function unenrollStudents(slug, uids){
     group.forEach(uid => { const s = studentByUid(uid); if(s) s.subjectIds = s.subjectIds.filter(x => x !== slug); });
     const rm = resultsStore.get(slug); if(rm) group.forEach(uid => rm.delete(uid));   // no longer part of this subject's view
   }
+  if(todo.length){ const subj = subjectBySlug(slug); logAdminAction('subject.updated', {uid: slug, name: subj && subj.name}, `Removed ${todo.length} student(s) from ${(subj && subj.name) || slug}.`); }
   return todo.length;
 }
 
@@ -2184,7 +2568,7 @@ function parseRoute(){
   const view = parts[0] || 'subjects';
   if(view === 'students' && parts[1]) return {view:'student', slug:null, uid:parts[1], tab: STU_TABS.includes(parts[2]) ? parts[2] : 'summary'};
   if(view === 'subjects' && parts[1]) return {view:'subject', slug:parts[1], tab: SUB_TABS.includes(parts[2]) ? parts[2] : 'overview'};
-  if(['subjects','overview','students','teachers','admins','noaccess'].includes(view)) return {view, slug:null, tab:'overview'};
+  if(['subjects','overview','students','teachers','admins','timetable','noaccess'].includes(view)) return {view, slug:null, tab:'overview'};
   return {view:'subjects', slug:null, tab:'overview'};
 }
 function go(path, after){
@@ -2220,7 +2604,7 @@ function renderRoute(){
   refreshOptions();
   renderSideSubjects();
   if(typeof renderSalam === 'function') renderSalam();
-  const renderers = {admins: renderAdminsScreen, noaccess: () => {}, subjects: renderSubjectsScreen, subject: renderSubjectScreen, overview: renderOverview, students: renderStudentsScreen, student: renderStudentProfile, teachers: renderTeachersScreen};
+  const renderers = {timetable: renderTimetableScreen, admins: renderAdminsScreen, noaccess: () => {}, subjects: renderSubjectsScreen, subject: renderSubjectScreen, overview: renderOverview, students: renderStudentsScreen, student: renderStudentProfile, teachers: renderTeachersScreen};
   renderers[r.view]();
   if(changedScreen) $('mainScroll').scrollTop = 0;
   if(pendingAfterRoute){ const f = pendingAfterRoute; pendingAfterRoute = null; f(); }
@@ -2285,12 +2669,12 @@ function N(n, k){
 const AR = {
   // ---- shell / navigation
   'Admin console':'لوحة الإدارة','Workspace':'مساحة العمل','Subjects':'المواد','Overview':'نظرة عامة','Your subjects':'موادك','Directory':'الدليل',
-  'Students':'الطلاب','Teachers':'المعلمون','Sign out':'تسجيل الخروج','Medical Education Operations':'إدارة التعليم الطبي','ADMIN':'الإدارة',
+  'Students':'الطلاب','Teachers':'المعلمون','Sign out':'تسجيل الخروج','JUMJ Operations':'عمليات JUMJ','ADMIN':'الإدارة',
   'Collapse sidebar':'طيّ الشريط الجانبي','Expand sidebar':'توسيع الشريط الجانبي','Global search':'بحث شامل',
   'Search subjects, students, teachers…':'ابحث عن مادة أو طالب أو معلم…','Language':'اللغة',
-  'Jimma University · Medical Education':'جامعة جيما · التعليم الطبي','Academic admin workspace':'مساحة الإدارة الأكاديمية',
+  'JUMJ':'JUMJ','Academic admin workspace':'مساحة الإدارة الأكاديمية',
   'Knowledge · Trust · Excellence':'العلم · الأمانة · الإتقان','Preparing your workspace…':'جارٍ تجهيز مساحة العمل بإذن الله…',
-  'Welcome back':'السلام عليكم','Sign in to continue to the medical education admin console.':'سجّل الدخول للمتابعة إلى لوحة إدارة التعليم الطبي.',
+  'Welcome back':'السلام عليكم','Sign in to continue to the JUMJ admin console.':'سجّل الدخول للمتابعة إلى لوحة إدارة JUMJ.',
   'A platform for managing subjects, students and results with trust and clarity.':'منصة لإدارة المواد والطلاب والنتائج بأمانة ووضوح.',
   'Admin email':'البريد الإلكتروني للمشرف','Admin password':'كلمة مرور المشرف','Sign in to workspace':'الدخول إلى مساحة العمل',
   'Authorized personnel only · JUMJ administration':'للمصرّح لهم فقط · إدارة JUMJ',
@@ -2399,6 +2783,28 @@ const AR = {
   'No subjects yet.':'لا توجد مواد بعد.','Fix':'معالجة','Every subject is set up and fully graded.':'جميع المواد مُعدَّة ومُقيَّمة بالكامل.','(no name)':'(بلا اسم)','Refresh failed.':'فشل التحديث.',
   'Open Overview':'فتح نظرة عامة','Cohort performance by subject':'أداء الدفعة حسب المادة','Escape':'Esc',
   // tooltips
+  'Timetable':'الجدول الدراسي','SCHEDULE':'الجدول','Choose the days and periods once, then drop subjects into the grid — each subject brings its teacher automatically.':'حدّد الأيام والحصص مرة واحدة، ثم أسقِط المواد في الجدول — وتأتي كل مادة مع معلمها تلقائيًا.',
+  'View':'العرض','Group':'المجموعة','Print':'طباعة','Timetable settings':'إعدادات الجدول','Days & periods':'الأيام والحصص','New timetable':'جدول جديد','Place':'الحصة',
+  'Create':'إنشاء','Duplicate':'تكرار','Close':'إغلاق','e.g. Year 1 — Medicine':'مثال: السنة الأولى — الطب','Any':'الكل',
+  'Irshad days':'أيام إرشاد','Tick the days that have classes and put them in order.':'حدّد أيام الدراسة ورتّبها.','Periods & breaks':'الحصص والاستراحات','Start':'البداية','End':'النهاية','Type':'النوع','Lesson':'حصة دراسية','Break':'استراحة','Lunch':'الغداء',
+  '+ Add period':'+ إضافة حصة','+ Add break':'+ إضافة استراحة','Generate schedule':'توليد الجدول','Builds the periods for you. Subjects already scheduled stay where they are.':'يُنشئ الحصص نيابةً عنك. تبقى المواد المجدولة في أماكنها.',
+  'First period starts':'بداية الحصة الأولى','Period length (minutes)':'مدة الحصة (بالدقائق)','Number of periods':'عدد الحصص','Break after period':'استراحة بعد الحصة','Break length (minutes)':'مدة الاستراحة (بالدقائق)','Lunch after period':'الغداء بعد الحصة','Lunch length (minutes)':'مدة الغداء (بالدقائق)','Generate':'توليد',
+  'Max subjects per period':'أقصى عدد للمواد في الحصة الواحدة','Time format':'صيغة الوقت','24-hour':'24 ساعة','12-hour':'12 ساعة','Show teacher':'إظهار المعلم','Show room':'إظهار القاعة','Save configuration':'حفظ الإعداد',
+  'Drag a subject into a period, or click a subject and then click cells to paint it. Click any entry to edit it.':'اسحب مادة إلى حصة، أو انقر على مادة ثم انقر على الخانات لتعبئتها. انقر على أي مادة لتعديلها.','Stop painting':'إيقاف التعبئة',
+  'No timetable yet':'لا يوجد جدول بعد','Create your first timetable to start scheduling subjects.':'أنشئ أول جدول لتبدأ بجدولة المواد.','Create timetable':'إنشاء جدول','Room':'القاعة','Note (optional)':'ملاحظة (اختيارية)','Remove':'إزالة','Add':'إضافة',
+  'Automatic':'تلقائي','Automatic (the subject has no teacher yet)':'تلقائي (لا معلم للمادة بعد)','Choose a teacher':'اختر معلمًا','Choose a subject.':'اختر مادة.',
+  'Could not save the timetable.':'تعذّر حفظ الجدول.','Could not duplicate the timetable.':'تعذّر تكرار الجدول.','Could not delete the timetable.':'تعذّر حذف الجدول.','Could not save the configuration.':'تعذّر حفظ الإعداد.',
+  'Pick at least one day.':'اختر يومًا واحدًا على الأقل.','Add at least one class period.':'أضف حصة دراسية واحدة على الأقل.','Every period needs a label.':'يجب أن تكون لكل حصة تسمية.','Check the times — each period must end after it starts.':'تحقق من الأوقات — يجب أن تنتهي كل حصة بعد بدايتها.','Saved configuration.':'تم حفظ الإعداد.',
+  'View timetables':'عرض الجداول','Edit timetables':'تعديل الجداول','Configure days & periods':'ضبط الأيام والحصص',
+  'All timetables':'كل الجداول','Export PDF':'تصدير PDF','Export timetable as PDF':'تصدير الجدول كملف PDF',
+  'Customize the banner before exporting — this won\'t change what\'s saved.':'خصّص عنوان اللافتة قبل التصدير — لن يغيّر ذلك ما تم حفظه.',
+  'Banner title':'عنوان اللافتة','Banner subtitle':'العنوان الفرعي','Footer note':'ملاحظة التذييل','Color theme':'نمط الألوان',
+  'Emerald & Gold':'زمردي وذهبي','Ocean Blue':'أزرق محيطي','Royal Purple':'بنفسجي ملكي','Sunset Coral':'مرجاني غروبي','Slate Charcoal':'رمادي فحمي',
+  'Generate PDF':'إنشاء PDF','Nothing to export yet.':'لا يوجد شيء لتصديره بعد.','Exporting the schedule currently shown for this teacher.':'سيتم تصدير الجدول المعروض حاليًا لهذا المعلم.',
+  'Exporting the timetable currently shown.':'سيتم تصدير الجدول المعروض حاليًا.','Could not load the PDF engine — check your connection and try again.':'تعذّر تحميل محرّك PDF — تحقق من اتصالك وحاول مجددًا.',
+  'Class Timetable':'الجدول الدراسي','Issued':'تاريخ الإصدار','irshad days':'أيام إرشاد','periods / day':'حصص باليوم',
+  'JUMJ — Class Timetables':'جداول JUMJ الدراسية',' — Teacher Schedule':' — جدول المعلم','All Class Timetables':'كل الجداول الدراسية',
+  'Choose a teacher first.':'اختر معلمًا أولاً.',
   'Loading subjects':'جارٍ تحميل المواد',
   'Administration':'الإدارة','ADMINISTRATION':'الإدارة','Admins':'المشرفون','Admin':'مشرف','Super admin':'مشرف رئيسي','You':'أنت','Full access':'وصول كامل','No access':'بلا وصول','Access':'الوصول','Role':'الدور',
   'Create admin accounts and choose exactly what each admin can open. Anything left unticked is hidden from that admin.':'أنشئ حسابات المشرفين وحدّد بدقة ما يمكن لكل مشرف فتحه. كل ما لم يُحدَّد يكون مخفيًا عن ذلك المشرف.',
@@ -2406,7 +2812,18 @@ const AR = {
   'Tick what this admin is allowed to open. Anything unticked is hidden from them.':'حدّد ما يُسمح لهذا المشرف بفتحه. كل ما لم يُحدَّد يكون مخفيًا عنه.',
   'Select all':'تحديد الكل','Clear all':'إلغاء تحديد الكل','All':'الكل','Access to subjects':'الوصول إلى المواد','Manage admins':'إدارة المشرفين','Save admin':'حفظ المشرف','admin(s)':'مشرف',
   'No admins found.':'لم يُعثر على مشرفين.','Enter a name.':'أدخل الاسم.','Enter a valid email.':'أدخل بريدًا إلكترونيًا صحيحًا.','Password must be at least 6 characters.':'يجب ألا تقل كلمة المرور عن 6 أحرف.',
-  'You cannot remove your own admin-management access.':'لا يمكنك إزالة صلاحية إدارة المشرفين عن حسابك.','You cannot delete your own admin access.':'لا يمكنك حذف صلاحيات حسابك.',
+  'You cannot remove your own "Manage admins" permission — have another super admin do it, or you\'ll lock yourself out.':'لا يمكنك إزالة صلاحية "إدارة المشرفين" عن نفسك — اطلب من مشرف رئيسي آخر القيام بذلك، وإلا فقدت وصولك.','You cannot delete your own admin access.':'لا يمكنك حذف صلاحيات حسابك.',
+  'Super admins are protected — they cannot be edited or deleted from here.':'المشرفون الرئيسيون محميون — لا يمكن تعديلهم أو حذفهم من هنا.',
+  'Create admin accounts and choose exactly what each admin can open. Anything left unticked is hidden from that admin. Other super admins can\'t be edited or deleted here, and you can\'t delete yourself or remove your own "Manage admins" permission.':'أنشئ حسابات المشرفين وحدّد بدقة ما يمكن لكل مشرف فتحه. كل ما لم يُحدَّد يكون مخفيًا عن ذلك المشرف. لا يمكن تعديل أو حذف المشرفين الرئيسيين الآخرين من هنا، ولا يمكنك حذف حسابك أو إزالة صلاحية "إدارة المشرفين" عن نفسك.',
+  'Manage admins':'إدارة المشرفين','Activity log':'سجل النشاط','View admin activity log':'عرض سجل نشاط المشرفين',
+  'Every admin created, edited or deleted, and by whom. Visible to super admins with the "View admin activity log" permission.':'كل مشرف تم إنشاؤه أو تعديله أو حذفه، ومن قام بذلك. يظهر للمشرفين الرئيسيين الذين لديهم صلاحية "عرض سجل نشاط المشرفين".',
+  'When':'الوقت','Action':'الإجراء','Details':'التفاصيل','No activity yet.':'لا يوجد نشاط بعد.','Admin activity log':'سجل نشاط المشرفين',
+  'Created admin':'تم إنشاء مشرف','Updated admin access':'تم تحديث صلاحيات المشرف','Deleted admin':'تم حذف مشرف','entry':'إدخال','entries':'إدخالات',
+  'Clear log':'مسح السجل','The activity log is already empty.':'سجل النشاط فارغ بالفعل.','Could not clear the activity log.':'تعذّر مسح سجل النشاط.',
+  'Created student':'تم إنشاء طالب','Updated student':'تم تحديث بيانات الطالب','Deleted student':'تم حذف طالب',
+  'Created teacher':'تم إنشاء معلم','Updated teacher':'تم تحديث بيانات المعلم','Deleted teacher':'تم حذف معلم',
+  'Created subject':'تم إنشاء مادة','Updated subject':'تم تحديث المادة','Deleted subject':'تم حذف المادة',
+  'Created timetable':'تم إنشاء جدول','Updated timetable':'تم تحديث الجدول','Deleted timetable':'تم حذف الجدول',
   'That email already has an account (it may be a student or teacher account). Use a different email.':'هذا البريد مرتبط بحساب بالفعل (قد يكون حساب طالب أو معلم). استخدم بريدًا آخر.',
   'Could not save admin.':'تعذّر حفظ المشرف.','Could not delete admin.':'تعذّر حذف المشرف.','No access yet':'لا وصول بعد',
   'Your account is signed in but has no permissions assigned. Ask a super admin to grant you access.':'حسابك مسجَّل الدخول لكن لم تُسنَد إليه أي صلاحيات. اطلب من مشرف رئيسي منحك الوصول.',
@@ -2440,6 +2857,17 @@ function P(tpl, fn){
 }
 const T = (s) => tr(s);
 const AR_RE = [
+  P('Period {n}', (m,a) => `الحصة ${a}`),
+  P('Exporting all {n} timetable(s), one page each.', (m,a) => `سيتم تصدير ${a} جداول دراسية، كل جدول في صفحة مستقلة.`),
+  P('{n} conflict(s)', (m,a) => `${a} تعارض`),
+  P('Timetable {n}/{n}', (m,a,b) => `الجدول ${a}/${b}`),
+  P('Could not load the timetable: {s}', (m,a) => `تعذّر تحميل الجدول: ${a}`),
+  P('Could not save the timetable: {s}', (m,a) => `تعذّر حفظ الجدول: ${a}`),
+  P('This period already holds {n} subject(s).', (m,a) => `تحتوي هذه الحصة بالفعل على ${N(a,'subject')}.`),
+  P('Removing days or periods will delete {n} scheduled subject(s). Continue?', (m,a) => `سيؤدي حذف الأيام أو الحصص إلى إزالة ${N(a,'subject')} مجدولة. هل تريد المتابعة؟`),
+  P('Delete timetable "{s}"? This removes its whole schedule.', (m,a) => `حذف الجدول "${a}"؟ سيؤدي ذلك إلى إزالة جدوله بالكامل.`),
+  P('Teacher conflict: {s} is also teaching {s} at this time.', (m,a,b) => `تعارض معلم: ${a} يدرّس أيضًا ${b} في هذا الوقت.`),
+  P('Room conflict: {s} is also used by {s} at this time.', (m,a,b) => `تعارض قاعة: ${a} مستخدمة أيضًا في ${b} في هذا الوقت.`),
   P('Students {n}/{n}', (m,a,b) => `الطلاب ${a}/${b}`),
   P('Teachers {n}/{n}', (m,a,b) => `المعلمون ${a}/${b}`),
   P('Subjects {n}/{n}', (m,a,b) => `المواد ${a}/${b}`),
@@ -2623,6 +3051,7 @@ function setLang(next){
   translateTree(document.body);
   document.querySelectorAll('.lang-switch button').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
   if(typeof renderSalam === 'function' && typeof bootstrapped !== 'undefined' && bootstrapped) renderSalam();
+  if(typeof bootstrapped !== 'undefined' && bootstrapped && typeof route !== 'undefined' && route.view === 'timetable' && ttLoaded){ renderTimetableScreen(); if(!$('ttConfigCard').classList.contains('hidden')) renderTtConfig(); }
   if(lang === 'ar'){ trObserver.disconnect(); trObserver.observe(document.body, {childList:true, subtree:true, characterData:true, attributes:true, attributeFilter:TR_ATTRS}); }
   else trObserver.disconnect();
 }
@@ -2755,6 +3184,7 @@ $('createSubjBtn').addEventListener('click', async () => {
   const btn = $('createSubjBtn'); setBusy(btn, true);
   try{
     await setDoc(doc(db, SUBJECTS, slug), { name, slug, teacherUid, teacherName: teacher ? (teacher.name || teacher.email) : null, components });
+    logAdminAction('subject.created', {uid: slug, name}, `Created subject ${name}.`);
     let warn = '';
     try{ if(teacherUid) await addTeacherSlug(teacherUid, slug); }
     catch(e){ warn = 'Subject created, but the teacher access list could not be updated (' + (e.message||e) + ') — use "Resync teacher access" under Maintenance.'; }
@@ -3315,10 +3745,8 @@ $('saveNewCompBtn').addEventListener('click', async () => {
     const appended = pendingNewCols.filter(r => !existingKeys.has(r.key)).map(r => ({key:r.key, label:r.label, max:num(r.max), weight:num(r.weight)}));
     const components = [...(subj.components || []), ...appended];
     await updateDoc(doc(db, SUBJECTS, subj.slug), { components });
+    logAdminAction('subject.updated', {uid: subj.slug, name: subj.name}, `Added grading column(s) to ${subj.name}: ${appended.map(c => c.label).join(', ')}.`);
     subj.components = components;
-    renderHero(subj); renderIndivComponents(); renderAllResultsTable();
-    $('newCompWrap').classList.add('hidden');
-    if(pendingParse) await continueParse(pendingParse);
   }catch(err){ setBox('newCompError', err.message || 'Could not save components.'); }
   finally{ setBusy(btn, false); }
 });
@@ -3531,6 +3959,7 @@ $('gradeSaveBtn').addEventListener('click', async () => {
   const btn = $('gradeSaveBtn'); setBusy(btn, true);
   try{
     await updateDoc(doc(db, SUBJECTS, subj.slug), { components });
+    logAdminAction('subject.updated', {uid: subj.slug, name: subj.name}, `Updated grading components for ${subj.name}.`);
     subj.components = components;
     renderHero(subj); gradeEditor.set(components);
     setBox('gradeOk', `Saved ${components.length} component(s) — total marks ${maxTotalOf(subj)}.`, 'ok');
@@ -3558,6 +3987,7 @@ $('setSaveBtn').addEventListener('click', async () => {
   try{
     const oldUid = subj.teacherUid || null;
     await setDoc(doc(db, SUBJECTS, subj.slug), { name, teacherUid, teacherName: teacher ? (teacher.name || teacher.email) : null }, {merge:true});
+    logAdminAction('subject.updated', {uid: subj.slug, name}, `Updated subject "${name}" (name/teacher).`);
     let warn = '';
     try{
       if(oldUid && oldUid !== teacherUid) await removeTeacherSlug(oldUid, subj.slug);
@@ -3591,6 +4021,7 @@ $('deleteSubjBtn').addEventListener('click', async () => {
       }
     }
     await deleteDoc(doc(db, SUBJECTS, subj.slug));
+    logAdminAction('subject.deleted', {uid: subj.slug, name: subj.name}, `Deleted subject "${subj.name}" (${enrolled.length} student(s) unenrolled).`);
     resultsStore.delete(subj.slug); loadedSubjects.delete(subj.slug);
     await loadAllSubjects();
     wsSlug = null;
@@ -3685,6 +4116,7 @@ function renderAllStudentsTable(){
       saveBtn.disabled = true; saveBtn.textContent = 'Saving…'; saveBtn.classList.add('is-busy'); statusTd.textContent = ''; statusTd.className = 'status';
       try{
         await updateDoc(doc(db, STUDENTS, uid), {...vals, subjectIds});
+        logAdminAction('student.updated', {uid, name: vals.name}, `Updated student ${vals.name || uid}.`);
         if(rec) Object.assign(rec, vals, {subjectIds});
         if(addedSlugs.length) await stampEnrollment(uid, addedSlugs);
         tr.dataset.orig = snapshot(); tr.classList.remove('dirty');
@@ -3728,9 +4160,11 @@ $('stuDeleteBtn').addEventListener('click', async () => {
   let done = 0, failed = 0; setProgress('stuDelProgress', 0, uids.length, 'Deleting');
   for(const uid of uids){
     try{
+      const s = studentByUid(uid);
       const resultsSnap = await getDocs(collection(db, STUDENTS, uid, MODULE_RESULTS));
       for(const d of resultsSnap.docs) await deleteDoc(d.ref);
       await deleteDoc(doc(db, STUDENTS, uid));
+      logAdminAction('student.deleted', {uid, name: s && s.name}, `Deleted student ${(s && s.name) || uid} and their results.`);
       allStudents = allStudents.filter(s => s.uid !== uid);
       resultsStore.forEach(m => m.delete(uid));
       done++;
@@ -3839,6 +4273,7 @@ $('runAcctImportBtn').addEventListener('click', async () => {
         uid = await createAuthUser(r.email, r.password);
         await setDoc(doc(db, STUDENTS, uid), { name: r.name, email: r.email, idConfirmed: false,
           gender: r.gender || '', phone: r.phone || '', department: r.department || '', batch: r.batch || '', subjectIds: r.subjectIds || [] });
+        logAdminAction('student.created', {uid, name: r.name, email: r.email}, `Created student ${r.name} via bulk import.`);
         await stampEnrollment(uid, r.subjectIds || [], {created: true});
       }else{
         // Existing student: only overwrite what the CSV actually supplied; subjects are added, never replaced.
@@ -3848,6 +4283,7 @@ $('runAcctImportBtn').addEventListener('click', async () => {
         const known = studentByUid(uid);
         const addedSlugs = known ? (r.subjectIds || []).filter(sl => !known.subjectIds.includes(sl)) : [];
         await updateDoc(doc(db, STUDENTS, uid), upd);
+        logAdminAction('student.updated', {uid, name: r.name}, `Updated student ${r.name} via bulk import.`);
         if(addedSlugs.length) await stampEnrollment(uid, addedSlugs);
       }
       r.status = 'done'; r.existingUid = uid; ok++;
@@ -3915,11 +4351,13 @@ $('saveAcctIndivBtn').addEventListener('click', async () => {
     if(!uid){
       uid = await createAuthUser(email, password);
       await setDoc(doc(db, STUDENTS, uid), { name, email, idConfirmed: false, gender, phone, department, batch, subjectIds });
+      logAdminAction('student.created', {uid, name, email}, `Created student ${name}.`);
       await stampEnrollment(uid, subjectIds, {created: true});
     }else{
       const known = studentByUid(uid);
       const addedSlugs = known ? subjectIds.filter(sl => !known.subjectIds.includes(sl)) : [];
       await updateDoc(doc(db, STUDENTS, uid), { name, email, gender, phone, department, batch, subjectIds });
+      logAdminAction('student.updated', {uid, name}, `Updated student ${name}.`);
       if(addedSlugs.length) await stampEnrollment(uid, addedSlugs);
     }
     acctIndivState.existingUid = uid; acctIndivState.subjectIds = subjectIds;
@@ -4019,6 +4457,7 @@ function renderAllTeachersTable(){
       saveBtn.disabled = true; saveBtn.textContent = 'Saving…'; saveBtn.classList.add('is-busy'); statusTd.textContent = ''; statusTd.className = 'status';
       try{
         await updateDoc(doc(db, TEACHERS, uid), vals);
+        logAdminAction('teacher.updated', {uid, name: vals.name}, `Updated teacher ${vals.name || vals.email || uid}.`);
         const rec = teacherByUid(uid); if(rec) Object.assign(rec, vals);
         await assignSubjects(uid, add, {label: vals.name || vals.email});
         await unassignSubjects(uid, remove);
@@ -4043,6 +4482,7 @@ function renderAllTeachersTable(){
       try{
         for(const s of assigned){ await setDoc(doc(db, SUBJECTS, s.slug), { teacherUid: null, teacherName: null }, {merge:true}); s.teacherUid = null; s.teacherName = null; }
         await deleteDoc(doc(db, TEACHERS, uid));
+        logAdminAction('teacher.deleted', {uid, name: rec && (rec.name || rec.email)}, `Deleted teacher ${(rec && (rec.name || rec.email)) || uid}.`);
         allTeachers = allTeachers.filter(t => t.uid !== uid);
         refreshOptions(); renderAllTeachersTable();
       }catch(err){ statusTd.textContent = err.message || 'Delete failed'; statusTd.className = 'status failed'; deleteBtn.disabled = false; saveBtn.disabled = false; deleteBtn.textContent = 'Delete'; deleteBtn.classList.remove('is-busy'); }
@@ -4124,8 +4564,10 @@ $('runTeachImportBtn').addEventListener('click', async () => {
       if(!uid){
         uid = await createAuthUser(r.email, r.password);
         await setDoc(doc(db, TEACHERS, uid), { name: r.name, email: r.email, phone: r.phone, assignedSubjectSlugs: [] });
+        logAdminAction('teacher.created', {uid, name: r.name, email: r.email}, `Created teacher ${r.name} via bulk import.`);
       }else{
         await updateDoc(doc(db, TEACHERS, uid), { name: r.name, phone: r.phone });
+        logAdminAction('teacher.updated', {uid, name: r.name}, `Updated teacher ${r.name} via bulk import.`);
       }
       if((r.subjectIds || []).length) await assignSubjects(uid, r.subjectIds, {label: r.name || r.email});
       r.status = 'done'; r.existingUid = uid; ok++;
@@ -4178,8 +4620,10 @@ $('saveTeachIndivBtn').addEventListener('click', async () => {
     if(!uid){
       uid = await createAuthUser(email, password);
       await setDoc(doc(db, TEACHERS, uid), { name, email, phone, assignedSubjectSlugs: [] });
+      logAdminAction('teacher.created', {uid, name, email}, `Created teacher ${name}.`);
     }else{
       await updateDoc(doc(db, TEACHERS, uid), { name, phone });
+      logAdminAction('teacher.updated', {uid, name}, `Updated teacher ${name}.`);
     }
     teachIndivState.existingUid = uid;
     await loadAllTeachers();
@@ -4835,6 +5279,1019 @@ async function stampEnrollment(uid, slugs, opts){
 })();
 
 
+
+// ================================================================
+// TIMETABLE — configurable days & periods. A subject dropped into the grid brings its teacher automatically.
+//   settings/timetable   → { days:[…], periods:[{id,label,start,end,kind}], maxPerCell, showTeacher, showRoom, hour12 }
+//   timetables/{id}      → { name, department, batch, slots:{ "<day>_<periodId>": [ {subject,teacherUid,teacherName,room,note} ] } }
+// An entry with no teacherUid FOLLOWS the subject's teacher, so re-assigning a subject's teacher updates every timetable.
+// ================================================================
+const TT_DAYS = ['sun','mon','tue','wed','thu','fri','sat'];        // index = JS getDay()
+const TT_PRESETS = {
+  monfri: ['mon','tue','wed','thu','fri'], monsat: ['mon','tue','wed','thu','fri','sat'],
+  sunthu: ['sun','mon','tue','wed','thu'], satthu: ['sat','sun','mon','tue','wed','thu'],
+};
+let ttConfig = null, ttTables = [], ttLoaded = false, ttLoading = false;
+let ttCurrentId = null, ttMode = 'class', ttTeacherSel = '', ttBrush = null;
+let ttDraft = null, ttFormMode = null, ttModalCtx = null;
+const ttSaveTimers = {};
+
+const ttId = () => 'p' + Math.random().toString(36).slice(2, 8);
+const ttMin = (t) => { const m = /^(\d{1,2}):(\d{2})$/.exec(t || ''); return m ? (+m[1]) * 60 + (+m[2]) : NaN; };
+const ttHM = (mins) => { mins = ((Math.round(mins) % 1440) + 1440) % 1440; return String(Math.floor(mins / 60)).padStart(2, '0') + ':' + String(mins % 60).padStart(2, '0'); };
+function ttFmtTime(t){
+  const m = ttMin(t); if(isNaN(m)) return t || '';
+  try{ return new Date(2024, 0, 1, Math.floor(m / 60), m % 60).toLocaleTimeString(lang === 'ar' ? 'ar-u-nu-latn' : 'en-US', {hour: 'numeric', minute: '2-digit', hour12: !!(ttConfig && ttConfig.hour12)}); }
+  catch(e){ return t; }
+}
+function ttDayName(k, style){
+  const i = TT_DAYS.indexOf(k);
+  try{ return new Date(2024, 0, 7 + i).toLocaleDateString(lang === 'ar' ? 'ar-u-nu-latn' : 'en-GB', {weekday: style || 'long'}); }catch(e){ return k; }
+}
+function ttHue(slug){ let h = 0; for(const c of String(slug)) h = (h * 31 + c.charCodeAt(0)) % 360; return h; }
+
+function ttGenerate(o){
+  const out = []; let t = ttMin(o.start); if(isNaN(t)) t = 480;
+  const minutes = Math.max(5, +o.minutes || 45), count = Math.max(1, Math.min(20, +o.count || 6));
+  for(let i = 1; i <= count; i++){
+    out.push({id: ttId(), label: 'Period ' + i, start: ttHM(t), end: ttHM(t + minutes), kind: 'class'}); t += minutes;
+    if(i === +o.breakAfter && +o.breakMinutes > 0){ out.push({id: ttId(), label: 'Break', start: ttHM(t), end: ttHM(t + +o.breakMinutes), kind: 'break'}); t += +o.breakMinutes; }
+    if(i === +o.lunchAfter && +o.lunchMinutes > 0){ out.push({id: ttId(), label: 'Lunch', start: ttHM(t), end: ttHM(t + +o.lunchMinutes), kind: 'break'}); t += +o.lunchMinutes; }
+  }
+  return out;
+}
+function ttDefaultConfig(){
+  return {days: [...TT_PRESETS.monfri], periods: ttGenerate({start: '08:00', minutes: 45, count: 6, breakAfter: 3, breakMinutes: 15}), maxPerCell: 1, showTeacher: true, showRoom: true, hour12: false};
+}
+function ttNormalizeConfig(d){
+  const def = ttDefaultConfig();
+  const days = Array.isArray(d.days) ? d.days.filter(x => TT_DAYS.includes(x)) : def.days;
+  const periods = Array.isArray(d.periods) && d.periods.length
+    ? d.periods.map(p => ({id: p.id || ttId(), label: String(p.label || ''), start: p.start || '08:00', end: p.end || '08:45', kind: p.kind === 'break' ? 'break' : 'class'})) : def.periods;
+  return {days: days.length ? days : def.days, periods, maxPerCell: Math.min(4, Math.max(1, +d.maxPerCell || 1)), showTeacher: d.showTeacher !== false, showRoom: d.showRoom !== false, hour12: !!d.hour12};
+}
+function ttNormalizeTable(id, d){
+  return {id, name: d.name || 'Timetable', department: d.department || '', batch: d.batch || '', slots: (d.slots && typeof d.slots === 'object') ? d.slots : {}, updatedAt: d.updatedAt || ''};
+}
+const ttCanEdit = () => can('timetable.edit');
+const ttCanConfig = () => can('timetable.config');
+const ttCur = () => ttTables.find(t => t.id === ttCurrentId) || null;
+const ttSlotKey = (day, pid) => day + '_' + pid;
+function ttSlotActive(key){
+  const i = key.indexOf('_'); if(i < 0 || !ttConfig) return false;
+  return ttConfig.days.includes(key.slice(0, i)) && ttConfig.periods.some(p => p.id === key.slice(i + 1) && p.kind === 'class');
+}
+
+// ---------------------------------------------------------------- data
+async function ttLoad(force){
+  if(ttLoading || (ttLoaded && !force)) return;
+  ttLoading = true; setBox('ttError', '');
+  try{
+    const cs = await getDoc(doc(db, 'settings', 'timetable'));
+    if(cs.exists()) ttConfig = ttNormalizeConfig(cs.data());
+    else{
+      // First-ever use: generate the default once and PERSIST it immediately, so its period ids
+      // (which every timetable's slot keys are built from) stay stable across reloads and devices.
+      ttConfig = ttDefaultConfig();
+      if(ttCanConfig()){ try{ await setDoc(doc(db, 'settings', 'timetable'), {...ttConfig, updatedAt: new Date().toISOString()}); }catch(e){ /* another admin may have just created it, or no permission — fine, keep using it in memory */ } }
+    }
+    const snap = await getDocs(collection(db, 'timetables'));
+    ttTables = snap.docs.map(d => ttNormalizeTable(d.id, d.data())).sort((a, b) => a.name.localeCompare(b.name, undefined, {sensitivity: 'base'}));
+    ttLoaded = true;
+    if(ttCurrentId !== '__all__' && !ttTables.some(t => t.id === ttCurrentId)) ttCurrentId = ttTables.length ? ttTables[0].id : null;
+    if(ttCurrentId === '__all__' && !ttTables.length) ttCurrentId = null;
+  }catch(err){
+    console.error('Timetable load failed', err);
+    setBox('ttError', 'Could not load the timetable: ' + (err.message || err));
+  }finally{ ttLoading = false; }
+}
+function ttScheduleSave(t){
+  clearTimeout(ttSaveTimers[t.id]);
+  $('ttSaveState').textContent = 'Saving…'; $('ttSaveState').className = 'chip muted';
+  ttSaveTimers[t.id] = setTimeout(async () => {
+    try{
+      const clean = {};
+      Object.entries(t.slots).forEach(([k, arr]) => { if(Array.isArray(arr) && arr.length) clean[k] = arr; });
+      t.slots = clean;
+      t.updatedAt = new Date().toISOString();
+      await updateDoc(doc(db, 'timetables', t.id), {slots: clean, updatedAt: t.updatedAt});
+      $('ttSaveState').textContent = 'Saved ✓'; $('ttSaveState').className = 'chip ok';
+      setTimeout(() => { if($('ttSaveState').textContent === 'Saved ✓' || $('ttSaveState').textContent === 'تم الحفظ ✓') $('ttSaveState').className = 'chip hidden'; }, 2200);
+    }catch(err){
+      $('ttSaveState').className = 'chip hidden';
+      setBox('ttError', 'Could not save the timetable: ' + (err.message || err));
+      await ttLoad(true); renderTimetableScreen();
+    }
+  }, 350);
+}
+// Change one timetable's slots, redraw and save.
+function ttApply(t, mutate){
+  const slots = JSON.parse(JSON.stringify(t.slots || {}));
+  mutate(slots); t.slots = slots;
+  renderTtGrid(); ttScheduleSave(t);
+}
+
+// ---------------------------------------------------------------- teachers / conflicts
+function ttEntryTeacher(e){
+  const s = subjectBySlug(e.subject);
+  const uid = e.teacherUid || (s ? s.teacherUid : null) || null;
+  let name = e.teacherName || '';
+  if(!name && uid) name = teacherLabel(uid) || '';
+  return {uid, name, auto: !e.teacherUid};
+}
+function ttTeacherList(){
+  const m = new Map();
+  allTeachers.forEach(t => m.set(t.uid, t.name || t.email));
+  allSubjects.forEach(s => { if(s.teacherUid && !m.has(s.teacherUid) && s.teacherName) m.set(s.teacherUid, s.teacherName); });
+  ttTables.forEach(t => Object.values(t.slots || {}).forEach(arr => (arr || []).forEach(e => { if(e.teacherUid && !m.has(e.teacherUid) && e.teacherName) m.set(e.teacherUid, e.teacherName); })));
+  return Array.from(m.entries()).map(([uid, name]) => ({uid, name})).sort((a, b) => String(a.name).localeCompare(String(b.name), undefined, {sensitivity: 'base'}));
+}
+function ttConflicts(){
+  const map = {}, bySlot = {};
+  ttTables.forEach(t => Object.entries(t.slots || {}).forEach(([k, arr]) => { if(!ttSlotActive(k)) return; (arr || []).forEach((e, i) => { (bySlot[k] = bySlot[k] || []).push({t, e, i}); }); }));
+  const label = (x) => `${(subjectBySlug(x.e.subject) || {name: x.e.subject}).name} · ${x.t.name}`;
+  Object.entries(bySlot).forEach(([k, list]) => {
+    if(list.length < 2) return;
+    list.forEach(a => list.forEach(b => {
+      if(a === b) return;
+      const ta = ttEntryTeacher(a.e), tb = ttEntryTeacher(b.e), id = `${a.t.id}|${k}|${a.i}`;
+      if(ta.uid && ta.uid === tb.uid) (map[id] = map[id] || []).push(`Teacher conflict: ${ta.name || '—'} is also teaching ${label(b)} at this time.`);
+      const ra = (a.e.room || '').trim().toLowerCase();
+      if(ra && ra === (b.e.room || '').trim().toLowerCase()) (map[id] = map[id] || []).push(`Room conflict: ${a.e.room} is also used by ${label(b)} at this time.`);
+    }));
+  });
+  return map;
+}
+
+// ---------------------------------------------------------------- screen
+function renderTimetableScreen(){
+  if(!ttLoaded){
+    $('ttBody').classList.add('hidden'); $('ttLoading').classList.remove('hidden');
+    ttLoad().then(() => { if(route.view === 'timetable') renderTimetableScreen(); });
+    return;
+  }
+  $('ttLoading').classList.add('hidden'); $('ttBody').classList.remove('hidden');
+  const opts = ttTables.map(t => `<option value="${esc(t.id)}">${esc(t.name)}${(t.department || t.batch) ? ' — ' + esc([t.department, t.batch].filter(Boolean).join(' · ')) : ''}</option>`).join('');
+  $('ttSelect').innerHTML = ttTables.length ? (`<option value="__all__">All timetables</option>` + opts) : '<option value="">—</option>';
+  $('ttSelect').value = ttCurrentId || '';
+  const tl = ttTeacherList(), prev = ttTeacherSel;
+  $('ttTeacher').innerHTML = `<option value="">Choose a teacher</option>` + tl.map(t => `<option value="${esc(t.uid)}">${esc(t.name)}</option>`).join('');
+  $('ttTeacher').value = tl.some(t => t.uid === prev) ? prev : ''; ttTeacherSel = $('ttTeacher').value;
+  document.querySelectorAll('#ttMode button').forEach(b => b.classList.toggle('active', b.dataset.mode === ttMode));
+  $('ttSelectWrap').classList.toggle('hidden', ttMode !== 'class');
+  $('ttTeacherWrap').classList.toggle('hidden', ttMode !== 'teacher');
+  $('ttPaletteCard').classList.toggle('hidden', !(ttMode === 'class' && ttCur() && ttCanEdit()));
+  renderTtPalette(); renderTtGrid();
+}
+function ttSubjectChip(s){
+  const t = ttEntryTeacher({subject: s.slug});
+  return `<button type="button" class="tt-chip ${ttBrush === s.slug ? 'active' : ''}" style="--h:${ttHue(s.slug)}" data-slug="${esc(s.slug)}" draggable="true" title="${esc(s.name)}">
+    <b>${esc(s.name)}</b><small>${t.name ? esc(t.name) : '<span class="tt-noteacher">No teacher</span>'}</small></button>`;
+}
+function renderTtPalette(){
+  const q = ($('ttPaletteSearch').value || '').trim().toLowerCase();
+  const list = allSubjects.filter(s => !q || (s.name + ' ' + (s.teacherName || teacherLabel(s.teacherUid))).toLowerCase().includes(q));
+  $('ttPalette').innerHTML = list.length ? list.map(ttSubjectChip).join('') : `<span class="chip muted">No subjects yet</span>`;
+  const b = ttBrush ? subjectBySlug(ttBrush) : null;
+  $('ttBrushNote').classList.toggle('hidden', !b);
+  if(b) $('ttBrushName').textContent = b.name;
+}
+function ttCellHTML(t, day, p, conflicts, forceReadOnly){
+  const key = ttSlotKey(day, p.id), arr = t.slots[key] || [], cfg = ttConfig, edit = !forceReadOnly && ttCanEdit() && ttMode === 'class';
+  const entries = arr.map((e, i) => {
+    const s = subjectBySlug(e.subject), tea = ttEntryTeacher(e), cf = conflicts[`${t.id}|${key}|${i}`];
+    const name = s ? s.name : e.subject;
+    return `<div class="tt-entry ${cf ? 'tt-conflict' : ''} ${s ? '' : 'tt-missing'}" style="--h:${ttHue(e.subject)}" data-idx="${i}" ${edit ? 'draggable="true"' : ''} ${cf ? `title="${esc(cf.join('\n'))}"` : ''}>
+      <b>${esc(name)}</b>
+      ${cfg.showTeacher ? `<small>${tea.name ? esc(tea.name) : '<span class="tt-noteacher">No teacher</span>'}</small>` : ''}
+      ${cfg.showRoom && e.room ? `<small class="tt-room"><i class="fa-solid fa-door-open"></i> ${esc(e.room)}</small>` : ''}
+      ${cf ? '<span class="tt-warn"><i class="fa-solid fa-triangle-exclamation"></i></span>' : ''}
+      ${edit ? '<button type="button" class="tt-x" title="Remove">×</button>' : ''}
+    </div>`;
+  }).join('');
+  const room = arr.length < cfg.maxPerCell;
+  return `<td class="tt-cell ${edit ? 'editable' : ''} ${ttBrush && edit && room ? 'brush' : ''}" data-day="${day}" data-pid="${p.id}">${entries}${edit && room ? `<div class="tt-add" title="Add">+</div>` : ''}</td>`;
+}
+function ttTeacherCellHTML(d, p, conflicts){
+  // teacher view: everything this teacher teaches in this slot, across every timetable
+  const key = ttSlotKey(d, p.id), items = [];
+  ttTables.forEach(tb => (tb.slots[key] || []).forEach((e, i) => { const tea = ttEntryTeacher(e); if(ttTeacherSel && tea.uid === ttTeacherSel) items.push({tb, e, i}); }));
+  const cells = items.map(it => {
+    const s = subjectBySlug(it.e.subject), cf = conflicts[`${it.tb.id}|${key}|${it.i}`];
+    return `<div class="tt-entry ${cf ? 'tt-conflict' : ''}" style="--h:${ttHue(it.e.subject)}" data-open="${esc(it.tb.id)}"><b>${esc(s ? s.name : it.e.subject)}</b><small>${esc(it.tb.name)}</small>${ttConfig.showRoom && it.e.room ? `<small class="tt-room"><i class="fa-solid fa-door-open"></i> ${esc(it.e.room)}</small>` : ''}${cf ? '<span class="tt-warn"><i class="fa-solid fa-triangle-exclamation"></i></span>' : ''}</div>`;
+  }).join('');
+  return `<td class="tt-cell ${items.length ? '' : 'tt-free'}" data-day="${d}" data-pid="${p.id}">${cells}</td>`;
+}
+// Builds the <thead>/<tbody> markup for one grid, given a callback that renders one <td> per day/period.
+function ttGridTableHTML(cfg, cellFn){
+  const days = cfg.days;
+  let html = `<thead><tr><th class="tt-corner">Place</th>${days.map(d => `<th>${esc(ttDayName(d))}</th>`).join('')}</tr></thead><tbody>`;
+  cfg.periods.forEach(p => {
+    const time = `${esc(ttFmtTime(p.start))} – ${esc(ttFmtTime(p.end))}`;
+    const head = `<th class="tt-period"><b>${esc(p.label)}</b><small>${time}</small></th>`;
+    if(p.kind === 'break'){ html += `<tr class="tt-break">${head}<td colspan="${days.length}"><span>${esc(p.label)}</span></td></tr>`; return; }
+    html += `<tr>${head}` + days.map(d => cellFn(d, p)).join('') + '</tr>';
+  });
+  return html + '</tbody>';
+}
+function ttSectionHTML(title, cfg, cellFn){
+  return `<div class="tt-section"><div class="tt-title">${esc(title)}</div><div class="table-scroll"><table class="tt-grid">${ttGridTableHTML(cfg, cellFn)}</table></div></div>`;
+}
+function renderTtGrid(){
+  const cfg = ttConfig;
+  if(!cfg) return;
+  const teacherMode = ttMode === 'teacher';
+  const allMode = !teacherMode && ttCurrentId === '__all__';
+  const t = allMode ? null : ttCur();
+  const isEmpty = teacherMode ? false : (allMode ? !ttTables.length : !t);
+  if(isEmpty){
+    $('ttGridSections').innerHTML = '';
+    $('ttEmpty').classList.remove('hidden'); $('ttGridWrap').classList.add('hidden'); $('ttConflictChip').classList.add('hidden');
+    $('ttEmptyCreate').classList.toggle('hidden', !ttCanConfig());
+    return;
+  }
+  $('ttEmpty').classList.add('hidden'); $('ttGridWrap').classList.remove('hidden');
+  const conflicts = ttConflicts();
+  const nConf = Object.keys(conflicts).length;
+  $('ttConflictChip').classList.toggle('hidden', !nConf); $('ttConflictChip').textContent = `${nConf} conflict(s)`;
+  let sectionsHtml;
+  if(teacherMode){
+    const sel = ttTeacherList().find(x => x.uid === ttTeacherSel);
+    sectionsHtml = ttSectionHTML(sel ? sel.name : '', cfg, (d, p) => ttTeacherCellHTML(d, p, conflicts));
+  }else if(allMode){
+    sectionsHtml = ttTables.map(tb => {
+      const title = tb.name + ((tb.department || tb.batch) ? ' — ' + [tb.department, tb.batch].filter(Boolean).join(' · ') : '');
+      return ttSectionHTML(title, cfg, (d, p) => ttCellHTML(tb, d, p, conflicts, true));
+    }).join('');
+  }else{
+    const title = t.name + ((t.department || t.batch) ? ' — ' + [t.department, t.batch].filter(Boolean).join(' · ') : '');
+    sectionsHtml = ttSectionHTML(title, cfg, (d, p) => ttCellHTML(t, d, p, conflicts, false));
+  }
+  $('ttGridSections').innerHTML = sectionsHtml;
+}
+
+// ---------------------------------------------------------------- toolbar wiring
+$('ttSelect').addEventListener('change', () => { ttCurrentId = $('ttSelect').value; renderTimetableScreen(); });
+$('ttTeacher').addEventListener('change', () => { ttTeacherSel = $('ttTeacher').value; renderTtGrid(); });
+$('ttMode').addEventListener('click', (e) => { const b = e.target.closest('button[data-mode]'); if(!b) return; ttMode = b.dataset.mode; if(ttMode !== 'class') ttBrush = null; renderTimetableScreen(); });
+$('ttRefreshBtn').addEventListener('click', async () => { await withBusy($('ttRefreshBtn'), () => ttLoad(true)); renderTimetableScreen(); });
+$('ttPrintBtn').addEventListener('click', () => window.print());
+$('ttPdfBtn').addEventListener('click', openTtPdfModal);
+$('ttPaletteSearch').addEventListener('input', renderTtPalette);
+$('ttBrushClear').addEventListener('click', () => { ttBrush = null; renderTtPalette(); renderTtGrid(); });
+document.addEventListener('keydown', (e) => { if(e.key === 'Escape'){ if(!$('ttPdfModal').classList.contains('hidden')) closeTtPdfModal(); else if(!$('ttModal').classList.contains('hidden')) closeTtModal(); else if(ttBrush){ ttBrush = null; if(route.view === 'timetable'){ renderTtPalette(); renderTtGrid(); } } } });
+
+// palette: click = brush, drag = drop into a cell
+$('ttPalette').addEventListener('click', (e) => {
+  const c = e.target.closest('.tt-chip'); if(!c) return;
+  ttBrush = (ttBrush === c.dataset.slug) ? null : c.dataset.slug; renderTtPalette(); renderTtGrid();
+});
+$('ttPalette').addEventListener('dragstart', (e) => {
+  const c = e.target.closest('.tt-chip'); if(!c) return;
+  e.dataTransfer.setData('text/plain', JSON.stringify({kind: 'subject', slug: c.dataset.slug})); e.dataTransfer.effectAllowed = 'copy';
+});
+
+// ---------------------------------------------------------------- grid interaction
+function ttAddEntry(t, day, pid, entry, opts = {}){
+  const key = ttSlotKey(day, pid), cur = (t.slots[key] || []);
+  if(cur.length >= ttConfig.maxPerCell){ setBox('ttError', `This period already holds ${ttConfig.maxPerCell} subject(s).`); return false; }
+  setBox('ttError', '');
+  ttApply(t, slots => { slots[key] = [...(slots[key] || []), entry]; });
+  return true;
+}
+function ttNewEntry(slug){ return {subject: slug, teacherUid: null, teacherName: null, room: '', note: ''}; }
+$('ttGridSections').addEventListener('click', (e) => {
+  const t = ttCur();
+  const open = e.target.closest('[data-open]');
+  if(open){ ttCurrentId = open.dataset.open; ttMode = 'class'; renderTimetableScreen(); return; }
+  if(ttMode !== 'class' || !t || !ttCanEdit()) return;
+  const td = e.target.closest('td.tt-cell'); if(!td) return;
+  const day = td.dataset.day, pid = td.dataset.pid, key = ttSlotKey(day, pid);
+  const x = e.target.closest('.tt-x');
+  const entryEl = e.target.closest('.tt-entry');
+  if(x && entryEl){
+    ttApply(t, slots => { const arr = [...(slots[key] || [])]; arr.splice(+entryEl.dataset.idx, 1); slots[key] = arr; });
+    return;
+  }
+  if(entryEl){ openTtModal({tableId: t.id, day, pid, idx: +entryEl.dataset.idx}); return; }
+  if(ttBrush){ ttAddEntry(t, day, pid, ttNewEntry(ttBrush)); return; }
+  if((t.slots[key] || []).length < ttConfig.maxPerCell) openTtModal({tableId: t.id, day, pid, idx: null});
+});
+$('ttGridSections').addEventListener('dragstart', (e) => {
+  const en = e.target.closest('.tt-entry'); const td = e.target.closest('td.tt-cell'); if(!en || !td || !ttCanEdit()) return;
+  e.dataTransfer.setData('text/plain', JSON.stringify({kind: 'move', tableId: ttCurrentId, key: ttSlotKey(td.dataset.day, td.dataset.pid), idx: +en.dataset.idx})); e.dataTransfer.effectAllowed = 'move';
+});
+$('ttGridSections').addEventListener('dragover', (e) => { const td = e.target.closest('td.tt-cell.editable'); if(td){ e.preventDefault(); document.querySelectorAll('.tt-cell.drop').forEach(c => { if(c !== td) c.classList.remove('drop'); }); td.classList.add('drop'); } });
+$('ttGridSections').addEventListener('dragleave', (e) => { const td = e.target.closest('td.tt-cell'); if(td && !td.contains(e.relatedTarget)) td.classList.remove('drop'); });
+$('ttGridSections').addEventListener('drop', (e) => {
+  const td = e.target.closest('td.tt-cell.editable'); if(!td) return;
+  e.preventDefault(); td.classList.remove('drop');
+  const t = ttCur(); if(!t) return;
+  let data; try{ data = JSON.parse(e.dataTransfer.getData('text/plain')); }catch(err){ return; }
+  const day = td.dataset.day, pid = td.dataset.pid, key = ttSlotKey(day, pid);
+  if(data.kind === 'subject'){ ttAddEntry(t, day, pid, ttNewEntry(data.slug)); return; }
+  if(data.kind === 'move' && data.tableId === t.id){
+    if(data.key === key) return;
+    if((t.slots[key] || []).length >= ttConfig.maxPerCell){ setBox('ttError', `This period already holds ${ttConfig.maxPerCell} subject(s).`); return; }
+    setBox('ttError', '');
+    ttApply(t, slots => { const src = [...(slots[data.key] || [])]; const [moved] = src.splice(data.idx, 1); if(!moved) return; slots[data.key] = src; slots[key] = [...(slots[key] || []), moved]; });
+  }
+});
+
+// ---------------------------------------------------------------- add / edit modal
+function ttUpdateAutoOption(){
+  const s = subjectBySlug($('ttmSubject').value), auto = $('ttmTeacher').options[0];
+  const name = s ? (teacherLabel(s.teacherUid) || s.teacherName || '') : '';
+  auto.textContent = name ? `Automatic — ${name}` : 'Automatic (the subject has no teacher yet)';
+}
+function openTtModal(ctx){
+  const t = ttTables.find(x => x.id === ctx.tableId), p = ttConfig.periods.find(x => x.id === ctx.pid); if(!t || !p) return;
+  const cur = ctx.idx != null ? (t.slots[ttSlotKey(ctx.day, ctx.pid)] || [])[ctx.idx] : null;
+  ttModalCtx = ctx;
+  $('ttModalTitle').innerHTML = `<span>${esc(ttDayName(ctx.day))}</span> · <span>${esc(p.label)}</span>`;
+  $('ttModalTime').textContent = `${ttFmtTime(p.start)} – ${ttFmtTime(p.end)}`;
+  $('ttmSubject').innerHTML = `<option value="">—</option>` + allSubjects.map(s => `<option value="${esc(s.slug)}">${esc(s.name)}</option>`).join('');
+  $('ttmSubject').value = cur ? cur.subject : (ttBrush || '');
+  const tl = ttTeacherList();
+  $('ttmTeacher').innerHTML = `<option value="">Automatic</option>` + tl.map(x => `<option value="${esc(x.uid)}">${esc(x.name)}</option>`).join('');
+  $('ttmTeacher').value = cur && cur.teacherUid ? cur.teacherUid : '';
+  ttUpdateAutoOption();
+  $('ttmRoom').value = cur ? (cur.room || '') : ''; $('ttmNote').value = cur ? (cur.note || '') : '';
+  $('ttmRoomWrap').classList.toggle('hidden', !ttConfig.showRoom);
+  $('ttmDelete').classList.toggle('hidden', !cur);
+  setBox('ttmError', '');
+  $('ttModal').classList.remove('hidden'); $('ttmSubject').focus();
+}
+function closeTtModal(){ $('ttModal').classList.add('hidden'); ttModalCtx = null; }
+$('ttmSubject').addEventListener('change', ttUpdateAutoOption);
+$('ttmCancel').addEventListener('click', closeTtModal);
+$('ttModal').addEventListener('click', (e) => { if(e.target === $('ttModal')) closeTtModal(); });
+$('ttmDelete').addEventListener('click', () => {
+  const c = ttModalCtx, t = c && ttTables.find(x => x.id === c.tableId); if(!t || c.idx == null) return;
+  const key = ttSlotKey(c.day, c.pid);
+  ttApply(t, slots => { const arr = [...(slots[key] || [])]; arr.splice(c.idx, 1); slots[key] = arr; });
+  closeTtModal();
+});
+$('ttmSave').addEventListener('click', () => {
+  const c = ttModalCtx, t = c && ttTables.find(x => x.id === c.tableId); if(!t) return;
+  const slug = $('ttmSubject').value;
+  if(!slug){ setBox('ttmError', 'Choose a subject.'); return; }
+  const tid = $('ttmTeacher').value, tl = ttTeacherList().find(x => x.uid === tid);
+  const entry = {subject: slug, teacherUid: tid || null, teacherName: tid ? (tl ? tl.name : null) : null, room: $('ttmRoom').value.trim().slice(0, 40), note: $('ttmNote').value.trim().slice(0, 200)};
+  const key = ttSlotKey(c.day, c.pid);
+  if(c.idx == null){ if(ttAddEntry(t, c.day, c.pid, entry)) closeTtModal(); return; }
+  ttApply(t, slots => { const arr = [...(slots[key] || [])]; arr[c.idx] = entry; slots[key] = arr; });
+  closeTtModal();
+});
+
+// ---------------------------------------------------------------- PDF export
+function ttPdfDefaultTitle(){ return L('JUMJ — Class Timetables', 'جداول JUMJ الدراسية'); }
+function ttPdfDefaultSubtitle(){
+  if(ttMode === 'teacher'){ const sel = ttTeacherList().find(x => x.uid === ttTeacherSel); return (sel ? sel.name : '') + L(' — Teacher Schedule', ' — جدول المعلم'); }
+  if(ttCurrentId === '__all__') return L('All Class Timetables', 'كل الجداول الدراسية');
+  const t = ttCur(); return t ? (t.name + ((t.department || t.batch) ? ' — ' + [t.department, t.batch].filter(Boolean).join(' · ') : '')) : '';
+}
+function ttPdfDefaultFooter(){
+  const d = new Date().toLocaleDateString(lang === 'ar' ? 'ar-u-nu-latn' : 'en-GB', {day: '2-digit', month: 'short', year: 'numeric'});
+  return L(`Generated ${d} via the JUMJ admin console`, `أُنشئ في ${d} عبر لوحة JUMJ`);
+}
+let ttPdfLogoDataUrl = null;
+function ttPdfSetLogo(dataUrl){
+  ttPdfLogoDataUrl = dataUrl || null;
+  const img = $('ttPdfLogoPreview'), empty = $('ttPdfLogoEmpty'), rm = $('ttPdfLogoRemove');
+  if(ttPdfLogoDataUrl){
+    img.src = ttPdfLogoDataUrl; img.classList.remove('hidden');
+    empty.classList.add('hidden'); rm.classList.remove('hidden');
+  }else{
+    img.classList.add('hidden'); img.removeAttribute('src');
+    empty.classList.remove('hidden'); rm.classList.add('hidden');
+  }
+}
+function ttPdfReadLogoFile(file){
+  if(!file || !file.type || !file.type.startsWith('image/')) return;
+  const reader = new FileReader();
+  reader.onload = () => ttPdfSetLogo(reader.result);
+  reader.readAsDataURL(file);
+}
+$('ttPdfLogoDrop').addEventListener('click', (e) => { if(e.target.closest('#ttPdfLogoRemove')) return; $('ttPdfLogoInput').click(); });
+$('ttPdfLogoInput').addEventListener('change', (e) => ttPdfReadLogoFile(e.target.files && e.target.files[0]));
+$('ttPdfLogoRemove').addEventListener('click', (e) => { e.stopPropagation(); ttPdfSetLogo(null); $('ttPdfLogoInput').value = ''; });
+['dragenter','dragover'].forEach(ev => $('ttPdfLogoDrop').addEventListener(ev, (e) => { e.preventDefault(); $('ttPdfLogoDrop').classList.add('drag'); }));
+['dragleave','drop'].forEach(ev => $('ttPdfLogoDrop').addEventListener(ev, (e) => { e.preventDefault(); $('ttPdfLogoDrop').classList.remove('drag'); }));
+$('ttPdfLogoDrop').addEventListener('drop', (e) => ttPdfReadLogoFile(e.dataTransfer.files && e.dataTransfer.files[0]));
+function openTtPdfModal(){
+  if(!ttConfig){ return; }
+  if(ttMode === 'teacher' && !ttTeacherSel){ setBox('ttError', 'Choose a teacher first.'); return; }
+  if(ttMode === 'class' && ttCurrentId === '__all__' && !ttTables.length){ setBox('ttError', 'Nothing to export yet.'); return; }
+  if(ttMode === 'class' && ttCurrentId !== '__all__' && !ttCur()){ setBox('ttError', 'Nothing to export yet.'); return; }
+  $('ttPdfTitle').value = ttPdfDefaultTitle();
+  $('ttPdfSubtitle').value = ttPdfDefaultSubtitle();
+  $('ttPdfFooter').value = ttPdfDefaultFooter();
+  $('ttPdfScope').textContent = ttMode === 'teacher'
+    ? 'Exporting the schedule currently shown for this teacher.'
+    : (ttCurrentId === '__all__' ? `Exporting all ${ttTables.length} timetable(s), one page each.` : 'Exporting the timetable currently shown.');
+  ttPdfSetLogo(ttPdfLogoDataUrl);
+  setBox('ttPdfError', '');
+  $('ttPdfModal').classList.remove('hidden');
+}
+function closeTtPdfModal(){ $('ttPdfModal').classList.add('hidden'); }
+async function ttGeneratePdf(){
+  const btn = $('ttPdfGenerate');
+  setBox('ttPdfError', '');
+  const sections = Array.from($('ttGridSections').querySelectorAll('.tt-section'));
+  if(!sections.length){ setBox('ttPdfError', 'Nothing to export yet.'); return; }
+  if(typeof html2canvas === 'undefined' || !window.jspdf){ setBox('ttPdfError', 'Could not load the PDF engine — check your connection and try again.'); return; }
+  const title = ($('ttPdfTitle').value || '').trim().slice(0, 80) || ttPdfDefaultTitle();
+  const subtitle = ($('ttPdfSubtitle').value || '').trim().slice(0, 120);
+  const footer = ($('ttPdfFooter').value || '').trim().slice(0, 120);
+  const theme = $('ttPdfTheme').value || 'emerald';
+  const headerEvery = $('ttPdfHeaderEvery').checked;
+  const logoDataUrl = ttPdfLogoDataUrl;
+  await withBusy(btn, async () => {
+    const root = $('ttPdfExportRoot');
+    root.className = 'pdf-doc pdf-theme-' + theme;
+    root.dir = document.documentElement.dir; root.lang = document.documentElement.lang;
+    const { jsPDF } = window.jspdf;
+    let pdf = null;
+    const issued = new Date().toLocaleDateString(lang === 'ar' ? 'ar-u-nu-latn' : 'en-GB', {day: '2-digit', month: 'short', year: 'numeric'});
+    try{
+      for(let i = 0; i < sections.length; i++){
+        const sec = sections[i];
+        const page = document.createElement('div'); page.className = 'pdf-page';
+        const sectionTitle = sec.querySelector('.tt-title') ? sec.querySelector('.tt-title').innerHTML : '';
+        const showBanner = i === 0 || headerEvery;
+        const logoBox = logoDataUrl ? `<img src="${logoDataUrl}" alt="">` : '';
+        const bannerHtml = `
+          <div class="pdf-banner">
+            <div class="pdf-banner-logo">${logoBox}</div>
+            <div class="pdf-banner-text">
+              <div class="pdf-eyebrow">${esc(sections.length > 1 ? `${i + 1} / ${sections.length}` : L('Class Timetable', 'الجدول الدراسي'))}</div>
+              <div class="pdf-title">${esc(title)}</div>
+              ${subtitle ? `<div class="pdf-subtitle">${esc(subtitle)}</div>` : ''}
+            </div>
+            <div class="pdf-banner-badge"><b>${esc(issued)}</b><small>${esc(L('Issued', 'تاريخ الإصدار'))}</small></div>
+          </div>
+          <div class="pdf-section-title">${sectionTitle}</div>
+        `;
+        const slimHtml = `
+          <div class="pdf-slim-head">
+            <span class="pdf-slim-title">${sectionTitle}</span>
+            <span class="pdf-slim-page">${esc(`${i + 1} / ${sections.length}`)}</span>
+          </div>
+        `;
+        page.innerHTML = `
+          ${showBanner ? bannerHtml : slimHtml}
+          <div class="pdf-tablewrap"></div>
+          <div class="pdf-footer"><span>${esc(footer)}</span><b>JUMJ</b></div>
+        `;
+        const clonedTable = sec.querySelector('table').cloneNode(true);
+        clonedTable.querySelectorAll('.tt-x,.tt-add').forEach(el => el.remove());
+        clonedTable.querySelectorAll('[draggable]').forEach(el => el.removeAttribute('draggable'));
+        clonedTable.querySelectorAll('.editable,.brush').forEach(el => el.classList.remove('editable', 'brush'));
+        page.querySelector('.pdf-tablewrap').appendChild(clonedTable);
+        root.innerHTML = ''; root.appendChild(page);
+        await new Promise(r => setTimeout(r, 30));
+        const canvas = await html2canvas(page, {scale: 2, backgroundColor: '#f6f2e6', useCORS: true});
+        const img = canvas.toDataURL('image/jpeg', 0.95);
+        const pw = 297, ph = 210, ratio = canvas.width / canvas.height;
+        let w = pw - 14, h = w / ratio;
+        if(h > ph - 14){ h = ph - 14; w = h * ratio; }
+        const x = (pw - w) / 2, y = (ph - h) / 2;
+        if(!pdf) pdf = new jsPDF({orientation: 'landscape', unit: 'mm', format: 'a4'});
+        else pdf.addPage('a4', 'landscape');
+        pdf.setFillColor(246, 242, 230); pdf.rect(0, 0, pw, ph, 'F');
+        pdf.addImage(img, 'JPEG', x, y, w, h);
+      }
+      const fname = (title || 'timetable').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').slice(0, 60) || 'timetable';
+      pdf.save(`${fname}.pdf`);
+      closeTtPdfModal();
+    }catch(err){
+      console.error('PDF export failed', err);
+      setBox('ttPdfError', 'Could not generate the PDF: ' + (err.message || err));
+    }finally{
+      root.innerHTML = ''; root.removeAttribute('dir'); root.removeAttribute('lang'); root.className = '';
+    }
+  });
+}
+$('ttPdfCancel').addEventListener('click', closeTtPdfModal);
+$('ttPdfModal').addEventListener('click', (e) => { if(e.target === $('ttPdfModal')) closeTtPdfModal(); });
+$('ttPdfGenerate').addEventListener('click', ttGeneratePdf);
+
+// ---------------------------------------------------------------- generic table PDF export (Results / Students)
+let tblPdfKind = null; // 'results' | 'students' | 'roster'
+let tblPdfLogoDataUrl = null;
+function tblPdfSetLogo(dataUrl){
+  tblPdfLogoDataUrl = dataUrl || null;
+  const img = $('tblPdfLogoPreview'), empty = $('tblPdfLogoEmpty'), rm = $('tblPdfLogoRemove');
+  if(tblPdfLogoDataUrl){
+    img.src = tblPdfLogoDataUrl; img.classList.remove('hidden');
+    empty.classList.add('hidden'); rm.classList.remove('hidden');
+  }else{
+    img.classList.add('hidden'); img.removeAttribute('src');
+    empty.classList.remove('hidden'); rm.classList.add('hidden');
+  }
+}
+function tblPdfReadLogoFile(file){
+  if(!file || !file.type || !file.type.startsWith('image/')) return;
+  const reader = new FileReader();
+  reader.onload = () => tblPdfSetLogo(reader.result);
+  reader.readAsDataURL(file);
+}
+$('tblPdfLogoDrop').addEventListener('click', (e) => { if(e.target.closest('#tblPdfLogoRemove')) return; $('tblPdfLogoInput').click(); });
+$('tblPdfLogoInput').addEventListener('change', (e) => tblPdfReadLogoFile(e.target.files && e.target.files[0]));
+$('tblPdfLogoRemove').addEventListener('click', (e) => { e.stopPropagation(); tblPdfSetLogo(null); $('tblPdfLogoInput').value = ''; });
+['dragenter','dragover'].forEach(ev => $('tblPdfLogoDrop').addEventListener(ev, (e) => { e.preventDefault(); $('tblPdfLogoDrop').classList.add('drag'); }));
+['dragleave','drop'].forEach(ev => $('tblPdfLogoDrop').addEventListener(ev, (e) => { e.preventDefault(); $('tblPdfLogoDrop').classList.remove('drag'); }));
+$('tblPdfLogoDrop').addEventListener('drop', (e) => tblPdfReadLogoFile(e.dataTransfer.files && e.dataTransfer.files[0]));
+
+function tblPdfDefaultFooter(){
+  const d = new Date().toLocaleDateString(lang === 'ar' ? 'ar-u-nu-latn' : 'en-GB', {day: '2-digit', month: 'short', year: 'numeric'});
+  return L(`Generated ${d} via the JUMJ admin console`, `أُنشئ في ${d} عبر لوحة JUMJ`);
+}
+function openResPdfModal(){
+  const subj = curSubj(); if(!subj) return;
+  const rowCount = $('allResultsBody').querySelectorAll('tr[data-uid]').length;
+  if(!rowCount){ setBox('resAllError', 'Nothing to export yet.'); return; }
+  tblPdfKind = 'results';
+  $('tblPdfHeadTitle').textContent = L('Export results as PDF', 'تصدير النتائج كملف PDF');
+  $('tblPdfTitle').value = subj.name;
+  $('tblPdfSubtitle').value = L('Results', 'النتائج');
+  $('tblPdfFooter').value = tblPdfDefaultFooter();
+  $('tblPdfScope').textContent = `${L('Exporting', 'تصدير')} ${rowCount} ${L('student(s) currently shown.', 'طالب/طلاب معروضين حاليًا.')}`;
+  tblPdfSetLogo(tblPdfLogoDataUrl);
+  $('tblPdfColsField').classList.add('hidden'); $('tblPdfGroupField').classList.add('hidden');
+  setBox('tblPdfError', '');
+  $('tblPdfModal').classList.remove('hidden');
+}
+// Column-pickable PDF exports (student directory + per-subject roster): which data columns exist, how to
+// read a plain-text value out of a row, and where each export's rows come from. No avatar and no gender
+// color coding in any of these — exported tables are plain text only.
+const STU_PDF_COLUMNS = [
+  {key:'name',       label:() => L('Name','الاسم')},
+  {key:'email',      label:() => L('Email','البريد الإلكتروني')},
+  {key:'gender',     label:() => L('Gender','الجنس')},
+  {key:'phone',      label:() => L('Phone','الهاتف')},
+  {key:'department', label:() => L('Department','القسم')},
+  {key:'batch',      label:() => L('Batch','الدفعة')},
+  {key:'subjects',   label:() => L('Subjects','المواد')},
+];
+function tblPdfStuCellValue(s, key){
+  switch(key){
+    case 'name': return s.name || '';
+    case 'email': return s.email || '';
+    case 'gender': return s.gender || L('—','—');
+    case 'phone': return s.phone || L('—','—');
+    case 'department': return s.department || L('—','—');
+    case 'batch': return s.batch || L('—','—');
+    case 'subjects': return (s.subjectIds || []).map(id => subjectBySlug(id)).filter(Boolean).map(x => x.name).join(', ') || L('—','—');
+    default: return '';
+  }
+}
+const ROSTER_PDF_COLUMNS = [
+  {key:'name',       label:() => L('Name','الاسم')},
+  {key:'email',      label:() => L('Email','البريد الإلكتروني')},
+  {key:'gender',     label:() => L('Gender','الجنس')},
+  {key:'phone',      label:() => L('Phone','الهاتف')},
+  {key:'department', label:() => L('Department','القسم')},
+  {key:'batch',      label:() => L('Batch','الدفعة')},
+  {key:'result',     label:() => L('Result','النتيجة')},
+];
+function tblPdfRosterResultText(uid, m, known){
+  const r = m.get(uid);
+  if(r && r.maxTotal) return (r.total / r.maxTotal * 100).toFixed(1) + '%' + (r.complete ? '' : ' ' + L('(partial)', '(جزئي)'));
+  return known ? L('No result', 'لا نتيجة') : L('…', '…');
+}
+function tblPdfRosterCellValue(item, key){
+  return key === 'result' ? item.resultText : tblPdfStuCellValue(item.s, key);
+}
+// Which export "kind" reads from which screen, what columns it offers, and how to turn a row into a cell value.
+const PDF_EXPORTS = {
+  students: {
+    columns: STU_PDF_COLUMNS,
+    getRows(){ return Array.from($('allStudentsBody').querySelectorAll('tr[data-uid]')).map(tr => studentByUid(tr.dataset.uid)).filter(Boolean); },
+    cellValue: (s, key) => tblPdfStuCellValue(s, key),
+  },
+  roster: {
+    columns: ROSTER_PDF_COLUMNS,
+    getRows(){
+      const subj = curSubj(); if(!subj) return [];
+      const m = resultsStore.get(subj.slug) || new Map();
+      const known = resultsKnown(subj.slug);
+      return Array.from($('enrBody').querySelectorAll('tr[data-uid]')).map(tr => {
+        const s = studentByUid(tr.dataset.uid); if(!s) return null;
+        return {s, resultText: tblPdfRosterResultText(tr.dataset.uid, m, known)};
+      }).filter(Boolean);
+    },
+    cellValue: (item, key) => tblPdfRosterCellValue(item, key),
+  },
+};
+let tblPdfColsByKind = {students: new Set(STU_PDF_COLUMNS.map(c => c.key)), roster: new Set(ROSTER_PDF_COLUMNS.map(c => c.key))}; // remembered per kind, for the session
+function tblPdfActiveExport(){ return PDF_EXPORTS[tblPdfKind] || null; }
+function tblPdfRenderCols(){
+  const cfg = tblPdfActiveExport(); if(!cfg) return;
+  const cols = tblPdfColsByKind[tblPdfKind];
+  $('tblPdfCols').innerHTML = cfg.columns.map(c => `
+    <label class="tt-pdf-toggle"><input type="checkbox" class="tblPdfColChk" value="${c.key}" ${cols.has(c.key) ? 'checked' : ''}> ${esc(c.label())}</label>
+  `).join('');
+}
+function tblPdfRenderGroupBy(){
+  const cfg = tblPdfActiveExport(); if(!cfg) return;
+  const sel = $('tblPdfGroupBy'), cur = sel.value;
+  sel.innerHTML = `<option value="">${esc(L('No grouping — one table', 'بدون تجميع — جدول واحد'))}</option>` +
+    cfg.columns.map(c => `<option value="${c.key}">${esc(L('One table per ', 'جدول لكل '))}${esc(c.label())}</option>`).join('');
+  if(Array.from(sel.options).some(o => o.value === cur)) sel.value = cur;
+}
+// Once a "split by" column is picked, this shows every value actually present for that column (e.g. every
+// department, every subject, every batch) so the admin can choose which specific one(s) to export — not
+// just export one table per value automatically. Selection defaults to "all" so behavior is unchanged
+// until the admin narrows it down. Re-picking the group-by column resets the selection back to "all".
+let tblPdfGroupVals = null;    // Set of selected values, or null when nothing to pick from
+let tblPdfGroupValsKey = null; // which group-by column tblPdfGroupVals belongs to
+function tblPdfRenderGroupVals(resetSelection){
+  const cfg = tblPdfActiveExport();
+  const groupKey = $('tblPdfGroupBy').value;
+  const wrap = $('tblPdfGroupValsWrap');
+  if(!cfg || !groupKey){
+    wrap.classList.add('hidden'); $('tblPdfGroupVals').innerHTML = '';
+    tblPdfGroupVals = null; tblPdfGroupValsKey = null;
+    return;
+  }
+  const col = cfg.columns.find(c => c.key === groupKey);
+  const values = Array.from(new Set(cfg.getRows().map(row => cfg.cellValue(row, groupKey) || L('—', '—'))))
+    .sort((a, b) => String(a).localeCompare(String(b), undefined, {numeric: true}));
+  if(resetSelection || tblPdfGroupValsKey !== groupKey){ tblPdfGroupVals = new Set(values); tblPdfGroupValsKey = groupKey; }
+  $('tblPdfGroupValsLabel').textContent = col ? L('Which ', 'أيّ ') + col.label() + L(' to include', ' يتم تضمينها') : L('Which values to include', 'القيم المطلوب تضمينها');
+  $('tblPdfGroupVals').innerHTML = values.map(v => `
+    <label class="tt-pdf-toggle"><input type="checkbox" class="tblPdfGroupValChk" value="${esc(v)}" ${tblPdfGroupVals.has(v) ? 'checked' : ''}> ${esc(v)}</label>
+  `).join('');
+  wrap.classList.remove('hidden');
+}
+$('tblPdfGroupBy').addEventListener('change', () => tblPdfRenderGroupVals(true));
+$('tblPdfGroupVals').addEventListener('change', (e) => {
+  if(!e.target.classList.contains('tblPdfGroupValChk') || !tblPdfGroupVals) return;
+  if(e.target.checked) tblPdfGroupVals.add(e.target.value); else tblPdfGroupVals.delete(e.target.value);
+});
+$('tblPdfGroupValsAll').addEventListener('click', () => tblPdfRenderGroupVals(true));
+$('tblPdfGroupValsNone').addEventListener('click', () => { if(!tblPdfGroupVals) return; tblPdfGroupVals.clear(); tblPdfRenderGroupVals(false); });
+$('tblPdfCols').addEventListener('change', (e) => {
+  if(!e.target.classList.contains('tblPdfColChk') || !tblPdfColsByKind[tblPdfKind]) return;
+  const cols = tblPdfColsByKind[tblPdfKind];
+  if(e.target.checked) cols.add(e.target.value); else cols.delete(e.target.value);
+});
+$('tblPdfColsAll').addEventListener('click', () => { const cfg = tblPdfActiveExport(); if(!cfg) return; tblPdfColsByKind[tblPdfKind] = new Set(cfg.columns.map(c => c.key)); tblPdfRenderCols(); });
+$('tblPdfColsNone').addEventListener('click', () => { if(!tblPdfActiveExport()) return; tblPdfColsByKind[tblPdfKind] = new Set(); tblPdfRenderCols(); });
+
+function openStuPdfModal(){
+  const rowCount = $('allStudentsBody').querySelectorAll('tr[data-uid]').length;
+  if(!rowCount){ setBox('stuError', 'Nothing to export yet.'); return; }
+  tblPdfKind = 'students';
+  $('tblPdfHeadTitle').textContent = L('Export students as PDF', 'تصدير الطلاب كملف PDF');
+  $('tblPdfTitle').value = L('Students', 'الطلاب');
+  $('tblPdfSubtitle').value = L('Student directory', 'دليل الطلاب');
+  $('tblPdfFooter').value = tblPdfDefaultFooter();
+  $('tblPdfScope').textContent = `${L('Exporting', 'تصدير')} ${rowCount} ${L('student(s) currently shown.', 'طالب/طلاب معروضين حاليًا.')}`;
+  tblPdfSetLogo(tblPdfLogoDataUrl);
+  tblPdfRenderCols();
+  tblPdfRenderGroupBy(); $('tblPdfGroupBy').value = ''; tblPdfRenderGroupVals();
+  $('tblPdfColsField').classList.remove('hidden'); $('tblPdfGroupField').classList.remove('hidden');
+  setBox('tblPdfError', '');
+  $('tblPdfModal').classList.remove('hidden');
+}
+function openEnrPdfModal(){
+  const subj = curSubj(); if(!subj) return;
+  const rowCount = $('enrBody').querySelectorAll('tr[data-uid]').length;
+  if(!rowCount){ setBox('enrError', 'Nothing to export yet.'); return; }
+  tblPdfKind = 'roster';
+  $('tblPdfHeadTitle').textContent = L('Export roster as PDF', 'تصدير قائمة الطلاب كملف PDF');
+  $('tblPdfTitle').value = subj.name;
+  $('tblPdfSubtitle').value = L('Roster', 'قائمة الطلاب');
+  $('tblPdfFooter').value = tblPdfDefaultFooter();
+  $('tblPdfScope').textContent = `${L('Exporting', 'تصدير')} ${rowCount} ${L('student(s) currently shown.', 'طالب/طلاب معروضين حاليًا.')}`;
+  tblPdfSetLogo(tblPdfLogoDataUrl);
+  tblPdfRenderCols();
+  tblPdfRenderGroupBy(); $('tblPdfGroupBy').value = ''; tblPdfRenderGroupVals();
+  $('tblPdfColsField').classList.remove('hidden'); $('tblPdfGroupField').classList.remove('hidden');
+  setBox('tblPdfError', '');
+  $('tblPdfModal').classList.remove('hidden');
+}
+function closeTblPdfModal(){ $('tblPdfModal').classList.add('hidden'); }
+$('tblPdfCancel').addEventListener('click', closeTblPdfModal);
+$('tblPdfModal').addEventListener('click', (e) => { if(e.target === $('tblPdfModal')) closeTblPdfModal(); });
+$('resPdfBtn').addEventListener('click', openResPdfModal);
+$('stuPdfBtn').addEventListener('click', openStuPdfModal);
+$('enrPdfBtn').addEventListener('click', openEnrPdfModal);
+
+// Cleans a cloned <table> for print: strips checkboxes/buttons, bakes form values into plain text, drops empty action columns.
+function tblPdfCleanTable(table){
+  table.querySelectorAll('.chk').forEach(el => el.remove());
+  table.querySelectorAll('button').forEach(el => el.remove());
+  table.querySelectorAll('input,select,textarea').forEach(el => {
+    const span = document.createElement('span');
+    span.className = el.className;
+    span.textContent = el.tagName === 'SELECT' ? (el.options[el.selectedIndex] ? el.options[el.selectedIndex].text : '') : (el.value || '');
+    el.replaceWith(span);
+  });
+  table.querySelectorAll('details.subjpick').forEach(d => {
+    const span = document.createElement('span');
+    span.textContent = d.querySelector('summary') ? d.querySelector('summary').textContent : '';
+    d.replaceWith(span);
+  });
+  const headRow = table.querySelector('thead tr');
+  if(headRow){
+    Array.from(headRow.children).forEach((th, i) => {
+      if(!th.textContent.trim()){
+        table.querySelectorAll('tr').forEach(tr => { if(tr.children[i]) tr.children[i].remove(); });
+      }
+    });
+  }
+  table.classList.add('pdf-plain-table');
+  return table;
+}
+
+// Builds a plain-text table for export: only the picked columns, no avatar, no gender color coding —
+// every cell is just text, same as any other export column. Works for any column-pickable export kind.
+function tblPdfBuildTable(rows, cols, cellValue){
+  const table = document.createElement('table');
+  table.className = 'pdf-plain-table';
+  table.innerHTML = `<thead><tr>${cols.map(c => `<th>${esc(c.label())}</th>`).join('')}</tr></thead>` +
+    `<tbody>${rows.map(row => `<tr>${cols.map(c => `<td>${esc(cellValue(row, c.key))}</td>`).join('')}</tr>`).join('')}</tbody>`;
+  return table;
+}
+// Splits rows into groups by one column's value (e.g. one table per Department). No grouping → a single group.
+function tblPdfGroupRows(rows, groupKey, cellValue){
+  if(!groupKey) return [{label: '', rows}];
+  const map = new Map();
+  rows.forEach(row => {
+    const v = cellValue(row, groupKey) || L('—', '—');
+    if(!map.has(v)) map.set(v, []);
+    map.get(v).push(row);
+  });
+  return Array.from(map.entries())
+    .sort((a, b) => String(a[0]).localeCompare(String(b[0]), undefined, {numeric: true}))
+    .map(([label, rows]) => ({label, rows}));
+}
+
+async function tblGeneratePdf(){
+  const btn = $('tblPdfGenerate');
+  setBox('tblPdfError', '');
+  if(typeof html2canvas === 'undefined' || !window.jspdf){ setBox('tblPdfError', 'Could not load the PDF engine — check your connection and try again.'); return; }
+
+  // sections: one {label, table} per exported table. Students/roster may split into several (grouped); results is always one.
+  let sections;
+  const cfg = tblPdfActiveExport();
+  if(cfg){
+    const rows = cfg.getRows();
+    if(!rows.length){ setBox('tblPdfError', 'Nothing to export yet.'); return; }
+    const cols = cfg.columns.filter(c => tblPdfColsByKind[tblPdfKind].has(c.key));
+    if(!cols.length){ setBox('tblPdfError', 'Pick at least one column.'); return; }
+    const groupKey = $('tblPdfGroupBy').value || '';
+    let groups = tblPdfGroupRows(rows, groupKey, cfg.cellValue);
+    if(groupKey && tblPdfGroupVals && tblPdfGroupValsKey === groupKey){
+      groups = groups.filter(g => tblPdfGroupVals.has(g.label));
+      if(!groups.length){ setBox('tblPdfError', 'Pick at least one value to include.'); return; }
+    }
+    sections = groups.map(g => ({label: g.label, table: tblPdfBuildTable(g.rows, cols, cfg.cellValue)}));
+  }else{
+    const sourceTable = document.querySelector('#tabResAll table');
+    if(!sourceTable){ setBox('tblPdfError', 'Nothing to export yet.'); return; }
+    sections = [{label: '', table: tblPdfCleanTable(sourceTable.cloneNode(true))}];
+  }
+
+  const title = ($('tblPdfTitle').value || '').trim().slice(0, 80) || 'Export';
+  const subtitle = ($('tblPdfSubtitle').value || '').trim().slice(0, 120);
+  const footer = ($('tblPdfFooter').value || '').trim().slice(0, 120);
+  const theme = $('tblPdfTheme').value || 'emerald';
+  const logoDataUrl = tblPdfLogoDataUrl;
+  await withBusy(btn, async () => {
+    const root = $('tblPdfExportRoot');
+    root.className = 'pdf-doc pdf-theme-' + theme;
+    root.dir = document.documentElement.dir; root.lang = document.documentElement.lang;
+    const { jsPDF } = window.jspdf;
+    const issued = new Date().toLocaleDateString(lang === 'ar' ? 'ar-u-nu-latn' : 'en-GB', {day: '2-digit', month: 'short', year: 'numeric'});
+    const pw = 297, ph = 210, margin = 7;
+    const contentW = pw - margin * 2, contentH = ph - margin * 2;
+    let pdf = null;
+    try{
+      // Every section (table) gets its own banner/heading, then is captured and sliced across as many
+      // physical pages as its row count needs — so a single big group still paginates cleanly, and every
+      // table ends up in the same PDF, one after another.
+      for(let si = 0; si < sections.length; si++){
+        const sec = sections[si];
+        const page = document.createElement('div'); page.className = 'pdf-page';
+        const showBanner = si === 0;
+        const logoBox = logoDataUrl ? `<img src="${logoDataUrl}" alt="">` : '';
+        const bannerHtml = `
+          <div class="pdf-banner">
+            <div class="pdf-banner-logo">${logoBox}</div>
+            <div class="pdf-banner-text">
+              <div class="pdf-eyebrow">${esc(sections.length > 1 ? `${si + 1} / ${sections.length}` : L('Export', 'تصدير'))}</div>
+              <div class="pdf-title">${esc(title)}</div>
+              ${subtitle ? `<div class="pdf-subtitle">${esc(subtitle)}</div>` : ''}
+            </div>
+            <div class="pdf-banner-badge"><b>${esc(issued)}</b><small>${esc(L('Issued', 'تاريخ الإصدار'))}</small></div>
+          </div>
+          ${sec.label ? `<div class="pdf-section-title">${esc(sec.label)}</div>` : ''}
+        `;
+        const slimHtml = `
+          <div class="pdf-slim-head">
+            <span class="pdf-slim-title">${esc(sec.label || title)}</span>
+            <span class="pdf-slim-page">${esc(`${si + 1} / ${sections.length}`)}</span>
+          </div>
+        `;
+        page.innerHTML = `
+          ${showBanner ? bannerHtml : slimHtml}
+          <div class="pdf-tablewrap"></div>
+          <div class="pdf-footer"><span>${esc(footer)}</span><b>JUMJ</b></div>
+        `;
+        page.querySelector('.pdf-tablewrap').appendChild(sec.table);
+        root.innerHTML = ''; root.appendChild(page);
+        await new Promise(r => setTimeout(r, 30));
+
+        const canvas = await html2canvas(page, {scale: 2, backgroundColor: '#f6f2e6', useCORS: true});
+        const pxPerMm = canvas.width / contentW;
+        const pageContentPx = Math.floor(contentH * pxPerMm);
+        const totalPages = Math.max(1, Math.ceil(canvas.height / pageContentPx));
+        for(let i = 0; i < totalPages; i++){
+          if(!pdf) pdf = new jsPDF({orientation: 'landscape', unit: 'mm', format: 'a4'});
+          else pdf.addPage('a4', 'landscape');
+          pdf.setFillColor(246, 242, 230); pdf.rect(0, 0, pw, ph, 'F');
+          const sy = i * pageContentPx;
+          const sh = Math.min(pageContentPx, canvas.height - sy);
+          const slice = document.createElement('canvas');
+          slice.width = canvas.width; slice.height = sh;
+          slice.getContext('2d').drawImage(canvas, 0, sy, canvas.width, sh, 0, 0, canvas.width, sh);
+          const img = slice.toDataURL('image/jpeg', 0.95);
+          const h = sh / pxPerMm;
+          pdf.addImage(img, 'JPEG', margin, margin, contentW, h);
+        }
+      }
+      const fname = (title || 'export').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').slice(0, 60) || 'export';
+      pdf.save(`${fname}.pdf`);
+      closeTblPdfModal();
+    }catch(err){
+      console.error('PDF export failed', err);
+      setBox('tblPdfError', 'Could not generate the PDF: ' + (err.message || err));
+    }finally{
+      root.innerHTML = ''; root.removeAttribute('dir'); root.removeAttribute('lang'); root.className = '';
+    }
+  });
+}
+$('tblPdfGenerate').addEventListener('click', tblGeneratePdf);
+
+// ---------------------------------------------------------------- timetable create / rename / duplicate / delete
+function ttFillGroupSelects(dept, batch){
+  const uniq = (k) => Array.from(new Set(allStudents.map(s => s[k]).filter(Boolean))).sort((a, b) => String(a).localeCompare(String(b), undefined, {numeric: true}));
+  const opt = (vals, cur) => `<option value="">Any</option>` + vals.concat(cur && !vals.includes(cur) ? [cur] : []).map(v => `<option value="${esc(v)}">${esc(v)}</option>`).join('');
+  $('ttFormDept').innerHTML = opt(uniq('department'), dept); $('ttFormDept').value = dept || '';
+  $('ttFormBatch').innerHTML = opt(uniq('batch'), batch); $('ttFormBatch').value = batch || '';
+}
+function openTtForm(mode){
+  ttFormMode = mode; const t = ttCur();
+  $('ttFormTitle').textContent = mode === 'new' ? 'New timetable' : 'Timetable settings';
+  $('ttFormName').value = mode === 'edit' && t ? t.name : '';
+  ttFillGroupSelects(mode === 'edit' && t ? t.department : '', mode === 'edit' && t ? t.batch : '');
+  $('ttFormSave').textContent = mode === 'new' ? 'Create' : 'Save changes';
+  $('ttFormDup').classList.toggle('hidden', mode !== 'edit'); $('ttFormDel').classList.toggle('hidden', mode !== 'edit');
+  setBox('ttFormError', ''); $('ttConfigCard').classList.add('hidden');
+  $('ttFormCard').classList.remove('hidden'); $('ttFormName').focus();
+}
+$('ttNewBtn').addEventListener('click', () => openTtForm('new'));
+$('ttEmptyCreate').addEventListener('click', () => openTtForm('new'));
+$('ttSettingsBtn').addEventListener('click', () => { if(ttCur()) openTtForm('edit'); });
+$('ttFormClose').addEventListener('click', () => $('ttFormCard').classList.add('hidden'));
+$('ttFormSave').addEventListener('click', async () => {
+  setBox('ttFormError', '');
+  const name = $('ttFormName').value.trim(), department = $('ttFormDept').value, batch = $('ttFormBatch').value;
+  if(!name){ setBox('ttFormError', 'Enter a name.'); return; }
+  const btn = $('ttFormSave'); setBusy(btn, true);
+  try{
+    if(ttFormMode === 'new'){
+      const id = slugify(name) + '-' + Math.random().toString(36).slice(2, 5), now = new Date().toISOString();
+      await setDoc(doc(db, 'timetables', id), {name, department, batch, slots: {}, createdAt: now, updatedAt: now});
+      logAdminAction('timetable.created', {uid: id, name}, `Created timetable "${name}".`);
+      ttCurrentId = id;
+    }else{
+      const t = ttCur(); if(!t) return;
+      await updateDoc(doc(db, 'timetables', t.id), {name, department, batch, updatedAt: new Date().toISOString()});
+      logAdminAction('timetable.updated', {uid: t.id, name}, `Updated timetable "${name}".`);
+    }
+    await ttLoad(true); $('ttFormCard').classList.add('hidden'); renderTimetableScreen();
+  }catch(err){ setBox('ttFormError', err.message || 'Could not save the timetable.'); }
+  finally{ setBusy(btn, false); }
+});
+$('ttFormDup').addEventListener('click', async () => {
+  const t = ttCur(); if(!t) return; const btn = $('ttFormDup'); setBusy(btn, true);
+  try{
+    const name = `Copy of ${t.name}`, id = slugify(name) + '-' + Math.random().toString(36).slice(2, 5), now = new Date().toISOString();
+    await setDoc(doc(db, 'timetables', id), {name, department: t.department, batch: t.batch, slots: JSON.parse(JSON.stringify(t.slots || {})), createdAt: now, updatedAt: now});
+    logAdminAction('timetable.created', {uid: id, name}, `Duplicated timetable "${t.name}" as "${name}".`);
+    ttCurrentId = id; await ttLoad(true); $('ttFormCard').classList.add('hidden'); renderTimetableScreen();
+  }catch(err){ setBox('ttFormError', err.message || 'Could not duplicate the timetable.'); }
+  finally{ setBusy(btn, false); }
+});
+$('ttFormDel').addEventListener('click', async () => {
+  const t = ttCur(); if(!t) return;
+  if(!confirm(`Delete timetable "${t.name}"? This removes its whole schedule.`)) return;
+  const btn = $('ttFormDel'); setBusy(btn, true);
+  try{ await deleteDoc(doc(db, 'timetables', t.id)); logAdminAction('timetable.deleted', {uid: t.id, name: t.name}, `Deleted timetable "${t.name}".`); ttCurrentId = null; await ttLoad(true); $('ttFormCard').classList.add('hidden'); renderTimetableScreen(); }
+  catch(err){ setBox('ttFormError', err.message || 'Could not delete the timetable.'); }
+  finally{ setBusy(btn, false); }
+});
+
+// ---------------------------------------------------------------- configuration: days, periods, options
+function openTtConfig(){
+  ttDraft = JSON.parse(JSON.stringify(ttConfig));
+  ttDraft.order = [...ttDraft.days, ...TT_DAYS.filter(d => !ttDraft.days.includes(d))];
+  ttDraft.enabled = new Set(ttDraft.days);
+  $('ttFormCard').classList.add('hidden');
+  renderTtConfig(); setBox('ttConfigError', '');
+  $('ttConfigCard').classList.remove('hidden');
+}
+function renderTtConfig(){
+  const d = ttDraft;
+  $('ttDaysList').innerHTML = d.order.map((k, i) => `
+    <div class="tt-dayrow ${d.enabled.has(k) ? '' : 'off'}" data-day="${k}">
+      <label><input type="checkbox" class="ttDayChk" ${d.enabled.has(k) ? 'checked' : ''}> <span>${esc(ttDayName(k))}</span></label>
+      <span class="tt-mv"><button type="button" class="linkbtn" data-mv="-1" ${i === 0 ? 'disabled' : ''}>↑</button><button type="button" class="linkbtn" data-mv="1" ${i === d.order.length - 1 ? 'disabled' : ''}>↓</button></span>
+    </div>`).join('');
+  $('ttPresets').innerHTML = Object.entries(TT_PRESETS).map(([k, list]) => `<button type="button" class="btn btn-secondary btn-sm" data-preset="${k}">${esc(ttDayName(list[0], 'short'))}–${esc(ttDayName(list[list.length - 1], 'short'))}</button>`).join('');
+  $('ttPeriodsBody').innerHTML = d.periods.map((p, i) => `
+    <tr data-i="${i}" class="${p.kind === 'break' ? 'brk' : ''}">
+      <td><input type="text" class="ttpLabel" value="${esc(p.label)}"></td>
+      <td><input type="time" class="ttpStart" value="${esc(p.start)}"></td>
+      <td><input type="time" class="ttpEnd" value="${esc(p.end)}"></td>
+      <td><select class="ttpKind"><option value="class" ${p.kind === 'class' ? 'selected' : ''}>Lesson</option><option value="break" ${p.kind === 'break' ? 'selected' : ''}>Break</option></select></td>
+      <td class="tt-mv"><button type="button" class="linkbtn" data-pmv="-1" ${i === 0 ? 'disabled' : ''}>↑</button><button type="button" class="linkbtn" data-pmv="1" ${i === d.periods.length - 1 ? 'disabled' : ''}>↓</button><button type="button" class="btn btn-danger btn-sm" data-pdel="1">✕</button></td>
+    </tr>`).join('');
+  $('ttMaxPerCell').value = d.maxPerCell; $('ttShowTeacher').checked = d.showTeacher; $('ttShowRoom').checked = d.showRoom; $('ttHour12').value = d.hour12 ? '12' : '24';
+}
+$('ttConfigBtn').addEventListener('click', () => { if($('ttConfigCard').classList.contains('hidden')) openTtConfig(); else $('ttConfigCard').classList.add('hidden'); });
+$('ttCancelConfigBtn').addEventListener('click', () => $('ttConfigCard').classList.add('hidden'));
+$('ttDaysList').addEventListener('change', (e) => { const row = e.target.closest('.tt-dayrow'); if(!row || !e.target.classList.contains('ttDayChk')) return; if(e.target.checked) ttDraft.enabled.add(row.dataset.day); else ttDraft.enabled.delete(row.dataset.day); renderTtConfig(); });
+$('ttDaysList').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-mv]'); if(!b) return; const row = b.closest('.tt-dayrow'), i = ttDraft.order.indexOf(row.dataset.day), j = i + +b.dataset.mv;
+  if(j < 0 || j >= ttDraft.order.length) return; [ttDraft.order[i], ttDraft.order[j]] = [ttDraft.order[j], ttDraft.order[i]]; renderTtConfig();
+});
+$('ttPresets').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-preset]'); if(!b) return; const list = TT_PRESETS[b.dataset.preset];
+  ttDraft.order = [...list, ...TT_DAYS.filter(d => !list.includes(d))]; ttDraft.enabled = new Set(list); renderTtConfig();
+});
+$('ttPeriodsBody').addEventListener('input', (e) => {
+  const tr = e.target.closest('tr[data-i]'); if(!tr) return; const p = ttDraft.periods[+tr.dataset.i];
+  if(e.target.classList.contains('ttpLabel')) p.label = e.target.value;
+  else if(e.target.classList.contains('ttpStart')) p.start = e.target.value;
+  else if(e.target.classList.contains('ttpEnd')) p.end = e.target.value;
+});
+$('ttPeriodsBody').addEventListener('change', (e) => { const tr = e.target.closest('tr[data-i]'); if(tr && e.target.classList.contains('ttpKind')){ ttDraft.periods[+tr.dataset.i].kind = e.target.value; renderTtConfig(); } });
+$('ttPeriodsBody').addEventListener('click', (e) => {
+  const tr = e.target.closest('tr[data-i]'); if(!tr) return; const i = +tr.dataset.i, arr = ttDraft.periods;
+  const mv = e.target.closest('[data-pmv]'); if(mv){ const j = i + +mv.dataset.pmv; if(j >= 0 && j < arr.length){ [arr[i], arr[j]] = [arr[j], arr[i]]; renderTtConfig(); } return; }
+  if(e.target.closest('[data-pdel]')){ arr.splice(i, 1); renderTtConfig(); }
+});
+function ttAddPeriod(kind){
+  const last = ttDraft.periods[ttDraft.periods.length - 1], start = last ? last.end : '08:00', s = ttMin(start), len = kind === 'break' ? 15 : 45;
+  const n = ttDraft.periods.filter(p => p.kind === kind).length + 1;
+  ttDraft.periods.push({id: ttId(), label: kind === 'break' ? 'Break' : 'Period ' + n, start, end: ttHM((isNaN(s) ? 480 : s) + len), kind}); renderTtConfig();
+}
+$('ttAddPeriodBtn').addEventListener('click', () => ttAddPeriod('class'));
+$('ttAddBreakBtn').addEventListener('click', () => ttAddPeriod('break'));
+$('ttGenBtn').addEventListener('click', () => {
+  const g = ttGenerate({start: $('ttGenStart').value, minutes: $('ttGenMinutes').value, count: $('ttGenCount').value, breakAfter: $('ttGenBreakAfter').value, breakMinutes: $('ttGenBreakMin').value, lunchAfter: $('ttGenLunchAfter').value, lunchMinutes: $('ttGenLunchMin').value});
+  // keep existing ids (in order, per kind) so subjects already scheduled stay in place
+  const pool = {class: ttDraft.periods.filter(p => p.kind === 'class').map(p => p.id), break: ttDraft.periods.filter(p => p.kind === 'break').map(p => p.id)};
+  g.forEach(p => { const id = pool[p.kind].shift(); if(id) p.id = id; });
+  ttDraft.periods = g; renderTtConfig();
+});
+$('ttSaveConfigBtn').addEventListener('click', async () => {
+  setBox('ttConfigError', '');
+  const d = ttDraft;
+  const days = d.order.filter(k => d.enabled.has(k));
+  if(!days.length){ setBox('ttConfigError', 'Pick at least one day.'); return; }
+  if(!d.periods.some(p => p.kind === 'class')){ setBox('ttConfigError', 'Add at least one class period.'); return; }
+  if(d.periods.some(p => !String(p.label).trim())){ setBox('ttConfigError', 'Every period needs a label.'); return; }
+  if(d.periods.some(p => !(ttMin(p.end) > ttMin(p.start)))){ setBox('ttConfigError', 'Check the times — each period must end after it starts.'); return; }
+  const cfg = {days, periods: d.periods.map(p => ({id: p.id, label: String(p.label).trim().slice(0, 40), start: p.start, end: p.end, kind: p.kind})),
+    maxPerCell: Math.min(4, Math.max(1, +$('ttMaxPerCell').value || 1)), showTeacher: $('ttShowTeacher').checked, showRoom: $('ttShowRoom').checked, hour12: $('ttHour12').value === '12'};
+  // entries that sit on a removed day / period / break would be lost — say so first
+  const valid = new Set(); cfg.days.forEach(k => cfg.periods.filter(p => p.kind === 'class').forEach(p => valid.add(ttSlotKey(k, p.id))));
+  let lost = 0; ttTables.forEach(t => Object.entries(t.slots || {}).forEach(([k, arr]) => { if(!valid.has(k)) lost += (arr || []).length; }));
+  if(lost && !confirm(`Removing days or periods will delete ${lost} scheduled subject(s). Continue?`)) return;
+  const btn = $('ttSaveConfigBtn'); setBusy(btn, true);
+  try{
+    await setDoc(doc(db, 'settings', 'timetable'), {...cfg, updatedAt: new Date().toISOString()});
+    for(const t of ttTables){
+      const clean = {}; let changed = false;
+      Object.entries(t.slots || {}).forEach(([k, arr]) => { if(valid.has(k) && arr && arr.length) clean[k] = arr; else changed = true; });
+      if(changed){ await updateDoc(doc(db, 'timetables', t.id), {slots: clean, updatedAt: new Date().toISOString()}); t.slots = clean; }
+    }
+    ttConfig = ttNormalizeConfig(cfg);
+    logAdminAction('timetable.updated', {uid: 'settings/timetable', name: 'Timetable configuration'}, `Updated timetable days/periods configuration${lost ? ` (${lost} scheduled subject(s) removed)` : ''}.`);
+    $('ttConfigCard').classList.add('hidden'); renderTimetableScreen();
+    setBox('ttOk', 'Saved configuration.', 'ok');
+  }catch(err){ setBox('ttConfigError', err.message || 'Could not save the configuration.'); }
+  finally{ setBusy(btn, false); }
+});
+
 // ================================================================
 // Admin access control — who can open what
 // Stored on /admins/{uid}.permissions as { students:{all,bulk,individual}, teachers:{…}, subject:{overview,roster,results,grading,settings,enroll}, admins:{manage} }.
@@ -4844,7 +6301,8 @@ const PERM_GROUPS = [
   {id:'students', title:'Student operations', short:'Students', items:[['students.all','All students'],['students.bulk','Bulk import'],['students.individual','Add individually']]},
   {id:'teachers', title:'Teacher operations', short:'Teachers', items:[['teachers.all','All teachers'],['teachers.bulk','Bulk import'],['teachers.individual','Add individually']]},
   {id:'subject',  title:'Access to subjects', short:'Subjects', items:[['subject.overview','Overview'],['subject.roster','Roster'],['subject.results','Results'],['subject.grading','Grading'],['subject.settings','Settings'],['subject.enroll','Enroll']]},
-  {id:'admins',   title:'Administration',     short:'Admins',   items:[['admins.manage','Manage admins']]},
+  {id:'timetable', title:'Timetable', short:'Timetable', items:[['timetable.view','View timetables'],['timetable.edit','Edit timetables'],['timetable.config','Configure days & periods']]},
+  {id:'admins',   title:'Administration',     short:'Admins',   items:[['admins.manage','Manage admins'],['admins.log','View admin activity log']]},
 ];
 const ALL_PERMS = PERM_GROUPS.flatMap(g => g.items.map(i => i[0]));
 const PERM_BY_TAB = {
@@ -4876,13 +6334,14 @@ function canAny(prefix){ return ALL_PERMS.some(k => k.startsWith(prefix) && acce
 // What each admin may READ — kept identical to firestore.rules (mayReadStudents / mayReadResults / mayReadTeachers / mayReadSubjects).
 function canReadStudentsData(){ return canAny('students.') || can('subject.overview') || can('subject.roster') || can('subject.results') || can('subject.enroll') || can('subject.settings'); }
 function canReadResultsData(){ return can('students.all') || can('subject.overview') || can('subject.roster') || can('subject.results') || can('subject.settings'); }
-function canReadTeachersData(){ return canAny('teachers.') || can('subject.settings'); }
-function canReadSubjectsData(){ return canAny('subject.') || canAny('teachers.') || canAny('students.'); }
+function canReadTeachersData(){ return canAny('teachers.') || can('subject.settings') || can('timetable.edit'); }
+function canReadSubjectsData(){ return canAny('subject.') || canAny('teachers.') || canAny('students.') || canAny('timetable.'); }
 
 function firstAllowedPath(){
   if(canAny('subject.')) return 'subjects';
   if(canAny('students.')) return 'students';
   if(canAny('teachers.')) return 'teachers';
+  if(canAny('timetable.')) return 'timetable';
   if(can('admins.manage')) return 'admins';
   return 'noaccess';
 }
@@ -4901,6 +6360,7 @@ function guardRoute(r){
     case 'students': return canAny('students.') ? null : firstAllowedPath();
     case 'student': return can('students.all') ? null : (canAny('students.') ? 'students' : firstAllowedPath());
     case 'teachers': return canAny('teachers.') ? null : firstAllowedPath();
+    case 'timetable': return canAny('timetable.') ? null : firstAllowedPath();
     case 'admins': return can('admins.manage') ? null : firstAllowedPath();
   }
   return null;
@@ -4926,6 +6386,7 @@ function applyAccessUI(){
   });
   const ae = $('autoEnrollChk');
   if(ae){ const ok = can('subject.enroll'); const lab = ae.closest('label'); if(lab) lab.classList.toggle('perm-hidden', !ok); if(!ok) ae.checked = false; }
+  refreshAdminLogBadge();
 }
 // Links to a student's profile do nothing for admins without "All students".
 document.addEventListener('click', (e) => {
@@ -4954,12 +6415,18 @@ async function recheckAccess(){
   if(rec.status === 'none'){ await signOut(auth).catch(()=>{}); return; }
   const before = JSON.stringify([...access.perms].sort());
   setAccess(rec.data);
-  if(JSON.stringify([...access.perms].sort()) !== before) refreshUI();
+  myLogSeenAt = (rec.data && rec.data.logSeenAt) || myLogSeenAt;
+  if(JSON.stringify([...access.perms].sort()) !== before) refreshUI(); else refreshAdminLogBadge();
 }
 document.addEventListener('visibilitychange', () => { if(!document.hidden && bootstrapped) recheckAccess(); });
 
 // ================================================================
 // Admins screen — create admins and choose what each may open
+// A super admin (anyone with admins.manage) can never be edited or deleted from here — by anyone,
+// including other super admins — and nobody can edit their own admin access. This protects against a
+// locked-out console (nobody can revoke or downgrade themselves) and against one super admin quietly
+// stripping another super admin's access. Both restrictions must also be mirrored in firestore.rules —
+// this UI guard is not a substitute for the server-side check.
 // ================================================================
 let allAdmins = [], adminsLoaded = false, adminEditing = null;
 async function loadAdmins(){
@@ -4976,9 +6443,29 @@ function accessChips(a){
   PERM_GROUPS.forEach(g => {
     const n = g.items.filter(([k]) => p.has(k)).length;
     if(!n) return;
-    chips.push(g.id === 'admins' ? '<span class="chip">Manage admins</span>' : `<span class="chip">${g.short} ${n}/${g.items.length}</span>`);
+    chips.push(g.id === 'admins' ? `<span class="chip">${g.items.filter(([k]) => p.has(k)).map(([,l]) => l).join(', ')}</span>` : `<span class="chip">${g.short} ${n}/${g.items.length}</span>`);
   });
   return chips.length ? `<span class="chips">${chips.join('')}</span>` : '<span class="chip danger">No access</span>';
+}
+// Can the signed-in admin delete this row from the UI? Never their own row, never a super admin's row —
+// deletion is irreversible from here, so both self and other super admins are always protected.
+function adminRowDeleteLocked(a){
+  const me = auth.currentUser ? auth.currentUser.uid : null;
+  return a.uid === me || adminPerms(a).has('admins.manage');
+}
+// Can the signed-in admin open this row in the editor? Your own row is always openable — that's the only way
+// to turn the "no permissions field = full access" fallback into an explicit map (see the bootstrap guide) —
+// but another super admin's row is protected from everyone, including other super admins.
+function adminRowEditLocked(a){
+  const me = auth.currentUser ? auth.currentUser.uid : null;
+  if(a.uid === me) return false;
+  return adminPerms(a).has('admins.manage');
+}
+function adminRowLockReason(a, action){
+  const me = auth.currentUser ? auth.currentUser.uid : null;
+  if(action === 'delete' && a.uid === me) return 'You cannot delete your own admin access.';
+  if(a.uid !== me && adminPerms(a).has('admins.manage')) return 'Super admins are protected — they cannot be edited or deleted from here.';
+  return '';
 }
 function renderAdminsScreen(){
   if(!adminsLoaded && !renderAdminsScreen._loading){
@@ -4991,13 +6478,15 @@ function renderAdminsScreen(){
   $('adminsBody').innerHTML = allAdmins.length ? allAdmins.map(a => {
     const isMe = a.uid === me;
     const manager = adminPerms(a).has('admins.manage');
+    const editLocked = adminRowEditLocked(a), deleteLocked = adminRowDeleteLocked(a);
+    const editReason = adminRowLockReason(a, 'edit'), deleteReason = adminRowLockReason(a, 'delete');
     return `<tr data-uid="${esc(a.uid)}">
       <td>${esc(a.name || '—')} ${isMe ? '<span class="chip gold">You</span>' : ''}</td>
       <td class="mono">${esc(a.email || a.uid)}</td>
       <td>${accessChips(a)}</td>
       <td>${manager ? '<span class="chip">Super admin</span>' : '<span class="chip muted">Admin</span>'}</td>
-      <td><button class="btn btn-secondary btn-sm admEdit">Edit access</button></td>
-      <td><button class="btn btn-danger btn-sm admDelete" ${isMe ? 'disabled' : ''}>Delete</button></td>
+      <td><button class="btn btn-secondary btn-sm admEdit" ${editLocked ? 'disabled' : ''} ${editLocked ? `title="${esc(editReason)}"` : ''}>Edit access</button></td>
+      <td><button class="btn btn-danger btn-sm admDelete" ${deleteLocked ? 'disabled' : ''} ${deleteLocked ? `title="${esc(deleteReason)}"` : ''}>Delete</button></td>
     </tr>`;
   }).join('') : `<tr><td colspan="6">${adminsLoaded ? 'No admins found.' : 'Loading…'}</td></tr>`;
 }
@@ -5010,6 +6499,7 @@ function renderPermGroups(selected){
 }
 function readPermGroups(){ return new Set(Array.from($('admPermGroups').querySelectorAll('input[data-perm-key]:checked')).map(i => i.dataset.permKey)); }
 function openAdminEditor(a){
+  if(a && adminRowEditLocked(a)){ setBox('adminsError', adminRowLockReason(a, 'edit')); return; }
   adminEditing = a || null;
   $('adminEditor').classList.remove('hidden');
   $('adminEditorTitle').textContent = a ? 'Edit access' : 'New admin';
@@ -5044,9 +6534,13 @@ $('adminsBody').addEventListener('click', async (e) => {
   if(e.target.closest('.admEdit')){ openAdminEditor(a); return; }
   if(e.target.closest('.admDelete')){
     setBox('adminsError',''); setBox('adminsOk','');
-    if(a.uid === (auth.currentUser && auth.currentUser.uid)){ setBox('adminsError', 'You cannot delete your own admin access.'); return; }
+    if(adminRowDeleteLocked(a)){ setBox('adminsError', adminRowLockReason(a, 'delete')); return; }
     if(!confirm(`Delete ${a.name || a.email || a.uid}'s admin access? They will no longer be able to open the console. (Their sign-in account itself is not deleted.)`)) return;
-    try{ await deleteDoc(doc(db, 'admins', a.uid)); await loadAdmins(); renderAdminsScreen(); setBox('adminsOk', `Removed ${a.name || a.email || a.uid}.`, 'ok'); }
+    try{
+      await deleteDoc(doc(db, 'admins', a.uid));
+      logAdminAction('admin.deleted', a, `Removed admin access for ${a.name || a.email || a.uid}.`);
+      await loadAdmins(); renderAdminsScreen(); setBox('adminsOk', `Removed ${a.name || a.email || a.uid}.`, 'ok');
+    }
     catch(err){ setBox('adminsError', err.message || 'Could not delete admin.'); }
   }
 });
@@ -5060,13 +6554,15 @@ $('admSaveBtn').addEventListener('click', async () => {
   const btn = $('admSaveBtn');
   try{
     if(adminEditing){
-      if(adminEditing.uid === me && !perms.has('admins.manage')){ setBox('admError', 'You cannot remove your own admin-management access.'); return; }
+      // Defense in depth — the Edit button is already disabled/hidden for these rows, but never trust the UI alone.
+      if(adminRowEditLocked(adminEditing)){ setBox('admError', adminRowLockReason(adminEditing, 'edit')); return; }
+      if(adminEditing.uid === me && !perms.has('admins.manage')){ setBox('admError', 'You cannot remove your own "Manage admins" permission — have another super admin do it, or you\'ll lock yourself out.'); return; }
       setBusy(btn, true);
       const payload = {role, permissions: permsToDoc(perms)};
       if(name) payload.name = name;
       if(!adminEditing.email && email) payload.email = email;
       await setDoc(doc(db, 'admins', adminEditing.uid), payload, {merge:true});
-      if(adminEditing.uid === me){ setAccess({permissions: payload.permissions}); }
+      logAdminAction('admin.updated', adminEditing, `Updated access for ${name || adminEditing.name || adminEditing.email || adminEditing.uid}.`);
       setBox('adminsOk', `Saved ${name || adminEditing.name || adminEditing.email || adminEditing.uid}'s access.`, 'ok');
     }else{
       if(!/^\S+@\S+\.\S+$/.test(email)){ setBox('admError', 'Enter a valid email.'); return; }
@@ -5074,12 +6570,111 @@ $('admSaveBtn').addEventListener('click', async () => {
       setBusy(btn, true);
       const uid = await createAuthUser(email, password);
       await setDoc(doc(db, 'admins', uid), {name, email, role, permissions: permsToDoc(perms), createdAt: new Date().toISOString(), createdBy: me});
+      logAdminAction('admin.created', {uid, name, email}, `Created ${role === 'super' ? 'super admin' : 'admin'} ${name}.`);
       setBox('adminsOk', `Created admin ${name}.`, 'ok');
     }
     await loadAdmins(); closeAdminEditor(); renderAdminsScreen(); refreshUI();
   }catch(err){
     setBox('admError', err && err.code === 'auth/email-already-in-use' ? 'That email already has an account (it may be a student or teacher account). Use a different email.' : (err.message || 'Could not save admin.'));
   }finally{ setBusy(btn, false); }
+});
+
+// ================================================================
+// Admin activity log — every create/update/delete of an admin is recorded here.
+// Visible only to admins with the admins.log permission (in practice, super admins), and drives the
+// notification bell so a super admin can see at a glance what other admins have been doing.
+// ================================================================
+let allAdminLogs = [], adminLogsLoaded = false, myLogSeenAt = '';
+const ADMIN_LOG_LABELS = {
+  'admin.created':'Created admin', 'admin.updated':'Updated admin access', 'admin.deleted':'Deleted admin',
+  'student.created':'Created student', 'student.updated':'Updated student', 'student.deleted':'Deleted student',
+  'teacher.created':'Created teacher', 'teacher.updated':'Updated teacher', 'teacher.deleted':'Deleted teacher',
+  'subject.created':'Created subject', 'subject.updated':'Updated subject', 'subject.deleted':'Deleted subject',
+  'timetable.created':'Created timetable', 'timetable.updated':'Updated timetable', 'timetable.deleted':'Deleted timetable',
+};
+async function loadAdminLogs(){
+  const snap = await getDocs(collection(db, ADMIN_LOGS));
+  allAdminLogs = snap.docs.map(d => ({id: d.id, ...d.data()}));
+  allAdminLogs.sort((a,b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
+  adminLogsLoaded = true;
+}
+// Fire-and-forget: an admin action should never fail to save just because the log write hiccuped.
+function logAdminAction(action, target, details){
+  const u = auth.currentUser;
+  addDoc(collection(db, ADMIN_LOGS), {
+    action, details: details || '',
+    actorUid: u ? u.uid : null, actorName: adminName, actorEmail: u ? u.email : null,
+    targetUid: (target && target.uid) || null, targetName: (target && (target.name || target.email || target.uid)) || null, targetEmail: (target && target.email) || null,
+    createdAt: new Date().toISOString(),
+  }).catch(err => console.error('Could not write admin log', err))
+    .finally(() => { adminLogsLoaded = false; refreshAdminLogBadge(); });
+}
+function unseenAdminLogCount(){
+  const me = auth.currentUser ? auth.currentUser.uid : null;
+  return allAdminLogs.filter(l => l.actorUid !== me && String(l.createdAt || '') > (myLogSeenAt || '')).length;
+}
+async function refreshAdminLogBadge(){
+  if(!can('admins.log')) return;
+  if(!adminLogsLoaded && !refreshAdminLogBadge._loading){
+    refreshAdminLogBadge._loading = true;
+    try{ await loadAdminLogs(); }catch(err){ console.error('Could not load admin logs', err); }
+    refreshAdminLogBadge._loading = false;
+  }
+  const n = unseenAdminLogCount();
+  const badge = $('admLogBellBadge');
+  if(badge){ badge.textContent = n > 99 ? '99+' : String(n); badge.classList.toggle('hidden', n === 0); }
+  if(route.view === 'admins') renderAdminLogScreen();
+}
+async function markAdminLogSeen(){
+  const u = auth.currentUser; if(!u) return;
+  myLogSeenAt = new Date().toISOString();
+  const badge = $('admLogBellBadge'); if(badge) badge.classList.add('hidden');
+  try{ await setDoc(doc(db, 'admins', u.uid), {logSeenAt: myLogSeenAt}, {merge:true}); }
+  catch(err){ console.error('Could not save log seen state', err); }
+}
+function renderAdminLogScreen(){
+  if(!adminLogsLoaded && !renderAdminLogScreen._loading){
+    renderAdminLogScreen._loading = true;
+    loadAdminLogs().catch(err => setBox('admLogError', 'Could not load activity log: ' + (err.message || err)))
+      .finally(() => { renderAdminLogScreen._loading = false; if(route.view === 'admins') renderAdminLogScreen(); refreshAdminLogBadge(); });
+  }
+  const el = $('admLogCount'); if(el) el.innerHTML = `<b>${allAdminLogs.length}</b> entr${allAdminLogs.length === 1 ? 'y' : 'ies'}`;
+  const me = auth.currentUser ? auth.currentUser.uid : null;
+  const body = $('admLogBody'); if(!body) return;
+  body.innerHTML = allAdminLogs.length ? allAdminLogs.slice(0, 300).map(l => {
+    const when = l.createdAt ? new Date(l.createdAt).toLocaleString() : '—';
+    const isNew = l.actorUid !== me && String(l.createdAt || '') > (myLogSeenAt || '');
+    return `<tr class="${isNew ? 'dirty' : ''}">
+      <td class="mono">${esc(when)}</td>
+      <td>${esc(l.actorName || l.actorEmail || l.actorUid || '—')}</td>
+      <td>${esc(ADMIN_LOG_LABELS[l.action] || l.action || '—')}</td>
+      <td>${esc(l.details || (l.targetName ? `Target: ${l.targetName}` : '—'))}</td>
+    </tr>`;
+  }).join('') : `<tr><td colspan="4">${adminLogsLoaded ? 'No activity yet.' : 'Loading…'}</td></tr>`;
+}
+$('admLogRefreshBtn').addEventListener('click', async () => {
+  setBox('admLogError','');
+  await withBusy($('admLogRefreshBtn'), async () => { try{ await loadAdminLogs(); }catch(err){ setBox('admLogError', 'Could not load activity log: ' + (err.message || err)); } });
+  renderAdminLogScreen();
+});
+$('admLogClearBtn').addEventListener('click', async () => {
+  setBox('admLogError','');
+  if(!adminLogsLoaded){ try{ await loadAdminLogs(); }catch(err){ setBox('admLogError', 'Could not load activity log: ' + (err.message || err)); return; } }
+  if(!allAdminLogs.length){ setBox('admLogError', 'The activity log is already empty.'); return; }
+  if(!confirm(`Permanently delete all ${allAdminLogs.length} activity log entr${allAdminLogs.length === 1 ? 'y' : 'ies'}? This can't be undone.`)) return;
+  const btn = $('admLogClearBtn'); setBusy(btn, true);
+  try{
+    for(const group of chunk(allAdminLogs.map(l => l.id), 400)){
+      const batch = writeBatch(db);
+      group.forEach(id => batch.delete(doc(db, ADMIN_LOGS, id)));
+      await batch.commit();
+    }
+    const n = allAdminLogs.length;
+    allAdminLogs = []; adminLogsLoaded = true;
+    renderAdminLogScreen(); refreshAdminLogBadge();
+    setBox('admLogError', `Cleared ${n} activity log entr${n === 1 ? 'y' : 'ies'}.`, 'ok');
+  }catch(err){ setBox('admLogError', err.message || 'Could not clear the activity log.'); }
+  finally{ setBusy(btn, false); }
 });
 
 // ================================================================
@@ -5119,6 +6714,7 @@ async function handleAuthUser(user, attempt = 0){
       setBusy(adminSignInBtn, false); return;
     }
     setAccess(rec.data);
+    myLogSeenAt = (rec.data && rec.data.logSeenAt) || '';
     loginScreen.classList.add('hidden'); appShell.classList.remove('hidden');
     $('sidebarUserEmail').textContent = user.email;
     { const p = (user.email || 'admin').split('@')[0]; adminName = (rec.data && rec.data.name) ? rec.data.name : p.charAt(0).toUpperCase() + p.slice(1); }
@@ -5138,6 +6734,7 @@ async function handleAuthUser(user, attempt = 0){
     bootstrapped = false; lastRouteKey = ''; wsSlug = null;
     resultsStore.clear(); loadedSubjects.clear(); globalLoaded = false; globalTried = false;
     allAdmins = []; adminsLoaded = false; closeAdminEditor();
+    allAdminLogs = []; adminLogsLoaded = false; myLogSeenAt = '';
     access = {legacy:false, perms:new Set()};
     appShell.classList.add('hidden'); loginScreen.classList.remove('hidden');
     setBusy(adminSignInBtn, false);
