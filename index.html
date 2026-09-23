@@ -7712,6 +7712,10 @@ async function handleAuthUser(user, attempt = 0){
     cachePurgeUser(cacheUid); cacheUid = null;
     bootstrapped = false; lastRouteKey = ''; wsSlug = null;
     resultsStore.clear(); loadedSubjects.clear(); globalLoaded = false; globalTried = false;
+    // In-memory caches (never touch localStorage, but still live in this tab) belong to whoever
+    // was signed in — wipe them too, so a second admin signing in on the same tab without a full
+    // reload can never inherit the first admin's data.
+    attnAnCache = {}; attnAnRevalidating = {}; spAttnData = new Map(); spAttnLoading = new Set();
     allAdmins = []; adminsLoaded = false; closeAdminEditor();
     allAdminLogs = []; adminLogsLoaded = false; myLogSeenAt = '';
     access = {legacy:false, perms:new Set()};
