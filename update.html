@@ -2041,7 +2041,6 @@ body.dlg-open{overflow:hidden}
                   <button class="btn btn-secondary btn-sm" id="teachRefreshBtn"><i class="fa-solid fa-rotate"></i> Refresh</button>
                 </div>
               </div>
-              <p class="hint" style="margin:0 0 10px">A ustaz can teach several qirats — tick them under "Teaches" and press Save. A qirat has one ustaz, so a qirat already taught by someone else is reassigned.</p>
               <div class="progress hidden" id="teachSaveProgress"><div class="progress-track"><span></span></div><small></small></div>
               <div class="error-box" id="teachTableError"></div>
               <div class="ok-box" id="teachTableOk"></div>
@@ -2060,7 +2059,6 @@ body.dlg-open{overflow:hidden}
                 <label for="teachCsvInput">CSV data</label>
                 <textarea id="teachCsvInput" rows="6" placeholder="name,email,phone,subjects&#10;Dr. Sara Getu,sara.getu@med.ju,0911223344,Anatomy;Physiology"></textarea>
               </div>
-              <p class="hint" style="margin-top:8px">Only name and email are required. subjects is optional: a semicolon-separated list of subject names — a teacher can have several. A subject already taught by someone else is reassigned.</p>
               <div class="btn-row"><button class="btn btn-secondary" id="parseTeachBulkBtn">Parse &amp; preview</button></div>
               <div class="error-box" id="teachBulkError"></div>
               <div class="ok-box" id="teachBulkOk"></div>
@@ -2091,7 +2089,6 @@ body.dlg-open{overflow:hidden}
 
           <div class="tab-panel" id="tabTeachIndiv">
             <div class="card">
-              <p class="hint">Look up a ustaz by email. If no account exists yet, fill in their details to create one.</p>
               <div class="field-row"><div class="field"><label for="teachLookupEmail">Ustaz email</label><input type="email" id="teachLookupEmail" placeholder="e.g. sara.getu@med.ju"></div></div>
               <div class="btn-row"><button class="btn btn-secondary" id="teachLookupBtn">Find ustaz</button></div>
               <div class="error-box" id="teachLookupError"></div>
@@ -8029,4 +8026,3 @@ function ensureToolbarToggle(root){
 </div>
 </body>
 </html>
-  
